@@ -98,7 +98,7 @@ export const RegisterForm = () => {
                                     <SelectItem value="Region IX">Zamboanga Peninsula (Region IX)</SelectItem>
                                     <SelectItem value="Region X">Northern Mindanao (Region X)</SelectItem>
                                     <SelectItem value="Region XI">Davao Region (Region XI)</SelectItem>
-                                    <SelectItem value="Region XI">SOCCSKSARGEN (Region XII)</SelectItem>
+                                    <SelectItem value="Region XII">SOCCSKSARGEN (Region XII)</SelectItem>
                                     <SelectItem value="Region XIII">Caraga (Region XIII)</SelectItem>
                                     <SelectItem value="BARMM">Bangsamoro Autonomous Region of Muslim Mindanao (BARMM)</SelectItem>
                                 </SelectContent>

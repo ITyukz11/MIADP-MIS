@@ -1,6 +1,3 @@
-import Link from "next/link"
-import { buttonVariants } from "@/components/ui/button"
-import { cn } from "@/lib/utils"
 
 import {
   PageActions,
@@ -20,9 +17,6 @@ export default function IndexPage() {
         Welcome to the MIADP Management Information System! Our system efficiently tracks encoded documents, streamlining document management processes for easy access and organization.
         </PageHeaderDescription>
         <PageActions>
-          <Link href="/supports" className={cn(buttonVariants())}>
-            I-Plan
-          </Link>
          
         </PageActions>
       </PageHeader>

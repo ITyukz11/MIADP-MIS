@@ -2,10 +2,8 @@ import * as z from "zod";
 import { LoginSchema } from "@/schemas";
 import { signIn } from "next-auth/react";
 
-
 export const login = async (values: z.infer<typeof LoginSchema>) => {
   try {
-
     const validatedFields = LoginSchema.safeParse(values);
 
     if (!validatedFields.success) {

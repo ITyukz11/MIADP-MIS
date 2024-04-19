@@ -1,4 +1,3 @@
-import Image from "next/image"
 import Link from "next/link"
 import { buttonVariants } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
@@ -9,7 +8,6 @@ import {
   PageHeaderDescription,
   PageHeaderHeading,
 } from "@/components/page-header"
-import { GitHubLogoIcon } from "@radix-ui/react-icons"
 
 export default function IndexPage() {
   return (

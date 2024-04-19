@@ -21,6 +21,7 @@ import { register } from "@/actions/register";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '../ui/select';
+import { Header } from "./header";
 
 
 export const RegisterForm = () => {
@@ -67,14 +68,14 @@ export const RegisterForm = () => {
 
     return (
         <div className=" w-96">
-            <CardWrapper
+            {/* <CardWrapper
                 headerTitle="Sign Up"
                 headerLabel="Create an account"
                 backButtonLabel="Already have an account?"
                 backButtonHref="/auth/login"
                 loading={loading}
-                showSocial>
-
+                showSocial> */}
+                <Header label='Enter your credentials below to register' title='Sign Up' />
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)}
                         className="space-y-6"
@@ -169,7 +170,7 @@ export const RegisterForm = () => {
                         </Button>
                     </form>
                 </Form>
-            </CardWrapper>
+            {/* </CardWrapper> */}
         </div>
 
     )

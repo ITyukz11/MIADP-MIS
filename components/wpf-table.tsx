@@ -39,170 +39,222 @@ import { RiArrowUpDownFill } from "react-icons/ri";
 import { IoMdAdd } from "react-icons/io";
 
 
-const data: WPFDATA[] = [
-    {
-      majorComponent: "Component 2",
-      subComponent: "Sub-Component 2",
-      wfpItem: "Item 2",
-      physical: "1200",
-      financial: "8000",
-      verificationStatus: "Pending",
-      action: "View"
-      },
-      {
-        majorComponent: "Component 3",
-        subComponent: "Sub-Component 2",
-        wfpItem: "Item 2",
-        physical: "1200",
-        financial: "8000",
-        verificationStatus: "Pending",
-        action: "View"
-      },
-      {
-        majorComponent: "Component 4",
-        subComponent: "Sub-Component 2",
-        wfpItem: "Item 2",
-        physical: "1200",
-        financial: "8000",
-        verificationStatus: "Pending",
-        action: "View"
-        },
-        {
-          majorComponent: "Component 62",
-          subComponent: "Sub-Component 2",
-          wfpItem: "Item 2",
-          physical: "1200",
-          financial: "8000",
-          verificationStatus: "Pending",
-          action: "View"
-        },
-        {
-          majorComponent: "Component 7",
-          subComponent: "Sub-Component 2",
-          wfpItem: "Item 2",
-          physical: "1200",
-          financial: "8000",
-          verificationStatus: "Pending",
-          action: "View"
-          },
-          {
-            majorComponent: "Component 37",
-            subComponent: "Sub-Component 2",
-            wfpItem: "Item 2",
-            physical: "1200",
-            financial: "8000",
-            verificationStatus: "Pending",
-            action: "View"
-          },
-          {
-            majorComponent: "Component 32",
-            subComponent: "Sub-Component 2",
-            wfpItem: "Item 2",
-            physical: "1200",
-            financial: "8000",
-            verificationStatus: "Pending",
-            action: "View"
-            },
-            {
-              majorComponent: "Component 21",
-              subComponent: "Sub-Component 2",
-              wfpItem: "Item 2",
-              physical: "1200",
-              financial: "8000",
-              verificationStatus: "Pending",
-              action: "View"
-            },
-            {
-              majorComponent: "Component 5",
-              subComponent: "Sub-Component 2",
-              wfpItem: "Item 2",
-              physical: "1200",
-              financial: "8000",
-              verificationStatus: "Pending",
-              action: "View"
-              },
-              {
-                majorComponent: "Component 12",
-                subComponent: "Sub-Component 2",
-                wfpItem: "Item 2",
-                physical: "1200",
-                financial: "8000",
-                verificationStatus: "Pending",
-                action: "View"
-              },
-]
+
 
 export type WPFDATA = {
-    majorComponent: string;
-    subComponent: string;
-    wfpItem: string;
-    physical: string;
-    financial: string
-    verificationStatus: string;
-    action: string;
-  };
-    
-  export const columns: ColumnDef<WPFDATA>[] = [
-    {
-      accessorKey: "majorComponent",
-      header: "Major Component",
-      cell: ({ row }) => (
-        <div className="capitalize">{row.getValue("majorComponent")}</div>
-      ),
-    },
-    {
-      accessorKey: "subComponent",
-      header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          >
-            Sub-Component
-            <RiArrowUpDownFill className="ml-2 h-4 w-4" />
-          </Button>
-        )
-      },
-      cell: ({ row }) => <div className="lowercase">{row.getValue("subComponent")}</div>,
-    },
-    {
-      accessorKey: "wfpItem",
-      header: () => <div>WFP Item / Deliverables</div>,
-      cell: ({ row }) => {
-        return (
-          <div>
-            {row.getValue("wfpItem")}
-          </div>
-        );
-      },
-    },
-    {
-      id: "physical",
-      header: "Physical",
-      columns: [
-        { accessorKey: "target", header: "Target" },
-        { accessorKey: "actual", header: "Actual" },
-        { accessorKey: "accomplishment", header: "Accom.%" },
-      ],
-    },
-    {
-      id: "financial",
-      header: "Financial",
-      columns: [
-        { accessorKey: "target", header: "Target" },
-        { accessorKey: "actual", header: "Actual" },
-        { accessorKey: "accomplishment", header: "Accom.%" },
-      ],
-    },
-    {
-      accessorKey: "action",
-      header: "Action",
-      cell: ({ row }) => (
-        <Button variant={'outline'} className="text-center">{row.getValue("action")}</Button>
-      ),
-    },
-  ];
+  operatingUnit: string;
+  component: string;
+  resultIndicator: string;
+  outputIndicator: string;
+  majorActivity: string
+  activities: string;
+  indicator: string;
+  // target: AnnualQuarterlyData;
+  // actualBudget: AnnualQuarterlyData;
+  // budget: AnnualQuarterlyData;
+  // physicalActual: AnnualQuarterlyData;
+  // accomplishment: AnnualQuarterlyData;
+};
+export type AnnualQuarterlyData = {
+  annual: string;
+  q1: string;
+  q2: string;
+  q3: string;
+  q4: string;
+};
+const data: WPFDATA[] = [
+  {
+    operatingUnit: "Region 10",
+    component: "Component 1",
+    resultIndicator: "-",
+    outputIndicator: "-",
+    majorActivity: "-",
+    activities: "-",
+    indicator: "-",
+    // target: {
+    //   annual: '1',
+    //   q1: '1',
+    //   q2: '1',
+    //   q3: '1',
+    //   q4: '1'
+    // },
+    // actualBudget: {
+    //   annual: '2',
+    //   q1: '2',
+    //   q2: '2',
+    //   q3: '2',
+    //   q4: '2'
+    // },
+    // budget: {
+    //   annual: '3',
+    //   q1: '3',
+    //   q2: '3',
+    //   q3: '3',
+    //   q4: '3'
+    // },
+    // physicalActual: {
+    //   annual: '4',
+    //   q1: '4',
+    //   q2: '4',
+    //   q3: '4',
+    //   q4: '4'
+    // },
+    // accomplishment: {
+    //   annual: '5',
+    //   q1: '5',
+    //   q2: '5',
+    //   q3: '5',
+    //   q4: '5'
+    // },
+  },
   
+
+]
+
+export const columns: ColumnDef<WPFDATA>[] = [
+  {
+    accessorKey: "operatingUnit",
+    header: "Operating Unit",
+    cell: ({ row }) => (
+      <div className="capitalize">{row.getValue("operatingUnit")}</div>
+    ),
+  },
+  {
+    accessorKey: "component",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Component
+          <RiArrowUpDownFill className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
+    cell: ({ row }) => <div className="lowercase">{row.getValue("component")}</div>,
+  },
+  {
+    accessorKey: "resultIndicator",
+    header: () => <div>Result Indicator</div>,
+    cell: ({ row }) => {
+      return (
+        <div>
+          {row.getValue("resultIndicator")}
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: "outputIndicator",
+    header: () => <div>Output Indicator</div>,
+    cell: ({ row }) => {
+      return (
+        <div>
+          {row.getValue("outputIndicator")}
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: "majorActivity",
+    header: () => <div>Major Activity</div>,
+    cell: ({ row }) => {
+      return (
+        <div>
+          {row.getValue("majorActivity")}
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: "activities",
+    header: () => <div>Activities</div>,
+    cell: ({ row }) => {
+      return (
+        <div>
+          {row.getValue("activities")}
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: "indicator",
+    header: () => <div>Indicator</div>,
+    cell: ({ row }) => {
+      return (
+        <div>
+          {row.getValue("indicator")}
+        </div>
+      );
+    },
+  },
+  // {
+  //   accessorKey: "target",
+  //   id: "target",
+  //   header: "Target",
+  //   enableGrouping: true,
+  //   columns: [
+  //     { accessorKey: "Annual", id: "Annual", header: () => <div>Annual</div>, cell: ({ row }) => row.original.target.annual },
+  //     { accessorKey: "Q1", header: () => <div>Q1</div>, cell: ({ row }) => row.original.target.q1 },
+  //     { accessorKey: "Q2", header: () => <div>Q2</div>, cell: ({ row }) => row.original.target.q2 },
+  //     { accessorKey: "Q3", header: () => <div>Q3</div>, cell: ({ row }) => row.original.target.q3 },
+  //     { accessorKey: "Q4", header: () => <div>Q4</div>, cell: ({ row }) => row.original.target.q4 },
+  //   ],
+  // },
+  // {
+  //   id: "actualBudget",
+  //   header: "Actual Budget",
+  //   columns: [
+  //     { accessorKey: "Annual", header: "Annual", cell: ({ row }) => row.original.actualBudget.annual },
+  //     { accessorKey: "Q1", header: "Q1", cell: ({ row }) => row.original.actualBudget.q1 },
+  //     { accessorKey: "Q2", header: "Q2", cell: ({ row }) => row.original.actualBudget.q2 },
+  //     { accessorKey: "Q3", header: "Q3", cell: ({ row }) => row.original.actualBudget.q3 },
+  //     { accessorKey: "Q4", header: "Q4", cell: ({ row }) => row.original.actualBudget.q4 },
+  //   ],
+  // },
+  // {
+  //   id: "budget",
+  //   header: "Budget",
+  //   columns: [
+  //     { accessorKey: "Annual", header: "Annual", cell: ({ row }) => row.original.budget.annual },
+  //     { accessorKey: "Q1", header: "Q1", cell: ({ row }) => row.original.budget.q1 },
+  //     { accessorKey: "Q2", header: "Q2", cell: ({ row }) => row.original.budget.q2 },
+  //     { accessorKey: "Q3", header: "Q3", cell: ({ row }) => row.original.budget.q3 },
+  //     { accessorKey: "Q4", header: "Q4", cell: ({ row }) => row.original.budget.q4 },
+  //   ],
+  // },
+  // {
+  //   id: "physicalActual",
+  //   header: "Physical-Actual",
+  //   columns: [
+  //     { accessorKey: "Annual", header: "Annual", cell: ({ row }) => row.original.physicalActual.annual },
+  //     { accessorKey: "Q1", header: "Q1", cell: ({ row }) => row.original.physicalActual.q1 },
+  //     { accessorKey: "Q2", header: "Q2", cell: ({ row }) => row.original.physicalActual.q2 },
+  //     { accessorKey: "Q3", header: "Q3", cell: ({ row }) => row.original.physicalActual.q3 },
+  //     { accessorKey: "Q4", header: "Q4", cell: ({ row }) => row.original.physicalActual.q4 },
+  //   ],
+  // },
+  // {
+  //   id: "accomplishment",
+  //   header: "Accomplishment",
+  //   columns: [
+  //     { accessorKey: "Annual", header: "Annual", cell: ({ row }) => row.original.accomplishment.annual },
+  //     { accessorKey: "Q1", header: "Q1", cell: ({ row }) => row.original.accomplishment.q1 },
+  //     { accessorKey: "Q2", header: "Q2", cell: ({ row }) => row.original.accomplishment.q2 },
+  //     { accessorKey: "Q3", header: "Q3", cell: ({ row }) => row.original.accomplishment.q3 },
+  //     { accessorKey: "Q4", header: "Q4", cell: ({ row }) => row.original.accomplishment.q4 },
+  //   ],
+  // },
+  // {
+  //   accessorKey: "action",
+  //   header: "Action",
+  //   cell: ({ row }) => (
+  //     <Button variant={'outline'} className="text-center">{row.getValue("action")}</Button>
+  //   ),
+  // },
+];
+
 
 export function DataTableDemo() {
   const [sorting, setSorting] = React.useState<SortingState>([])
@@ -236,16 +288,16 @@ export function DataTableDemo() {
     <div className="w-full shadow-xl rounded-md p-6">
       <div className="flex items-center py-4">
         <Input
-          placeholder="Filter Major Component..."
-          value={(table.getColumn("majorComponent")?.getFilterValue() as string) ?? ""}
+          placeholder="Filter Component..."
+          value={(table.getColumn("component")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
-            table.getColumn("majorComponent")?.setFilterValue(event.target.value)
+            table.getColumn("component")?.setFilterValue(event.target.value)
           }
           className="max-w-sm"
         />
         <DropdownMenu>
           <div>
-            
+
           </div>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="ml-auto">
@@ -253,27 +305,43 @@ export function DataTableDemo() {
             </Button>
           </DropdownMenuTrigger>
           <Button variant="outline" className="ml-2">
-              <IoMdAdd/> Add 
-            </Button>
+            <IoMdAdd /> Add
+          </Button>
           <DropdownMenuContent align="end">
             {table
               .getAllColumns()
-              .filter((column) => column.getCanHide())
+              .filter((column) => column.getCanHide()) // Include all columns, including subcolumns
               .map((column) => {
+                if (column.id.includes('.')) {
+                  return (
+                    column.columns.map((subColumn) => (
+                      <DropdownMenuCheckboxItem
+                        key={subColumn.id}
+                        className="capitalize"
+                        checked={subColumn.getIsVisible()}
+                        onCheckedChange={(value) => subColumn.toggleVisibility(!!value)}
+                      >
+                        {subColumn.id}
+                      </DropdownMenuCheckboxItem>
+                    ))
+
+                  );
+                }
                 return (
                   <DropdownMenuCheckboxItem
                     key={column.id}
                     className="capitalize"
                     checked={column.getIsVisible()}
-                    onCheckedChange={(value) =>
-                      column.toggleVisibility(!!value)
-                    }
+                    onCheckedChange={(value) => column.toggleVisibility(!!value)}
                   >
                     {column.id}
                   </DropdownMenuCheckboxItem>
-                )
+                );
               })}
           </DropdownMenuContent>
+
+
+
         </DropdownMenu>
       </div>
       <div className="rounded-md border">
@@ -282,15 +350,16 @@ export function DataTableDemo() {
             {table.getHeaderGroups().map((headerGroup, index) => (
               <TableRow key={index}>
                 {headerGroup.headers.map((header) => {
- 
+                  const colSpan = header.colSpan == 1 ? 0 : header.colSpan
+                  const rowSPan = header.colSpan > 1 ? 2 : 1
                   return (
-                    <TableHead key={header.id} colSpan={header.colSpan} className="border text-center">
+                    <TableHead key={header.id} colSpan={colSpan} className={`text-center ${colSpan == 0 ? '' : 'border'}`}>
                       {header.isPlaceholder
                         ? null
                         : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
                     </TableHead>
                   )
                 })}
@@ -326,7 +395,7 @@ export function DataTableDemo() {
               </TableRow>
             )}
           </TableBody>
-          
+
         </Table>
       </div>
       <div className="flex items-center justify-end space-x-2 py-4">

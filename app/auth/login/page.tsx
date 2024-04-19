@@ -1,8 +1,8 @@
-import { LoginForm } from "@/components/auth/login-form";
+import AuthenticationPage from "@/components/auth/auth-component";
 
 const LoginPage =() =>{
     return(
-        <LoginForm/>
+        <AuthenticationPage/>
     )
 }
 

@@ -7,17 +7,13 @@ const AuthLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <AnimatePresence>
       <motion.div
-        className="relative bg-cover bg-center bg-no-repeat min-h-screen"
-        style={{ backgroundImage: "url('/result-background.png')" }}
+        className="relative bg-cover bg-center min-h-screen"       
         initial={{ opacity: 0.5 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0.5 }}
       >
-        <div className='h-screen flex items-center justify-center flex-col bg-cover bg-center bg-no-repeat min-h-screen'
-          style={{ backgroundImage: "url('/background.png')" }}>
+        <div className='h-screen flex items-center justify-center flex-col'>
           {children}
-   
-
         </div>
     
       </motion.div>

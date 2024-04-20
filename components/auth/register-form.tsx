@@ -17,14 +17,18 @@ import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { FormError } from "../form-error";
 import { FormSuccess } from "../form-success";
-import { register } from "@/actions/register";
-import axios from "axios";
 import { useRouter } from "next/navigation";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '../ui/select';
 import { Header } from "./header";
+import { LoadingSpinner } from "../LoadingSpinner";
+import { useToast } from "../ui/use-toast";
+import { ToastAction } from "@radix-ui/react-toast";
+import { pendinguser } from "@/actions/pendinguser";
 
-
-export const RegisterForm = () => {
+interface RegisterFormProps{
+    backToLogin: ()=> void
+}
+export const RegisterForm = ({backToLogin}:RegisterFormProps) => {
     const [isPending, startTransition] = useTransition();
     const [loading, setLoading] = useState(false); // Initialize loading state
 
@@ -32,7 +36,7 @@ export const RegisterForm = () => {
     const [success, setSuccess] = useState<string | undefined>("");
 
     const router = useRouter(); // Initialize useRouter
-
+    const { toast } = useToast()
     const form = useForm<z.infer<typeof RegisterSchema>>({
         resolver: zodResolver(RegisterSchema),
         defaultValues: {
@@ -50,14 +54,21 @@ export const RegisterForm = () => {
             setSuccess("")
             startTransition(() => {
                 setLoading(true)
-                register(values)
+                pendinguser(values)
                     .then((data) => {
                         setError(data.error)
                         setSuccess(data.success)
-    
                         setTimeout(() => {
                             if (!data.error) {
-                              router.push('/auth/login'); 
+                                toast({
+                                    title: "Registration",
+                                    description: "Please contact MMIS Team Leader for approval",
+                                    duration:10000,
+                                    action: (
+                                      <ToastAction altText="Goto schedule to undo">Ok</ToastAction>
+                                    ),
+                                  })
+                                  backToLogin()
                             }
                             setLoading(false)
                           }, 2000); // Delay for 2 seconds                      
@@ -76,10 +87,10 @@ export const RegisterForm = () => {
                 loading={loading}
                 showSocial> */}
                 <Header label='Enter your credentials below to register' title='Sign Up' />
-                <Form {...form}>
+                <Form  {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)}
                         className="space-y-6"
-                    >
+                    autoComplete="off" >
                         <div className="space-y-4">
                         <FormField
                     name='region'
@@ -94,7 +105,7 @@ export const RegisterForm = () => {
                                     </SelectTrigger>
                                 </FormControl>
                                 <SelectContent>
-                                    <SelectItem value="PSO">PSO</SelectItem>
+                                    <SelectItem value="PSO">Project Support Office (PSO)</SelectItem>
                                     <SelectItem value="Region IX">Zamboanga Peninsula (Region IX)</SelectItem>
                                     <SelectItem value="Region X">Northern Mindanao (Region X)</SelectItem>
                                     <SelectItem value="Region XI">Davao Region (Region XI)</SelectItem>
@@ -116,7 +127,6 @@ export const RegisterForm = () => {
                                         <FormControl>
                                             <Input
                                                 {...field}
-                                                placeholder="First & Last name"
                                                 disabled={loading} />
                                         </FormControl>
                                         <FormMessage />
@@ -132,9 +142,8 @@ export const RegisterForm = () => {
                                         <FormControl>
                                             <Input
                                                 {...field}
-                                                placeholder="miadp@example.com"
                                                 disabled={loading}
-                                                autoComplete="off" />
+                                                autoComplete="false"/>
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -149,7 +158,6 @@ export const RegisterForm = () => {
                                         <FormControl>
                                             <Input
                                                 {...field}
-                                                placeholder="******"
                                                 type="password"
                                                 disabled={loading} />
                                         </FormControl>
@@ -166,7 +174,7 @@ export const RegisterForm = () => {
                             className="w-full"
                             disabled={loading}
                         >
-                            Create an account
+                          {loading&&<LoadingSpinner/>}  Create an account
                         </Button>
                     </form>
                 </Form>

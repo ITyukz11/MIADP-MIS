@@ -3,7 +3,7 @@ import NextAuth from 'next-auth';
 import { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import { compare } from 'bcrypt';
-import { sql } from '@vercel/postgres';
+import prisma from '@/lib/prisma';
 
 // Define your authentication options
 const authOptions: NextAuthOptions = {
@@ -14,42 +14,47 @@ const authOptions: NextAuthOptions = {
     CredentialsProvider({
       type: 'credentials',
       credentials: {
-        email:{},
-        password:{}
+        email: {},
+        password: {}
       },
       async authorize(credentials, req) {
+        try {
+          const user = await prisma.user.findUnique({
+            where: {
+              email: credentials?.email
+            }
+          });
 
-        console.log("Credentials: ", credentials?.password)
-        const response = await sql`SELECT * FROM users WHERE email=${credentials?.email};`;
+          if (!user) {
+            throw new Error('User not found');
+          }
 
-        const user = response.rows[0];
-        console.log("response: ",response)
-        console.log("user: ",user)
+          const passwordCorrect = await compare(
+            credentials?.password || '',
+            user.password
+          );
 
-        const passwordCorrect = await compare(
-          credentials?.password || '', 
-          user.password)
-
-          if(passwordCorrect){
-            return{
+          if (passwordCorrect) {
+            return {
               id: user.id,
               email: user.email,
-              name: user.fullname
-            }
+              name: user.name
+            };
           }
-        return null
 
+          return null;
+        } catch (error) {
+          console.error('Error authorizing user:', error);
+          return null;
+        }
       }
     })
   ],
   pages: {
-    signIn: "/auth/login" // Adjust this to your desired signIn page URL
+    signIn: '/auth/login' // Adjust this to your desired signIn page URL
   }
 };
 
 // eslint-disable-next-line import/no-anonymous-default-export
 export default (req: NextApiRequest, res: NextApiResponse) =>
   NextAuth(req, res, authOptions);
-
-
-

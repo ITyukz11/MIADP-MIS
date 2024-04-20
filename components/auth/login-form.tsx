@@ -20,6 +20,9 @@ import { login } from "@/actions/login";
 import { useRouter } from "next/navigation";
 import { Checkbox } from "../ui/checkbox";
 import { Header } from "./header";
+import { FcGoogle } from "react-icons/fc";
+import { LoadingSpinner } from "../LoadingSpinner";
+
 
 
 export const LoginForm = () => {
@@ -50,12 +53,18 @@ export const LoginForm = () => {
                 .then((data) => {
                     setError(data.error);
                     setSuccess(data.success);
-                    setLoading(false); // Set loading state to false when login request completes
 
                     if (!data.error) {
-                        router.push('/'); // Redirect to '/' if there's no error (login is successful)
-                    }
+                        setTimeout(() => {
+                            if (!data.error) {
+                                router.push('/'); // Redirect to '/' if there's no error (login is successful)
+                            }
+                        }, 2000); // Delay for 2 seconds    
 
+                    } else {
+                        setLoading(false);
+
+                    }
                 })
                 .catch((error) => {
                     setError('An error occurred while logging in. Error: ' + error);
@@ -68,10 +77,9 @@ export const LoginForm = () => {
         //axios.post("/your/api/router", values).then .get etc
     }
 
-    console.log("isPending: ", isPending)
 
     return (
-        <div>
+        <div className="flex flex-col gap-2 w-96">
             {/* <CardWrapper
             headerTitle="Sign In"
             headerLabel="MIADP Management Information System"
@@ -120,7 +128,7 @@ export const LoginForm = () => {
                         />
                     </div>
                     <div className="flex items-center space-x-2">
-                        <Checkbox id="remember-password" />
+                        <Checkbox id="remember-password" disabled={loading} />
                         <label
                             htmlFor="terms"
                             className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
@@ -135,10 +143,23 @@ export const LoginForm = () => {
                         className="w-full"
                         disabled={loading}
                     >
-                        Login
+                        {loading && <LoadingSpinner />} Login
                     </Button>
                 </form>
             </Form>
+            <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                    <span className="w-full border-t" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-background px-2 text-muted-foreground">
+                        Or continue with
+                    </span>
+                </div>
+            </div>
+            <Button variant="outline" type="button" className=" hover:cursor-not-allowed">
+                <FcGoogle className=" h-96 mr-2" /> Google
+            </Button>
             {/* </CardWrapper> */}
         </div>
 

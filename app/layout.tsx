@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { NextAuthProvider } from "./provider";
+import { Toaster } from "@/components/ui/toaster";
 
 
 const inter = Inter({ subsets: ["latin"] });
@@ -19,8 +20,8 @@ export default function RootLayout({
 }>) {
   return (
     <NextAuthProvider>
-      <html lang="en" suppressHydrationWarning>
-        <body>
+      <html lang="en">
+        <body className={inter.className} suppressHydrationWarning={true}>
           <ThemeProvider
             attribute="class"
             defaultTheme="light"
@@ -28,6 +29,7 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             {children}
+            <Toaster />
           </ThemeProvider>
         </body>
       </html>

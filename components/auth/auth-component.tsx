@@ -4,7 +4,7 @@ import Image from "next/image"
 import Link from "next/link"
 
 import { cn } from "@/lib/utils"
-import { buttonVariants } from "@/components/ui/button"
+import { Button, buttonVariants } from "@/components/ui/button"
 import { LoginForm } from "./login-form"
 import Autoplay from "embla-carousel-autoplay"
 
@@ -16,6 +16,8 @@ import {
 } from "@/components/ui/carousel"
 import { RegisterForm } from "./register-form"
 import { usePathname } from "next/navigation"
+import { useState } from "react"
+import { AnimatePresence, motion } from "framer-motion"
 
 export const metadata: Metadata = {
     title: "Authentication",
@@ -23,7 +25,7 @@ export const metadata: Metadata = {
 }
 
 export default function AuthenticationPage() {
-
+    const [userLogginIn, setUserLogginIn] = useState(true)
     const pathName = usePathname()
 
     const images = [{
@@ -59,48 +61,21 @@ export default function AuthenticationPage() {
         alt: 'miadp-pso logo'
     },
     ]
-    console.log(pathName)
-    const isLoginPage = pathName === '/auth/login';
     return (
 
         <div className="container relative">
-            <div className="md:hidden">
-                <Image
-                    src="/examples/authentication-light.png"
-                    width={1280}
-                    height={843}
-                    alt="Authentication"
-                    className="block dark:hidden"
-                />
-                <Image
-                    src="/examples/authentication-dark.png"
-                    width={1280}
-                    height={843}
-                    alt="Authentication"
-                    className="hidden dark:block"
-                />
-            </div>
             <div className="border border-border/80 shadow-2xl rounded-xl container relative hidden h-[800px] flex-col items-center justify-center md:grid lg:max-w-none lg:grid-cols-2 lg:px-0">
-                
-                {isLoginPage? <Link
-                    href="/auth/register"
-                    className={cn(
-                        buttonVariants({ variant: "link" }),
-                        "absolute right-4 top-4 md:right-8 md:top-8"
-                    )}
+
+                <Button
+                    variant={'link'}
+                    className={"absolute right-4 top-4 md:right-8 md:top-8"}
+                    onClick={() => setUserLogginIn(!userLogginIn)}
                 >
-                    Don&apos;t have an account?
-                </Link> :<Link
-                    href="/auth/login"
-                    className={cn(
-                        buttonVariants({ variant: "link" }),
-                        "absolute right-4 top-4 md:right-8 md:top-8"
-                    )}
-                >
-                    Already have an account?
-                </Link>}
-   
-                <div className="relative hidden h-full flex-col bg-muted p-10 text-white lg:flex dark:border-r justify-between">
+                    {userLogginIn ? "Don't have an account?" : "Already have an account?"}
+                </Button>
+
+
+                <div className="z-10 relative hidden h-full flex-col bg-muted p-10 text-white lg:flex dark:border-r justify-between">
                     <div className="absolute inset-0 bg-zinc-900  rounded-l-xl rounded-bl-xl" />
                     <div className="relative z-20 flex items-center text-lg font-medium">
                         <svg
@@ -155,8 +130,32 @@ export default function AuthenticationPage() {
                 </div>
                 <div className="lg:p-8">
                     <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
+                        <div className="flex flex-row w-full">
+
+                        {userLogginIn?
+                  
+                        <motion.div
+                            key="login"
+                            initial={{ x: '-100%', opacity: 0 }}
+                            animate={{ x: 0, opacity: 1 }}
+                            exit={{ x: '-100%', opacity: 0 }}
+                        >
+                            <LoginForm />
+                        </motion.div>
+                    :
+                            <motion.div
+                                key="register"
+                                initial={{ x: '60%', opacity: 0 }}
+                                animate={{ x: 0, opacity: 1 }}
+                                exit={{ x: '100%', opacity: 0 }}
+                            >
+                                <RegisterForm backToLogin={()=> setUserLogginIn(true)}/>
+                            </motion.div>
+                      }
+                        </div>
+                  
                         
-                        {isLoginPage? <LoginForm /> :<RegisterForm />}
+                        
                         <p className="px-8 text-center text-sm text-muted-foreground">
                             By clicking continue, you agree to our{" "}
                             <Link

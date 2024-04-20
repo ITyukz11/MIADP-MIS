@@ -7,18 +7,18 @@ interface RegisterResponse {
     error?: string;
 }
 
-export const register = async (values: z.infer<typeof RegisterSchema>): Promise<RegisterResponse> => {
+export const pendinguser = async (values: z.infer<typeof RegisterSchema>): Promise<RegisterResponse> => {
     const validatedFields = RegisterSchema.safeParse(values);
 
     try {
         if (!validatedFields.success) {
             return { error: "Invalid fields!" };
         } else {
-            const response = await axios.post('/api/auth/register', {
+            const response = await axios.post('/api/auth/pending-users', {
                 region:values.region,
                 fullname: values.fullname,
                 email: values.email,
-                password: values.password
+                password: values.password,
             });
     
             // Check if the response contains an error message

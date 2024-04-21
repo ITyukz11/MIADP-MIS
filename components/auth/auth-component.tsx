@@ -73,7 +73,7 @@ export default function AuthenticationPage() {
 
                 <div className="z-10 relative rounded-l-xl rounded-bl-xl hidden h-full flex-col bg-muted p-10 text-white lg:flex dark:border-r justify-between">
                     <div className="absolute inset-0 bg-zinc-900  rounded-l-xl rounded-bl-xl" />
-                    <div className="relative z-20 flex items-center text-lg font-medium">
+                    <div className="relative z-20 flex items-center text-lg font-bold">
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
                             viewBox="0 0 24 24"
@@ -117,8 +117,7 @@ export default function AuthenticationPage() {
                     <div className="relative z-20">
                         <blockquote className="space-y-2">
                             <p className="text-lg">
-                                Welcome to the MIADP Management Information System! Our system efficiently tracks encoded documents, streamlining document management processes for easy access and organization.
-                                I-Plan
+                                Welcome to the MIADP Management Information System! Our system efficiently tracks encoded documents, streamlining document management processes for easy access and organization.                             
                             </p>
                             <footer className="text-sm">Binyang Maria</footer>
                         </blockquote>

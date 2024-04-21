@@ -31,6 +31,7 @@ export const LoginForm = () => {
     const [success, setSuccess] = useState<string | undefined>("");
     const [loading, setLoading] = useState(false); // Initialize loading state
 
+    const [isChecked, setIsChecked] = useState(false);
     const router = useRouter(); // Initialize useRouter
 
     const form = useForm<z.infer<typeof LoginSchema>>({
@@ -128,10 +129,11 @@ export const LoginForm = () => {
                         />
                     </div>
                     <div className="flex items-center space-x-2">
-                        <Checkbox id="remember-password" disabled={loading} />
+                        <Checkbox id="remember-password" checked={isChecked} onChange={() => setIsChecked(!isChecked)} disabled={loading} />
                         <label
-                            htmlFor="terms"
-                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                            htmlFor="remember-password" // this matches the ID of the associated checkbox
+                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                            onClick={() => setIsChecked(!isChecked)} // Attach click event handler to the label
                         >
                             Remember password
                         </label>

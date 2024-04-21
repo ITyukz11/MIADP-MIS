@@ -5,10 +5,13 @@ import { ModeToggle } from "./mode-toggle";
 import { useSession } from "next-auth/react";
 import { DropDownMenuComponent } from "./drop-down-menu";
 import { MdNotifications } from "react-icons/md";
+import { getCurrentUser } from "@/lib/session";
 
-export function SiteHeader() {
+interface SiteHeaderProps{
+    currentUser: string
+}
+export const SiteHeader=({currentUser}:SiteHeaderProps) =>{
 
-    const session = useSession();
 
     return (
         <header className="sticky top-0 z-50 w-full border-b-2 border-border/80 bg-black backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -20,7 +23,7 @@ export function SiteHeader() {
                     </div>
                     <nav className="flex items-center gap-2">
                         <MdNotifications/>
-                            Welcome back {session.data?.user?.name}
+                            Welcome back {currentUser}
                         <DropDownMenuComponent/>
                         <ModeToggle />
                     </nav>

@@ -1,38 +1,30 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
-import { NextAuthProvider } from "./provider";
 import { Toaster } from "@/components/ui/toaster";
+import { Inter } from "next/font/google"
 
 
 const inter = Inter({ subsets: ["latin"] });
-
 export const metadata: Metadata = {
   title: "MMIS",
   description: "MIADP Information Management System",
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+interface RootLayoutProps {
+  children: React.ReactNode
+}
+
+export default function RootLayout({ children }: RootLayoutProps) {
   return (
-    <NextAuthProvider>
-      <html lang="en">
-        <body className={inter.className} suppressHydrationWarning={true}>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="light"
-            enableSystem
-            disableTransitionOnChange
-          >
-            {children}
-            <Toaster />
-          </ThemeProvider>
-        </body>
-      </html>
-    </NextAuthProvider>
+    <html lang="en" suppressHydrationWarning>
+    <head />
+    <body className={inter.className} suppressHydrationWarning={true}>
+      <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+        {children}  
+        <Toaster />
+      </ThemeProvider>
+    </body>
+  </html>
   );
 }

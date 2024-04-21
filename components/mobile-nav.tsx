@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import Link, { LinkProps } from "next/link"
-import { useRouter } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -10,10 +10,11 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Label } from "./ui/label"
 import { TbCloudDataConnection } from "react-icons/tb";
+import { navLinks } from "@/config/nav-links"
 
 export function MobileNav() {
     const [open, setOpen] = React.useState(false)
-
+    const pathname = usePathname()
     return (
         <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>
@@ -63,8 +64,19 @@ export function MobileNav() {
                 </MobileLink>
                 <ScrollArea className="my-4 h-[calc(100vh-8rem)] pb-10 pl-6">
                     <div className="flex flex-col space-y-3">
-                        <Label>Home</Label>
-                        <Label>WPF</Label>
+
+                        {navLinks.map((link, index) => (
+                            <Link
+                                key={index}
+                                href={link.href}
+                                className={cn(
+                                    "transition-colors hover:text-foreground/80",
+                                    pathname === link.href ? "text-foreground" : "text-foreground/60"
+                                )}
+                            >
+                                {link.text}
+                            </Link>
+                        ))}
                     </div>
                     <div className="flex flex-col space-y-2">
 

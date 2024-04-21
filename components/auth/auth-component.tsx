@@ -3,8 +3,7 @@ import { Metadata } from "next"
 import Image from "next/image"
 import Link from "next/link"
 
-import { cn } from "@/lib/utils"
-import { Button, buttonVariants } from "@/components/ui/button"
+import { Button } from "@/components/ui/button"
 import { LoginForm } from "./login-form"
 import Autoplay from "embla-carousel-autoplay"
 
@@ -15,9 +14,8 @@ import {
     CarouselItem,
 } from "@/components/ui/carousel"
 import { RegisterForm } from "./register-form"
-import { usePathname } from "next/navigation"
 import { useState } from "react"
-import { AnimatePresence, motion } from "framer-motion"
+import {motion } from "framer-motion"
 
 export const metadata: Metadata = {
     title: "Authentication",
@@ -26,12 +24,8 @@ export const metadata: Metadata = {
 
 export default function AuthenticationPage() {
     const [userLogginIn, setUserLogginIn] = useState(true)
-    const pathName = usePathname()
 
-    const images = [{
-        src: '/miadp-cover.png',
-        alt: 'miadp-cover'
-    },
+    const images = [
     {
         src: '/miadp-pso.jpg',
         alt: 'miadp-pso logo'
@@ -61,10 +55,12 @@ export default function AuthenticationPage() {
         alt: 'miadp-pso logo'
     },
     ]
+
+
     return (
 
         <div className="container relative">
-            <div className="border border-border/80 shadow-2xl rounded-xl container relative hidden h-[800px] flex-col items-center justify-center md:grid lg:max-w-none lg:grid-cols-2 lg:px-0">
+            <div className="border-2 border-border/80 shadow-2xl rounded-xl container relative hidden h-[800px] flex-col items-center justify-center md:grid lg:max-w-none lg:grid-cols-2 lg:px-0">
 
                 <Button
                     variant={'link'}
@@ -75,7 +71,7 @@ export default function AuthenticationPage() {
                 </Button>
 
 
-                <div className="z-10 relative hidden h-full flex-col bg-muted p-10 text-white lg:flex dark:border-r justify-between">
+                <div className="z-10 relative rounded-l-xl rounded-bl-xl hidden h-full flex-col bg-muted p-10 text-white lg:flex dark:border-r justify-between">
                     <div className="absolute inset-0 bg-zinc-900  rounded-l-xl rounded-bl-xl" />
                     <div className="relative z-20 flex items-center text-lg font-medium">
                         <svg
@@ -107,8 +103,8 @@ export default function AuthenticationPage() {
                                             key={index}
                                             src={image.src}
                                             alt={image.alt}
-                                            width={image.alt == "miadp-cover" ? 800 : 500}
-                                            height={300}
+                                            width={500}
+                                            height={500}
                                             priority
                                         />
                                     </CarouselItem>

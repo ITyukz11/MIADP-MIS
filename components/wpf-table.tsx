@@ -37,6 +37,7 @@ import {
 import { ChevronDownIcon, HamburgerMenuIcon } from "@radix-ui/react-icons"
 import { RiArrowUpDownFill } from "react-icons/ri";
 import { IoMdAdd } from "react-icons/io";
+import DialogDemo from "./dialog-demo"
 
 
 
@@ -296,17 +297,15 @@ export function DataTableDemo() {
           className="max-w-sm"
         />
         <DropdownMenu>
-          <div>
-
-          </div>
+          <div className="flex gap-1 flex-row justify-end w-full">
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="ml-auto">
               Columns <ChevronDownIcon className="ml-2 h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
-          <Button variant="outline" className="ml-2">
-            <IoMdAdd /> Add
-          </Button>
+          <DialogDemo/>
+          </div>
+      
           <DropdownMenuContent align="end">
             {table
               .getAllColumns()

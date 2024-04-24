@@ -3,7 +3,8 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/toaster";
 import { Inter } from "next/font/google"
-
+import { Suspense } from "react";
+import Loading from "./Loading";
 
 const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
@@ -18,13 +19,13 @@ interface RootLayoutProps {
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="en" suppressHydrationWarning>
-    <head />
-    <body className={inter.className} suppressHydrationWarning={true}>
-      <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-        {children}  
-        <Toaster />
-      </ThemeProvider>
-    </body>
-  </html>
+      <head />
+      <body className={inter.className} suppressHydrationWarning={true}>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <Suspense fallback={<Loading />}>{children}</Suspense>
+          <Toaster />
+        </ThemeProvider>
+      </body>
+    </html>
   );
 }

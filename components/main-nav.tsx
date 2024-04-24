@@ -1,15 +1,19 @@
+'use client'
 import * as React from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { TbCloudDataConnection } from "react-icons/tb";
 import { cn } from "@/lib/utils"
 import { navLinks } from "@/config/nav-links";
+import { Badge } from "./ui/badge";
 
-export function MainNav() {
+interface MainNavProps{
+  currentUser: string
+}
+
+export const MainNav: React.FC<MainNavProps> = ({ currentUser }) => {
   const pathname = usePathname()
-
   // Define an array of navigation links
-
 
   return (
     <div className="mr-4 hidden md:flex">
@@ -33,6 +37,19 @@ export function MainNav() {
             {link.text}
           </Link>
         ))}
+
+        {currentUser === "admin" &&
+          <Link
+          key={currentUser}
+          href='/admin/account'
+          className={cn(
+            "transition-colors hover:text-foreground/80",
+            pathname === '/admin/account' ? "text-foreground" : "text-foreground/60"
+          )}
+        >
+         <Badge>Admin</Badge> 
+        </Link>
+        }
       </nav>
     </div>
   )

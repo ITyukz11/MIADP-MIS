@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { hash } from 'bcrypt';
 import prisma from '@/lib/prisma';
 
 export async function POST(request) {
@@ -13,18 +12,29 @@ export async function POST(request) {
       return NextResponse.json({ error: 'Email already exists' });
     }
 
-    const hashedPassword = await hash(password, 10);
 
-    const response = await prisma.user.create({
-      data: {
-        region,
-        name: fullname,
-        email,
-        password: hashedPassword,
-      }
-    });
+    // Execute both queries within a transaction
+    const result = await prisma.$transaction([
+      // Create the new user
+      prisma.user.create({
+        data: {
+          region,
+          name: fullname,
+          email,
+          password
+        }
+      }),
+      // Update the status of the pending user to "approved"
+      prisma.pendingUser.update({
+        where: { email }, // Assuming email is unique and used as the identifier
+        data: { status: 'approved' },
+      })
+    ]);
 
-    return NextResponse.json({ response });
+    // Extract the results of the queries
+    const [newUser, updatedPendingUser] = result;
+    console.log({ newUser, updatedPendingUser })
+    return NextResponse.json({ newUser, updatedPendingUser });
   } catch (error) {
     console.error('Error registering user:', error);
     return NextResponse.json({ error: 'Internal server error' });

@@ -2,10 +2,8 @@
 import { MainNav } from "./main-nav";
 import { MobileNav } from "./mobile-nav";
 import { ModeToggle } from "./mode-toggle";
-import { useSession } from "next-auth/react";
 import { DropDownMenuComponent } from "./drop-down-menu";
 import { MdNotifications } from "react-icons/md";
-import { getCurrentUser } from "@/lib/session";
 
 interface SiteHeaderProps{
     currentUser: string

@@ -37,7 +37,7 @@ import {
 import { ChevronDownIcon, HamburgerMenuIcon } from "@radix-ui/react-icons"
 import { RiArrowUpDownFill } from "react-icons/ri";
 import { IoMdAdd } from "react-icons/io";
-import DialogDemo from "./dialog-demo"
+import DialogWFPActivityForm from "./dialog-wfp-activity-form"
 
 
 
@@ -256,6 +256,80 @@ export const columns: ColumnDef<WPFDATA>[] = [
   // },
 ];
 
+type WFPActivity = {
+  operatingUnit: string;
+  componentsUnits: string;
+  activities: string;
+  costTabMajorityActivity: string;
+  costTabSubActivity: string;
+  physicalTarget: string;
+  financialTotal: string;
+  loanProceed: string;
+  gopCounterPart: string;
+  budgetLine: string;
+  uacsCode: string;
+};
+
+// Define columns with appropriate accessor keys for your WFPActivity data
+export const columns2: ColumnDef<WFPActivity>[] = [
+  {
+    accessorKey: "operatingUnit",
+    header: "Operating Unit",
+    cell: ({ row }) => (
+      <div className="capitalize">{row.getValue("operatingUnit")}</div>
+    ),
+  },
+  {
+    accessorKey: "componentsUnits",
+    header: "Components Units",
+    cell: ({ row }) => <div>{row.getValue("componentsUnits")}</div>,
+  },
+  {
+    accessorKey: "activities",
+    header: "Activities",
+    cell: ({ row }) => <div>{row.getValue("activities")}</div>,
+  },
+  {
+    accessorKey: "costTabMajorityActivity",
+    header: "Cost Tab Majority Activity",
+    cell: ({ row }) => <div>{row.getValue("costTabMajorityActivity")}</div>,
+  },
+  {
+    accessorKey: "costTabSubActivity",
+    header: "Cost Tab Sub Activity",
+    cell: ({ row }) => <div>{row.getValue("costTabSubActivity")}</div>,
+  },
+  {
+    accessorKey: "physicalTarget",
+    header: "Physical Target",
+    cell: ({ row }) => <div>{row.getValue("physicalTarget")}</div>,
+  },
+  {
+    accessorKey: "financialTotal",
+    header: "Financial Total",
+    cell: ({ row }) => <div>{row.getValue("financialTotal")}</div>,
+  },
+  {
+    accessorKey: "loanProceed",
+    header: "Loan Proceed",
+    cell: ({ row }) => <div>{row.getValue("loanProceed")}</div>,
+  },
+  {
+    accessorKey: "gopCounterPart",
+    header: "GOP Counterpart",
+    cell: ({ row }) => <div>{row.getValue("gopCounterPart")}</div>,
+  },
+  {
+    accessorKey: "budgetLine",
+    header: "Budget Line",
+    cell: ({ row }) => <div>{row.getValue("budgetLine")}</div>,
+  },
+  {
+    accessorKey: "uacsCode",
+    header: "UACS Code",
+    cell: ({ row }) => <div>{row.getValue("uacsCode")}</div>,
+  },
+];
 
 export function DataTableDemo() {
   const [sorting, setSorting] = React.useState<SortingState>([])
@@ -303,7 +377,7 @@ export function DataTableDemo() {
               Columns <ChevronDownIcon className="ml-2 h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
-          <DialogDemo/>
+          <DialogWFPActivityForm/>
           </div>
       
           <DropdownMenuContent align="end">

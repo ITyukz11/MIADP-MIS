@@ -69,30 +69,36 @@ export const WFPActivitySchema = z.object({
     }),
     UACSCode: z.string().min(1, {
         message: "UACS Code is required"
-    }),
-    physicalQ1: z.string().min(1,{
-        message: "Timeframe (physical) Q1 is required"
-    }),
-    physicalQ2: z.string().min(1,{
-        message: "Timeframe (physical) Q2 is required"
-    }),
-    physicalQ3: z.string().min(1,{
-        message: "Timeframe (physical) Q3 is required"
-    }),
-    physicalQ4: z.string().min(1,{
-        message: "Timeframe (physical) Q4 is required"
-    }),
-    financialQ1: z.string().min(1,{
-        message: "Timeframe (financial) Q1 is required"
-    }),
-    financialQ2: z.string().min(1,{
-        message: "Timeframe (financial) Q2 is required"
-    }),
-    financialQ3: z.string().min(1,{
-        message: "Timeframe (financial) Q3 is required"
-    }),
-    financialQ4: z.string().min(1,{
-        message: "Timeframe (financial) Q4 is required"
-    }),
+    }),    
   });
+export const WFPActivityPhysicalMonthSchema = z.object({
+  physicalJan: z.string().min(1, { message: "required" }),
+  physicalFeb: z.string().min(1, { message: "required" }),
+  physicalMar: z.string().min(1, { message: "required" }),
+  physicalApr: z.string().min(1, { message: "required" }),
+  physicalMay: z.string().min(1, { message: "required" }),
+  physicalJun: z.string().min(1, { message: "required" }),
+  physicalJul: z.string().min(1, { message: "required" }),
+  physicalAug: z.string().min(1, { message: "required" }),
+  physicalSep: z.string().min(1, { message: "required" }),
+  physicalOct: z.string().min(1, { message: "required" }),
+  physicalNov: z.string().min(1, { message: "required" }),
+  physicalDec: z.string().min(1, { message: "required" }),
+})
+
+export const WFPActivityFinancialMonthSchema = z.object({  
+  financialJan: z.string().min(1, { message: "required" }),
+  financialFeb: z.string().min(1, { message: "required" }),
+  financialMar: z.string().min(1, { message: "required" }),
+  financialApr: z.string().min(1, { message: "required" }),
+  financialMay: z.string().min(1, { message: "required" }),
+  financialJun: z.string().min(1, { message: "required" }),
+  financialJul: z.string().min(1, { message: "required" }),
+  financialAug: z.string().min(1, { message: "required" }),
+  financialSep: z.string().min(1, { message: "required" }),
+  financialOct: z.string().min(1, { message: "required" }),
+  financialNov: z.string().min(1, { message: "required" }),
+  financialDec: z.string().min(1, { message: "required" }),
+})
+
 

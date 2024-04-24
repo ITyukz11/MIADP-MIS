@@ -19,7 +19,6 @@ import { Announcements } from "@/components/dashboard/announcements"
 
 
 export default function AnnouncementsPage() {
-  
   return (
     <div className="container relative">
       <div className="flex-col md:flex">

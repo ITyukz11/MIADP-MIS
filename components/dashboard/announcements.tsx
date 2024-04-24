@@ -48,8 +48,9 @@ export function Announcements() {
               <AvatarFallback>{announcement.avatar}</AvatarFallback>
             </Avatar>
             <div className="ml-4 space-y-1">
-              <p className="text-sm font-medium leading-none">{announcement.user}</p>
+              <p className="text-sm font-semi-bold leading-none">{announcement.title}</p>
               <p className="text-sm text-muted-foreground">{announcement.content}</p>
+              <p className="text-sm text-muted-foreground">Uploader: {announcement.user}</p>
             </div>
           </div>
           <DropdownMenu>

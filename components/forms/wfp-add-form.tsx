@@ -105,6 +105,9 @@ export const WFPForm = () => {
                     });
             })
             setSuccess("Form submitted successfully!");
+            localStorage.removeItem("WPFActivityData");
+            location.reload()
+
         } catch (error) {
             setError("An error occurred while submitting the form.");
         } finally {

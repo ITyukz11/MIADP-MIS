@@ -4,6 +4,7 @@ import { NavigationMenuDemo } from '@/components/navigation-menu';
 import { fetchWPFActivityData } from '@/lib/supports/wpf-activity'; // Assuming WPFActivityType is exported from wpf-activity
 import { columns2 } from '@/components/wpf-table';
 import { DataTable } from '@/components/table/data-table';
+import DialogWFPActivityForm from '@/components/dialog-wfp-activity-form';
 
 
 export default function Page() {
@@ -39,6 +40,7 @@ export default function Page() {
         <NavigationMenuDemo />
       </div>
       <div className='mt-5'>
+        <DialogWFPActivityForm/>
       <DataTable columns={columns2} data={WPFActivityData} disableApproveButton={true}/>
 
       </div>

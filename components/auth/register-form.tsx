@@ -68,6 +68,8 @@ export const RegisterForm = ({backToLogin}:RegisterFormProps) => {
                                       <ToastAction altText="Goto schedule to undo">Ok</ToastAction>
                                     ),
                                   })
+                                  localStorage.removeItem("pendingUsers");
+                                  
                                   backToLogin()
                             }
                             setLoading(false)

@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { ChangeEvent, startTransition, useContext, useEffect, useState } from "react";
 import * as z from "zod"
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod"
-import { WFPActivitySchema } from "@/schemas";
+import { WFPActivityFinancialMonthSchema, WFPActivityPhysicalMonthSchema, WFPActivitySchema } from "@/schemas";
 import { Form, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
@@ -12,6 +12,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { BudgetLine, BudgetYear, ComponentsUnits, CostTabMajorActivity, CostTabSubActivity, OperatingUnit, TypeOfActivity, UACSCode, UnitOfMeasures } from "./data";
 import { Separator } from "../ui/separator";
 import { Label } from "../ui/label";
+import { WFPActivityAction } from "@/actions/wpf-activity";
+import { toast } from "../ui/use-toast";
+import { ToastAction } from "../ui/toast";
 
 export const WFPForm = () => {
     const [error, setError] = useState<string | undefined>("");
@@ -19,8 +22,10 @@ export const WFPForm = () => {
     const [loading, setLoading] = useState(false);
     const [tempComponentUnitData, setTempComponentUnitData] = useState('');
 
-    const form = useForm<z.infer<typeof WFPActivitySchema>>({
-        resolver: zodResolver(WFPActivitySchema),
+    const combinedSchema = z.union([WFPActivitySchema, WFPActivityPhysicalMonthSchema,WFPActivityFinancialMonthSchema]);
+
+    const form = useForm<z.infer<typeof combinedSchema>>({
+        resolver: zodResolver(combinedSchema),
         defaultValues: {
             activityIdNumber: "",
             typeOfActivity: "",
@@ -37,24 +42,68 @@ export const WFPForm = () => {
             gopCounterpart: "",
             budgetLine: "",
             UACSCode: "",
-            physicalQ1:"",
-            physicalQ2:"",
-            physicalQ3:"",
-            physicalQ4:"",
-            financialQ1:"",
-            financialQ2:"",
-            financialQ3:"",
-            financialQ4:"",        
+
+            physicalJan: "12",
+            physicalFeb: "",
+            physicalMar: "",
+            physicalApr: "",
+            physicalMay: "",
+            physicalJun: "",
+            physicalJul: "",
+            physicalAug: "",
+            physicalSep: "",
+            physicalOct: "",
+            physicalNov: "",
+            physicalDec: "",
+
+            financialJan: "",
+            financialFeb: "",
+            financialMar: "",
+            financialApr: "",
+            financialMay: "",
+            financialJun: "",
+            financialJul: "",
+            financialAug: "",
+            financialSep: "",
+            financialOct: "",
+            financialNov: "",
+            financialDec: "",
+
+    
         }
     });
 
-    const onSubmit = async (values: z.infer<typeof WFPActivitySchema>) => {
+    const onSubmit = async () => {
+        const values = form.getValues();
+        console.log("values: ",values)
         setError('');
         setSuccess('');
         setLoading(true);
 
         try {
-            // Your form submission logic here...
+            
+
+            startTransition(() => {
+                setLoading(true)
+                WFPActivityAction(values)
+                    .then((data) => {
+                        setError(data.error)
+                        setSuccess(data.success)
+                        setTimeout(() => {
+                            if (!data.error) {
+                                toast({
+                                    title: "Uploaded Success",
+                                    description: "Test",
+                                    duration:10000,
+                                    action: (
+                                      <ToastAction altText="Ok">Ok</ToastAction>
+                                    ),
+                                  })
+                            }
+                            setLoading(false)
+                          }, 2000); // Delay for 2 seconds                      
+                    });
+            })
             setSuccess("Form submitted successfully!");
         } catch (error) {
             setError("An error occurred while submitting the form.");
@@ -63,12 +112,62 @@ export const WFPForm = () => {
         }
     }
 
+    type Month = {
+        name: string;
+        label: string;
+    };
+
+    const PhysicalMonths: Month[] = [
+        { name: "physicalJan", label: "Jan" },
+        { name: "physicalFeb", label: "Feb" },
+        { name: "physicalMar", label: "Mar" },
+        { name: "physicalApr", label: "Apr" },
+        { name: "physicalMay", label: "May" },
+        { name: "physicalJun", label: "Jun" },
+        { name: "physicalJul", label: "Jul" },
+        { name: "physicalAug", label: "Aug" },
+        { name: "physicalSep", label: "Sept" },
+        { name: "physicalOct", label: "Oct" },
+        { name: "physicalNov", label: "Nov" },
+        { name: "physicalDec", label: "Dec" },
+    ];
+
+    const FinancialMonths: Month[] = [
+        { name: "financialJan", label: "Jan" },
+        { name: "financialFeb", label: "Feb" },
+        { name: "financialMar", label: "Mar" },
+        { name: "financialApr", label: "Apr" },
+        { name: "financialMay", label: "May" },
+        { name: "financialJun", label: "Jun" },
+        { name: "financialJul", label: "Jul" },
+        { name: "financialAug", label: "Aug" },
+        { name: "financialSep", label: "Sept" },
+        { name: "financialOct", label: "Oct" },
+        { name: "financialNov", label: "Nov" },
+        { name: "financialDec", label: "Dec" },
+    ];
+
+    const TargetsFields = [
+        { name: 'physicalTarget', label: 'Physical Target' },
+        { name: 'financialTotal', label: 'Financial (Total)' },
+        { name: 'loanProceed', label: 'Loan Proceed' },
+        { name: 'gopCounterpart', label: 'GOP Counterpart' }
+    ];
+
+    const handleInputChange = (e: ChangeEvent<HTMLInputElement>, monthName: string, field: any) => {
+        const { name, value } = e.currentTarget;
+        // Custom validation specific to the month's name
+        if (name === monthName && !/^(?!0\d$)(\d*\.?\d*)$/.test(value)) return;
+        // Call the original onChange function from react-hook-form
+        field.onChange(e);
+    };
+
     return (
         <div>
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-5">
                     <Separator />
-                    <div className="grid grid-cols-2 gap-6">
+                    <div className="grid grid-cols-3 gap-6">
                         <FormField
                             control={form.control}
                             name="activityIdNumber"
@@ -120,7 +219,6 @@ export const WFPForm = () => {
                                 </FormItem>
                             )}
                         />
-
 
                         <FormField
                             name='componentsUnits'
@@ -221,7 +319,7 @@ export const WFPForm = () => {
                                         <SelectContent>
                                             {form.watch('costTabMajorActivity') &&
                                                 (CostTabSubActivity.costTabSubActivity[form.watch('costTabMajorActivity')] || CostTabSubActivity.costTabSubActivity.OTHERS).map((data, index) => (
-                                                    form.watch('componentsUnits') !== tempComponentUnitData && (
+                                                    form.watch('componentsUnits') == tempComponentUnitData && (
                                                         <SelectItem key={index} value={data}>{data}</SelectItem>
                                                     )
                                                 ))}
@@ -233,8 +331,9 @@ export const WFPForm = () => {
                         />
                     </div>
                     <Separator />
+                    {/**TARGET */}
                     <Label className="font-bold underline">Target</Label>
-                    <div className="grid grid-cols-2 gap-6">
+                    <div className="grid grid-cols-5 gap-6">
                         <FormField
                             name='unitOfMeasure'
                             control={form.control}
@@ -259,151 +358,83 @@ export const WFPForm = () => {
                                 </FormItem>
                             )}
                         />
-                        <FormField
-                            control={form.control}
-                            name="physicalTarget"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Physical Target</FormLabel>
-                                    <Input {...field} disabled={loading} />
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="financialTotal"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Financial (Total)</FormLabel>
-                                    <Input {...field} disabled={loading} />
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="loanProceed"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Loan Proceed</FormLabel>
-                                    <Input {...field} disabled={loading} />
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="gopCounterpart"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>GOP Counterpart</FormLabel>
-                                    <Input {...field} disabled={loading} />
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
+
+
+                        {TargetsFields.map(data => (
+                            <FormField
+                                key={data.name}
+                                control={form.control}
+                                name={data.name as any} // Explicitly cast to string
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>{data.label}</FormLabel>
+                                        <Input
+                                            {...field}
+                                            type="text" // Change the type to text to allow for custom input validation
+                                            min="0"
+                                            disabled={loading}
+                                            onChange={(e: ChangeEvent<HTMLInputElement>) => handleInputChange(e, data.name, field)}
+                                        />
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        ))}
                     </div>
                     <Separator />
                     <Label className="font-bold underline">Timeframe (Physical)</Label>
                     <div>
-                        <div className="grid grid-cols-4 gap-2">
-                        <FormField
-                            control={form.control}
-                            name="financialQ1"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Qtr 1</FormLabel>
-                                    <Input {...field} disabled={loading} />
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                          <FormField
-                            control={form.control}
-                            name="financialQ2"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Qtr 2</FormLabel>
-                                    <Input {...field} disabled={loading} />
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                          <FormField
-                            control={form.control}
-                            name="financialQ3"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Qtr 3</FormLabel>
-                                    <Input {...field} disabled={loading} />
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                          <FormField
-                            control={form.control}
-                            name="financialQ4"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Qtr 4</FormLabel>
-                                    <Input {...field} disabled={loading} />
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        </div>          
+                        <div className="grid grid-cols-12 gap-2">
+                            {PhysicalMonths.map(month => (
+                                <FormField
+                                    key={month.name}
+                                    control={form.control}
+                                    name={month.name as any} // Explicitly cast to string
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>{month.label}</FormLabel>
+                                            <Input
+                                                {...field}
+                                                type="text" // Change the type to text to allow for custom input validation
+                                                min="0"
+                                                disabled={loading}
+                                                onChange={(e: ChangeEvent<HTMLInputElement>) => handleInputChange(e, month.name, field)}
+                                            />
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            ))}
+                        </div>
                     </div>
+
                     <Label className="font-bold underline">Timeframe (Financial)</Label>
                     <div>
-                        <div className="grid grid-cols-4 gap-2">
-                        <FormField
-                            control={form.control}
-                            name="physicalQ1"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Qtr 1</FormLabel>
-                                    <Input {...field} disabled={loading} />
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                          <FormField
-                            control={form.control}
-                            name="physicalQ2"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Qtr 2</FormLabel>
-                                    <Input {...field} disabled={loading} />
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                          <FormField
-                            control={form.control}
-                            name="physicalQ3"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Qtr 3</FormLabel>
-                                    <Input {...field} disabled={loading} />
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                          <FormField
-                            control={form.control}
-                            name="physicalQ4"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Qtr 4</FormLabel>
-                                    <Input {...field} disabled={loading} />
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        </div>          
+                        <div className="grid grid-cols-12 gap-2">
+                            {FinancialMonths.map(month => (
+                                <FormField
+                                    key={month.name}
+                                    control={form.control}
+                                    name={month.name as any} // Explicitly cast to string
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>{month.label}</FormLabel>
+                                            <Input
+                                                {...field}
+                                                type="text" // Change the type to text to allow for custom input validation
+                                                min="0"
+                                                disabled={loading}
+                                                onChange={(e: ChangeEvent<HTMLInputElement>) => handleInputChange(e, month.name, field)}
+                                            />
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            ))}
+                        </div>
                     </div>
                     <Separator />
+                    {/**UACS CODE */}
                     <Label className="font-bold underline">UACS Code</Label>
                     <div className="grid grid-cols-2 gap-6">
                         <FormField
@@ -430,8 +461,8 @@ export const WFPForm = () => {
                                 </FormItem>
                             )}
                         />
-                       
-                             <FormField
+
+                        <FormField
                             name='UACSCode'
                             control={form.control}
                             render={({ field }) => (

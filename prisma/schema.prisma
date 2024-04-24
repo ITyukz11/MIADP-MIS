@@ -13,6 +13,7 @@ model User {
   region        String
   name          String
   email         String    @unique
+  wfpActivities WFPActivity[]
   password      String
   createdAt     DateTime  @default(now()) @map(name: "created_at")
   updatedAt     DateTime  @updatedAt @map(name: "updated_at")
@@ -29,4 +30,63 @@ model PendingUser {
   createdAt     DateTime  @default(now()) @map(name: "created_at")
   updatedAt     DateTime  @updatedAt @map(name: "updated_at")
   @@map(name: "pending_users")
+}
+
+model WFPActivity {
+  id                       Int               @id @default(autoincrement())
+  activityIdNum            String
+  typeOfActivity           String
+  operatingUnit            String
+  componentsUnits          String
+  budgetYear               String
+  activities               String
+  costTabMajorityActivity  String
+  costTabSubActivity       String
+  unitMeasures             String
+  physicalTarget           String
+  financialTotal           String
+  loanProceed              String
+  gopCounterPart           String
+  budgetLine               String
+  uacsCode                 String
+  userEmail                String
+  user                     User              @relation(fields: [userEmail], references: [email])
+  timeFramePhysical        TimeFramePhysical?
+  timeFrameFinancial       TimeFrameFinancial?
+}
+
+model TimeFramePhysical {
+  id               Int          @id @default(autoincrement())
+  january          Int
+  february         Int
+  march            Int
+  april            Int
+  may              Int
+  june             Int
+  july             Int
+  august           Int
+  september        Int
+  october          Int
+  november         Int
+  december         Int
+  wfpActivityId    Int          @unique
+  wfpActivity      WFPActivity  @relation(fields: [wfpActivityId], references: [id])
+}
+
+model TimeFrameFinancial {
+  id               Int          @id @default(autoincrement())
+  january          Int
+  february         Int
+  march            Int
+  april            Int
+  may              Int
+  june             Int
+  july             Int
+  august           Int
+  september        Int
+  october          Int
+  november         Int
+  december         Int
+  wfpActivityId    Int          @unique
+  wfpActivity      WFPActivity  @relation(fields: [wfpActivityId], references: [id])
 }

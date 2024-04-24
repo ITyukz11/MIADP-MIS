@@ -12,7 +12,7 @@ import {
 import { IoMdAdd } from "react-icons/io"
 import { WFPForm } from "./forms/wfp-add-form"
 
-export default function DialogDemo() {
+export default function DialogWFPActivityForm() {
   return (
     <Dialog>
       <DialogTrigger asChild>

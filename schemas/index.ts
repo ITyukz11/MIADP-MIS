@@ -101,4 +101,17 @@ export const WFPActivityFinancialMonthSchema = z.object({
   financialDec: z.string().min(1, { message: "required" }),
 })
 
+export const ActivitySchema = z.object({
+  activityDescription: z.string(),
+  type: z.string(),
+  plannedFromDate: z.date().nullable(),
+  plannedToDate: z.date().nullable(),
+  targetParticipants: z.string(),
+  location: z.string().optional(),
+  status: z.string().default('new'),
+  remarks: z.string(),
+  user: z.string(),
+});
+
+
 

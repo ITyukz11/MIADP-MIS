@@ -31,17 +31,18 @@ import { DataTableToolbar } from "./data-table-toolbar"
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
-  disableApproveButton:boolean
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
-  disableApproveButton
 }: DataTableProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = React.useState({})
-  const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({})
+  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({
+    user_id: false,
+    target_participant:false,
+    coa_id:false
+  });
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
   )
@@ -52,15 +53,19 @@ export function DataTable<TData, TValue>({
     columns,
     state: {
       sorting,
-      columnVisibility,
+      columnVisibility: columnVisibility, 
       rowSelection,
       columnFilters,
     },
+    
     enableRowSelection: true,
+    
     onRowSelectionChange: setRowSelection,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
-    onColumnVisibilityChange: setColumnVisibility,
+    onColumnVisibilityChange: (visibility) => {
+      setColumnVisibility(visibility); // Update columnVisibility state when visibility changes
+    },
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
@@ -71,7 +76,7 @@ export function DataTable<TData, TValue>({
 
   return (
     <div className="space-y-4">
-      <DataTableToolbar data={data} table={table} selectedRows={rowSelection} disableApproveButton={disableApproveButton}/>
+      <DataTableToolbar data={data} table={table} selectedRows={rowSelection}/>
       <div className="rounded-md border">
         <Table>
           <TableHeader>

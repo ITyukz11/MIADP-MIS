@@ -17,6 +17,22 @@ interface PendingAccountFormProps {
 }
 
 export default function PendingAccountForm({ pendingUsers, disableApproveButton }: PendingAccountFormProps) {
+
+//   const submit = () => {
+//     const selectedIndices = Object.keys(selectedRows)
+//       .map((key) => parseInt(key)) // Convert keys to numbers
+//       .filter((index) => selectedRows[index]); // Filter out non-selected rows
+
+//     console.log("Selected indices:", selectedIndices);
+
+//     // Get the data for the selected rows
+//     const selectedData = selectedIndices.map((num) => data[num]);
+
+//     // Update approvedPendingUsersData state with the selected data
+//     setApprovedPendingUsersData(selectedData);
+// }
+
+
   if (!pendingUsers) {
     return (
       <div>
@@ -24,10 +40,10 @@ export default function PendingAccountForm({ pendingUsers, disableApproveButton 
       </div>
     );
   }
-
+ 
   return (
     <div>
-      <DataTable data={pendingUsers} columns={columns} disableApproveButton={disableApproveButton}/>
+      <DataTable data={pendingUsers} columns={columns}/>
     </div>
   );
 }

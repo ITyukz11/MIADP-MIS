@@ -23,12 +23,10 @@ import { zodResolver } from "@hookform/resolvers/zod"
 
 interface DialogApprovePendingUsersProps<TData> {
     approvedPendingUsersData: Array<TData & { id?: number, name?: string, email?: string, region?: string, password?: string }>
-    submit: () => void
     disable: boolean
-    disableApproveButton:boolean
 }
 
-export function DialogApprovePendingUsers<TData>({ approvedPendingUsersData, submit, disable,disableApproveButton }: DialogApprovePendingUsersProps<TData>): JSX.Element {
+export function DialogApprovePendingUsers<TData>({ approvedPendingUsersData, disable }: DialogApprovePendingUsersProps<TData>): JSX.Element {
     const [loading, setLoading] = useState(false)
     console.log("approvedPendingUsersData: ", approvedPendingUsersData)
     const [open, setOpen] = useState(false)
@@ -81,9 +79,9 @@ export function DialogApprovePendingUsers<TData>({ approvedPendingUsersData, sub
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
+            {/* <DialogTrigger asChild>
                 <Button size="sm" onClick={submit} disabled={disableApproveButton||disable}>Approve</Button>
-            </DialogTrigger>
+            </DialogTrigger> */}
             <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
                     <DialogTitle>Approving pending users</DialogTitle>

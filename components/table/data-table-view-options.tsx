@@ -12,6 +12,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu"
+import { useEffect } from "react"
 
 interface DataTableViewOptionsProps<TData> {
   table: Table<TData>
@@ -20,6 +21,13 @@ interface DataTableViewOptionsProps<TData> {
 export function DataTableViewOptions<TData>({
   table,
 }: DataTableViewOptionsProps<TData>) {
+
+  // table.getAllColumns().forEach((column) => {
+  //   if (column.id === "user_id") {
+  //     column.toggleVisibility(false);
+  //   }
+  // });
+  
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -32,28 +40,29 @@ export function DataTableViewOptions<TData>({
           View
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-[150px]">
-        <DropdownMenuLabel>Toggle columns</DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        {table
-          .getAllColumns()
-          .filter(
-            (column) =>
-              typeof column.accessorFn !== "undefined" && column.getCanHide()
-          )
-          .map((column) => {
-            return (
-              <DropdownMenuCheckboxItem
-                key={column.id}
-                className="capitalize"
-                checked={column.getIsVisible()}
-                onCheckedChange={(value) => column.toggleVisibility(!!value)}
-              >
-                {column.id}
-              </DropdownMenuCheckboxItem>
-            )
-          })}
-      </DropdownMenuContent>
+        <DropdownMenuContent align="end" className="w-[150px]">
+          <DropdownMenuLabel>Toggle columns</DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          {table
+    .getAllColumns()
+    .filter(
+      (column) =>
+        typeof column.accessorFn !== "undefined" && column.getCanHide()
+    )
+    .map((column) => {
+      return (
+        <DropdownMenuCheckboxItem
+          key={column.id}
+          className="capitalize"
+          checked={column.getIsVisible()}
+          onCheckedChange={(value) => {column.toggleVisibility(value)}}
+        >
+          {column.id}
+        </DropdownMenuCheckboxItem>
+      );
+      
+    })}
+        </DropdownMenuContent>
     </DropdownMenu>
   )
 }

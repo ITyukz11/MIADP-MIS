@@ -60,7 +60,7 @@ export default function AuthenticationPage() {
     return (
 
         <div className="container relative">
-            <div className="border-2 border-border/80 shadow-2xl rounded-xl container relative hidden h-[800px] flex-col items-center justify-center md:grid lg:max-w-none lg:grid-cols-2 lg:px-0">
+            <div className="border-2 border-border/80 shadow-2xl rounded-xl container relative h-full mb-12 overflow-hidden flex-col items-center justify-center md:grid lg:max-w-none lg:grid-cols-2 lg:px-0">
 
                 <Button
                     variant={'link'}
@@ -103,8 +103,8 @@ export default function AuthenticationPage() {
                                             key={index}
                                             src={image.src}
                                             alt={image.alt}
-                                            width={500}
-                                            height={500}
+                                            width={300}
+                                            height={300}
                                             priority
                                         />
                                     </CarouselItem>
@@ -116,7 +116,7 @@ export default function AuthenticationPage() {
 
                     <div className="relative z-20">
                         <blockquote className="space-y-2">
-                            <p className="text-lg">
+                            <p className="text-base">
                                 Welcome to the MIADP Management Information System! Our system efficiently tracks encoded documents, streamlining document management processes for easy access and organization.                             
                             </p>
                             <footer className="text-sm">Binyang Maria</footer>
@@ -130,6 +130,7 @@ export default function AuthenticationPage() {
                         {userLogginIn?
                   
                         <motion.div
+                            className="w-full"
                             key="login"
                             initial={{ x: '-100%', opacity: 0 }}
                             animate={{ x: 0, opacity: 1 }}
@@ -139,6 +140,7 @@ export default function AuthenticationPage() {
                         </motion.div>
                     :
                             <motion.div
+                            className="w-full"  
                                 key="register"
                                 initial={{ x: '60%', opacity: 0 }}
                                 animate={{ x: 0, opacity: 1 }}

@@ -5,6 +5,8 @@ import { fetchWPFActivityData } from '@/lib/supports/wpf-activity'; // Assuming 
 import { columns2 } from '@/components/wpf-table';
 import { DataTable } from '@/components/table/data-table';
 import DialogWFPActivityForm from '@/components/dialog-wfp-activity-form';
+import { Button } from '@/components/ui/button';
+import { MdDelete, MdPrint, MdUpdate } from 'react-icons/md';
 
 
 export default function Page() {
@@ -39,9 +41,14 @@ export default function Page() {
       <div>
         <NavigationMenuDemo />
       </div>
-      <div className='mt-5'>
+      <div className='mt-5 flex flex-col gap-4'>
+        <div className='flex flex-row flex-wrap gap-2'>
         <DialogWFPActivityForm/>
-      <DataTable columns={columns2} data={WPFActivityData} disableApproveButton={true}/>
+    <Button variant={'outline'}><MdUpdate/> Update</Button>
+    <Button variant={'outline'}><MdDelete/> Delete</Button>
+    <Button variant={'outline'}><MdPrint/> Print</Button>
+        </div>
+        <DataTable columns={columns2} data={WPFActivityData}/>
 
       </div>
       {/* <DataTableDemo /> */}

@@ -56,16 +56,21 @@ export const LoginForm = () => {
                     setSuccess(data.success);
 
                     if (!data.error) {
-                        setTimeout(() => {
-                            if (!data.error) {
-                                router.push('/'); // Redirect to '/' if there's no error (login is successful)
-                            }
-                        }, 2000); // Delay for 2 seconds    
-
-                    } else {
-                        setLoading(false);
-
+                        router.push('/'); // Redirect to '/' if there's no error (login is successful)
                     }
+                    setLoading(false);
+
+                    // if (!data.error) {
+                    //     setTimeout(() => {
+                    //         if (!data.error) {
+                    //             router.push('/'); // Redirect to '/' if there's no error (login is successful)
+                    //         }
+                    //     }, 2000); // Delay for 2 seconds    
+
+                    // } else {
+                    //     setLoading(false);
+
+                    // }
                 })
                 .catch((error) => {
                     setError('An error occurred while logging in. Error: ' + error);
@@ -80,7 +85,7 @@ export const LoginForm = () => {
 
 
     return (
-        <div className="flex flex-col gap-2 w-96">
+        <div className="flex flex-col gap-2 w-full">
             {/* <CardWrapper
             headerTitle="Sign In"
             headerLabel="MIADP Management Information System"
@@ -92,7 +97,7 @@ export const LoginForm = () => {
             <Header label='Enter your email below to login' title='Sign In' />
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)}
-                    className="space-y-6"
+                    className="space-y-6 w-full"
                 >
                     <div className="space-y-4">
                         <FormField
@@ -138,7 +143,7 @@ export const LoginForm = () => {
                             Remember password
                         </label>
                     </div>
-                    <FormSuccess message={success} />
+                    {/* <FormSuccess message={success} /> */}
                     <FormError message={error} />
                     <Button
                         typeof="submit"

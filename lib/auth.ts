@@ -2,6 +2,14 @@ import { NextAuthOptions } from "next-auth"
 import CredentialsProvider from 'next-auth/providers/credentials';
 import { compare } from 'bcrypt';
 import prisma from '@/lib/prisma';
+import { UserRole } from "@prisma/client";
+
+type CustomUser = {
+  id: string;
+  email: string;
+  name: string;
+  role: UserRole;
+};
 
 
 export const authOptions: NextAuthOptions = {
@@ -33,10 +41,19 @@ export const authOptions: NextAuthOptions = {
             );
   
             if (passwordCorrect) {
+              console.log({
+                id: user.id,
+                email: user.email,
+                name: user.name,
+                role: user.role
+              }
+            
+              )
               return {
                 id: user.id,
                 email: user.email,
-                name: user.name
+                name: user.name,
+                role: user.region
               };
             }
   
@@ -48,6 +65,21 @@ export const authOptions: NextAuthOptions = {
         }
       })
     ],
+    callbacks: {
+      async jwt({ token, user }) {
+        if (user) {
+          token.role = user.role; // Include the 'role' property from the user object in the token
+        }
+        return token;
+      },
+
+      async session({ session, token }) {
+        if(session?.user) session.user.role = token.role
+        return session;
+      },
+    },
+    
+    
     pages: {
       signIn: '/auth/login', // Adjust this to your desired signIn page URL
       signOut:'/auth/login'

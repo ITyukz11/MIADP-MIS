@@ -1,5 +1,5 @@
 import { DataTable } from "@/components/table/data-table";
-import { columns } from "@/components/table/columns";
+import { columns } from "@/components/table/data/pending-users/columns";
 import { Label } from "@/components/ui/label";
 
 export interface PendingUser {

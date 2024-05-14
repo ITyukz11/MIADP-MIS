@@ -12,24 +12,25 @@ import { FaPlusCircle } from "react-icons/fa"
 import CalendarForm from "./calendar-form"
 import { Separator } from "@/components/ui/separator"
 
+interface CalendarFormDialogProps{
+  open: boolean;
+  setClose: ()=> void;
+  refreshCalendar: ()=> void;
+}
 
-export default function CalendarFormDialog() {
+export default function CalendarFormDialog({open, setClose, refreshCalendar}:CalendarFormDialogProps) {
   return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <Button variant="outline"  className='flex flex-row items-center gap-1 justify-center'><FaPlusCircle /> Create new activity</Button>
-      </DialogTrigger>
-      <DialogContent className="min-w-[40%] overflow-y-auto max-h-[90vh] ">
+    <Dialog open={open} onOpenChange={setClose}>
+      <DialogContent className="min-w-[60%] overflow-y-auto max-h-[95vh] ">
         <DialogHeader>
           <DialogTitle>Create new activity form</DialogTitle>
           <DialogDescription>
-            Click save when you&apos;re done.
+            Click submit when you&apos;re done.
           </DialogDescription>
         </DialogHeader>
         <Separator/>
-        <CalendarForm/>
+        <CalendarForm setDialogClose={setClose} refreshCalendar={refreshCalendar}/>
       </DialogContent>
-  
     </Dialog>
   )
 }

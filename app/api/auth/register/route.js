@@ -3,8 +3,8 @@ import prisma from '@/lib/prisma';
 
 export async function POST(request) {
   try {
-    const { region, fullname, email, password } = await request.json();
-    console.log('api/auth/register route: ', { region, fullname, email, password });
+    const { region, component, unit, position, fullname, email, password } = await request.json();
+    console.log('api/auth/register route: ', { region, component, unit, position, fullname, email, password });
 
     // Check if the email already exists in the database
     const existingUser = await prisma.user.findUnique({ where: { email } });
@@ -19,6 +19,9 @@ export async function POST(request) {
       prisma.user.create({
         data: {
           region,
+          component, 
+          unit, 
+          position,
           name: fullname,
           email,
           password
@@ -27,7 +30,7 @@ export async function POST(request) {
       // Update the status of the pending user to "approved"
       prisma.pendingUser.update({
         where: { email }, // Assuming email is unique and used as the identifier
-        data: { status: 'approved' },
+        data: { status: 'Approved' },
       })
     ]);
 

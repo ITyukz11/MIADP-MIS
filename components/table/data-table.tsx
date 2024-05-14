@@ -57,7 +57,6 @@ export function DataTable<TData, TValue>({
       rowSelection,
       columnFilters,
     },
-    
     enableRowSelection: true,
     
     onRowSelectionChange: setRowSelection,

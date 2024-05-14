@@ -3,97 +3,151 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("POSTGRES_PRISMA_URL") // uses connection pooling
+  provider  = "postgresql"
+  url       = env("POSTGRES_PRISMA_URL") // uses connection pooling
   directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
 }
 
-enum UserRole{
+enum UserRole {
   ADMIN
   USER
 }
 
 model User {
-  id            String    @id @default(cuid())
-  region        String
-  name          String
-  email         String    @unique
-  wfpActivities WFPActivity[]
-  password      String
-  createdAt     DateTime  @default(now()) @map(name: "created_at")
-  updatedAt     DateTime  @updatedAt @map(name: "updated_at")
-  
+  id                   String               @id @default(cuid())
+  region               String
+  name                 String               @unique
+  unit                 String
+  component            String
+  position             String
+  email                String               @unique
+  wfpActivities        WFPActivity[]
+  calendarOfActivities CalendarOfActivity[]
+  password             String
+  status               String               @default("Approved") // Status field to track approval status (e.g., "approved", "disapproved", "pending")
+  createdAt            DateTime             @default(now()) @map(name: "created_at")
+  updatedAt            DateTime             @updatedAt @map(name: "updated_at")
+
   role UserRole @default(USER)
+
   @@map(name: "users")
 }
 
 model PendingUser {
-  id            String    @id @default(cuid())
-  region        String
-  name          String
-  email         String    @unique
-  password      String
-  status        String    @default("pending")// Status field to track approval status (e.g., "approved", "disapproved", "pending")
-  createdAt     DateTime  @default(now()) @map(name: "created_at")
-  updatedAt     DateTime  @updatedAt @map(name: "updated_at")
+  id        String   @id @default(cuid())
+  region    String
+  unit      String
+  component String
+  position  String
+  name      String
+  email     String   @unique
+  password  String
+  status    String   @default("Pending") // Status field to track approval status (e.g., "approved", "disapproved", "pending")
+  createdAt DateTime @default(now()) @map(name: "created_at")
+  updatedAt DateTime @updatedAt @map(name: "updated_at")
+
   @@map(name: "pending_users")
 }
 
 model WFPActivity {
-  id                       Int               @id @default(autoincrement())
-  activityIdNum            String
-  typeOfActivity           String
-  operatingUnit            String
-  componentsUnits          String
-  budgetYear               String
-  activities               String
-  costTabMajorityActivity  String
-  costTabSubActivity       String
-  unitMeasures             String
-  physicalTarget           String
-  financialTotal           String
-  loanProceed              String
-  gopCounterPart           String
-  budgetLine               String
-  uacsCode                 String
-  userEmail                String
-  user                     User              @relation(fields: [userEmail], references: [email])
-  timeFramePhysical        TimeFramePhysical?
-  timeFrameFinancial       TimeFrameFinancial?
+  id                      Int                 @id @default(autoincrement())
+  activityIdNum           String
+  typeOfActivity          String
+  operatingUnit           String
+  componentsUnits         String
+  budgetYear              String
+  activities              String
+  costTabMajorityActivity String
+  costTabSubActivity      String
+  unitMeasures            String
+  physicalTarget          String
+  financialTotal          String
+  loanProceed             String
+  gopCounterPart          String
+  budgetLine              String
+  uacsCode                String
+  userEmail               String
+  user                    User                @relation(fields: [userEmail], references: [email])
+  timeFramePhysical       TimeFramePhysical?
+  timeFrameFinancial      TimeFrameFinancial?
 }
 
 model TimeFramePhysical {
-  id               Int          @id @default(autoincrement())
-  january          Int
-  february         Int
-  march            Int
-  april            Int
-  may              Int
-  june             Int
-  july             Int
-  august           Int
-  september        Int
-  october          Int
-  november         Int
-  december         Int
-  wfpActivityId    Int          @unique
-  wfpActivity      WFPActivity  @relation(fields: [wfpActivityId], references: [id])
+  id            Int         @id @default(autoincrement())
+  january       Int
+  february      Int
+  march         Int
+  april         Int
+  may           Int
+  june          Int
+  july          Int
+  august        Int
+  september     Int
+  october       Int
+  november      Int
+  december      Int
+  wfpActivityId Int         @unique
+  wfpActivity   WFPActivity @relation(fields: [wfpActivityId], references: [id])
 }
 
 model TimeFrameFinancial {
-  id               Int          @id @default(autoincrement())
-  january          Int
-  february         Int
-  march            Int
-  april            Int
-  may              Int
-  june             Int
-  july             Int
-  august           Int
-  september        Int
-  october          Int
-  november         Int
-  december         Int
-  wfpActivityId    Int          @unique
-  wfpActivity      WFPActivity  @relation(fields: [wfpActivityId], references: [id])
+  id            Int         @id @default(autoincrement())
+  january       Int
+  february      Int
+  march         Int
+  april         Int
+  may           Int
+  june          Int
+  july          Int
+  august        Int
+  september     Int
+  october       Int
+  november      Int
+  december      Int
+  wfpActivityId Int         @unique
+  wfpActivity   WFPActivity @relation(fields: [wfpActivityId], references: [id])
+}
+
+model CalendarOfActivity {
+  id                        String                      @id @default(cuid())
+  authorizeOther            Boolean
+  activityTitle             String
+  activityDescription       String
+  type                      String
+  targetParticipant         String
+  location                  String
+  dateFrom                  String
+  dateRange                 Json[]
+  timeRange                 String
+  allDay                    Boolean
+  preparatoryList           PreparatoryList[]
+  remarks                   String
+  color                     String
+  status                    String
+  userName                  String
+  user                      User                        @relation(fields: [userName], references: [name])
+  calendarOfActivityHistory CalendarOfActivityHistory[]
+  createdAt                 DateTime                    @default(now()) @map(name: "created_at")
+  updatedAt                 DateTime                    @updatedAt @map(name: "updated_at")
+}
+
+model PreparatoryList {
+  id                 String             @id @default(cuid())
+  description        String
+  status             String
+  remarks            String
+  activity           String
+  calendarOfActivity CalendarOfActivity @relation(fields: [activity], references: [id])
+
+  createdAt DateTime @default(now()) @map(name: "created_at")
+  updatedAt DateTime @updatedAt @map(name: "updated_at")
+}
+
+model CalendarOfActivityHistory {
+  id                 String             @id @default(cuid())
+  activity           String
+  calendarOfActivity CalendarOfActivity @relation(fields: [activity], references: [id])
+
+  createdAt DateTime @default(now()) @map(name: "created_at")
+  updatedAt DateTime @updatedAt @map(name: "updated_at")
 }

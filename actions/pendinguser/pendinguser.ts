@@ -15,10 +15,13 @@ export const pendinguser = async (values: z.infer<typeof RegisterSchema>): Promi
             return { error: "Invalid fields!" };
         } else {
             const response = await axios.post('/api/auth/pending-users', {
-                region: values.region,
+                region:values.region,
                 fullname: values.fullname,
                 email: values.email,
-                password: values.password,
+                component: values.component,
+                unit: values.unit,
+                position: values.position,
+                password: values.password
             });
 
             // Check if the response contains an error message

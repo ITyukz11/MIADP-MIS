@@ -16,7 +16,7 @@ type Props = {}
 
 const page = (props: Props) => {
   const [data, setData] = useState<any[]>([]);
-const [coaData, setCoaData] = useState({})
+  const [coaData, setCoaData] = useState<any[]>([]); 
   // Effect to fetch data from the API
   useEffect(() => {
     const fetchData = async () => {
@@ -63,10 +63,10 @@ const [coaData, setCoaData] = useState({})
           ))}
         </div>
 
-        {coaData && coaData.length > 0 ? (
+        {coaData ? (
         <DataTable data={coaData} columns={columns} />
       ) : (
-        <p className='flex flex-row gap-2'><LoadingSpinner/> Please wait...</p>
+        <p className='flex flex-row gap-2 mt-3'><LoadingSpinner/> Please wait...</p>
       )}
 
       </div>

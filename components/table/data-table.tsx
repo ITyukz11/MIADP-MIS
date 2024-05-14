@@ -39,9 +39,12 @@ export function DataTable<TData, TValue>({
 }: DataTableProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = React.useState({})
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({
-    user_id: false,
+    id: false,
     target_participant:false,
-    coa_id:false
+    coa_id:false,
+    authorizeOther:false,
+    timeRange:false,
+    activityDescription:false,
   });
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []

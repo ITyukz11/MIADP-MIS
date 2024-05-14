@@ -5,13 +5,13 @@ import { z } from "zod"
 export const pendingUsersSchema = z.object({
   id: z.string(),
   region: z.string(),
-  name: z.string(),
+  name:z.string(),
   email: z.string(),
   status: z.string(),
-  unit: z.string(),
+  createdAt: z.string(),
   component: z.string(),
+  unit: z.string(),
   position: z.string(),
-  createdAt: z.string()
 })
 
-export type Task = z.infer<typeof pendingUsersSchema>
+export type PendingUserType = z.infer<typeof pendingUsersSchema>

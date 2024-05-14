@@ -6,7 +6,16 @@ const instance = axios.create({
 
 export async function fetchPendingUsers() {
   try {
-    const response = await instance.get('/api/auth/pending-users');
+    const username = 'MIADP';
+    const password = 'test';
+    const authHeader = `Basic ${Buffer.from(`${username}:${password}`).toString('base64')}`;
+    
+    const response = await instance.get('/api/auth/pending-users', {
+      headers: {
+        Authorization: authHeader,
+      },
+    });
+
     return response.data;
   } catch (error) {
     console.error('Error fetching pending users:', error);

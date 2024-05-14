@@ -1,12 +1,12 @@
 "use client"
 import { ColumnDef } from "@tanstack/react-table"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Task } from "./schema" 
 import { DataTableColumnHeader } from "../../data-table-column-header"
 import { DataTableRowActions } from "./data-table-row-actions"
 import { Badge } from "../../../ui/badge"
+import { PendingUserType } from "./schema"
 
-export const columns: ColumnDef<Task>[] = [
+export const columns: ColumnDef<PendingUserType>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -102,7 +102,7 @@ export const columns: ColumnDef<Task>[] = [
         <div className="flex space-x-2">
           <span className="max-w-[500px] truncate font-medium">
           
-          <Badge variant={row.getValue("status")=="approved"?"outline":"destructive"}>{row.getValue("status")}</Badge>
+          <Badge variant={row.getValue("status")=="Approved"?"outline":"destructive"}>{row.getValue("status")}</Badge>
           </span>
         </div>
       );

@@ -15,15 +15,20 @@ export const pendinguser = async (values: z.infer<typeof RegisterSchema>): Promi
             return { error: "Invalid fields!" };
         } else {
             const response = await axios.post('/api/auth/pending-users', {
-                region:values.region,
+                region: values.region,
                 fullname: values.fullname,
                 email: values.email,
                 component: values.component,
                 unit: values.unit,
                 position: values.position,
                 password: values.password
+            }, {
+                auth: {
+                    username: 'MIADP',
+                    password: 'test'
+                  }
             });
-
+    
             // Check if the response contains an error message
             if (response.data && response.data.error) {
                 // If there's an error message, return it
@@ -33,8 +38,7 @@ export const pendinguser = async (values: z.infer<typeof RegisterSchema>): Promi
                 return { success: response.data.message };
             }
         }
-    }
-    catch (error) {
+    } catch (error) {
         // Handle any errors from the API
         if (axios.isAxiosError(error)) {
             const axiosError = error as AxiosError;
@@ -44,7 +48,7 @@ export const pendinguser = async (values: z.infer<typeof RegisterSchema>): Promi
                     return { error: responseData.message };
                 }
             }
-            return { error: error.response?.data?.error === 'Email already exists'?error.response?.data?.error : "An error occurred while registering." };
+            return { error: error.response?.data?.error === 'Email already exists' ? error.response?.data?.error : "An error occurred while registering." };
         } else {
             return { error: "An error occurred while registering." };
         }

@@ -1,37 +1,28 @@
 'use client'
 import { Separator } from "@/components/ui/separator";
-import { PendingUser } from "./components/pending-account-form";
 import { useEffect, useState } from "react";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { fetchPendingUsers } from "@/lib/admin/pending-users";
 import PendingAccountForm from "./components/pending-account-form";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { PendingUserType } from "@/components/table/data/pending-users/schema";
 
 export default function SettingsAccountPage() {
   const [loading, setLoading] = useState(true);
   
-  const [filteredPendingUsers, setFilteredPendingUsers] = useState<PendingUser[]>([]);
-  const [pendingUsers, setPendingUsers] = useState<PendingUser[] | null>(null);
+  const [filteredPendingUsers, setFilteredPendingUsers] = useState<PendingUserType[]>([]);
+  const [pendingUsers, setPendingUsers] = useState<PendingUserType[] | null>(null);
   
   const [showAll, setShowAll] = useState(false)
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Retrieve cached data from localStorage
-        // const cachedDataString = localStorage.getItem("pendingUsers");
-        // if (cachedDataString) {
-        //   // If data is found in localStorage, parse it and set the state
-        //   const cachedData: PendingUser[] = JSON.parse(cachedDataString);
-        //   setPendingUsers(cachedData);
-        //   setFilteredPendingUsers(cachedData.filter((user: PendingUser) => user.status == "pending"));
-        // } else {
-          // If no data found in localStorage, fetch from API and store in localStorage
+      
           const data = await fetchPendingUsers();
           setPendingUsers(data);
-          setFilteredPendingUsers(data.filter((user: PendingUser) => user.status.toLocaleLowerCase() == "pending"));
-         // localStorage.setItem("pendingUsers", JSON.stringify(data));
-        //}
+          setFilteredPendingUsers(data.filter((user: PendingUserType) => user.status.toLocaleLowerCase() == "pending"));
+         
         setLoading(false);
       } catch (error) {
         console.error("Error fetching pending users:", error);

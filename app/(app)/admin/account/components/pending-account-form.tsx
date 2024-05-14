@@ -1,38 +1,29 @@
+// Import necessary components and types
 import { DataTable } from "@/components/table/data-table";
-import { columns } from "@/components/table/data/pending-users/columns";
+import { columns } from "@/components/table/data/pending-users/columns"; // Adjust the import path
 import { Label } from "@/components/ui/label";
 
-export interface PendingUser {
+// Define the PendingUser interface
+interface PendingUser {
   id: string; 
   region: string; 
   name: string; 
   email: string; 
   status: string; 
   createdAt: string;
+  component: string;
+  unit: string;
+  position: string;
 }
 
+// Define the props for PendingAccountForm component
 interface PendingAccountFormProps {
   pendingUsers: PendingUser[];
   disableApproveButton: boolean; // Define the prop here
 }
 
-export default function PendingAccountForm({ pendingUsers, disableApproveButton }: PendingAccountFormProps) {
-
-//   const submit = () => {
-//     const selectedIndices = Object.keys(selectedRows)
-//       .map((key) => parseInt(key)) // Convert keys to numbers
-//       .filter((index) => selectedRows[index]); // Filter out non-selected rows
-
-//     console.log("Selected indices:", selectedIndices);
-
-//     // Get the data for the selected rows
-//     const selectedData = selectedIndices.map((num) => data[num]);
-
-//     // Update approvedPendingUsersData state with the selected data
-//     setApprovedPendingUsersData(selectedData);
-// }
-
-
+// Define the PendingAccountForm component
+export default function PendingAccountForm({ pendingUsers }: PendingAccountFormProps) {
   if (!pendingUsers) {
     return (
       <div>
@@ -40,13 +31,10 @@ export default function PendingAccountForm({ pendingUsers, disableApproveButton 
       </div>
     );
   }
- 
+
   return (
     <div>
-      <DataTable data={pendingUsers} columns={columns}/>
+      <DataTable data={pendingUsers} columns={columns} />
     </div>
   );
 }
-
-
-

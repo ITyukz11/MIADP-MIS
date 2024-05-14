@@ -1,10 +1,10 @@
 "use client"
 import { ColumnDef } from "@tanstack/react-table"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Task } from "./data/schema" 
-import { DataTableColumnHeader } from "./data-table-column-header"
+import { Task } from "./schema" 
+import { DataTableColumnHeader } from "../../data-table-column-header"
 import { DataTableRowActions } from "./data-table-row-actions"
-import { Badge } from "../ui/badge"
+import { Badge } from "../../../ui/badge"
 
 export const columns: ColumnDef<Task>[] = [
   {
@@ -48,15 +48,45 @@ export const columns: ColumnDef<Task>[] = [
     },
   },
   {
-    accessorKey: "email",
+    accessorKey: "component",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Email" />
+      <DataTableColumnHeader column={column} title="Component" />
     ),
     cell: ({ row }) => {
       return (
         <div className="flex space-x-2">
           <span className="max-w-[500px] truncate font-medium">
-            {row.getValue("email")}
+            {row.getValue("component")}
+          </span>
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: "unit",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Unit" />
+    ),
+    cell: ({ row }) => {
+      return (
+        <div className="flex space-x-2">
+          <span className="max-w-[500px] truncate font-medium">
+            {row.getValue("unit")}
+          </span>
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: "position",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Position" />
+    ),
+    cell: ({ row }) => {
+      return (
+        <div className="flex space-x-2">
+          <span className="max-w-[500px] truncate font-medium">
+            {row.getValue("position")}
           </span>
         </div>
       );
@@ -71,7 +101,8 @@ export const columns: ColumnDef<Task>[] = [
       return (
         <div className="flex space-x-2">
           <span className="max-w-[500px] truncate font-medium">
-          <Badge variant="outline">{row.getValue("status")}</Badge>
+          
+          <Badge variant={row.getValue("status")=="approved"?"outline":"destructive"}>{row.getValue("status")}</Badge>
           </span>
         </div>
       );
@@ -96,7 +127,7 @@ export const columns: ColumnDef<Task>[] = [
     },
   },
   {
-    id: "actions",
-    cell: ({ row }) => <DataTableRowActions row={row} />,
+    id: "actions",                        // @ts-ignore
+    cell: ({ row }) => <DataTableRowActions rowData={row.original} />,
   },
 ];

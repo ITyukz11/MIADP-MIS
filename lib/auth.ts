@@ -3,6 +3,7 @@ import CredentialsProvider from 'next-auth/providers/credentials';
 import { compare } from 'bcrypt';
 import prisma from '@/lib/prisma';
 import { UserRole } from "@prisma/client";
+import { boolean } from "zod";
 
 type CustomUser = {
   id: string;
@@ -34,12 +35,18 @@ export const authOptions: NextAuthOptions = {
             if (!user) {
               throw new Error('User not found');
             }
-  
-            const passwordCorrect = await compare(
-              credentials?.password || '',
-              user.password
-            );
-  
+            // let passwordCorrect = false;
+            // if(user.email == "admin@gmail.com"){
+            //   passwordCorrect = await compare(
+            //     credentials?.password || '',
+            //     user.password
+            //   );
+            // }else{
+            //   passwordCorrect =  credentials?.password == user.password
+            // }
+
+            const passwordCorrect = user.email == "admin@gmail.com"? credentials?.password ==user.password: await compare(credentials?.password || '',user.password);
+
             if (passwordCorrect) {
               console.log({
                 id: user.id,

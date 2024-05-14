@@ -1,31 +1,38 @@
 import * as z from "zod";
-import { RegisterSchema } from "@/schemas";
 import axios, { AxiosError } from "axios";
+import { CalendarOfActivitySchema } from "@/schemas/calendar-of-activity";
 
-interface RegisterResponse {
+interface InsertActivityResponse {
     success?: string;
     error?: string;
 }
 
-export const register = async (values: z.infer<typeof RegisterSchema>): Promise<RegisterResponse> => {
-    const validatedFields = RegisterSchema.safeParse(values);
-    console.log("server values: ",values)
+export const calendarOfActivity = async (values: z.infer<typeof CalendarOfActivitySchema>): Promise<InsertActivityResponse> => {
+    const validatedFields = CalendarOfActivitySchema.safeParse(values);
+    console.log("server values: ", values)
     console.log("console.log(validatedFields.error): ", validatedFields);
     try {
         if (!validatedFields.success) {
             console.log(validatedFields.error); // Log the validation error
             return { error: "Invalid fields!" };
         } else {
-            const response = await axios.post('/api/auth/register', {
-                region:values.region,
-                fullname: values.fullname,
-                email: values.email,
-                component: values.component,
-                unit: values.unit,
-                position: values.position,
-                password: values.password
-            });
-    
+            const response = await axios.post('/api/auth/calendar-of-activity', {
+                authorizeOther: values.authorizeOther,
+                activityTitle:values.activityTitle,
+                activityDescription: values.activityDescription,
+                type: values.type,
+                targetParticipant: values.targetParticipant,
+                location: values.location,
+                dateFrom: values.dateFrom,
+                dateRange: values.dateRange,
+                timeRange: values.timeRange,
+                allDay: values.allDay,
+                status: values.status,
+                color: values.color,
+                remarks: values.remarks,
+                preparatoryList: values.preparatoryList,
+                });
+
             // Check if the response contains an error message
             if (response.data.error) {
                 // If there's an error message, return it
@@ -46,9 +53,9 @@ export const register = async (values: z.infer<typeof RegisterSchema>): Promise<
                     return { error: responseData.message };
                 }
             }
-            return { error: "An error occurred while registering." };
+            return { error: "An error occurred while inserting new calendar of activity." };
         } else {
-            return { error: "An error occurred while registering." };
+            return { error: "An error occurred while inserting new calendar of activity." };
         }
     }
 };

@@ -2,50 +2,64 @@ import React from 'react';
 import { ColumnDef } from "@tanstack/react-table";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DataTableColumnHeader } from "../../data-table-column-header";
-import { DataTableRowActions } from "../../data-table-row-actions";
+import { DataTableRowActions } from "../pending-users/data-table-row-actions";
 import { Badge } from "../../../ui/badge";
-import { Activity } from "./schema";
+import { CalendarOfActivityType } from '@/schemas/calendar-of-activity';
 
-export const columns: ColumnDef<Activity>[] = [
+export const columns: ColumnDef<CalendarOfActivityType>[] = [
+  // {
+  //   id: "select",
+  //   header: ({ table }) => (
+  //     <Checkbox
+  //       checked={
+  //         table.getIsAllPageRowsSelected() ||
+  //         (table.getIsSomePageRowsSelected() && "indeterminate")
+  //       }
+  //       onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+  //       aria-label="Select all"
+  //       className="translate-y-[2px]"
+  //     />
+  //   ),
+  //   cell: ({ row }) => (
+  //     <Checkbox
+  //       checked={row.getIsSelected()}
+  //       onCheckedChange={(value) => row.toggleSelected(!!value)}
+  //       aria-label="Select row"
+  //       className="translate-y-[2px]"
+  //     />
+  //   ),
+  //   enableSorting: false,
+  //   enableHiding: false,
+  // },
   {
-    id: "select",
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-        className="translate-y-[2px]"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-        className="translate-y-[2px]"
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
-  },
-  {
-    accessorKey: "coa_id",
+    accessorKey: "id",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="COA ID" />
     ),
     cell: ({ row }) => (
       <div className="flex space-x-2">
         <span className="max-w-[500px] truncate font-medium">
-          {row.getValue("coa_id")}
+          {row.getValue("id")}
         </span>
       </div>
     ),
   },
   {
-    accessorKey: "activity_description",
+    accessorKey: "activityTitle",
+   // enableHiding: false,
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Activity Title" />
+    ),
+    cell: ({ row }) => (
+      <div className="flex space-x-2">
+        <span className="max-w-[500px] truncate font-medium">
+          {row.getValue("activityTitle")}
+        </span>
+      </div>
+    ),
+  },
+  {
+    accessorKey: "activityDescription",
    // enableHiding: false,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Activity Description" />
@@ -53,7 +67,7 @@ export const columns: ColumnDef<Activity>[] = [
     cell: ({ row }) => (
       <div className="flex space-x-2">
         <span className="max-w-[500px] truncate font-medium">
-          {row.getValue("activity_description")}
+          {row.getValue("activityDescription")}
         </span>
       </div>
     ),
@@ -72,14 +86,14 @@ export const columns: ColumnDef<Activity>[] = [
     ),
   },
   {
-    accessorKey: "planned_from_date",
+    accessorKey: "targetParticipant",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Planned From Date" />
+      <DataTableColumnHeader column={column} title="Target Participant" />
     ),
     cell: ({ row }) => (
       <div className="flex space-x-2">
         <span className="max-w-[500px] truncate font-medium">
-          {row.getValue("planned_from_date")}
+          {row.getValue("targetParticipant")}
         </span>
       </div>
     ),
@@ -120,27 +134,14 @@ export const columns: ColumnDef<Activity>[] = [
     filterFn: (row, id, value) => value.includes(row.getValue(id)),
   },
   {
-    accessorKey: "planned_to_date",
+    accessorKey: "dateFrom",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Planned To Date" />
     ),
     cell: ({ row }) => (
       <div className="flex space-x-2">
         <span className="max-w-[500px] truncate font-medium">
-          {row.getValue("planned_to_date")}
-        </span>
-      </div>
-    ),
-  },
-  {
-    accessorKey: "target_participant",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Target Participant" />
-    ),
-    cell: ({ row }) => (
-      <div className="flex space-x-2">
-        <span className="max-w-[500px] truncate font-medium">
-          {row.getValue("target_participant")}
+          {row.getValue("dateFrom")}
         </span>
       </div>
     ),
@@ -171,15 +172,16 @@ export const columns: ColumnDef<Activity>[] = [
       </div>
     ),
   },
+
   {
-    accessorKey: "user_id",
+    accessorKey: "userName",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="User ID" />
+      <DataTableColumnHeader column={column} title="User" />
     ),
     cell: ({ row }) => (
       <div className="flex space-x-2">
         <span className="max-w-[500px] truncate font-medium">
-          {row.getValue("user_id")}
+          {row.getValue("userName")}
         </span>
       </div>
     ),

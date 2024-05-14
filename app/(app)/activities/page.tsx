@@ -9,12 +9,14 @@ import { cn } from '@/lib/utils'
 import Link from 'next/link'
 import React, { useEffect, useState } from 'react'
 import { FilterMenus } from './filtermenus'
+import { fetchCalendarOfActivity } from '@/lib/calendar-of-activity/fetch-calendar-of-activity'
+import { LoadingSpinner } from '@/components/LoadingSpinner'
 
 type Props = {}
 
 const page = (props: Props) => {
   const [data, setData] = useState<any[]>([]);
-
+const [coaData, setCoaData] = useState({})
   // Effect to fetch data from the API
   useEffect(() => {
     const fetchData = async () => {
@@ -35,9 +37,20 @@ const page = (props: Props) => {
   console.log(data)
 
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+          const data = await fetchCalendarOfActivity();
+          setCoaData(data);
+      } catch (error) {
+        console.error("Error fetching calendar of activity:", error);
+      }
+    };
   
+    fetchData();
+  }, []);
 
-  
+  console.log("coaData: ",coaData)
 
   return (
     <div className='container relative'>
@@ -50,7 +63,11 @@ const page = (props: Props) => {
           ))}
         </div>
 
-        <DataTable data={coaDataExample} columns={columns} />
+        {coaData && coaData.length > 0 ? (
+        <DataTable data={coaData} columns={columns} />
+      ) : (
+        <p className='flex flex-row gap-2'><LoadingSpinner/> Please wait...</p>
+      )}
 
       </div>
     </div>

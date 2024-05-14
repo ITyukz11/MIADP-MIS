@@ -1,6 +1,5 @@
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { Label } from "@/components/ui/label";
-import { FaSpinner } from "react-icons/fa";
 
 const Loading: React.FC = () => {
   return (

@@ -19,19 +19,19 @@ export default function SettingsAccountPage() {
     const fetchData = async () => {
       try {
         // Retrieve cached data from localStorage
-        const cachedDataString = localStorage.getItem("pendingUsers");
-        if (cachedDataString) {
-          // If data is found in localStorage, parse it and set the state
-          const cachedData: PendingUser[] = JSON.parse(cachedDataString);
-          setPendingUsers(cachedData);
-          setFilteredPendingUsers(cachedData.filter((user: PendingUser) => user.status === "pending"));
-        } else {
+        // const cachedDataString = localStorage.getItem("pendingUsers");
+        // if (cachedDataString) {
+        //   // If data is found in localStorage, parse it and set the state
+        //   const cachedData: PendingUser[] = JSON.parse(cachedDataString);
+        //   setPendingUsers(cachedData);
+        //   setFilteredPendingUsers(cachedData.filter((user: PendingUser) => user.status == "pending"));
+        // } else {
           // If no data found in localStorage, fetch from API and store in localStorage
           const data = await fetchPendingUsers();
           setPendingUsers(data);
-          setFilteredPendingUsers(data.filter((user: PendingUser) => user.status === "pending"));
-          localStorage.setItem("pendingUsers", JSON.stringify(data));
-        }
+          setFilteredPendingUsers(data.filter((user: PendingUser) => user.status.toLocaleLowerCase() == "pending"));
+         // localStorage.setItem("pendingUsers", JSON.stringify(data));
+        //}
         setLoading(false);
       } catch (error) {
         console.error("Error fetching pending users:", error);

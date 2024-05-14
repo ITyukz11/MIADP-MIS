@@ -8,12 +8,10 @@ export const pendingUsersSchema = z.object({
   name: z.string(),
   email: z.string(),
   status: z.string(),
-  createdAt: z.string(),
-  // id: z.string(),
-  // title: z.string(),
-  // status: z.string(),
-  // label: z.string(),
-  // priority: z.string(),
+  unit: z.string(),
+  component: z.string(),
+  position: z.string(),
+  createdAt: z.string()
 })
 
 export type Task = z.infer<typeof pendingUsersSchema>

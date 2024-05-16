@@ -54,14 +54,28 @@ export async function POST(request) {
   }
 }
 
-export async function GET() {
+export async function GET(request) {
   try {
-    const calendarOfActivity = await prisma.calendarOfActivity.findMany({  
-      cacheStrategy: { ttl: 3600, swr: 300 },  
+    const calendarOfActivity = await prisma.calendarOfActivity.findMany({
+      include: {
+        user: {
+          select: {
+            component: true,
+            unit: true,
+            position: true,
+            region:true
+          }
+        }, 
+        calendarOfActivityHistory: true, // Include all fields from the calendarOfActivityHistory model
+        preparatoryList: true // Include all fields from the preparatoryList model
+      },
+      cacheStrategy: { ttl: 3600, swr: 300 },
     });
+
     return new Response(JSON.stringify(calendarOfActivity), { status: 200, headers: { 'Content-Type': 'application/json' } });
   } catch (error) {
     console.error('Error fetching Calendar Of Activity:', error);
     return new Response(JSON.stringify({ error: 'Internal Server Error' }), { status: 500, headers: { 'Content-Type': 'application/json' } });
   }
 }
+

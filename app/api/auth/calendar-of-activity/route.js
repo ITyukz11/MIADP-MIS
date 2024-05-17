@@ -12,7 +12,7 @@ export async function POST(request) {
     //const userName = await getCurrentUser();
     
     const { authorizeOther, activityTitle, activityDescription, type, targetParticipant, 
-            location, dateFrom, dateRange,timeRange,allDay,status,color,remarks,preparatoryList,userName} = await request.json();
+            location, dateFrom, dateTo,timeStart,timeEnd, allDay,status,color,remarks,preparatoryList,userName} = await request.json();
     console.log('api/auth/calendar-of-activity route: ', { authorizeOther,activityTitle, activityDescription, type, targetParticipant, 
       location, dateFrom, dateRange,timeRange,allDay,status,remarks,preparatoryList,userName });
 
@@ -26,8 +26,9 @@ export async function POST(request) {
             targetParticipant, 
             location, 
             dateFrom, 
-            dateRange,
-            timeRange,
+            dateTo,
+            timeStart,
+            timeEnd,
             allDay,
             status,
             color,

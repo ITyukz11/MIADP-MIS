@@ -6,6 +6,7 @@ import { ErrorBoundary } from "next/dist/client/components/error-boundary"
 import GlobalError from "../error"
 import { redirect } from "next/navigation"
 import { getServerSession } from "next-auth"
+import { CurrentUserProvider } from "@/components/CurrentUserContext"
 
 interface AppLayoutProps {
     children: React.ReactNode
@@ -19,12 +20,14 @@ export default async function AppLayout({ children }: AppLayoutProps) {
     }
 
     return (
+        <CurrentUserProvider initialUser={session.user as any}>
         <div className="flex flex-col">
             <ErrorBoundary errorComponent={GlobalError}>
-                <SiteHeader currentUser={session.user.name || "Guest"} />
+                <SiteHeader/>
                 <main className="flex-1 mt-4 mb-auto h-full">{children}</main>
                 <SiteFooter />
             </ErrorBoundary>
         </div>
+        </CurrentUserProvider>
     )
 }

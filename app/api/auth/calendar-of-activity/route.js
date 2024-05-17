@@ -49,8 +49,8 @@ export async function POST(request) {
     
         return NextResponse.json({ newCalendarOfActivity });
   } catch (error) {
-    console.error('Error registering user:', error);
-    return NextResponse.json({ error: 'Internal server error' });
+    console.error('Error inserting new activity:', error);
+    return NextResponse.json({ error: 'Internal server error. Error Message: ', error });
   }
 }
 

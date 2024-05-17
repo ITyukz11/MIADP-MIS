@@ -25,10 +25,11 @@ import { calendarOfActivity } from '@/actions/calendar-of-activity/calendarofact
 import { toast } from '@/components/ui/use-toast'
 import { LoadingSpinner } from '@/components/LoadingSpinner'
 import { ColorPicker } from '@/components/ui/color-picker'
+import { useCurrentUser } from '@/components/CurrentUserContext'
 
 type Props = {
     setDialogClose: () => void
-    refreshCalendar: ()=> void
+    refreshCalendar: () => void
 }
 
 const CalendarForm = ({ setDialogClose, refreshCalendar }: Props) => {
@@ -45,7 +46,7 @@ const CalendarForm = ({ setDialogClose, refreshCalendar }: Props) => {
 
     const { RangePicker } = DatePicker;
 
-    const dateFormat = 'YYYY/MM/DD';
+    const { currentUser } = useCurrentUser();
 
     const form = useForm<z.infer<typeof CalendarOfActivitySchema>>({
         resolver: zodResolver(CalendarOfActivitySchema),
@@ -57,18 +58,26 @@ const CalendarForm = ({ setDialogClose, refreshCalendar }: Props) => {
             location: '', // optional field, can be omitted if you don't want a default value
             type: '',
             dateFrom: dayjs().toString(),
-            dateRange: [{}],
-            timeRange: '',
+            dateTo: dayjs().toString(),
+            timeStart: '',
+            timeEnd: '',
             allDay: false,
             color: '#F5222D',
             status: 'New', // default value specified in the schema
             preparatoryList: [{ description: '', status: '', remarks: '' }],
             remarks: '',
+            name: currentUser?.name
         },
     })
 
     const onSubmit = async (values: z.infer<typeof CalendarOfActivitySchema>) => {
-        console.log("values: ", values)
+        console.log("submit values: ", values)
+
+        if (!navigator.onLine) {
+            // Alert the user that there is no internet connection
+            alert("No internet connection. Please check your network connection and try again.");
+            return;
+        }
 
         setError("")
         setSuccess("")
@@ -101,29 +110,51 @@ const CalendarForm = ({ setDialogClose, refreshCalendar }: Props) => {
     const handleRangePickerChange = (value: any) => {
         if (value && Array.isArray(value) && value.length === 2) {
             const [startDate, endDate] = value;
-            const formattedStartDate = startDate.format(dateFormat); // Convert Dayjs object to Date object
-            const formattedEndDate = endDate.format(dateFormat); // Convert Dayjs object to Date object
-            form.setValue('dateRange', [{ startDate: formattedStartDate, endDate: formattedEndDate }]);
+            const formattedStartDate = startDate.format('YYYY/MM/DD'); // Convert Dayjs object to string
+            const formattedEndDate = endDate.format('YYYY/MM/DD'); // Convert Dayjs object to string
 
-            console.log(formattedStartDate);
-            console.log(formattedEndDate);
+            form.setValue('dateFrom', formattedStartDate);
+            form.setValue('dateTo', formattedEndDate);
+
+            console.log("startDate: ", formattedStartDate);
+            console.log("dateTo: ", formattedEndDate);
         } else {
             // Clear the value if no range is selected
-            form.setValue('dateRange', []);
+            form.setValue('dateFrom', '');
+            form.setValue('dateTo', '');
         }
     };
 
     const handleDatePickerChange = (value: any) => {
         if (value) {
             const date = value;
-            const finalDate = date.format(dateFormat); // Convert Dayjs object to Date object
+            const formattedStartDate = date.format('YYYY/MM/DD'); // Convert Dayjs object to string
 
-            form.setValue('dateFrom', finalDate);
-
-            console.log(finalDate);
+            form.setValue('dateFrom', formattedStartDate);
+            form.setValue('dateTo', formattedStartDate);
+            console.log(formattedStartDate);
         } else {
             // Clear the value if no range is selected
             form.setValue('dateFrom', '');
+            form.setValue('dateTo', '');
+        }
+    };
+
+    const handleTimeRangeChange = (value: any) => {
+        if (value && Array.isArray(value) && value.length === 2) {
+            const [startTime, endTime] = value;
+            const formattedStartTime = startTime.format('HH:mm'); // Extract only the time part
+            const formattedEndTime = endTime.format('HH:mm'); // Extract only the time part
+            
+            form.setValue('timeStart', formattedStartTime);
+            form.setValue('timeEnd', formattedEndTime);
+
+            console.log('timeStart', formattedStartTime);
+            console.log('timeEnd', formattedEndTime);
+        } else {
+            // Clear the value if no range is selected
+            form.setValue('timeStart', '');
+            form.setValue('timeEnd', '');
         }
     };
 
@@ -237,7 +268,7 @@ const CalendarForm = ({ setDialogClose, refreshCalendar }: Props) => {
                                 </FormItem>
                             )}
                         />
-                       
+
                     </div>
                     <div className='flex flex-row gap-2 item-start'>
                         <div className='flex flex-row items-center justify-start gap-1 mt-5'>
@@ -251,13 +282,12 @@ const CalendarForm = ({ setDialogClose, refreshCalendar }: Props) => {
                         {allDayChecked ?
                             <FormField
                                 control={form.control}
-                                name="dateRange"
+                                name="dateTo"
                                 render={({ field }) => (
                                     <FormItem className='flex flex-col mt-auto w-full'>
                                         <FormLabel>Planned Date Range</FormLabel>
                                         <RangePicker
                                             defaultValue={[dayjs(), null]}
-                                            format={dateFormat}
                                             onChange={(value) => handleRangePickerChange(value)}
                                             disabled={loading}
                                         />
@@ -277,7 +307,6 @@ const CalendarForm = ({ setDialogClose, refreshCalendar }: Props) => {
                                             <DatePicker
                                                 className='w-full'
                                                 defaultValue={[dayjs()]}
-                                                format={dateFormat}
                                                 onChange={(value) => handleDatePickerChange(value)}
                                                 disabled={loading} />
                                             <FormMessage />
@@ -286,18 +315,21 @@ const CalendarForm = ({ setDialogClose, refreshCalendar }: Props) => {
                                 />
                                 <FormField
                                     control={form.control}
-                                    name="timeRange"
+                                    name="timeStart"
                                     render={({ field }) => (
                                         <FormItem>
                                             <FormLabel>Time Range</FormLabel>
-                                            <TimePicker.RangePicker className='w-full' />
+                                            <TimePicker.RangePicker
+                                                className='w-full'
+                                                onChange={(value) => handleTimeRangeChange(value)}
+                                            />
                                             <FormMessage />
                                         </FormItem>
                                     )}
                                 />
                             </div>
                         }
-                         <FormField
+                        <FormField
                             name='color'
                             render={({ field }) => {
                                 console.log(field); // Log the field object
@@ -307,12 +339,12 @@ const CalendarForm = ({ setDialogClose, refreshCalendar }: Props) => {
                                         <FormControl className='flex items-center mt-auto'>
                                             <ColorPicker
                                                 background={field.value}
-                                                setBackground={(value)=> handleColorPickerChange(value)} />
+                                                setBackground={(value) => handleColorPickerChange(value)} />
                                         </FormControl>
                                     </FormItem>
                                 );
                             }}
-                        />  
+                        />
                     </div>
                     {/* Preparatory list items */}
                     <Separator />
@@ -388,21 +420,21 @@ const CalendarForm = ({ setDialogClose, refreshCalendar }: Props) => {
                         </div>
                     ))}
                     <Separator />
-                        <FormField
-                            control={form.control}
-                            name="remarks"
-                            render={({ field }) => (
-                                <FormItem className='w-full'>
-                                    <FormLabel>Remarks</FormLabel>
-                                    <FormControl>
-                                        <Textarea {...field} disabled={loading} placeholder="Type your remarks here." />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
+                    <FormField
+                        control={form.control}
+                        name="remarks"
+                        render={({ field }) => (
+                            <FormItem className='w-full'>
+                                <FormLabel>Remarks</FormLabel>
+                                <FormControl>
+                                    <Textarea {...field} disabled={loading} placeholder="Type your remarks here." />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
 
-                        
+
 
                 </div>
                 <FormSuccess message={success} />

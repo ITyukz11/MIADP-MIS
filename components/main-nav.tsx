@@ -6,15 +6,12 @@ import { TbCloudDataConnection } from "react-icons/tb";
 import { cn } from "@/lib/utils"
 import { navLinks } from "@/config/nav-links";
 import { Badge } from "./ui/badge";
+import { useCurrentUser } from "./CurrentUserContext";
 
-interface MainNavProps{
-  currentUser: string
-}
-
-export const MainNav: React.FC<MainNavProps> = ({ currentUser }) => {
+export const MainNav = () => {
   const pathname = usePathname()
   // Define an array of navigation links
-
+  const { currentUser } = useCurrentUser();
   return (
     <div className="mr-4 hidden md:flex">
       <Link href="/" className="mr-6 flex items-center space-x-2">
@@ -38,17 +35,17 @@ export const MainNav: React.FC<MainNavProps> = ({ currentUser }) => {
           </Link>
         ))}
 
-        {currentUser === "admin" &&
+        {currentUser?.name === "admin" &&
           <Link
-          key={currentUser}
-          href='/admin/account'
-          className={cn(
-            "transition-colors hover:text-foreground/80",
-            pathname === '/admin/account' ? "text-foreground" : "text-foreground/60"
-          )}
-        >
-         <Badge>Admin</Badge> 
-        </Link>
+            key={currentUser?.name}
+            href='/admin/account'
+            className={cn(
+              "transition-colors hover:text-foreground/80",
+              pathname === '/admin/account' ? "text-foreground" : "text-foreground/60"
+            )}
+          >
+            <Badge>Admin</Badge>
+          </Link>
         }
       </nav>
     </div>

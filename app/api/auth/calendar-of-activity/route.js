@@ -9,12 +9,12 @@ const prisma = new PrismaClient().$extends(withAccelerate())
 export async function POST(request) {
   try {
 
-    const userName = await getCurrentUser();
+    //const userName = await getCurrentUser();
     
     const { authorizeOther, activityTitle, activityDescription, type, targetParticipant, 
-            location, dateFrom, dateRange,timeRange,allDay,status,color,remarks,preparatoryList} = await request.json();
+            location, dateFrom, dateRange,timeRange,allDay,status,color,remarks,preparatoryList,userName} = await request.json();
     console.log('api/auth/calendar-of-activity route: ', { authorizeOther,activityTitle, activityDescription, type, targetParticipant, 
-      location, dateFrom, dateRange,timeRange,allDay,status,remarks,preparatoryList });
+      location, dateFrom, dateRange,timeRange,allDay,status,remarks,preparatoryList,userName });
 
         // Create the new calendar of activity
         const newCalendarOfActivity = await prisma.calendarOfActivity.create({
@@ -39,7 +39,7 @@ export async function POST(request) {
             },
             user: {
               connect:{
-                name: userName.name
+                name: userName
               }
             }
           }
@@ -50,7 +50,7 @@ export async function POST(request) {
         return NextResponse.json({ newCalendarOfActivity });
   } catch (error) {
     console.error('Error inserting new activity:', error);
-    return NextResponse.json({ error: error.message || 'Internal server error.' });
+    return NextResponse.json({ error: 'Internal server error.' });
   }
 }
 

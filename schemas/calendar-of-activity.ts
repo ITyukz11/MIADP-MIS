@@ -8,13 +8,9 @@ export const CalendarOfActivitySchema = z.object({
   targetParticipant: z.string().min(1, "Target Participant is required"),
   location: z.string().min(1, "Location is required"),
   dateFrom: z.string(),
-  dateRange: z.array(
-    z.object({
-      startDate: z.string(), // Assuming start date is a date
-      endDate: z.string(),   // Assuming end date is a date
-    })
-  ),
-  timeRange: z.string(),
+  dateTo: z.string(),
+  timeStart: z.string(),
+  timeEnd: z.string(),
   allDay: z.boolean(),
   preparatoryList: z.object({
     description: z.string().min(1, ""),
@@ -24,6 +20,7 @@ export const CalendarOfActivitySchema = z.object({
   remarks: z.string(),
   color:z.string(),
   status: z.string(),
+  name: z.string()
 });
 
 export type CalendarOfActivityType = z.infer<typeof CalendarOfActivitySchema>;

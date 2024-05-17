@@ -11,6 +11,7 @@ export const calendarOfActivity = async (values: z.infer<typeof CalendarOfActivi
     const validatedFields = CalendarOfActivitySchema.safeParse(values);
     console.log("server values: ", values)
     console.log("console.log(validatedFields.error): ", validatedFields);
+    
     try {
         if (!validatedFields.success) {
             console.log(validatedFields.error); // Log the validation error
@@ -24,13 +25,15 @@ export const calendarOfActivity = async (values: z.infer<typeof CalendarOfActivi
                 targetParticipant: values.targetParticipant,
                 location: values.location,
                 dateFrom: values.dateFrom,
-                dateRange: values.dateRange,
-                timeRange: values.timeRange,
+                dateTo: values.dateTo,
+                timeStart: values.timeStart,
+                timeEnd: values.timeEnd,
                 allDay: values.allDay,
                 status: values.status,
                 color: values.color,
                 remarks: values.remarks,
                 preparatoryList: values.preparatoryList,
+                userName:values.name
                 });
 
             // Check if the response contains an error message

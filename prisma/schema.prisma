@@ -117,8 +117,9 @@ model CalendarOfActivity {
   targetParticipant         String
   location                  String
   dateFrom                  String
-  dateRange                 Json[]
-  timeRange                 String
+  dateTo                    String
+  startTime                 String
+  endTime                   String
   allDay                    Boolean
   preparatoryList           PreparatoryList[]
   remarks                   String

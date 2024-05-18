@@ -142,9 +142,9 @@ const CalendarForm = ({ setDialogClose, refreshCalendar }: Props) => {
 
     const handleTimeRangeChange = (value: any) => {
         if (value && Array.isArray(value) && value.length === 2) {
-            const [startTime, endTime] = value;
-            const formattedStartTime = startTime.format('HH:mm'); // Extract only the time part
-            const formattedEndTime = endTime.format('HH:mm'); // Extract only the time part
+            const [timeStart, timeEnd] = value;
+            const formattedStartTime = timeStart.format('HH:mm'); // Extract only the time part
+            const formattedEndTime = timeEnd.format('HH:mm'); // Extract only the time part
             
             form.setValue('timeStart', formattedStartTime);
             form.setValue('timeEnd', formattedEndTime);

@@ -118,8 +118,8 @@ model CalendarOfActivity {
   location                  String
   dateFrom                  String
   dateTo                    String
-  startTime                 String
-  endTime                   String
+  timeStart                 String
+  timeEnd                   String
   allDay                    Boolean
   preparatoryList           PreparatoryList[]
   remarks                   String

@@ -13,8 +13,8 @@ export async function POST(request) {
     
     const { authorizeOther, activityTitle, activityDescription, type, targetParticipant, 
             location, dateFrom, dateTo,timeStart,timeEnd, allDay,status,color,remarks,preparatoryList,userName} = await request.json();
-    console.log('api/auth/calendar-of-activity route: ', { authorizeOther,activityTitle, activityDescription, type, targetParticipant, 
-      location, dateFrom, dateRange,timeRange,allDay,status,remarks,preparatoryList,userName });
+    console.log('api/auth/calendar-of-activity route: ', {authorizeOther, activityTitle, activityDescription, type, targetParticipant, 
+      location, dateFrom, dateTo,timeStart,timeEnd, allDay,status,color,remarks,preparatoryList,userName});
 
         // Create the new calendar of activity
         const newCalendarOfActivity = await prisma.calendarOfActivity.create({

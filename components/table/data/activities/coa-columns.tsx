@@ -112,7 +112,7 @@ export const columns: ColumnDef<CalendarOfActivityType>[] = [
     cell: ({ row }) => (
       <div className="flex space-x-2">
         <span className="max-w-[500px] truncate font-medium">
-          {row.getValue("type")}
+        <Badge variant='outline'> {row.getValue("type")}</Badge>
         </span>
       </div>
     ),

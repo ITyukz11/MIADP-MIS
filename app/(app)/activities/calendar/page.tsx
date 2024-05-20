@@ -225,7 +225,8 @@ const page = () => {
                     </CardContent>
                 </Card>
             </div>
-            <CalendarFormDialog open={calendarFormOpen} setClose={() => setCalendarFormOpen(false)} refreshCalendar={()=> setRefreshCalendarData(prevState => !prevState)}/>
+            <CalendarFormDialog open={calendarFormOpen} 
+                                setClose={() => setCalendarFormOpen(false)}/>
         </div>
     );
 };

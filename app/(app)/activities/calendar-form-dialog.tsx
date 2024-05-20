@@ -15,10 +15,9 @@ import { Separator } from "@/components/ui/separator"
 interface CalendarFormDialogProps{
   open: boolean;
   setClose: ()=> void;
-  refreshCalendar: ()=> void;
 }
 
-export default function CalendarFormDialog({open, setClose, refreshCalendar}:CalendarFormDialogProps) {
+export default function CalendarFormDialog({open, setClose}:CalendarFormDialogProps) {
   return (
     <Dialog open={open} onOpenChange={setClose}>
       <DialogContent className="min-w-[60%] overflow-y-auto max-h-[95vh] ">
@@ -29,7 +28,7 @@ export default function CalendarFormDialog({open, setClose, refreshCalendar}:Cal
           </DialogDescription>
         </DialogHeader>
         <Separator/>
-        <CalendarForm setDialogClose={setClose} refreshCalendar={refreshCalendar}/>
+        <CalendarForm setDialogClose={setClose}/>
       </DialogContent>
     </Dialog>
   )

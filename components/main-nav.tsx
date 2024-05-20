@@ -35,7 +35,7 @@ export const MainNav = () => {
           </Link>
         ))}
 
-        {currentUser?.name === "admin" &&
+        {currentUser?.name === "Admin" &&
           <Link
             key={currentUser?.name}
             href='/admin/account'

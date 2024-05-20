@@ -1,4 +1,5 @@
 export const status = [
+    "To Be Conducted",
     "Conducted",
     "Postponed",
     "Rescheduled",

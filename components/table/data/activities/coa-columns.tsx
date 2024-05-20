@@ -6,6 +6,24 @@ import { DataTableRowActions } from "../pending-users/data-table-row-actions";
 import { Badge } from "../../../ui/badge";
 import { CalendarOfActivityType } from '@/schemas/calendar-of-activity';
 
+const formatDate = (dateString: string) => {
+  const date = new Date(dateString);
+  const month = date.toLocaleString('default', { month: 'short' });
+  const day = date.getDate();
+  return `${month} ${day}`;
+};
+
+const formatTime = (timeString: string) => {
+  const date = new Date(timeString);
+  const hours = date.getHours();
+  const minutes = date.getMinutes();
+  const amOrPm = hours >= 12 ? 'PM' : 'AM';
+  const formattedHours = hours % 12 || 12; // Convert to 12-hour format
+  const formattedMinutes = minutes < 10 ? '0' + minutes : minutes;
+  const time = `${formattedHours}:${formattedMinutes} ${amOrPm}`;
+  return `${time}`;
+};
+
 export const columns: ColumnDef<CalendarOfActivityType>[] = [
   // {
   //   id: "select",
@@ -150,88 +168,51 @@ export const columns: ColumnDef<CalendarOfActivityType>[] = [
   {
     accessorKey: "dateFrom",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Planned To Date" />
-    ),
-    cell: ({ row }) => {
-      const dateRange = row.getValue("dateRange") as { startDate: string, endDate: string }[];
-  
-      // Check if dateRange has data
-      if (dateRange && dateRange.length > 0) {
-        // Format the dateRange
-        const formattedDateRange = dateRange.map(range => {
-          const startDate = new Date(range.startDate.replace(/\//g, '-')).toISOString().slice(0, 10);
-          const endDate = new Date(range.endDate.replace(/\//g, '-')).toISOString().slice(0, 10);
-          return `${startDate} to ${endDate}`;
-        }).join(", "); // Join multiple date ranges with a comma if there are multiple ranges
-  
-        return (
-          <div className="flex space-x-2">
-            <span className="max-w-[500px] truncate font-medium">
-              {formattedDateRange}
-            </span>
-          </div>
-        );
-      }
-  
-      // If dateRange has no data, don't display dateFrom
-      return null;
-    },
-  },
-  {
-    accessorKey: "dateRange",
-    header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Planned From Date" />
-    ),
-    cell: ({ row }) => {
-      const dateRange = row.getValue("dateRange") as { startDate: string }[];
-  
-      // Assuming you want to display start and end dates in 'yyyy-mm-dd' format
-      const formattedDateRange = dateRange.map(range => {
-        const startDate = new Date(range.startDate).toISOString().slice(0, 10);
-        return `${startDate}`;
-      }).join(", "); // Join multiple date ranges with a comma if there are multiple ranges
-  
-      return (
-        <div className="flex space-x-2">
-          <span className="max-w-[500px] truncate font-medium">
-            {formattedDateRange}
-          </span>
-        </div>
-      );
-    },
-  },
-  {
-    accessorKey: "dateRange",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Planned To Date" />
-    ),
-    cell: ({ row }) => {
-      const dateRange = row.getValue("dateRange") as {endDate: string }[];
-  
-      // Assuming you want to display start and end dates in 'yyyy-mm-dd' format
-      const formattedDateRange = dateRange.map(range => {
-        const endDate = new Date(range.endDate).toISOString().slice(0, 10);
-        return `${endDate}`;
-      }).join(", "); // Join multiple date ranges with a comma if there are multiple ranges
-  
-      return (
-        <div className="flex space-x-2">
-          <span className="max-w-[500px] truncate font-medium">
-            {formattedDateRange}
-          </span>
-        </div>
-      );
-    },
-  },
-  {
-    accessorKey: "timeRange",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Time Range" />
     ),
     cell: ({ row }) => (
       <div className="flex space-x-2">
         <span className="max-w-[500px] truncate font-medium">
-          {row.getValue("timeRange")}
+          {formatDate(row.getValue("dateFrom"))}
+        </span>
+      </div>
+    ),
+  },
+  {
+    accessorKey: "dateTo",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Planned To Date" />
+    ),
+    cell: ({ row }) => (
+      <div className="flex space-x-2">
+        <span className="max-w-[500px] truncate font-medium">
+          {formatDate(row.getValue("dateTo"))}
+        </span>
+      </div>
+    ),
+  },
+  {
+    accessorKey: "timeStart",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Time Start" />
+    ),
+    cell: ({ row }) => (
+      <div className="flex space-x-2">
+        <span className="max-w-[500px] truncate font-medium">
+          {formatTime(row.getValue("timeStart"))}
+        </span>
+      </div>
+    ),
+  },
+  {
+    accessorKey: "timeEnd",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Time End" />
+    ),
+    cell: ({ row }) => (
+      <div className="flex space-x-2">
+        <span className="max-w-[500px] truncate font-medium">
+          {formatTime(row.getValue("timeEnd"))}
         </span>
       </div>
     ),

@@ -15,10 +15,12 @@ export function ColorPicker({
     background,
     setBackground,
     className,
+    disabled
   }: {
     background: string
     setBackground: (background: string) => void
     className?: string
+    disabled?: boolean
   }) {
     const solids = [
         "#F5222D",
@@ -43,6 +45,7 @@ export function ColorPicker({
         <PopoverTrigger asChild>
           <Button
             variant={'outline'}
+            disabled={disabled}
             className={cn(
               'w-[220px] justify-start text-left font-normal',
               !background && 'text-muted-foreground',

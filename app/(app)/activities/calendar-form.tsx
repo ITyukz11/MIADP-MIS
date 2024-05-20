@@ -19,7 +19,7 @@ import { FaMinus, FaPlus } from 'react-icons/fa'
 import { Separator } from '@/components/ui/separator'
 import { Select, SelectItem, SelectTrigger, SelectValue, SelectContent } from '@/components/ui/select'
 
-import { status } from '@/components/calendar-of-activity/data'
+import { status, type } from '@/components/calendar-of-activity/data'
 import { ToastAction } from '@/components/ui/toast'
 import { calendarOfActivity } from '@/actions/calendar-of-activity/calendarofactivity'
 import { toast } from '@/components/ui/use-toast'
@@ -29,10 +29,9 @@ import { useCurrentUser } from '@/components/CurrentUserContext'
 
 type Props = {
     setDialogClose: () => void
-    refreshCalendar: () => void
 }
 
-const CalendarForm = ({ setDialogClose, refreshCalendar }: Props) => {
+const CalendarForm = ({ setDialogClose}: Props) => {
     const [isPending, startTransition] = useTransition();
     const [loading, setLoading] = useState(false); // Initialize loading state
 
@@ -97,7 +96,6 @@ const CalendarForm = ({ setDialogClose, refreshCalendar }: Props) => {
                                     <ToastAction altText="Goto schedule to undo">Ok</ToastAction>
                                 ),
                             })
-                            refreshCalendar();
                             setDialogClose();
                         }
                         setLoading(false)
@@ -106,18 +104,15 @@ const CalendarForm = ({ setDialogClose, refreshCalendar }: Props) => {
         })
 
     }
-
     const handleRangePickerChange = (value: any) => {
         if (value && Array.isArray(value) && value.length === 2) {
-            const [startDate, endDate] = value;
-            const formattedStartDate = startDate.format('YYYY/MM/DD'); // Convert Dayjs object to string
-            const formattedEndDate = endDate.format('YYYY/MM/DD'); // Convert Dayjs object to string
-
-            form.setValue('dateFrom', formattedStartDate);
-            form.setValue('dateTo', formattedEndDate);
-
-            console.log("startDate: ", formattedStartDate);
-            console.log("dateTo: ", formattedEndDate);
+            const [startDate, endDate] = value.map((date: any) => dayjs(date).toISOString());
+    
+            form.setValue('dateFrom', startDate);
+            form.setValue('dateTo', endDate);
+    
+            console.log("startDate: ", startDate);
+            console.log("endDate: ", endDate);
         } else {
             // Clear the value if no range is selected
             form.setValue('dateFrom', '');
@@ -127,12 +122,12 @@ const CalendarForm = ({ setDialogClose, refreshCalendar }: Props) => {
 
     const handleDatePickerChange = (value: any) => {
         if (value) {
-            const date = value;
-            const formattedStartDate = date.format('YYYY/MM/DD'); // Convert Dayjs object to string
-
-            form.setValue('dateFrom', formattedStartDate);
-            form.setValue('dateTo', formattedStartDate);
-            console.log(formattedStartDate);
+            const date = dayjs(value); // Convert the input value to a Day.js object
+            const formattedDate = date.toISOString(); // Format the date as per ISO 8601
+    
+            form.setValue('dateFrom', formattedDate);
+            form.setValue('dateTo', formattedDate);
+            console.log(formattedDate);
         } else {
             // Clear the value if no range is selected
             form.setValue('dateFrom', '');
@@ -160,7 +155,6 @@ const CalendarForm = ({ setDialogClose, refreshCalendar }: Props) => {
 
     const handleColorPickerChange = (value: any) => {
         form.setValue('color', value);
-        console.log('color: ', value);
     };
 
     //const [background, setBackground] = useState('#B4D455')
@@ -227,21 +221,31 @@ const CalendarForm = ({ setDialogClose, refreshCalendar }: Props) => {
                             </FormItem>
                         )}
                     />
-                    <div className='grid grid-cols-3 gap-2'>
-                        <FormField
-                            control={form.control}
-                            name="type"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Type</FormLabel>
-                                    <FormControl>
-                                        <Input {...field} disabled={loading} autoComplete="false" />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-
+                    <div className='grid grid-cols-3 gap-2'>                   
+                             <FormField
+                                control={form.control}
+                                name='type'
+                                render={({ field }) => (
+                                    <FormItem className='w-full'>
+                                        <FormLabel>Type</FormLabel>
+                                        <FormControl>
+                                            <Select {...field} onValueChange={field.onChange} defaultValue={field.value} disabled={loading}>
+                                                <FormControl>
+                                                    <SelectTrigger>
+                                                        <SelectValue placeholder="Select a type" />
+                                                    </SelectTrigger>
+                                                </FormControl>
+                                                <SelectContent>
+                                                    {type.map((option, index) => (
+                                                        <SelectItem key={index} value={option} disabled={loading}>{option}</SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
                         <FormField
                             control={form.control}
                             name="targetParticipant"
@@ -294,9 +298,7 @@ const CalendarForm = ({ setDialogClose, refreshCalendar }: Props) => {
                                         <FormMessage />
                                     </FormItem>
                                 )}
-                            />
-
-                            :
+                            />:
                             <div className='flex flex-row gap-2 mt-auto '>
                                 <FormField
                                     control={form.control}
@@ -322,6 +324,7 @@ const CalendarForm = ({ setDialogClose, refreshCalendar }: Props) => {
                                             <TimePicker.RangePicker
                                                 className='w-full'
                                                 onChange={(value) => handleTimeRangeChange(value)}
+                                                disabled={loading}
                                             />
                                             <FormMessage />
                                         </FormItem>
@@ -339,7 +342,8 @@ const CalendarForm = ({ setDialogClose, refreshCalendar }: Props) => {
                                         <FormControl className='flex items-center mt-auto'>
                                             <ColorPicker
                                                 background={field.value}
-                                                setBackground={(value) => handleColorPickerChange(value)} />
+                                                setBackground={(value) => handleColorPickerChange(value)}
+                                                disabled={loading} />
                                         </FormControl>
                                     </FormItem>
                                 );
@@ -413,7 +417,7 @@ const CalendarForm = ({ setDialogClose, refreshCalendar }: Props) => {
 
                             <Button className='w-fit' type='button' variant={'destructive'} size={'sm'}
                                 onClick={() => setNumOfPreparatoryList(prev => prev - 1)}
-                                disabled={loading}>
+                                disabled={loading || numOfPreparatoryList==1}>
                                 <FaMinus />
                             </Button>
 

@@ -11,12 +11,13 @@ import React, { useEffect, useState } from 'react'
 import { FilterMenus } from './filtermenus'
 import { fetchCalendarOfActivity } from '@/lib/calendar-of-activity/fetch-calendar-of-activity'
 import { LoadingSpinner } from '@/components/LoadingSpinner'
+import { Skeleton } from '@/components/ui/skeleton'
 
 type Props = {}
 
 const page = (props: Props) => {
   const [data, setData] = useState<any[]>([]);
-  const [coaData, setCoaData] = useState<any[]>([]); 
+  const [coaData, setCoaData] = useState<any[]>([]);
   // Effect to fetch data from the API
   useEffect(() => {
     const fetchData = async () => {
@@ -40,34 +41,38 @@ const page = (props: Props) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-          const data = await fetchCalendarOfActivity();
-          setCoaData(data);
+        const data = await fetchCalendarOfActivity();
+        setCoaData(data);
       } catch (error) {
         console.error("Error fetching calendar of activity:", error);
       }
     };
-  
+
     fetchData();
   }, []);
 
-  console.log("coaData: ",coaData)
+  console.log("coaData: ", coaData)
 
   return (
     <div className='container relative'>
       <div className='flex flex-col gap-2 flex-wrap w-full'>
-        <div className='flex flex-row gap-2 overflow-x-auto w-full scroll scroll-me-px'>
+        <div className='flex flex-row gap-2 overflow-x-auto w-full scroll scroll-me-px mb-2'>
           {FilterMenus.map((menu, index) => (
-            <Button key={index} className='cursor-pointer whitespace-nowrap p-2 mb-2' variant={menu.variant =='default'? 'default': 'outline'}>
-            {menu.text}
-          </Button>
+            <Button key={index} className='cursor-pointer whitespace-nowrap p-2 mb-2' variant={menu.variant == 'default' ? 'default' : 'outline'}>
+              {menu.text}
+            </Button>
           ))}
         </div>
 
-        {coaData ? (
-        <DataTable data={coaData} columns={columns} />
-      ) : (
-        <p className='flex flex-row gap-2 mt-3'><LoadingSpinner/> Please wait...</p>
-      )}
+        {coaData.length > 0 ? (
+          <div className='w-full overflow-x-auto'>
+            <DataTable data={coaData} columns={columns} />
+          </div>
+        ) : (
+          <div className="flex flex-col space-y-3">
+            <Skeleton className="h-[250px] w-full rounded-xl" />
+          </div>
+        )}
 
       </div>
     </div>

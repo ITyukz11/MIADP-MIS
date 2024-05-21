@@ -42,13 +42,13 @@ export const RegisterForm = ({ backToLogin }: RegisterFormProps) => {
     // Define the options for the component and unit select fields
     const componentOptions = ["Component 1", "Component 2", "Component 3", "Component 4"];
     const unitOptions = [
-        "ODPD - Office of Deputy Project Director",
-        "FINANCE",
-        "ADMIN",
-        "Procurement",
-        "GGU",
-        "SES - Social and Environmental Safeguard",
-        "PMEU - Planning Monitoring Evaluation Unit"
+        { value:"ODPD", label:'ODPD - Office of Deputy Project Director' },
+        { value:"FINANCE", label:'FINANCE' },
+        { value:"ADMIN", label:'ADMIN' },
+        { value:"Procurement", label:'Procurement' },
+        { value:"GGU", label:'GGU' },
+        { value:"SES", label:'SES - Social and Environmental Safeguard' },
+        { value:"PMEU", label:'PMEU - Planning Monitoring Evaluation Unit' },
     ];
 
 
@@ -127,7 +127,7 @@ export const RegisterForm = ({ backToLogin }: RegisterFormProps) => {
                                         </FormControl>
                                         <SelectContent>
                                         {regionOptions.map((option, index)=>(
-                                                <SelectItem key={index} value={option}>{option}</SelectItem>
+                                                <SelectItem key={index} value={option.value}>{option.label}</SelectItem>
                                             ))}
                                         </SelectContent>
                                     </Select>
@@ -173,7 +173,7 @@ export const RegisterForm = ({ backToLogin }: RegisterFormProps) => {
                                         </FormControl>
                                         <SelectContent>
                                             {unitOptions.map((option, index)=>(
-                                                <SelectItem key={index} value={option}>{option}</SelectItem>
+                                                <SelectItem key={index} value={option.value}>{option.label}</SelectItem>
                                             ))}
                                         </SelectContent>
                                     </Select>

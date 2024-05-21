@@ -11,11 +11,11 @@ export const unitOptions = [
 ];
 
 export const regionOptions = [
-        "PSO - Project Support Office",
-        "Region IX - Zamboanga Peninsula",
-        "Region X - Northern Mindanao",
-        "Region XI - Davao Region",
-        "Region XII - Soccsksargen",
-        "Region XIII - Caraga",
-        "BARMM - Bangsamoro Autonomous Region of Muslim Mindanao"    
+    {value:"PSO", label:'PSO - Project Support Office'},
+    {value:"Region IX", label:'Region IX - Zamboanga Peninsula'},
+    {value:"Region X", label:'Region X - Northern Mindanao'},
+    {value:"Region XI", label:'Region XI - Davao Region'},
+    {value:"Region XII", label:'Region XII - Soccsksargen'},
+    {value:"Region XIII", label:'Region XIII - Caraga'},
+    {value:"BARMM", label:'BARMM - Bangsamoro Autonomous Region of Muslim Mindanao'},
 ]

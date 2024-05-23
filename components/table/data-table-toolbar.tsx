@@ -94,7 +94,7 @@ export function DataTableToolbar<TData>({
       <div className="flex flex-row gap-2">
         <DataTableViewOptions table={table} />
         <DialogApprovePendingUsers
-          approvedPendingUsersData={approvedPendingUsersData as Array<TData & {  id?: number, name?:string, email?:string,region?:string, password?:string}>}
+          approvedPendingUsersData={approvedPendingUsersData as Array<TData & {  id?: number, name?:string, email?:string,region?:string, color?:string, password?:string}>}
           disable={Object.keys(selectedRows).length > 0 ?false : true}
         />
 

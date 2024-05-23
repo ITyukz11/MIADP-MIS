@@ -19,3 +19,13 @@ export const regionOptions = [
     {value:"Region XIII", label:'Region XIII - Caraga'},
     {value:"BARMM", label:'BARMM - Bangsamoro Autonomous Region of Muslim Mindanao'},
 ]
+
+// export const regionOptions = [
+//     "PSO",
+//     "Region IX",
+//     "Region X",
+//     "Region XI",
+//     "Region XII",
+//     "Region XIII",
+//     "BARMM",
+// ]

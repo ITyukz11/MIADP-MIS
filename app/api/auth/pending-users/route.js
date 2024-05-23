@@ -16,8 +16,8 @@ export async function POST(request) {
   }
 
   try {
-    const { region, fullname, email, component, unit, position, password } = await request.json();
-    console.log('api/auth/pending-users route: ', { region, fullname, email, component, unit, position, password });
+    const { region, fullname, email, component, unit, position, color, password } = await request.json();
+    console.log('api/auth/pending-users route: ', { region, fullname, email, component, unit, position,color, password });
 
     const existingUser = await prisma.user.findUnique({ where: { email } });
     const existingPendingUser = await prisma.pendingUser.findUnique({ where: { email } });
@@ -32,6 +32,7 @@ export async function POST(request) {
           component,
           unit,
           position,
+          color,
           name: fullname,
           email,
           password: hashedPassword,

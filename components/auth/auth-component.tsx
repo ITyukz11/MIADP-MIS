@@ -59,18 +59,8 @@ export default function AuthenticationPage() {
 
     return (
 
-        <div className="container relative">
-            <div className="border-2 border-border/80 shadow-2xl rounded-xl container relative h-full mb-12 overflow-hidden flex-col items-center justify-center md:grid lg:max-w-none lg:grid-cols-2 lg:px-0">
-
-                <Button
-                    variant={'link'}
-                    className={"absolute right-4 top-4 md:right-8 md:top-8"}
-                    onClick={() => setUserLogginIn(!userLogginIn)}
-                >
-                    {userLogginIn ? "Don't have an account?" : "Already have an account?"}
-                </Button>
-
-
+        <div className="container relative overflow-auto z-10">
+            <div className="border-2 border-border/80 shadow-2xl rounded-xl container relative min-h-[50vh] overflow-hidden flex-col items-center justify-center md:grid lg:max-w-none lg:grid-cols-2 lg:px-0">
                 <div className="z-10 relative rounded-l-xl rounded-bl-xl hidden h-full flex-col bg-muted p-10 text-white lg:flex dark:border-r justify-between">
                     <div className="absolute inset-0 bg-zinc-900  rounded-l-xl rounded-bl-xl" />
                     <div className="relative z-20 flex items-center text-lg font-bold">
@@ -117,13 +107,13 @@ export default function AuthenticationPage() {
                     <div className="relative z-20">
                         <blockquote className="space-y-2">
                             <p className="text-base">
-                                Welcome to the MIADP Management Information System! Our system efficiently tracks encoded documents, streamlining document management processes for easy access and organization.                             
+                            Welcome to the MIADP Management Information System! Our system tracks encoded documents, streamlines management, features a calendar to track events, and an activity feed.
                             </p>
                             <footer className="text-sm">Binyang Maria</footer>
                         </blockquote>
                     </div>
                 </div>
-                <div className="lg:p-8">
+                <div className="pt-2 pb-2 sm:p-6 w-full ">
                     <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
                         <div className="flex flex-row w-full">
 
@@ -140,7 +130,7 @@ export default function AuthenticationPage() {
                         </motion.div>
                     :
                             <motion.div
-                            className="w-full"  
+                            className="w-fit"  
                                 key="register"
                                 initial={{ x: '60%', opacity: 0 }}
                                 animate={{ x: 0, opacity: 1 }}
@@ -153,7 +143,15 @@ export default function AuthenticationPage() {
                   
                         
                         
-                        <p className="px-8 text-center text-sm text-muted-foreground">
+                        <Button
+                    variant={'link'}
+                    onClick={() => setUserLogginIn(!userLogginIn)}
+                >
+                    {userLogginIn ? "Don't have an account?" : "Already have an account?"}
+                </Button>
+                {/* <p className="px-8 text-center text-sm text-muted-foreground">
+
+
                             By clicking continue, you agree to our{" "}
                             <Link
                                 href="/auth/login"
@@ -168,8 +166,8 @@ export default function AuthenticationPage() {
                             >
                                 Privacy Policy
                             </Link>
-                            .
-                        </p>
+                            . 
+                        </p>*/}
                     </div>
                 </div>
             </div>

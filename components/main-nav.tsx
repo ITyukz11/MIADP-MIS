@@ -12,6 +12,8 @@ export const MainNav = () => {
   const pathname = usePathname()
   // Define an array of navigation links
   const { currentUser } = useCurrentUser();
+
+  console.log("currentUser: ", currentUser)
   return (
     <div className="mr-4 hidden md:flex">
       <Link href="/" className="mr-6 flex items-center space-x-2">
@@ -35,7 +37,7 @@ export const MainNav = () => {
           </Link>
         ))}
 
-        {currentUser?.name === "Admin" &&
+        {currentUser?.role == "ADMIN" &&
           <Link
             key={currentUser?.name}
             href='/admin/account'

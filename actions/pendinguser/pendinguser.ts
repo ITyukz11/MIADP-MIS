@@ -7,6 +7,7 @@ interface RegisterResponse {
     error?: string;
 }
 
+
 export const pendinguser = async (values: z.infer<typeof RegisterSchema>): Promise<RegisterResponse> => {
     const validatedFields = RegisterSchema.safeParse(values);
 
@@ -14,6 +15,39 @@ export const pendinguser = async (values: z.infer<typeof RegisterSchema>): Promi
         if (!validatedFields.success) {
             return { error: "Invalid fields!" };
         } else {
+
+            type ColorMapping = {
+                [key: string]: string;
+              };
+              
+              const componentColors: ColorMapping = {
+                'Component 1': '#B4A7D6',
+                'Component 2': '#FBBC04',
+                'Component 3': '#00FF00',
+                'ODPD': '#1155CC'
+              };
+              
+              const unitColors: ColorMapping = {
+                'Procurement': '#FFFF00',
+                'Finance': '#E06666',
+                'PMEU': '#46BDC6',
+                'SES': '#B6D7A8',
+                'Admin': '#EAD1DC',
+                'GGU': '#783F04',
+                'Economist':'#38761D',
+                'Communication Advocacy':'#3D85C6',
+                'Legal':'#A64D79',
+                'Secretary':'#674EA7'
+              };
+              
+              let color = "";
+              
+              if (values.component in componentColors) {
+                color = componentColors[values.component];
+              } else if (values.unit in unitColors) {
+                color = unitColors[values.unit];
+              }
+
             const response = await axios.post('/api/auth/pending-users', {
                 region: values.region,
                 fullname: values.fullname,
@@ -21,6 +55,7 @@ export const pendinguser = async (values: z.infer<typeof RegisterSchema>): Promi
                 component: values.component,
                 unit: values.unit,
                 position: values.position,
+                color:color,
                 password: values.password
             }, {
                 auth: {

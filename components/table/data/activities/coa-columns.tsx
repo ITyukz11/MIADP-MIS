@@ -13,7 +13,7 @@ const formatDate = (dateString: string) => {
   return `${month} ${day}`;
 };
 
-const formatTime = (timeString: string) => {
+export const formatTime = (timeString: string) => {
   // Check if the timeString is already in "HH:MM" format
   const timePattern = /^([01]?\d|2[0-3]):([0-5]\d)$/;
   if (timePattern.test(timeString)) {
@@ -21,26 +21,23 @@ const formatTime = (timeString: string) => {
     const amOrPm = hours >= 12 ? 'PM' : 'AM';
     const formattedHours = hours % 12 || 12; // Convert to 12-hour format
     const formattedMinutes = minutes < 10 ? '0' + minutes : minutes;
-    const time = `${formattedHours}:${formattedMinutes} ${amOrPm}`;
-    return `${time}`;
+    return `${formattedHours}:${formattedMinutes} ${amOrPm}`;
   }
 
-  // If not in "HH:MM" format, attempt to parse as a date string
-  const date = new Date(`1970-01-01T${timeString}Z`); // Use a fixed date to avoid timezone issues
+  // Attempt to parse as an ISO 8601 date string
+  const date = new Date(timeString);
   if (!isNaN(date.getTime())) {
-    const hours = date.getUTCHours(); // Use getUTCHours to avoid timezone issues
-    const minutes = date.getUTCMinutes();
+    const hours = date.getHours();
+    const minutes = date.getMinutes();
     const amOrPm = hours >= 12 ? 'PM' : 'AM';
     const formattedHours = hours % 12 || 12; // Convert to 12-hour format
     const formattedMinutes = minutes < 10 ? '0' + minutes : minutes;
-    const time = `${formattedHours}:${formattedMinutes} ${amOrPm}`;
-    return `${time}`;
+    return `${formattedHours}:${formattedMinutes} ${amOrPm}`;
   }
 
   // If parsing fails, return the original string
   return timeString;
 };
-
 
 export const columns: ColumnDef<CalendarOfActivityType>[] = [
   // {

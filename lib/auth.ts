@@ -52,7 +52,8 @@ export const authOptions: NextAuthOptions = {
                 id: user.id,
                 email: user.email,
                 name: user.name,
-                role: user.role
+                role: user.role,
+                expoPushToken:user.expoPushToken
               }
             
               )
@@ -61,7 +62,8 @@ export const authOptions: NextAuthOptions = {
                 email: user.email,
                 name: user.name,
                 role: user.role,
-                region:user.region
+                region:user.region,
+                expoPushToken:user.expoPushToken
               };
             }
   

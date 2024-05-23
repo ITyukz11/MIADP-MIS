@@ -40,6 +40,7 @@ export async function POST(request) {
           unit: user.unit,
           component: user.component,
           position: user.position,
+          expoPushToken: user.expoPushToken
         },
         token: token,
       });

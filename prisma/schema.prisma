@@ -21,6 +21,7 @@ model User {
   component            String
   position             String
   email                String               @unique
+  color                String
   wfpActivities        WFPActivity[]
   calendarOfActivities CalendarOfActivity[]
   password             String
@@ -41,6 +42,7 @@ model PendingUser {
   position  String
   name      String
   email     String   @unique
+  color     String
   password  String
   status    String   @default("Pending") // Status field to track approval status (e.g., "approved", "disapproved", "pending")
   createdAt DateTime @default(now()) @map(name: "created_at")

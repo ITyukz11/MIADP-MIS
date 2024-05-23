@@ -39,16 +39,22 @@ export const RegisterForm = ({ backToLogin }: RegisterFormProps) => {
     const router = useRouter(); // Initialize useRouter
     const { toast } = useToast()
 
+    const [component4, setComponent4] = useState(true)
     // Define the options for the component and unit select fields
     const componentOptions = ["Component 1", "Component 2", "Component 3", "Component 4"];
     const unitOptions = [
-        { value:"ODPD", label:'ODPD - Office of Deputy Project Director' },
-        { value:"FINANCE", label:'FINANCE' },
-        { value:"ADMIN", label:'ADMIN' },
-        { value:"Procurement", label:'Procurement' },
-        { value:"GGU", label:'GGU' },
-        { value:"SES", label:'SES - Social and Environmental Safeguard' },
-        { value:"PMEU", label:'PMEU - Planning Monitoring Evaluation Unit' },
+        { value: "Finance", label: 'FINANCE' },
+        { value: "Admin", label: 'ADMIN' },
+        { value: "Procurement", label: 'Procurement' },
+        { value: "GGU", label: 'GGU' },
+        { value: "ODPD", label: 'ODPD - Office of Deputy Project Director' },
+        { value: "SES", label: 'SES - Social and Environmental Safeguard' },
+        { value: "PMEU", label: 'PMEU - Planning Monitoring Evaluation Unit' },
+        { value: "Economist", label: 'Economist' },
+        { value: "Communication Advocacy", label: 'Communication Advocacy' },
+        { value: "Legal", label: 'Legal' },
+        { value: "Secretary", label: 'Secretary' },
+        { value: " ", label: 'Not Applicable' },
     ];
 
 
@@ -62,6 +68,7 @@ export const RegisterForm = ({ backToLogin }: RegisterFormProps) => {
             unit: "",
             position: "",
             fullname: "",
+            color:""
         }
     })
 
@@ -97,8 +104,13 @@ export const RegisterForm = ({ backToLogin }: RegisterFormProps) => {
 
     }
 
+    const handleUnitDropDown = (allow:boolean) =>{
+        form.setValue('unit', '');
+        setComponent4(allow);
+    }
+
     return (
-        <div className=" w-96">
+        <div className="w-full">
             {/* <CardWrapper
                 headerTitle="Sign Up"
                 headerLabel="Create an account"
@@ -118,7 +130,7 @@ export const RegisterForm = ({ backToLogin }: RegisterFormProps) => {
                             control={form.control}
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Region</FormLabel>
+                                    <FormLabel className="flex flex-row">Region <FormMessage /></FormLabel>
                                     <Select onValueChange={field.onChange} defaultValue={field.value} disabled={loading}>
                                         <FormControl>
                                             <SelectTrigger>
@@ -131,7 +143,6 @@ export const RegisterForm = ({ backToLogin }: RegisterFormProps) => {
                                             ))}
                                         </SelectContent>
                                     </Select>
-                                    <FormMessage />
                                 </FormItem>
                             )}
                         />
@@ -140,20 +151,27 @@ export const RegisterForm = ({ backToLogin }: RegisterFormProps) => {
                             control={form.control}
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Component</FormLabel>
-                                    <Select onValueChange={field.onChange} defaultValue={field.value} disabled={loading}>
-                                        <FormControl>
-                                            <SelectTrigger>
-                                                <SelectValue placeholder="Select a component" />
-                                            </SelectTrigger>
-                                        </FormControl>
-                                        <SelectContent>
-                                            {componentOptions.map((option, index)=>(
-                                                <SelectItem key={index} value={option}>{option}</SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                    <FormMessage />
+                                    <FormLabel className="flex flex-row">Component<FormMessage /></FormLabel>
+                                    <Select
+                                            onValueChange={(newValue) => {
+                                                field.onChange(newValue)
+                                                newValue == 'Component 4' ? handleUnitDropDown(false):handleUnitDropDown(true)
+                                            }}
+                                            defaultValue={field.value}
+                                            disabled={loading}
+                                        >
+                                            <FormControl>
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Select a component" />
+                                                </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent>
+                                                {componentOptions.map((option, index) => (
+                                                    <SelectItem key={index} value={option}>{option}</SelectItem>
+                                                ))}
+                                                <SelectItem key={'Component5'} value={' '} disabled={true}>Component 5</SelectItem>
+                                            </SelectContent>
+                                        </Select>
                                 </FormItem>
                             )}
                         />
@@ -164,20 +182,24 @@ export const RegisterForm = ({ backToLogin }: RegisterFormProps) => {
                             control={form.control}
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Unit</FormLabel>
-                                    <Select onValueChange={field.onChange} defaultValue={field.value} disabled={loading}>
-                                        <FormControl>
-                                            <SelectTrigger>
-                                                <SelectValue placeholder="Select a unit" />
-                                            </SelectTrigger>
-                                        </FormControl>
-                                        <SelectContent>
-                                            {unitOptions.map((option, index)=>(
-                                                <SelectItem key={index} value={option.value}>{option.label}</SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                    <FormMessage />
+                                    <FormLabel className="flex flex-row">Unit<FormMessage /></FormLabel>
+                                    <Select
+                                            onValueChange={field.onChange}
+                                            defaultValue={field.value}
+                                            disabled={loading || component4}
+                                            value={field.value}
+                                        >
+                                            <FormControl>
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Select a unit"/>
+                                                </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent>
+                                                {unitOptions.map((option, index) => (
+                                                    <SelectItem key={index} value={option.value}>{option.label}</SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
                                 </FormItem>
                             )}
                         />
@@ -186,13 +208,12 @@ export const RegisterForm = ({ backToLogin }: RegisterFormProps) => {
                             name="position"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Position</FormLabel>
+                                    <FormLabel className="flex flex-row">Position<FormMessage /></FormLabel>
                                     <FormControl>
                                         <Input
                                             {...field}
                                             disabled={loading} />
                                     </FormControl>
-                                    <FormMessage />
                                 </FormItem>
                             )}
                         />
@@ -203,13 +224,12 @@ export const RegisterForm = ({ backToLogin }: RegisterFormProps) => {
                             name="fullname"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Fullname</FormLabel>
+                                    <FormLabel className="flex flex-row">Name<FormMessage /></FormLabel>
                                     <FormControl>
                                         <Input
                                             {...field}
                                             disabled={loading} />
                                     </FormControl>
-                                    <FormMessage />
                                 </FormItem>
                             )}
                         />
@@ -218,14 +238,13 @@ export const RegisterForm = ({ backToLogin }: RegisterFormProps) => {
                             name="email"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Email</FormLabel>
+                                    <FormLabel className="flex flex-row">Email<FormMessage /></FormLabel>
                                     <FormControl>
                                         <Input
                                             {...field}
                                             disabled={loading}
                                             autoComplete="false" />
                                     </FormControl>
-                                    <FormMessage />
                                 </FormItem>
                             )}
                         />
@@ -234,14 +253,13 @@ export const RegisterForm = ({ backToLogin }: RegisterFormProps) => {
                             name="password"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Password</FormLabel>
+                                    <FormLabel className="flex flex-row">Password<FormMessage /></FormLabel>
                                     <FormControl>
                                         <Input
                                             {...field}
                                             type="password"
                                             disabled={loading} />
                                     </FormControl>
-                                    <FormMessage />
                                 </FormItem>
                             )}
                         />

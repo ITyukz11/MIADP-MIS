@@ -23,6 +23,7 @@ export const register = async (values: z.infer<typeof RegisterSchema>): Promise<
                 component: values.component,
                 unit: values.unit,
                 position: values.position,
+                color:values.color,
                 password: values.password
             });
     

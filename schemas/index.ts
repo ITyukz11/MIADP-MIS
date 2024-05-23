@@ -11,30 +11,29 @@ export const LoginSchema = z.object({
 })
 
 
-
+const regionValues = regionOptions.map(option => option.value);
 // Define the register form schema
 export const RegisterSchema = z.object({
-    region: z.string().min(1).refine(value => regionOptions.includes(value), {
-      message: "Invalid unit selected"
-    }),
+  region: z.string().refine(value => regionValues.includes(value), {
+    message: "*",
+}),
     fullname: z.string().min(1, {
-        message: "Fullname is required"
+        message: "*"
     }),
     email: z.string().email({
-        message: "Email is required"
+        message: "*"
     }),
     password: z.string().min(6, {
-        message: "Minimum 6 characters required"
+        message: "*"
     }),
     position: z.string().min(1, {
-        message: "Position is required"
+        message: "*"
     }),
-    component: z.string().min(1).refine(value => componentOptions.includes(value), {
-        message: "Invalid component selected"
+    component: z.string().refine(value => componentOptions.includes(value), {
+        message: "*"
     }),
-    unit: z.string().min(1).refine(value => unitOptions.includes(value), {
-        message: "Invalid unit selected"
-    })
+    color: z.string(),
+    unit: z.string()
 });
 
 export const WFPActivitySchema = z.object({

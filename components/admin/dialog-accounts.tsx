@@ -22,7 +22,7 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 
 interface DialogApprovePendingUsersProps<TData> {
-    approvedPendingUsersData: Array<TData & { id?: number, name?: string, email?: string, region?: string, password?: string }>
+    approvedPendingUsersData: Array<TData & { id?: number, name?: string, email?: string, region?: string, color?:string, password?: string }>
     disable: boolean
 }
 
@@ -38,6 +38,7 @@ export function DialogApprovePendingUsers<TData>({ approvedPendingUsersData, dis
             email: "",
             password: "",
             fullname: "", // Add a default value for fullname
+            color:""
         }
     });
     
@@ -47,6 +48,7 @@ export function DialogApprovePendingUsers<TData>({ approvedPendingUsersData, dis
         form.setValue("fullname", user.name || ""); // Assuming 'name' corresponds to 'fullname'
         form.setValue("email", user.email || "");
         form.setValue("password", user.password || "");
+        form.setValue("color", user.color || "");
     });
     
     const onSubmit = async () => {

@@ -36,6 +36,7 @@ interface DataTableRowActionsProps {
     email: string;
     password: string;
     position: string;
+    color:string;
     component: string;
     unit: string;
   };
@@ -56,6 +57,7 @@ export function DataTableRowActions({ rowData }: DataTableRowActionsProps) {
       unit: rowData.unit || "",
       position: rowData.position || "",
       password: rowData.password || "",
+      color: rowData.color || "",
     }
   });
 

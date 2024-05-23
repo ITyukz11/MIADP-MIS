@@ -5,6 +5,7 @@ import React, { createContext, useState, useContext, ReactNode, FC } from 'react
 // Define the shape of the user
 interface User {
   name: string;
+  role: string;
   // Add other user properties if needed
 }
 

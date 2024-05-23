@@ -26,6 +26,8 @@ import { toast } from '@/components/ui/use-toast'
 import { LoadingSpinner } from '@/components/LoadingSpinner'
 import { ColorPicker } from '@/components/ui/color-picker'
 import { useCurrentUser } from '@/components/CurrentUserContext'
+import axios from 'axios'
+import { formatDate } from '@/components/table/data/activities/coa-columns'
 
 type Props = {
     setDialogClose: () => void
@@ -88,15 +90,41 @@ const CalendarForm = ({ setDialogClose}: Props) => {
                     setSuccess(data.success)
                     setTimeout(() => {
                         if (!data.error) {
-                            toast({
-                                title: "Success",
-                                description: "Your calendar of activity has been encoded to the server",
-                                duration: 10000,
-                                action: (
-                                    <ToastAction altText="Goto schedule to undo">Ok</ToastAction>
+                            try {
+                                currentUser?.expoPushToken && (
+                                    sendPushNotificationToMobileUser(
+                                        currentUser?.expoPushToken,
+                                        `New activity by ${currentUser?.name}`,
+                                        `${currentUser?.component} | ${currentUser?.unit} - ${values.activityTitle}\n${values.activityDescription}\n${formatDate(values.dateFrom as any)} - ${formatDate(values.dateTo as any)}`
+                                      )
+                                )
+                            
+                                toast({
+                                    title: "Success",
+                                    description: "Your calendar of activity has been encoded to the server",
+                                    duration: 10000,
+                                    action: (
+                                        <ToastAction altText="Goto schedule to undo">Ok</ToastAction>
+                                    ),
+                                })
+                                setDialogClose(); 
+                            } catch (error) {
+                                console.error("Error submitting calendar activity:", error);
+
+                                // Display an error toast notification
+                                toast({
+                                  title: "Error",
+                                  description: "An unexpected error occurred while sending notification.",
+                                  variant: "destructive",
+                                  duration: 10000,
+                                  action: (
+                                    <ToastAction altText="Error toast">Ok</ToastAction>
                                 ),
-                            })
-                            setDialogClose();
+                                });
+                            } finally {
+                                setLoading(false);
+                            }
+                         
                         }
                         setLoading(false)
                     }, 2000); // Delay for 2 seconds                      
@@ -104,6 +132,29 @@ const CalendarForm = ({ setDialogClose}: Props) => {
         })
 
     }
+
+        // Function to send a push notification
+const sendPushNotificationToMobileUser = async (expoPushToken:any, title:string, body:string, data?:string) => {
+    try {
+      const response = await axios.post('https://exp.host/--/api/v2/push/send', {
+        to: expoPushToken,
+        title,
+        body,
+        data
+      });
+  
+      // Check the response status and handle accordingly
+      if (response.data.data) {
+        console.log('Push notification sent successfully:', response.data.data);
+      } else {
+        console.error('Error sending push notification:', response.data);
+      }
+    } catch (error) {
+      console.error('Error making request:', error);
+    }
+  };
+
+
     const handleRangePickerChange = (value: any) => {
         if (value && Array.isArray(value) && value.length === 2) {
             const [startDate, endDate] = value.map((date: any) => dayjs(date).toISOString());

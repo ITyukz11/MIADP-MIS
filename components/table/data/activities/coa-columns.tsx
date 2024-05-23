@@ -6,7 +6,7 @@ import { DataTableRowActions } from "../pending-users/data-table-row-actions";
 import { Badge } from "../../../ui/badge";
 import { CalendarOfActivityType } from '@/schemas/calendar-of-activity';
 
-const formatDate = (dateString: string) => {
+export const formatDate = (dateString: string) => {
   const date = new Date(dateString);
   const month = date.toLocaleString('default', { month: 'short' });
   const day = date.getDate();

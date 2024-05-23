@@ -6,6 +6,9 @@ import React, { createContext, useState, useContext, ReactNode, FC } from 'react
 interface User {
   name: string;
   role: string;
+  expoPushToken: string;
+  component:string;
+  unit:string;
   // Add other user properties if needed
 }
 

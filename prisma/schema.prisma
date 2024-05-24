@@ -23,6 +23,7 @@ model User {
   email                String               @unique
   color                String
   expoPushToken        String
+  notification         Notifications?
   wfpActivities        WFPActivity[]
   calendarOfActivities CalendarOfActivity[]
   password             String
@@ -154,4 +155,13 @@ model CalendarOfActivityHistory {
 
   createdAt DateTime @default(now()) @map(name: "created_at")
   updatedAt DateTime @updatedAt @map(name: "updated_at")
+}
+
+model Notifications {
+  id            String   @id @default(cuid())
+  expoPushToken String
+  userName      String   @unique            // Ensure this field is unique
+  user          User     @relation(fields: [userName], references: [name])
+  createdAt     DateTime @default(now()) @map(name: "created_at")
+  updatedAt     DateTime @updatedAt @map(name: "updated_at")
 }

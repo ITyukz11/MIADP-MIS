@@ -55,6 +55,40 @@ export async function POST(request) {
   }
 }
 
+export async function DELETE(request) {
+  try {
+    const { id } = await request.json();
+
+    if (!id) {
+      return NextResponse.json({ error: 'ID is required.' }, { status: 400 });
+    }
+
+      // Find the preparatory lists associated with the calendar activity
+      const preparatoryLists = await prisma.preparatoryList.findMany({
+        where: { activity: id }
+      });
+  
+      // Delete the preparatory lists
+      await Promise.all(
+        preparatoryLists.map(async (preparatoryList) => {
+          await prisma.preparatoryList.delete({
+            where: { id: preparatoryList.id }
+          });
+        })
+      );
+  
+      // Delete the calendar activity
+      const deletedActivity = await prisma.calendarOfActivity.delete({
+        where: { id: id }
+      });
+  
+      return NextResponse.json({ deletedActivity });
+  } catch (error) {
+    console.error('Error deleting activity:', error);
+    return NextResponse.json({ error: 'Internal server error.' }, { status: 500 });
+  }
+}
+
 export async function GET(request) {
   try {
     const calendarOfActivity = await prisma.calendarOfActivity.findMany({

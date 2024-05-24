@@ -51,9 +51,9 @@ export async function POST(request) {
     console.log({ newCalendarOfActivity });
 
 
-    return NextResponse.json({ deletedActivity }, { status: 200 });
+    return NextResponse.json({ newCalendarOfActivity }, { status: 200 });
   } catch (error) {
-    console.error('Error deleting activity:', error);
+    console.error('Error inserting new activity:', error);
     return NextResponse.json({ error: 'Internal server error.' }, { status: 500 });
   }
 }

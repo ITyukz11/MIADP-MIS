@@ -64,7 +64,8 @@ export async function GET(request) {
             component: true,
             unit: true,
             position: true,
-            region:true
+            region:true,
+            color:true
           }
         }, 
         calendarOfActivityHistory: true, // Include all fields from the calendarOfActivityHistory model

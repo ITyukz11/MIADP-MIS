@@ -10,48 +10,51 @@ export async function POST(request) {
   try {
 
     //const userName = await getCurrentUser();
-    
-    const { authorizeOther, activityTitle, activityDescription, type, targetParticipant, 
-            location, dateFrom, dateTo,timeStart,timeEnd, allDay,status,color,remarks,preparatoryList,userName} = await request.json();
-    console.log('api/auth/calendar-of-activity route: ', {authorizeOther, activityTitle, activityDescription, type, targetParticipant, 
-      location, dateFrom, dateTo,timeStart,timeEnd, allDay,status,color,remarks,preparatoryList,userName});
 
-        // Create the new calendar of activity
-        const newCalendarOfActivity = await prisma.calendarOfActivity.create({
-          data: {
-            authorizeOther, 
-            activityTitle,
-            activityDescription, 
-            type, 
-            targetParticipant, 
-            location, 
-            dateFrom, 
-            dateTo,
-            timeStart,
-            timeEnd,
-            allDay,
-            status,
-            color,
-            remarks,
-            preparatoryList: {
-              createMany: {
-                data: preparatoryList // Assuming preparatoryList is an array of objects
-              }
-            },
-            user: {
-              connect:{
-                name: userName
-              }
-            }
+    const { authorizeOther, activityTitle, activityDescription, type, targetParticipant,
+      location, dateFrom, dateTo, timeStart, timeEnd, allDay, status, color, remarks, preparatoryList, userName } = await request.json();
+    console.log('api/auth/calendar-of-activity route: ', {
+      authorizeOther, activityTitle, activityDescription, type, targetParticipant,
+      location, dateFrom, dateTo, timeStart, timeEnd, allDay, status, color, remarks, preparatoryList, userName
+    });
+
+    // Create the new calendar of activity
+    const newCalendarOfActivity = await prisma.calendarOfActivity.create({
+      data: {
+        authorizeOther,
+        activityTitle,
+        activityDescription,
+        type,
+        targetParticipant,
+        location,
+        dateFrom,
+        dateTo,
+        timeStart,
+        timeEnd,
+        allDay,
+        status,
+        color,
+        remarks,
+        preparatoryList: {
+          createMany: {
+            data: preparatoryList // Assuming preparatoryList is an array of objects
           }
-        });
-    
-        console.log({ newCalendarOfActivity });
-    
-        return NextResponse.json({ newCalendarOfActivity });
+        },
+        user: {
+          connect: {
+            name: userName
+          }
+        }
+      }
+    });
+
+    console.log({ newCalendarOfActivity });
+
+
+    return NextResponse.json({ deletedActivity }, { status: 200 });
   } catch (error) {
-    console.error('Error inserting new activity:', error);
-    return NextResponse.json({ error: 'Internal server error.' });
+    console.error('Error deleting activity:', error);
+    return NextResponse.json({ error: 'Internal server error.' }, { status: 500 });
   }
 }
 
@@ -78,18 +81,16 @@ export async function DELETE(request) {
     );
 
     // Delete the calendar activity
-    await prisma.calendarOfActivity.delete({
+    const deletedActivity = await prisma.calendarOfActivity.delete({
       where: { id: id }
     });
 
-    // Return a success response with no content
-    return NextResponse.json({}, { status: 204 });
+    return NextResponse.json({ deletedActivity }, { status: 200 });
   } catch (error) {
     console.error('Error deleting activity:', error);
     return NextResponse.json({ error: 'Internal server error.' }, { status: 500 });
   }
 }
-
 
 export async function PUT(request) {
   try {
@@ -121,10 +122,10 @@ export async function GET(request) {
             component: true,
             unit: true,
             position: true,
-            region:true,
-            color:true
+            region: true,
+            color: true
           }
-        }, 
+        },
         calendarOfActivityHistory: true, // Include all fields from the calendarOfActivityHistory model
         preparatoryList: true // Include all fields from the preparatoryList model
       },

@@ -22,7 +22,7 @@ model User {
   position             String
   email                String               @unique
   color                String
-  expoPushToken        String
+  expoPushToken        String?
   notification         Notifications?
   wfpActivities        WFPActivity[]
   calendarOfActivities CalendarOfActivity[]

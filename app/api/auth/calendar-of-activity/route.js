@@ -101,11 +101,11 @@ export async function PUT(request) {
     }
 
     const updatedActivity = await prisma.calendarOfActivity.update({
-      where: { id: parseInt(id) },
+      where: { id: id },
       data: newData
     });
 
-    return NextResponse.json({ updatedActivity });
+    return NextResponse.json({ updatedActivity },{ status: 200 });
   } catch (error) {
     console.error('Error updating activity:', error);
     return NextResponse.json({ error: 'Internal server error.' }, { status: 500 });

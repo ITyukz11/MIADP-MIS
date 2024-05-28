@@ -128,6 +128,7 @@ model CalendarOfActivity {
   preparatoryList           PreparatoryList[]
   remarks                   String
   color                     String
+  attachments               String?
   status                    String
   userName                  String
   user                      User                        @relation(fields: [userName], references: [name])

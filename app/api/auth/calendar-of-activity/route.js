@@ -12,10 +12,10 @@ export async function POST(request) {
     //const userName = await getCurrentUser();
 
     const { authorizeOther, activityTitle, activityDescription, type, targetParticipant,
-      location, dateFrom, dateTo, timeStart, timeEnd, allDay, attachments, status, color, remarks, preparatoryList, userName } = await request.json();
+      location, dateFrom, dateTo, timeStart, timeEnd, allDay, attachments, status, remarks, preparatoryList, userName } = await request.json();
     console.log('api/auth/calendar-of-activity route: ', {
       authorizeOther, activityTitle, activityDescription, type, targetParticipant,
-      location, dateFrom, dateTo, timeStart, timeEnd, allDay, attachments, status, color, remarks, preparatoryList, userName
+      location, dateFrom, dateTo, timeStart, timeEnd, allDay, attachments, status, remarks, preparatoryList, userName
     });
 
     // Create the new calendar of activity
@@ -34,7 +34,6 @@ export async function POST(request) {
         allDay,
         attachments,
         status,
-        color,
         remarks,
         preparatoryList: {
           createMany: {

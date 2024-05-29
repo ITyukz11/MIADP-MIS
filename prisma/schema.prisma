@@ -127,7 +127,7 @@ model CalendarOfActivity {
   allDay                    Boolean
   preparatoryList           PreparatoryList[]
   remarks                   String
-  color                     String
+  color                     String?
   attachments               String?
   status                    String
   userName                  String

@@ -102,22 +102,22 @@ export default function FloatingAIChat() {
 
                     <form onSubmit={submitMessage} className="p-4 rounded-b-lg flex gap-2 relative">
 
-                        {!input && (
+                        {!input && messages.length == 0 && (
                             <div className="absolute inset-y-0 left-4 ml-4 flex items-center pointer-events-none">
-                                <Label>
+                                <Label className=' text-gray-500'>
                                 <Typewriter
                                     words={[
                                         'Ask me anything...',
-                                        'How can I help you today?',
+                                        'What is MIADP?',
                                         'Need assistance? Just ask!',
-                                        'What do you want to know?',
+                                        'Want to know the 4 components?',
                                         'Feel free to ask any question...',
                                     ]}
                                     loop={5}
                                     cursor
                                     cursorStyle='_'
-                                    typeSpeed={2}
-                                    deleteSpeed={1}
+                                    typeSpeed={40}
+                                    deleteSpeed={30}
                                     />
                                 </Label>
                              

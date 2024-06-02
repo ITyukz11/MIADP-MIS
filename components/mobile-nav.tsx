@@ -11,10 +11,14 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Label } from "./ui/label"
 import { TbCloudDataConnection } from "react-icons/tb";
 import { navLinks } from "@/config/nav-links"
+import { Badge } from "./ui/badge"
+import { useCurrentUser } from "./CurrentUserContext"
 
 export function MobileNav() {
     const [open, setOpen] = React.useState(false)
     const pathname = usePathname()
+
+    const {currentUser} = useCurrentUser();
     return (
         <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>
@@ -77,6 +81,18 @@ export function MobileNav() {
                                 {link.text}
                             </Link>
                         ))}
+                           {currentUser?.role == "ADMIN" &&
+          <Link
+            key={currentUser?.name}
+            href='/admin/account'
+            className={cn(
+              "transition-colors hover:text-foreground/80",
+              pathname === '/admin/account' ? "text-foreground" : "text-foreground/60"
+            )}
+          >
+            <Badge>Admin</Badge>
+          </Link>
+        }
                     </div>
                     <div className="flex flex-col space-y-2">
 

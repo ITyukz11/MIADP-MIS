@@ -38,6 +38,22 @@ export const formatTime = (timeString: string) => {
   // If parsing fails, return the original string
   return timeString;
 };
+const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'Ongoing':
+        return '#00a354'; // Green
+      case 'Upcoming':
+        return '#f2c018'; // Yellow
+      case 'Completed':
+        return '#4682B4'; // Blue
+      case 'Cancelled':
+        return '#b03620'; // Red
+      case 'Postponed':
+        return '#e38812'; // Orange
+      default:
+        return '#FFFFFF'; // Default color
+    }
+  };
 
 export const columns: ColumnDef<CalendarOfActivityType>[] = [
   // {
@@ -153,29 +169,21 @@ export const columns: ColumnDef<CalendarOfActivityType>[] = [
     cell: ({ row }) => {
       const status = row.getValue("status") as string;
       let variant: "secondary" | "outline" | "destructive" | "default" | null = null;
-
-      switch (status?.toLowerCase()) {
-        case "conducted":
-          variant = "secondary";
-          break;
-        case "postponed":
-          variant = "outline";
-          break;
-        case "re-scheduled":
-        case "cancelled":
-          variant = "destructive";
-          break;
-        default:
-          variant = "default";
-          break;
-      }
-
+      
       return (
         <div className="flex space-x-2">
-          <span className="max-w-[500px] truncate font-medium">
-            <Badge variant={variant}>{status}</Badge>
-          </span>
-        </div>
+        <span className="max-w-[500px] truncate">
+          <Badge
+            variant={variant}
+            className={`font-medium ${
+              getStatusColor(status) 
+            }`}
+          >
+            {status}
+          </Badge>
+        </span>
+      </div>
+      
       );
     },
     filterFn: (row, id, value) => value.includes(row.getValue(id)),

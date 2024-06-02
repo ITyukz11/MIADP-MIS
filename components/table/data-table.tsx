@@ -45,24 +45,33 @@ export function DataTable<TData, TValue>({
     authorizeOther:false,
     timeRange:false,
     activityDescription:false,
-    color:false
+    color:false,
+    remarks:false,
+    timeStart:false,
+    timeEnd:false
   });
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
-  )
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
   const [sorting, setSorting] = React.useState<SortingState>([])
+
+  // Add the numbering column
+  const numberingColumn: ColumnDef<TData, any> = {
+    id: 'numbering',
+    header: '#',
+    cell: (info) => info.row.index + 1,
+  }
+
+  const columnsWithNumbering = [numberingColumn, ...columns]
 
   const table = useReactTable({
     data,
-    columns,
+    columns: columnsWithNumbering,
     state: {
       sorting,
-      columnVisibility: columnVisibility, 
+      columnVisibility: columnVisibility,
       rowSelection,
       columnFilters,
     },
     enableRowSelection: true,
-    
     onRowSelectionChange: setRowSelection,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -120,7 +129,7 @@ export function DataTable<TData, TValue>({
             ) : (
               <TableRow>
                 <TableCell
-                  colSpan={columns.length}
+                  colSpan={columnsWithNumbering.length}
                   className="h-24 text-center"
                 >
                   No results.

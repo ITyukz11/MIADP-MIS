@@ -45,7 +45,7 @@ const page = (props: Props) => {
         </div>
 
         {coaData.length > 0 ? (
-          <div className='w-full overflow-x-auto'>
+          <div className='w-full overflow-x-auto scrollbar-thin'>
             <DataTable data={coaData} columns={columns} />
           </div>
         ) : (

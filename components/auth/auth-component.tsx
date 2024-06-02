@@ -59,8 +59,8 @@ export default function AuthenticationPage() {
 
     return (
 
-        <div className="container relative overflow-auto z-10">
-            <div className="border-2 border-border/80 shadow-2xl rounded-xl container relative min-h-[50vh] overflow-hidden flex-col items-center justify-center md:grid lg:max-w-none lg:grid-cols-2 lg:px-0">
+        <div className="container relative overflow-auto z-10 scrollbar-thin">
+            <div className="border-2 border-border/80 shadow-2xl rounded-xl container relative min-h-[50vh] scrollbar-thin overflow-hidden flex-col items-center justify-center md:grid lg:max-w-none lg:grid-cols-2 lg:px-0">
                 <div className="z-10 relative rounded-l-xl rounded-bl-xl hidden h-full flex-col bg-muted p-10 text-white lg:flex dark:border-r justify-between">
                     <div className="absolute inset-0 bg-zinc-900  rounded-l-xl rounded-bl-xl" />
                     <div className="relative z-20 flex items-center text-lg font-bold">

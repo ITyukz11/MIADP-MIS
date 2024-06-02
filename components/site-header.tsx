@@ -10,7 +10,7 @@ import { useCurrentUser } from "./CurrentUserContext";
 export const SiteHeader=() =>{
     const { currentUser } = useCurrentUser();
     return (
-        <header className="sticky top-0 z-50 w-full border-b-2 border-border/80 bg-black backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <header className="sticky top-0 overflow-hidden z-50 w-full border-b-2 border-border/80 bg-black backdrop-blur supports-[backdrop-filter]:bg-background/60">
             <div className="container flex h-14 max-w-screen-2xl items-center gap-2">
                 <MainNav/>
                 <MobileNav />

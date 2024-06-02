@@ -15,32 +15,35 @@ interface ActivitiesLayoutProps {
 export default function ActivitiesLayout({ children }: ActivitiesLayoutProps) {
   const [calendarFormOpen, setCalendarFormOpen] = useState(false)
   return (
-    <div className="container relative">
-            <PageHeader>
+    <div className="xs:container relative">
+      <PageHeader>
         <PageHeaderHeading className="hidden md:block">
           Welcome to the Calendar of Activities
         </PageHeaderHeading>
         <PageHeaderHeading className="md:hidden">Activity Calendar</PageHeaderHeading>
-        <PageHeaderDescription>
-          Explore and manage your scheduled activities with ease. This calendar provides a comprehensive view of all planned activities, allowing you to stay organized and efficient.
-        </PageHeaderDescription>
-        <PageActions>
-   
-          <Link href="/activities/calendar" className={cn(buttonVariants(), "rounded-[6px]")}>
+        <div className='hidden sm:block'>
+          <PageHeaderDescription>
+            Explore and manage your scheduled activities with ease. This calendar provides a comprehensive view of all planned activities, allowing you to stay organized and efficient.
+          </PageHeaderDescription>
+        </div>
+
+        <PageActions className='flex flex-wrap gap-2 md:gap-0 flex-col md:flex-row'>
+          <div></div>
+          <Link href="/activities/calendar" className={cn(buttonVariants(), "rounded-[6px] xs:w-[200px] md:w-fit")}>
             Show Calendar
           </Link>
-     
 
-          <Button variant='outline'onClick={() => setCalendarFormOpen(true)}>Start planning activity</Button>
-          <Link href="/activities" className={cn(buttonVariants(), "rounded-[6px]")}>
+          <Button variant='outline' className='xs:w-[200px] md:w-fit' onClick={() => setCalendarFormOpen(true)}>Start planning activity</Button>
+          <Link href="/activities" className={cn(buttonVariants(), "rounded-[6px] xs:w-[200px] md:w-fit")}>
             Table
           </Link>
+
         </PageActions>
       </PageHeader>
 
       {children}
-      <CalendarFormDialog open={calendarFormOpen} 
-                                setClose={() => setCalendarFormOpen(false)}/>
+      <CalendarFormDialog open={calendarFormOpen}
+        setClose={() => setCalendarFormOpen(false)} />
     </div>
   )
 }

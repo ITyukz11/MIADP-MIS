@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-hooks/rules-of-hooks */
 'use client'
 import React, { useEffect, useState } from 'react';
@@ -20,8 +21,8 @@ import { FilterMenus } from '../filtermenus';
 import CalendarFormDialog from '../calendar-form-dialog';
 import { useRouter } from 'next/navigation';
 import { ViewMySchedDialog } from '../view-my-sched-dialog';
-import { fetchCalendarOfActivity } from '@/lib/calendar-of-activity/fetch-calendar-of-activity';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useCalendarOfActivityContext } from '@/components/CalendarOfActivityContext';
 
 interface Event {
     id: string;
@@ -29,6 +30,7 @@ interface Event {
     start: string; // Assuming start date is a string in ISO 8601 format
     end: string; // Assuming end date is a string in ISO 8601 format
     color: string;
+
     // Add other properties if needed
 }
 
@@ -36,70 +38,59 @@ const page = () => {
     const router = useRouter();
     const [view, setView] = useState<string>('dayGridMonth'); // default view
     const [calendarFormOpen, setCalendarFormOpen] = useState(false)
-    const [coaData, setCoaData] = useState({})
+    // const [coaData, setCoaData] = useState({})
     const [filteredCoaData, setFilteredCoaData] = useState<Event[]>([]);
+    const [filteredUpcomingEvents, setFilteredUpcomingEvents] = useState<Event[]>([]);
 
     const [refreshCalendarData, setRefreshCalendarData] = useState(false);
 
+    const { activities, loading, error } = useCalendarOfActivityContext();
+
+    console.log("activities: ", activities)
+
 
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const data = await fetchCalendarOfActivity();
-                setCoaData(data);
-            } catch (error) {
-                console.error("Error fetching calendar of activity:", error);
-            }
-        };
+       
+        fetchData()
+    }, [])
+    const fetchData = () => {
+        try {
+            const formatDateToISOWithoutTimezone = (date: Date) => {
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            };
 
-        fetchData();
-    }, []);
+            const formattedData = activities.map((event: any) => {
+                const startDate = new Date(event.dateFrom);
+                const endDate = new Date(event.dateTo);
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const data = await fetchCalendarOfActivity();
-                const formattedData = data.map((event: { id: any; activityTitle: any; dateRange: any; dateFrom: any; color: any }) => {
-                    let start: string;
-                    let end: string;
+                return {
+                    id: event.id,
+                    title: event.activityTitle,
+                    start: formatDateToISOWithoutTimezone(startDate), // Format date without timezone
+                    end: formatDateToISOWithoutTimezone(endDate),
+                    timeStart: event.timeStart,
+                    timeEnd: event.timeEnd,
+                    color: event.user.color, // Use user color
+                    status: event.status
+                };
+            });
 
-                    // Check if dateRange has value
-                    if (event.dateRange && event.dateRange.length > 0) {
-                        // Assuming dateRange is an array with only one element
-                        const range = event.dateRange[0];
+            console.log(formattedData)
 
-                        // Format startDate and endDate into 'yyyy-mm-dd' format
-                        start = range.startDate.replace(/\//g, '-');
-                        end = range.endDate.replace(/\//g, '-');
-                    } else {
-                        // If dateRange is empty, use dateFrom as both start and end
-                        start = new Date(event.dateFrom).toISOString().slice(0, 10);
-                        end = start; // Assuming end date is same as start date for non-allDay events
-                    }
+            const filteredUpcomingData = formattedData
+                .filter((event: any) => event.status === 'Upcoming')
+                .slice(0, 10); // Take the first 5 events
 
-                    return {
-                        id: event.id,
-                        title: event.activityTitle,
-                        start: start,
-                        end: end,
-                        color: event.color // You can set color based on status or any other criteria
-                    };
-                });
-
-                setFilteredCoaData(formattedData);
-            } catch (error) {
-                console.error("Error fetching calendar of activity:", error);
-            }
-        };
-
-        // Trigger the effect whenever refreshData changes
-        fetchData();
-    }, [refreshCalendarData]); // Pass refreshData as a dependency to the useEffect
-
-
-
-    console.log("coaData: ", coaData)
-    console.log("filteredcoaData: ", filteredCoaData)
+            setFilteredCoaData(formattedData);
+            setFilteredUpcomingEvents(filteredUpcomingData)
+            console.log("filteredCoaData:", filteredCoaData)
+        } catch (error) {
+            console.error("Error fetching calendar of activity:", error);
+        }
+    };
     // const events = [
     //     // Replace this with your actual list of events
     //     { id: '1', title: 'Orientation cum Meeting with NCIP and MIADP Staff', start: '2024-05-01T11:00:00+09:00', end: '2024-05-04', color: '#ff0000' },
@@ -136,7 +127,7 @@ const page = () => {
     return (
         <div className='container relative'>
             <div className="flex gap-2 flex-wrap md:flex-nowrap">
-                <div className='flex flex-col md:w-1/4 gap-2'>
+                <div className='flex flex-col w-full md:w-1/4 gap-2'>
                     <Card>
                         <CardHeader>
                             <Button
@@ -146,25 +137,25 @@ const page = () => {
                             <ViewMySchedDialog />
                         </CardHeader>
                     </Card>
-                    <Card>
+                    <Card className=' overflow-hidden'>
                         <CardHeader className=' font-bold gap-2'>
-                            <CardTitle className='flex flex-row items-center justify-start gap-10'> <FaRegCalendarAlt /> Upcoming Events</CardTitle>
+                            <CardTitle className='flex flex-row items-center justify-start gap-10'> <FaRegCalendarAlt /> {filteredUpcomingEvents.length} Upcoming Event{filteredUpcomingEvents.length>1 ? 's':''}</CardTitle>
                         </CardHeader>
                         <Separator />
                         <CardContent>
                             {/* Display the top 5 nearest events */}
-                            {filteredCoaData.length>0 ? filteredCoaData
-                                .sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime()) // Sort events by start date
-                                .slice(0, 5) // Take the first 5 events
-                                .map((event: { start: string | number | Date; end: string | number | Date; id: React.Key | null | undefined; color: string | undefined; title: string | number | bigint | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<React.AwaitedReactNode> | null | undefined; }) => {
+                            {filteredUpcomingEvents.length > 0 ? filteredUpcomingEvents
+                                .map((event: any) => {
                                     const startDate = new Date(event.start);
                                     const endDate = new Date(event.end);
+                                    const timeStart = new Date(event.timeStart)
+                                    const timeEnd = new Date(event.timeEnd)
 
                                     // Format the date and time
                                     const startDateString = startDate.toLocaleDateString(); // Get date string
-                                    const startTimeString = startDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); // Get time string without seconds
+                                    const startTimeString = timeStart.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); // Get time string without seconds
                                     const endDateString = endDate.toLocaleDateString(); // Get date string
-                                    const endTimeString = endDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); // Get time string without seconds
+                                    const endTimeString = timeEnd.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); // Get time string without seconds
 
                                     return (
                                         <div className='mt-3 hover:cursor-pointer z-10' key={event.id}>
@@ -175,26 +166,27 @@ const page = () => {
                                                 </svg>
                                                 <div className='flex flex-col justify-center gap-3 w-full text-left'>
                                                     {/** - ${endDateString} ${endTimeString} */}
-                                                    <Label className="font-extralight">{`${startDateString} ${startTimeString}`}</Label>
+                                                    <Label className="font-extralight">{`${startDateString}-${startTimeString}`}</Label>
                                                     <Label>{event.title}</Label>
                                                 </div>
                                             </div>
                                             <Separator />
                                         </div>
                                     );
-                                }) : 
-                                <div className="space-y-2 mt-3">
-                                    <Skeleton className="h-4 w-[250px]" />
-                                    <Skeleton className="h-4 w-[200px]" />
+                                }) :
+                                <div className="space-y-2 mt-3 p-2">
+                                    <Skeleton className="h-4 w-full" />
+                                    <Skeleton className="h-4 w-full" />
                                 </div>
-                           }
+                            }
+
                         </CardContent>
 
                     </Card>
                 </div>
-                <Card className="w-fit md:w-3/4 overflow-x-auto">
+                <Card className="w-fit md:w-3/4 overflow-x-auto scrollbar-thin scrollbar-track-rounded-full ">
                     <CardHeader className='flex flex-row justify-end gap-2 items-center'>
-                        <div className='flex flex-row gap-2 overflow-x-auto w-full scroll scroll-me-px'>
+                        <div className='flex flex-row gap-2 overflow-x-auto scrollbar-thin scrollbar-track-rounded-full w-full scroll scroll-me-px'>
                             {FilterMenus.map((menu, index) => (
                                 <Button key={index} className='cursor-pointer whitespace-nowrap p-2 mb-2' variant={menu.variant == 'default' ? 'default' : 'outline'}>
                                     {menu.text}
@@ -225,8 +217,8 @@ const page = () => {
                     </CardContent>
                 </Card>
             </div>
-            <CalendarFormDialog open={calendarFormOpen} 
-                                setClose={() => setCalendarFormOpen(false)}/>
+            <CalendarFormDialog open={calendarFormOpen}
+                setClose={() => setCalendarFormOpen(false)} />
         </div>
     );
 };

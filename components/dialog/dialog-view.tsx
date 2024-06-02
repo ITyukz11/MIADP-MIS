@@ -79,7 +79,7 @@ function DialogView({ viewDatas, open, close}: DialogViewProps) {
   
   return (
     <Dialog open={open} onOpenChange={close}>
-      <DialogContent className="min-w-[30%] overflow-y-auto max-h-[95vh] ">
+      <DialogContent className="min-w-[30%] overflow-y-auto scrollbar-thin max-h-[95vh] ">
         <DialogHeader>
           <DialogTitle>Pending Account Details</DialogTitle>
           <DialogDescription>

@@ -18,7 +18,7 @@ export default function DialogWFPActivityForm() {
       <DialogTrigger asChild>
         <Button variant="outline"><IoMdAdd /> Add</Button>
       </DialogTrigger>
-      <DialogContent className="min-w-[70%] overflow-y-auto max-h-[90vh] ">
+      <DialogContent className="min-w-[70%] overflow-y-auto scrollbar-thin max-h-[90vh] ">
         <DialogHeader>
           <DialogTitle>WFP Activity Upload Form</DialogTitle>
           <DialogDescription>

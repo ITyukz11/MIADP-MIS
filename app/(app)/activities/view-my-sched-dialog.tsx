@@ -20,7 +20,7 @@ export const ViewMySchedDialog = (props: Props) => {
       <DialogTrigger asChild>
         <Button variant="outline"  className='flex flex-row items-center gap-1 justify-center'><FaCalendarAlt /> View my Activity</Button>
       </DialogTrigger>
-      <DialogContent className="min-w-[40%] overflow-y-auto max-h-[90vh] ">
+      <DialogContent className="min-w-[40%] overflow-y-auto scrollbar-thin max-h-[90vh] ">
         <DialogHeader>
           <DialogTitle>Create new activity form</DialogTitle>
           <DialogDescription>

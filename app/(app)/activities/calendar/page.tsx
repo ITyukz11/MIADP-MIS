@@ -22,6 +22,7 @@ import { useRouter } from 'next/navigation';
 import { ViewMySchedDialog } from '../view-my-sched-dialog';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useCalendarOfActivityContext } from '@/components/CalendarOfActivityContext';
+import { CalendarSheet } from '@/components/calendar-of-activity/CalendarSheet';
 
 interface Event {
     id: string;
@@ -37,10 +38,12 @@ const page = () => {
     const router = useRouter();
     const [view, setView] = useState<string>('dayGridMonth'); // default view
     const [calendarFormOpen, setCalendarFormOpen] = useState(false)
+    const [calendarSheetOpen, setCalendarSheetOpen] = useState(false)
+    const [activityData, setActivityData] = useState<any[]>([]);
     // const [coaData, setCoaData] = useState({})
     const [filteredCoaData, setFilteredCoaData] = useState<Event[]>([]);
     const [filteredUpcomingEvents, setFilteredUpcomingEvents] = useState<Event[]>([]);
-
+    const [filteredOnGoingEvents, setFilteredOnGoingEvents] = useState<Event[]>([]);
     const { activities, loading, error } = useCalendarOfActivityContext();
 
     console.log("activities: ", activities)
@@ -77,9 +80,14 @@ const page = () => {
                 const filteredUpcomingData = formattedData
                     .filter((event: any) => event.status === 'Upcoming')
                     .slice(0, 10); // Take the first 5 events
-    
+                
+                const filteredOnGoingEvents = formattedData
+                .filter((event: any) => event.status === 'Ongoing')
+                .slice(0, 10); // Take the first 5 events
+
                 setFilteredCoaData(formattedData);
                 setFilteredUpcomingEvents(filteredUpcomingData)
+                setFilteredOnGoingEvents(filteredOnGoingEvents)
                 console.log("filteredCoaData:", filteredCoaData)
             } catch (error) {
                 console.error("Error fetching calendar of activity:", error);
@@ -108,8 +116,9 @@ const page = () => {
     // ];
 
     const handleEventClick = (info: any) => {
-        // Redirect to event details page
-        router.push(`/event/${info.event.id}`);
+        const activity = activities.filter(activity => activity.id === info.event.id);
+        setActivityData(activity)
+        setCalendarSheetOpen(true)
     };
 
     const handleCreateNewActivity = () => {
@@ -178,7 +187,51 @@ const page = () => {
                             }
 
                         </CardContent>
+                    </Card>
+                    <Card className=' overflow-hidden'>
+                        <CardHeader className=' font-bold gap-2'>
+                            <CardTitle className='flex flex-row items-center justify-start gap-10'> <FaRegCalendarAlt /> {filteredOnGoingEvents.length} Ongoing Event{filteredOnGoingEvents.length>1 ? 's':''}</CardTitle>
+                        </CardHeader>
+                        <Separator />
+                        <CardContent>
+                            {/* Display the top 5 nearest events */}
+                            {filteredOnGoingEvents.length > 0 ? filteredOnGoingEvents
+                                .map((event: any) => {
+                                    const startDate = new Date(event.start);
+                                    const endDate = new Date(event.end);
+                                    const timeStart = new Date(event.timeStart)
+                                    const timeEnd = new Date(event.timeEnd)
 
+                                    // Format the date and time
+                                    const startDateString = startDate.toLocaleDateString(); // Get date string
+                                    const startTimeString = timeStart.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); // Get time string without seconds
+                                    const endDateString = endDate.toLocaleDateString(); // Get date string
+                                    const endTimeString = timeEnd.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); // Get time string without seconds
+
+                                    return (
+                                        <div className='mt-3 hover:cursor-pointer z-10' key={event.id}>
+                                            <div className="mb-2 flex gap-5">
+                                                {/* Colored circle icon */}
+                                                <svg width="10" height="10" className='flex items-start'>
+                                                    <circle cx="5" cy="5" r="4" fill={event.color} />
+                                                </svg>
+                                                <div className='flex flex-col justify-center gap-3 w-full text-left'>
+                                                    {/** - ${endDateString} ${endTimeString} */}
+                                                    <Label className="font-extralight">{`${startDateString}-${endDateString}`}</Label>
+                                                    <Label>{event.title}</Label>
+                                                </div>
+                                            </div>
+                                            <Separator />
+                                        </div>
+                                    );
+                                }) :
+                                <div className="space-y-2 mt-3 p-2">
+                                    <Skeleton className="h-4 w-full" />
+                                    <Skeleton className="h-4 w-full" />
+                                </div>
+                            }
+
+                        </CardContent>
                     </Card>
                 </div>
                 <Card className="w-fit md:w-3/4 overflow-x-auto scrollbar-thin scrollbar-track-rounded-full ">
@@ -193,10 +246,12 @@ const page = () => {
                     </CardHeader>
                     <CardContent>
                         <FullCalendar
+                            
                             headerToolbar={{
                                 left: 'today prev,next',
                                 center: 'title',
-                                right: 'dayGridMonth,timeGridWeek,timeGridDay,list'
+                                right: 'dayGridMonth,timeGridWeek,timeGridDay,list',
+
                             }}
                             displayEventTime={true}
                             eventTimeFormat={{
@@ -204,11 +259,12 @@ const page = () => {
                                 minute: '2-digit',
                                 hour12: false
                             }}
-                            eventDisplay='block' // Set the eventDisplay property to 'block'
+                            eventDisplay='block cursor-pointer' // Set the eventDisplay property to 'block'
                             plugins={[dayGridPlugin, timeGridPlugin, listPlugin]}
                             initialView={'dayGridMonth'}
                             events={filteredCoaData}
                             eventClick={handleEventClick}
+
                         />
 
                     </CardContent>
@@ -216,6 +272,7 @@ const page = () => {
             </div>
             <CalendarFormDialog open={calendarFormOpen}
                 setClose={() => setCalendarFormOpen(false)} />
+            <CalendarSheet activityData={activityData} openSheet={calendarSheetOpen} closeCalendarSheet={()=> setCalendarSheetOpen(!calendarSheetOpen)}/>
         </div>
     );
 };

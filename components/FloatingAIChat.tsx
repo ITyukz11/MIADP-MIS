@@ -9,6 +9,7 @@ import Image from 'next/image';
 import { Separator } from './ui/separator';
 import { Label } from './ui/label';
 import { Typewriter } from 'react-simple-typewriter'
+import GifAnimation from './lottie-icon-animations/GifAnimation';
 
 export default function FloatingAIChat() {
     const [aiAssistantOpen, setAiAssistantOpen] = useState(false);
@@ -93,9 +94,11 @@ export default function FloatingAIChat() {
 
 
                         {status === 'in_progress' && (
-                            <div className="mb-4 text-center text-gray-500">
-                                Typing...
-                            </div>
+                            // <div className="mb-4 text-center text-gray-500">
+                            //     Typing...
+                            // </div>
+                        <GifAnimation src="/lottie/loading.gif" width={25} height={25} />
+
                         )}
 
                     </div>

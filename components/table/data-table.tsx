@@ -48,7 +48,9 @@ export function DataTable<TData, TValue>({
     color:false,
     remarks:false,
     timeStart:false,
-    timeEnd:false
+    timeEnd:false,
+    user:false,
+    planned_to_date:false
   });
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
   const [sorting, setSorting] = React.useState<SortingState>([])

@@ -24,7 +24,7 @@ import { LoadingSpinner } from "../LoadingSpinner";
 import { useToast } from "../ui/use-toast";
 import { ToastAction } from "@radix-ui/react-toast";
 import { pendinguser } from "@/actions/pendinguser/pendinguser";
-import { regionOptions } from "./data";
+import { componentOptions, regionOptions, unitOptions } from "@/lib/data/filter";
 
 interface RegisterFormProps {
     backToLogin: () => void
@@ -41,21 +41,7 @@ export const RegisterForm = ({ backToLogin }: RegisterFormProps) => {
 
     const [component4, setComponent4] = useState(true)
     // Define the options for the component and unit select fields
-    const componentOptions = ["Component 1", "Component 2", "Component 3", "Component 4"];
-    const unitOptions = [
-        { value: "Finance", label: 'FINANCE' },
-        { value: "Admin", label: 'ADMIN' },
-        { value: "Procurement", label: 'Procurement' },
-        { value: "GGU", label: 'GGU' },
-        { value: "ODPD", label: 'ODPD - Office of Deputy Project Director' },
-        { value: "SES", label: 'SES - Social and Environmental Safeguard' },
-        { value: "PMEU", label: 'PMEU - Planning Monitoring Evaluation Unit' },
-        { value: "Economist", label: 'Economist' },
-        { value: "Communication Advocacy", label: 'Communication Advocacy' },
-        { value: "Legal", label: 'Legal' },
-        { value: "Secretary", label: 'Secretary' },
-        { value: " ", label: 'Not Applicable' },
-    ];
+  
 
 
     const form = useForm<z.infer<typeof RegisterSchema>>({
@@ -139,7 +125,7 @@ export const RegisterForm = ({ backToLogin }: RegisterFormProps) => {
                                         </FormControl>
                                         <SelectContent>
                                         {regionOptions.map((option, index)=>(
-                                                <SelectItem key={index} value={option.value}>{option.label}</SelectItem>
+                                                <SelectItem key={index} value={option}>{option}</SelectItem>
                                             ))}
                                         </SelectContent>
                                     </Select>

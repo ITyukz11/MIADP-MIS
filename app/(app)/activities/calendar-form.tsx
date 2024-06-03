@@ -19,7 +19,7 @@ import { FaMinus, FaPlus } from 'react-icons/fa'
 import { Separator } from '@/components/ui/separator'
 import { Select, SelectItem, SelectTrigger, SelectValue, SelectContent } from '@/components/ui/select'
 
-import { status, type } from '@/components/calendar-of-activity/data'
+import { ActivityStatus, TypeData} from '@/components/calendar-of-activity/data'
 import { ToastAction } from '@/components/ui/toast'
 import { calendarOfActivity } from '@/actions/calendar-of-activity/calendarofactivity'
 import { toast } from '@/components/ui/use-toast'
@@ -287,8 +287,8 @@ const sendPushNotificationToMobileUser = async (expoPushToken:any, title:string,
                                                     </SelectTrigger>
                                                 </FormControl>
                                                 <SelectContent>
-                                                    {type.map((option, index) => (
-                                                        <SelectItem key={index} value={option} disabled={loading}>{option}</SelectItem>
+                                                    {TypeData.map((option, index) => (
+                                                        <SelectItem key={index} value={option.value} disabled={loading}>{option.label}</SelectItem>
                                                     ))}
                                                 </SelectContent>
                                             </Select>
@@ -442,8 +442,8 @@ const sendPushNotificationToMobileUser = async (expoPushToken:any, title:string,
                                                     </SelectTrigger>
                                                 </FormControl>
                                                 <SelectContent>
-                                                    {status.map((option, index) => (
-                                                        <SelectItem key={index} value={option} disabled={loading}>{option}</SelectItem>
+                                                    {ActivityStatus.map((option, index) => (
+                                                        <SelectItem key={index} value={option.value} disabled={loading}>{option.label}</SelectItem>
                                                     ))}
                                                 </SelectContent>
                                             </Select>

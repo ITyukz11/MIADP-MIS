@@ -22,6 +22,7 @@ import { Checkbox } from "../ui/checkbox";
 import { Header } from "./header";
 import { FcGoogle } from "react-icons/fc";
 import { LoadingSpinner } from "../LoadingSpinner";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 
 
@@ -33,6 +34,8 @@ export const LoginForm = () => {
 
     const [isChecked, setIsChecked] = useState(false);
     const router = useRouter(); // Initialize useRouter
+
+    const [showPassword, setShowPassword] = useState(false)
 
     const form = useForm<z.infer<typeof LoginSchema>>({
         resolver: zodResolver(LoginSchema),
@@ -123,10 +126,21 @@ export const LoginForm = () => {
                                 <FormItem>
                                     <FormLabel>Password</FormLabel>
                                     <FormControl>
-                                        <Input
-                                            {...field}
-                                            type="password"
-                                            disabled={loading} />
+                                        <div className="relative">
+                                            <Input
+                                                {...field}
+                                                type={showPassword?'text':'password'}
+                                                disabled={loading}
+                                                className="pr-10" // Add padding to the right to make space for the icon
+                                            />
+                                            {showPassword?
+                                             <FaEye 
+                                             className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer"
+                                             onClick={()=> setShowPassword(false)} />:
+                                            <FaEyeSlash 
+                                            className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer"
+                                            onClick={()=> setShowPassword(true)} /> }
+                                        </div>
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -134,7 +148,7 @@ export const LoginForm = () => {
                         />
                     </div>
                     <div className="flex items-center space-x-2">
-                        <Checkbox id="remember-password" checked={isChecked} onChange={() => setIsChecked(!isChecked)} disabled={loading} />
+                        <Checkbox id="remember-password" checked={isChecked} onClick={() => setIsChecked(!isChecked)} disabled={loading} />
                         <label
                             htmlFor="remember-password" // this matches the ID of the associated checkbox
                             className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"

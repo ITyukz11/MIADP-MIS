@@ -17,7 +17,6 @@ import {
 } from "@/components/ui/card";
 import { Separator } from '@/components/ui/separator';
 import { Label } from '@/components/ui/label';
-import { FilterMenus } from '../filtermenus';
 import CalendarFormDialog from '../calendar-form-dialog';
 import { useRouter } from 'next/navigation';
 import { ViewMySchedDialog } from '../view-my-sched-dialog';
@@ -42,55 +41,53 @@ const page = () => {
     const [filteredCoaData, setFilteredCoaData] = useState<Event[]>([]);
     const [filteredUpcomingEvents, setFilteredUpcomingEvents] = useState<Event[]>([]);
 
-    const [refreshCalendarData, setRefreshCalendarData] = useState(false);
-
     const { activities, loading, error } = useCalendarOfActivityContext();
 
     console.log("activities: ", activities)
 
 
     useEffect(() => {
-       
-        fetchData()
-    }, [])
-    const fetchData = () => {
-        try {
-            const formatDateToISOWithoutTimezone = (date: Date) => {
-                const year = date.getFullYear();
-                const month = String(date.getMonth() + 1).padStart(2, '0');
-                const day = String(date.getDate()).padStart(2, '0');
-                return `${year}-${month}-${day}`;
-            };
-
-            const formattedData = activities.map((event: any) => {
-                const startDate = new Date(event.dateFrom);
-                const endDate = new Date(event.dateTo);
-
-                return {
-                    id: event.id,
-                    title: event.activityTitle,
-                    start: formatDateToISOWithoutTimezone(startDate), // Format date without timezone
-                    end: formatDateToISOWithoutTimezone(endDate),
-                    timeStart: event.timeStart,
-                    timeEnd: event.timeEnd,
-                    color: event.user.color, // Use user color
-                    status: event.status
+        const fetchData = () => {
+            try {
+                const formatDateToISOWithoutTimezone = (date: Date) => {
+                    const year = date.getFullYear();
+                    const month = String(date.getMonth() + 1).padStart(2, '0');
+                    const day = String(date.getDate()).padStart(2, '0');
+                    return `${year}-${month}-${day}`;
                 };
-            });
+    
+                const formattedData = activities.map((event: any) => {
+                    const startDate = new Date(event.dateFrom);
+                    const endDate = new Date(event.dateTo);
+    
+                    return {
+                        id: event.id,
+                        title: event.activityTitle,
+                        start: formatDateToISOWithoutTimezone(startDate), // Format date without timezone
+                        end: formatDateToISOWithoutTimezone(endDate),
+                        timeStart: event.timeStart,
+                        timeEnd: event.timeEnd,
+                        color: event.user.color, // Use user color
+                        status: event.status
+                    };
+                });
+    
+                console.log(formattedData)
+    
+                const filteredUpcomingData = formattedData
+                    .filter((event: any) => event.status === 'Upcoming')
+                    .slice(0, 10); // Take the first 5 events
+    
+                setFilteredCoaData(formattedData);
+                setFilteredUpcomingEvents(filteredUpcomingData)
+                console.log("filteredCoaData:", filteredCoaData)
+            } catch (error) {
+                console.error("Error fetching calendar of activity:", error);
+            }
+        };
+        fetchData()
+    }, [activities, loading])
 
-            console.log(formattedData)
-
-            const filteredUpcomingData = formattedData
-                .filter((event: any) => event.status === 'Upcoming')
-                .slice(0, 10); // Take the first 5 events
-
-            setFilteredCoaData(formattedData);
-            setFilteredUpcomingEvents(filteredUpcomingData)
-            console.log("filteredCoaData:", filteredCoaData)
-        } catch (error) {
-            console.error("Error fetching calendar of activity:", error);
-        }
-    };
     // const events = [
     //     // Replace this with your actual list of events
     //     { id: '1', title: 'Orientation cum Meeting with NCIP and MIADP Staff', start: '2024-05-01T11:00:00+09:00', end: '2024-05-04', color: '#ff0000' },
@@ -187,11 +184,11 @@ const page = () => {
                 <Card className="w-fit md:w-3/4 overflow-x-auto scrollbar-thin scrollbar-track-rounded-full ">
                     <CardHeader className='flex flex-row justify-end gap-2 items-center'>
                         <div className='flex flex-row gap-2 overflow-x-auto scrollbar-thin scrollbar-track-rounded-full w-full scroll scroll-me-px'>
-                            {FilterMenus.map((menu, index) => (
+                            {/* {FilterMenus.map((menu, index) => (
                                 <Button key={index} className='cursor-pointer whitespace-nowrap p-2 mb-2' variant={menu.variant == 'default' ? 'default' : 'outline'}>
                                     {menu.text}
                                 </Button>
-                            ))}
+                            ))} */}
                         </div>
                     </CardHeader>
                     <CardContent>

@@ -1,4 +1,4 @@
-import { componentOptions, regionOptions, unitOptions } from "@/components/auth/data";
+import { componentOptions, regionOptions } from "@/lib/data/filter";
 import * as z from "zod";
 
 export const LoginSchema = z.object({
@@ -11,10 +11,9 @@ export const LoginSchema = z.object({
 })
 
 
-const regionValues = regionOptions.map(option => option.value);
 // Define the register form schema
 export const RegisterSchema = z.object({
-  region: z.string().refine(value => regionValues.includes(value), {
+  region: z.string().refine(value => regionOptions.includes(value), {
     message: "*",
 }),
     fullname: z.string().min(1, {

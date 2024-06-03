@@ -8,11 +8,20 @@ import { Button, buttonVariants } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import Link from 'next/link'
 import React, { useEffect, useState } from 'react'
-import { FilterMenus } from './filtermenus'
 import { fetchCalendarOfActivity } from '@/lib/calendar-of-activity/fetch-calendar-of-activity'
 import { LoadingSpinner } from '@/components/LoadingSpinner'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useCalendarOfActivityContext } from '@/components/CalendarOfActivityContext'
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import { componentOptions, regionOptions, unitOptions } from '@/lib/data/filter'
 
 type Props = {}
 
@@ -36,12 +45,38 @@ const page = (props: Props) => {
   return (
     <div className='container relative'>
       <div className='flex flex-col gap-2 flex-wrap w-full'>
-        <div className='flex flex-row gap-2 overflow-x-auto w-full scrollbar-thin mb-2'>
-          {FilterMenus.map((menu, index) => (
+        <div className='flex flex-row gap-2 overflow-x-auto w-full scrollbar-thin'>
+          {/* {FilterMenus.map((menu, index) => (
             <Button key={index} className='cursor-pointer whitespace-nowrap p-2 mb-2' variant={menu.variant == 'default' ? 'default' : 'outline'}>
               {menu.text}
             </Button>
-          ))}
+          ))} */}
+          <Select>
+            <SelectTrigger className="w-fit">
+              <SelectValue placeholder="Select" />
+            </SelectTrigger>
+            <SelectContent>
+            <SelectItem value='All'>All</SelectItem>
+              <SelectGroup>
+                <SelectLabel>Regions</SelectLabel>
+                {regionOptions.map((option, index) => (
+                  <SelectItem key={index} value={option}>{option}</SelectItem>
+                ))}
+              </SelectGroup>
+              <SelectGroup>
+                <SelectLabel>Components</SelectLabel>
+                {componentOptions.map((option, index) => (
+                  <SelectItem key={index} value={option}>{option}</SelectItem>
+                ))}
+              </SelectGroup>
+              <SelectGroup>
+                <SelectLabel>Units</SelectLabel>
+                {unitOptions.map((option, index) => (
+                  <SelectItem key={index} value={option.value}>{option.label}</SelectItem>
+                ))}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
         </div>
 
         {coaData.length > 0 ? (

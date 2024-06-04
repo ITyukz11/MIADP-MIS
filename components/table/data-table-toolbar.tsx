@@ -1,45 +1,32 @@
-"use client"
+import { Cross2Icon } from "@radix-ui/react-icons";
+import { Table } from "@tanstack/react-table";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { DataTableViewOptions } from "./data-table-view-options";
+import { CSVLink } from "react-csv";
+import { useEffect, useState, useTransition } from "react";
+import { DialogApprovePendingUsers } from "../admin/dialog-accounts";
+import { AiOutlineExport, AiOutlinePrinter } from "react-icons/ai";
+import { Printer } from "lucide-react";
 
-import { Cross2Icon } from "@radix-ui/react-icons"
-import { Table } from "@tanstack/react-table"
-
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { DataTableViewOptions } from "./data-table-view-options"
-
-import { DataTableFacetedFilter } from "./data-table-faceted-filter"
-import { priorities, statuses } from "./data/data"
-import { RegisterSchema } from "@/schemas"
-import { z } from "zod"
-import { startTransition, useEffect, useState, useTransition } from "react"
-import { register } from "@/actions/register"
-import { toast } from "../ui/use-toast"
-import { ToastAction } from "../ui/toast"
-import { DialogApprovePendingUsers } from "../admin/dialog-accounts"
-
-
-interface DataTableToolbarProps<TData> {
-  data: TData[]
-  table: Table<TData>
+interface DataTableToolbarProps<TData extends object> {
+  data: TData[];
+  table: Table<TData>;
   selectedRows: Record<string, boolean>; // Define prop for selected rows as an object with boolean values
 }
 
-export function DataTableToolbar<TData>({
+export function DataTableToolbar<TData extends object>({
   data,
   table,
   selectedRows,
 }: DataTableToolbarProps<TData>) {
-  const isFiltered = table.getState().columnFilters.length > 0
+  const isFiltered = table.getState().columnFilters.length > 0;
   const [isPending, startTransition] = useTransition();
   const [loading, setLoading] = useState(false); // Initialize loading state
 
-  const [error, setError] = useState<string | undefined>("");
-  const [success, setSuccess] = useState<string | undefined>("");
+  const [filterInput, setFilterInput] = useState<string>("");
 
-  const [approvedPendingUsersData, setApprovedPendingUsersData] = useState<TData[]>([]);
-
-  const [filterInput, setFilterInput] = useState<string>('');
-
+  const filteredData = table.getFilteredRowModel().rows.map((row) => row.original);
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
@@ -52,34 +39,16 @@ export function DataTableToolbar<TData>({
   return (
     <div className="flex items-center justify-between">
       <div className="flex flex-1 items-center space-x-2">
-      <Input
+        <Input
           placeholder="Filter..."
           value={filterInput}
           onChange={(event) => setFilterInput(event.target.value)}
           className="h-8 w-[150px] lg:w-[250px]"
         />
-        {/* <Input
-          placeholder="Filter name..."
-          value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
-          onChange={(event) =>
-            table.getColumn("name")?.setFilterValue(event.target.value)
-          }
-          className="h-8 w-[150px] lg:w-[250px]"
-        /> */}
-        {/* {table.getColumn("status") && (
-          <DataTableFacetedFilter
-            column={table.getColumn("status")}
-            title="Status"
-            options={statuses}
-          />
-        )}
-        {table.getColumn("priority") && (
-          <DataTableFacetedFilter
-            column={table.getColumn("priority")}
-            title="Priority"
-            options={priorities}
-          />
-        )} */}
+        <CSVLink data={filteredData} filename="filtered_data.csv">
+          <Button variant="outline"><AiOutlineExport className="w-4 h-4"/> Export</Button>
+        </CSVLink>
+        <Button variant="outline"><AiOutlinePrinter className="w-5 h-5 shrink-0" /> Print</Button>
         {isFiltered && (
           <Button
             variant="ghost"
@@ -94,12 +63,19 @@ export function DataTableToolbar<TData>({
       <div className="flex flex-row gap-2">
         <DataTableViewOptions table={table} />
         <DialogApprovePendingUsers
-          approvedPendingUsersData={approvedPendingUsersData as Array<TData & {  id?: number, name?:string, email?:string,region?:string, color?:string, password?:string}>}
-          disable={Object.keys(selectedRows).length > 0 ?false : true}
+          approvedPendingUsersData={filteredData as Array<
+            TData & {
+              id?: number;
+              name?: string;
+              email?: string;
+              region?: string;
+              color?: string;
+              password?: string;
+            }
+          >}
+          disable={Object.keys(selectedRows).length > 0 ? false : true}
         />
-
-        {/* <Button size="sm" onClick={submit}>Approved</Button> */}
       </div>
     </div>
-  )
+  );
 }

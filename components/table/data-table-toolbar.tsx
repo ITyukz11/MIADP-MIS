@@ -18,13 +18,13 @@ import { ToastAction } from "../ui/toast"
 import { DialogApprovePendingUsers } from "../admin/dialog-accounts"
 
 
-interface DataTableToolbarProps<TData extends object> {
+interface DataTableToolbarProps<TData> {
   data: TData[]
   table: Table<TData>
   selectedRows: Record<string, boolean>; // Define prop for selected rows as an object with boolean values
 }
 
-export function DataTableToolbar<TData extends object>({
+export function DataTableToolbar<TData>({
   data,
   table,
   selectedRows,

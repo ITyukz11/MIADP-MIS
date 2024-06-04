@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DataTableViewOptions } from "./data-table-view-options";
 import { CSVLink } from "react-csv";
-import { useReactToPrint } from 'react-to-print';
 import { DialogApprovePendingUsers } from '../admin/dialog-accounts';
 
 interface DataTableToolbarProps<TData> {
@@ -30,12 +29,6 @@ export function DataTableToolbar<TData>({
   // Transform data to CSVRow type using type assertion
   const csvData: CSVRow[] = filteredData as CSVRow[];
 
-  const componentRef = useRef<HTMLDivElement>(null);
-
-  const handlePrint = useReactToPrint({
-    content: () => componentRef.current,
-  });
-
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       table.setGlobalFilter(filterInput || undefined);
@@ -56,7 +49,7 @@ export function DataTableToolbar<TData>({
         <CSVLink data={csvData} filename="filtered_data.csv">
           <Button variant="outline">Export</Button>
         </CSVLink>
-        <Button variant="outline" onClick={handlePrint}>
+        <Button variant="outline">
           Print
         </Button>
         {isFiltered && (

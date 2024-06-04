@@ -19,7 +19,7 @@ import { FaMinus, FaPlus } from 'react-icons/fa'
 import { Separator } from '@/components/ui/separator'
 import { Select, SelectItem, SelectTrigger, SelectValue, SelectContent } from '@/components/ui/select'
 
-import { ActivityStatus, TypeData} from '@/components/calendar-of-activity/data'
+import { ActivityStatus, PreparatoryActivityStatus, TypeData } from '@/components/calendar-of-activity/data'
 import { ToastAction } from '@/components/ui/toast'
 import { calendarOfActivity } from '@/actions/calendar-of-activity/calendarofactivity'
 import { toast } from '@/components/ui/use-toast'
@@ -33,7 +33,7 @@ type Props = {
     setDialogClose: () => void
 }
 
-const CalendarForm = ({ setDialogClose}: Props) => {
+const CalendarForm = ({ setDialogClose }: Props) => {
     const [isPending, startTransition] = useTransition();
     const [loading, setLoading] = useState(false); // Initialize loading state
 
@@ -64,7 +64,7 @@ const CalendarForm = ({ setDialogClose}: Props) => {
             timeEnd: '',
             allDay: false,
             color: '#F5222D',
-            status: 'New', // default value specified in the schema
+            status: '', // default value specified in the schema
             preparatoryList: [{ description: '', status: '', remarks: '' }],
             remarks: '',
             name: currentUser?.name
@@ -73,12 +73,28 @@ const CalendarForm = ({ setDialogClose}: Props) => {
 
     const onSubmit = async (values: z.infer<typeof CalendarOfActivitySchema>) => {
         console.log("submit values: ", values)
+        const today = new Date();
+        const todayFormatted = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+        let status = 'Upcoming';
+        if (values.dateFrom) {
+            // Convert dateFrom to local timezone
+            const localDateFrom = new Date(values.dateFrom);
+            // Adjust localDateFrom to match only the date (without time)
+            const localDateFromFormatted = new Date(localDateFrom.getFullYear(), localDateFrom.getMonth(), localDateFrom.getDate());
+
+            // Compare localDateFromFormatted with todayFormatted
+            if (localDateFromFormatted.getTime() <= todayFormatted.getTime()) {
+                status = 'Ongoing';
+            }
+        }
 
         if (!navigator.onLine) {
             // Alert the user that there is no internet connection
             alert("No internet connection. Please check your network connection and try again.");
             return;
         }
+
+        values.status = status
 
         setError("")
         setSuccess("")
@@ -96,9 +112,9 @@ const CalendarForm = ({ setDialogClose}: Props) => {
                                         currentUser?.expoPushToken,
                                         `New activity by ${currentUser?.name}`,
                                         `${currentUser?.component} | ${currentUser?.unit} - ${values.activityTitle}\n${values.activityDescription}\n${formatDate(values.dateFrom as any)} - ${formatDate(values.dateTo as any)}`
-                                      )
+                                    )
                                 )
-                            
+
                                 toast({
                                     title: "Success",
                                     description: "Your calendar of activity has been encoded to the server",
@@ -107,24 +123,24 @@ const CalendarForm = ({ setDialogClose}: Props) => {
                                         <ToastAction altText="Goto schedule to undo">Ok</ToastAction>
                                     ),
                                 })
-                                setDialogClose(); 
+                                setDialogClose();
                             } catch (error) {
                                 console.error("Error submitting calendar activity:", error);
 
                                 // Display an error toast notification
                                 toast({
-                                  title: "Error",
-                                  description: "An unexpected error occurred while sending notification.",
-                                  variant: "destructive",
-                                  duration: 10000,
-                                  action: (
-                                    <ToastAction altText="Error toast">Ok</ToastAction>
-                                ),
+                                    title: "Error",
+                                    description: "An unexpected error occurred while sending notification.",
+                                    variant: "destructive",
+                                    duration: 10000,
+                                    action: (
+                                        <ToastAction altText="Error toast">Ok</ToastAction>
+                                    ),
                                 });
                             } finally {
                                 setLoading(false);
                             }
-                         
+
                         }
                         setLoading(false)
                     }, 2000); // Delay for 2 seconds                      
@@ -133,35 +149,35 @@ const CalendarForm = ({ setDialogClose}: Props) => {
 
     }
 
-        // Function to send a push notification
-const sendPushNotificationToMobileUser = async (expoPushToken:any, title:string, body:string, data?:string) => {
-    try {
-      const response = await axios.post('https://exp.host/--/api/v2/push/send', {
-        to: expoPushToken,
-        title,
-        body,
-        data
-      });
-  
-      // Check the response status and handle accordingly
-      if (response.data.data) {
-        console.log('Push notification sent successfully:', response.data.data);
-      } else {
-        console.error('Error sending push notification:', response.data);
-      }
-    } catch (error) {
-      console.error('Error making request:', error);
-    }
-  };
+    // Function to send a push notification
+    const sendPushNotificationToMobileUser = async (expoPushToken: any, title: string, body: string, data?: string) => {
+        try {
+            const response = await axios.post('https://exp.host/--/api/v2/push/send', {
+                to: expoPushToken,
+                title,
+                body,
+                data
+            });
+
+            // Check the response status and handle accordingly
+            if (response.data.data) {
+                console.log('Push notification sent successfully:', response.data.data);
+            } else {
+                console.error('Error sending push notification:', response.data);
+            }
+        } catch (error) {
+            console.error('Error making request:', error);
+        }
+    };
 
 
     const handleRangePickerChange = (value: any) => {
         if (value && Array.isArray(value) && value.length === 2) {
             const [startDate, endDate] = value.map((date: any) => dayjs(date).toISOString());
-    
+
             form.setValue('dateFrom', startDate);
             form.setValue('dateTo', endDate);
-    
+
             console.log("startDate: ", startDate);
             console.log("endDate: ", endDate);
         } else {
@@ -175,7 +191,7 @@ const sendPushNotificationToMobileUser = async (expoPushToken:any, title:string,
         if (value) {
             const date = dayjs(value); // Convert the input value to a Day.js object
             const formattedDate = date.toISOString(); // Format the date as per ISO 8601
-    
+
             form.setValue('dateFrom', formattedDate);
             form.setValue('dateTo', formattedDate);
             console.log(formattedDate);
@@ -191,7 +207,7 @@ const sendPushNotificationToMobileUser = async (expoPushToken:any, title:string,
             const [timeStart, timeEnd] = value;
             const formattedStartTime = timeStart.format('HH:mm'); // Extract only the time part
             const formattedEndTime = timeEnd.format('HH:mm'); // Extract only the time part
-            
+
             form.setValue('timeStart', formattedStartTime);
             form.setValue('timeEnd', formattedEndTime);
 
@@ -272,31 +288,31 @@ const sendPushNotificationToMobileUser = async (expoPushToken:any, title:string,
                             </FormItem>
                         )}
                     />
-                    <div className='grid grid-cols-3 gap-2'>                   
-                             <FormField
-                                control={form.control}
-                                name='type'
-                                render={({ field }) => (
-                                    <FormItem className='w-full'>
-                                        <FormLabel>Type</FormLabel>
-                                        <FormControl>
-                                            <Select {...field} onValueChange={field.onChange} defaultValue={field.value} disabled={loading}>
-                                                <FormControl>
-                                                    <SelectTrigger>
-                                                        <SelectValue placeholder="Select a type" />
-                                                    </SelectTrigger>
-                                                </FormControl>
-                                                <SelectContent>
-                                                    {TypeData.map((option, index) => (
-                                                        <SelectItem key={index} value={option.value} disabled={loading}>{option.label}</SelectItem>
-                                                    ))}
-                                                </SelectContent>
-                                            </Select>
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
+                    <div className='grid grid-cols-3 gap-2'>
+                        <FormField
+                            control={form.control}
+                            name='type'
+                            render={({ field }) => (
+                                <FormItem className='w-full'>
+                                    <FormLabel>Type</FormLabel>
+                                    <FormControl>
+                                        <Select {...field} onValueChange={field.onChange} defaultValue={field.value} disabled={loading}>
+                                            <FormControl>
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Select a type" />
+                                                </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent>
+                                                {TypeData.map((option, index) => (
+                                                    <SelectItem key={index} value={option.value || 'default_value'} disabled={loading}>{option.label}</SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
                         <FormField
                             control={form.control}
                             name="targetParticipant"
@@ -349,7 +365,7 @@ const sendPushNotificationToMobileUser = async (expoPushToken:any, title:string,
                                         <FormMessage />
                                     </FormItem>
                                 )}
-                            />:
+                            /> :
                             <div className='flex flex-row gap-2 mt-auto '>
                                 <FormField
                                     control={form.control}
@@ -442,8 +458,8 @@ const sendPushNotificationToMobileUser = async (expoPushToken:any, title:string,
                                                     </SelectTrigger>
                                                 </FormControl>
                                                 <SelectContent>
-                                                    {ActivityStatus.map((option, index) => (
-                                                        <SelectItem key={index} value={option.value} disabled={loading}>{option.label}</SelectItem>
+                                                    {PreparatoryActivityStatus.map((option, index) => (
+                                                        <SelectItem key={index} value={option.value || 'default_value'} disabled={loading}>{option.label}</SelectItem>
                                                     ))}
                                                 </SelectContent>
                                             </Select>
@@ -452,23 +468,26 @@ const sendPushNotificationToMobileUser = async (expoPushToken:any, title:string,
                                     </FormItem>
                                 )}
                             />
-                            <FormField
-                                control={form.control}
-                                name={`preparatoryList.${index}.remarks`}
-                                render={({ field }) => (
-                                    <FormItem className='w-full'>
-                                        <FormLabel>Remarks</FormLabel>
-                                        <FormControl>
-                                            <Input {...field} className='w-full' disabled={loading} placeholder="Enter remarks" />
-                                        </FormControl>
-                                        <FormMessage />
-                                    </FormItem>
+                            {form.watch(`preparatoryList.${index}.status`) == "Other" &&
+                                (
+                                    <FormField
+                                        control={form.control}
+                                        name={`preparatoryList.${index}.remarks`}
+                                        render={({ field }) => (
+                                            <FormItem className='w-full'>
+                                                <FormLabel>Remarks</FormLabel>
+                                                <FormControl>
+                                                    <Input {...field} className='w-full' disabled={loading} placeholder="Enter remarks" />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
                                 )}
-                            />
 
                             <Button className='w-fit' type='button' variant={'destructive'} size={'sm'}
                                 onClick={() => setNumOfPreparatoryList(prev => prev - 1)}
-                                disabled={loading || numOfPreparatoryList==1}>
+                                disabled={loading || numOfPreparatoryList == 1}>
                                 <FaMinus />
                             </Button>
 

@@ -6,6 +6,15 @@ export const ActivityStatus=[
     { label: "Postponed", value: "Postponed" }
 ]
 
+export const PreparatoryActivityStatus=[
+    { label: "Conducted", value: "Conducted" },
+    { label: "To Be Conducted", value: "To Be Conducted" },
+    { label: "Postponed", value: "Postponed" },
+    { label: "Rescheduled", value: "Rescheduled" },
+    { label: "Cancelled", value: "Cancelled" },
+    { label: "Other", value: "Other" },
+]
+
 export const TypeData=[
     { label: "Select Type *", value: "" },
     { label: "Meeting", value: "Meeting" },

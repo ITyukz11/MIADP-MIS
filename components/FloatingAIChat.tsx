@@ -76,8 +76,9 @@ export default function FloatingAIChat() {
                                     )}
                                     {m.role !== 'data' ? (
                                         <div>
-                                            <Label>{m.content}</Label>
-
+                                            <Label>
+                                                <div dangerouslySetInnerHTML={{ __html: m.content.replace(/\*\*/g, '').replace(/\n/g, '<br/>') }} />
+                                            </Label>
                                         </div>
                                     ) : (
                                         <>
@@ -97,7 +98,7 @@ export default function FloatingAIChat() {
                             // <div className="mb-4 text-center text-gray-500">
                             //     Typing...
                             // </div>
-                        <GifAnimation src="/lottie/loading.gif" width={25} height={25} />
+                            <GifAnimation src="/lottie/loading.gif" width={25} height={25} />
 
                         )}
 
@@ -108,22 +109,22 @@ export default function FloatingAIChat() {
                         {!input && messages.length == 0 && (
                             <div className="absolute inset-y-0 left-4 ml-4 flex items-center pointer-events-none">
                                 <Label className=' text-gray-500'>
-                                <Typewriter
-                                    words={[
-                                        'Ask me anything...',
-                                        'What is MIADP?',
-                                        'Need assistance? Just ask!',
-                                        'Want to know the 4 components?',
-                                        'Feel free to ask any question...',
-                                    ]}
-                                    loop={5}
-                                    cursor
-                                    cursorStyle='_'
-                                    typeSpeed={40}
-                                    deleteSpeed={30}
+                                    <Typewriter
+                                        words={[
+                                            'Ask me anything...',
+                                            'What is MIADP?',
+                                            'Need assistance? Just ask!',
+                                            'Want to know the 4 components?',
+                                            'Feel free to ask any question...',
+                                        ]}
+                                        loop={5}
+                                        cursor
+                                        cursorStyle='_'
+                                        typeSpeed={40}
+                                        deleteSpeed={30}
                                     />
                                 </Label>
-                             
+
                             </div>
                         )}
                         <Input

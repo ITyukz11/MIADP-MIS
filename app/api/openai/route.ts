@@ -40,18 +40,23 @@ export async function POST(req: Request) {
             runResult?.status === 'requires_action' &&
             runResult.required_action?.type === 'submit_tool_outputs'
           ) {
-            const tool_outputs = runResult.required_action.submit_tool_outputs.tool_calls.map(
-              (toolCall: any) => {
+            const tool_outputs = await Promise.all(runResult.required_action.submit_tool_outputs.tool_calls.map(
+              async (toolCall: any) => {
                 const parameters = JSON.parse(toolCall.function.arguments);
 
                 switch (toolCall.function.name) {
-                  // configure your tool calls here
+                  case 'get_calendar_of_activities':
+                    const data = await fetch('https://miadp-mis.vercel.app/api/auth/calendar-of-activity').then((res) => res.json());
+                    return {
+                      tool_call_id: toolCall.id,
+                      output: JSON.stringify(data),
+                    };
 
                   default:
                     throw new Error(`Unknown tool call function: ${toolCall.function.name}`);
                 }
               },
-            );
+            ));
 
             runResult = await forwardStream(
               openai.beta.threads.runs.submitToolOutputsStream(threadId, runResult.id, { tool_outputs }),

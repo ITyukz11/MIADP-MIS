@@ -6,6 +6,8 @@ import { Input } from "@/components/ui/input";
 import { DataTableViewOptions } from "./data-table-view-options";
 import { CSVLink } from "react-csv";
 import { DialogApprovePendingUsers } from '../admin/dialog-accounts';
+import { AiOutlineExport, AiOutlinePrinter } from "react-icons/ai";
+import { Search, SearchIcon } from 'lucide-react';
 
 interface DataTableToolbarProps<TData> {
   data: TData[];
@@ -40,17 +42,21 @@ export function DataTableToolbar<TData>({
   return (
     <div className="flex items-center justify-between">
       <div className="flex flex-1 items-center space-x-2">
-        <Input
-          placeholder="Filter..."
-          value={filterInput}
-          onChange={(event) => setFilterInput(event.target.value)}
-          className="h-8 w-[150px] lg:w-[250px]"
-        />
+        <div className='relative'>
+          <Input
+            placeholder="Filter..."
+            value={filterInput}
+            onChange={(event) => setFilterInput(event.target.value)}
+            className="h-8 w-[150px] lg:w-[250px]"
+          />
+          <SearchIcon className='absolute right-2 top-2 h-4 w-4'/>
+        </div>
+
         <CSVLink data={csvData} filename="filtered_data.csv">
-          <Button variant="outline">Export</Button>
+          <Button variant="outline"><AiOutlineExport className='w-4 h-4 shrink-0' /> Export</Button>
         </CSVLink>
         <Button variant="outline">
-          Print
+          <AiOutlinePrinter className='w-5 h-5 shrink-0' /> Print
         </Button>
         {isFiltered && (
           <Button

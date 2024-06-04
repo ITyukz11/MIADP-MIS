@@ -95,10 +95,10 @@ export function CalendarSheet({ activityData, openSheet, closeCalendarSheet }: C
           <div className="flex items-center space-x-2">
             <TbStatusChange className="h-5 w-5 shrink-0" />
             <Badge variant={'outline'}>{status}
-            {status === "Ongoing" && (
+              {status === "Ongoing" && (
                 <div className="h-3 w-3 rounded-full bg-green-600 animate-pulse ml-1"></div>
-            )}</Badge>
-          
+              )}</Badge>
+
           </div>
 
           <div className="flex items-center space-x-2 mt-2">
@@ -132,33 +132,35 @@ export function CalendarSheet({ activityData, openSheet, closeCalendarSheet }: C
             <Info className="h-5 w-5 shrink-0" />
             <p className="text-sm">{activityDescription}</p>
           </div>
-        <Accordion type="single" collapsible>
-          {preparatoryList.map((prep:any, index:number) => (
-            <AccordionItem key={prep.id} value={prep.id}>
-              <AccordionTrigger className="flex items-center justify-start space-x-2">
-                <NotebookPen className="h-5 w-5 shrink-0" />
-                <Label>Preparatory List {index+1}</Label>
-              </AccordionTrigger>
-              <AccordionContent>
-                <div className="flex flex-col space-y-2 p-2 border rounded-lg">
-                  <div>
-                    <strong>Description:</strong> {prep.description}
+          <Accordion type="single" collapsible>
+            {preparatoryList.map((prep: any, index: number) => (
+              <AccordionItem key={prep.id} value={prep.id}>
+                <AccordionTrigger className="flex items-center justify-start space-x-2">
+                  <div className="flex flex-row flex-start gap-2 items-center">
+                    <NotebookPen className="h-5 w-5 shrink-0" />
+                    <Label className="cursor-pointer">Preparatory List {index + 1}</Label>
                   </div>
-                  <div>
-                    <strong>Status:</strong> {prep.status || 'None'}
+                </AccordionTrigger>
+                <AccordionContent>
+                  <div className="flex flex-col space-y-2 p-2 border rounded-lg">
+                    <div>
+                      <strong>Description:</strong> {prep.description}
+                    </div>
+                    <div>
+                      <strong>Status:</strong> {prep.status || 'None'}
+                    </div>
+                    <div>
+                      <strong>Remarks:</strong> {prep.remarks || 'None'}
+                    </div>
+                    <div>
+                      <strong>Created At:</strong> {new Date(prep.createdAt).toLocaleString()}
+                    </div>
                   </div>
-                  <div>
-                    <strong>Remarks:</strong> {prep.remarks || 'None'}
-                  </div>
-                  <div>
-                    <strong>Created At:</strong> {new Date(prep.createdAt).toLocaleString()}
-                  </div>
-                </div>
-              </AccordionContent>
-            </AccordionItem>
-          ))}
-        </Accordion>
-      </div>
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
+        </div>
 
         <SheetFooter>
           <SheetClose asChild>

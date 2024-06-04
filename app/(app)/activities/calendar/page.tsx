@@ -23,6 +23,7 @@ import { ViewMySchedDialog } from '../view-my-sched-dialog';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useCalendarOfActivityContext } from '@/components/CalendarOfActivityContext';
 import { CalendarSheet } from '@/components/calendar-of-activity/CalendarSheet';
+import { formatTime } from '@/components/table/data/activities/coa-columns';
 
 interface Event {
     id: string;
@@ -159,7 +160,8 @@ const page = () => {
 
                                     // Format the date and time
                                     const startDateString = startDate.toLocaleDateString(); // Get date string
-                                    const startTimeString = timeStart.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); // Get time string without seconds
+                                    // const startTimeString = timeStart.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); // Get time string without seconds
+                                    const startTimeString = formatTime(event.timeStart);
                                     const endDateString = endDate.toLocaleDateString(); // Get date string
                                     const endTimeString = timeEnd.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); // Get time string without seconds
 

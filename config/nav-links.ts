@@ -7,5 +7,6 @@ export const navLinks = [
     { href: "/supports", text: "Supports" },
     { href: "/users", text: "Users" },
     { href: "/settings", text: "Settings" },
+    { href: "/change-log", text: "Changelogs" },
   ];
   

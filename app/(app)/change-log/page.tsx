@@ -33,7 +33,7 @@ const changelogItems = [
 
 const ChangelogPage: React.FC = () => {
   return (
-    <div className="container relative px-56">
+    <div className="container relative md:px-56">
     <PageHeader>
       <PageHeaderHeading>MIADP MIS System Updates</PageHeaderHeading>
       <PageHeaderDescription>

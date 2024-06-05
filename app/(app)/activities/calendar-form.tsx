@@ -399,7 +399,7 @@ const CalendarForm = ({ setDialogClose }: Props) => {
                                 />
                             </div>
                         }
-                        <FormField
+                        {/* <FormField
                             name='color'
                             render={({ field }) => {
                                 console.log(field); // Log the field object
@@ -415,7 +415,7 @@ const CalendarForm = ({ setDialogClose }: Props) => {
                                     </FormItem>
                                 );
                             }}
-                        />
+                        /> */}
                     </div>
                     {/* Preparatory list items */}
                     <Separator />

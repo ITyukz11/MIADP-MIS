@@ -48,7 +48,7 @@ export default function Page() {
     <Button variant={'outline'}><MdDelete/> Delete</Button>
     <Button variant={'outline'}><MdPrint/> Print</Button>
         </div>
-        <DataTable columns={columns2} data={WPFActivityData}/>
+        <DataTable columns={columns2} data={WPFActivityData} allowSelectRow={true}/>
 
       </div>
       {/* <DataTableDemo /> */}

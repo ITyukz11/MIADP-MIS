@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-hooks/rules-of-hooks */
 'use client'
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import listPlugin from '@fullcalendar/list';
@@ -157,6 +157,10 @@ const page = () => {
         setView(newView);
     };
 
+    useEffect(() => {
+        handleWindowResize()
+    }, [])
+
     const handleWindowResize = () => {
         const calendarApi = calendarRef.current?.getApi();
         if (window.innerWidth < 768) {
@@ -165,12 +169,39 @@ const page = () => {
             calendarApi?.changeView('dayGridMonth');
         }
     };
-    
 
-      
+    const cardRef = useRef<HTMLDivElement>(null);
+    const [cardHeight, setCardHeight] = useState(0);
+
+    const updateCardHeight = () => {
+        if (cardRef.current && window.innerWidth >= 768) {
+            setCardHeight(cardRef.current.offsetHeight);
+            console.log(`Updated card height: ${cardRef.current.offsetHeight}`);
+        } else {
+            setCardHeight(0); // Reset height for small screens
+            console.log(`Screen too small, resetting height to 0`);
+        }
+    };
+
+    useLayoutEffect(() => {
+        updateCardHeight(); // Initial call
+
+        window.addEventListener('resize', updateCardHeight); // Update on resize
+        window.addEventListener('orientationchange', updateCardHeight); // Update on orientation change
+
+        return () => {
+            window.removeEventListener('resize', updateCardHeight); // Cleanup on unmount
+            window.removeEventListener('orientationchange', updateCardHeight); // Cleanup on unmount
+        };
+    }, []); // Empty dependency array to only run on mount and unmount
+
+    useEffect(() => {
+        updateCardHeight(); // Update on filteredUpcomingEvents change
+    }, [filteredUpcomingEvents]);
+
     return (
         <div className='container relative'>
-            <div className="flex gap-2 flex-wrap md:flex-nowrap">
+            <div className="flex flex-col md:flex-row gap-2 flex-wrap md:flex-nowrap overflow-hidden" style={{ height: cardHeight ? `${cardHeight}px` : 'auto' }}>
                 <div className='flex flex-col w-full md:w-1/4 gap-2'>
                     <Card>
                         <CardHeader>
@@ -181,14 +212,25 @@ const page = () => {
                             <ViewMySchedDialog />
                         </CardHeader>
                     </Card>
-                    <Card className='overflow-y-auto h-[21%]'>
-                        <CardHeader className=' font-bold gap-2'>
-                            <CardTitle className='flex flex-row items-center justify-start gap-10'> <FaRegCalendarAlt /> {filteredUpcomingEvents.length} Upcoming Event{filteredUpcomingEvents.length > 1 ? 's' : ''}</CardTitle>
+                    <Card className='overflow-y-auto md:h-full rounded-xl'>
+                        <CardHeader className="font-bold gap-2 sticky top-0 z-10 border-b bg-white dark:bg-gray-800">
+                            <CardTitle className="flex flex-row items-center justify-start gap-10">
+                                <FaRegCalendarAlt />
+                                <div className='flex flex-row gap-2 items-center'>
+                                    <Label className=' text-base font-semibold'>{filteredUpcomingEvents.slice(0, 10).length} Upcoming Event{filteredUpcomingEvents.length > 1 ? 's' : ''}</Label>
+                                    {filteredUpcomingEvents.length > 10 && (
+                                        <Label className='text-xs text-green-400'>
+                                            +{filteredUpcomingEvents.length - 10} more
+                                        </Label>
+                                    )}
+                                </div>
+                            </CardTitle>
                         </CardHeader>
                         <Separator />
                         <CardContent>
                             {/* Display the top 5 nearest events */}
                             {filteredUpcomingEvents.length > 0 ? filteredUpcomingEvents
+                                .slice(0, 10) // Limit to top 10 events
                                 .map((event: any) => {
                                     const startDate = new Date(event.start);
                                     const endDate = new Date(event.end);
@@ -231,9 +273,19 @@ const page = () => {
 
                         </CardContent>
                     </Card>
-                    <Card className='overflow-y-auto h-[21%]'>
-                        <CardHeader className=' font-bold gap-2'>
-                            <CardTitle className='flex flex-row items-center justify-start gap-10'> <FaRegCalendarAlt /> {filteredOnGoingEvents.length} Ongoing Event{filteredOnGoingEvents.length > 1 ? 's' : ''}</CardTitle>
+                    <Card className='overflow-y-auto md:h-full'>
+                        <CardHeader className="font-bold gap-2 sticky top-0 z-10 border-b bg-white dark:bg-gray-800">
+                        <CardTitle className="flex flex-row items-center justify-start gap-10">
+                                <FaRegCalendarAlt />
+                                <div className='flex flex-row gap-2 items-center'>
+                                    <Label className=' text-base font-semibold'>{filteredOnGoingEvents.slice(0, 10).length} Ongoing Event{filteredOnGoingEvents.length > 1 ? 's' : ''}</Label>
+                                    {filteredOnGoingEvents.length > 10 && (
+                                        <Label className='text-xs text-green-400'>
+                                            +{filteredOnGoingEvents.length - 10} more
+                                        </Label>
+                                    )}
+                                </div>
+                            </CardTitle>
                         </CardHeader>
                         <Separator />
                         <CardContent>
@@ -277,17 +329,10 @@ const page = () => {
                         </CardContent>
                     </Card>
                 </div>
-                <Card className="h-fit w-full md:w-3/4 overflow-x-auto scrollbar-thin scrollbar-track-rounded-full ">
+                <Card ref={cardRef} className="h-full mb-2 w-full md:w-3/4 overflow-x-auto scrollbar-thin scrollbar-track-rounded-full">
                     <CardHeader className='flex flex-row justify-end gap-2 items-center'>
-                        <div className='flex flex-row gap-2 overflow-x-auto scrollbar-thin scrollbar-track-rounded-full w-full scroll scroll-me-px'>
-                            {/* {FilterMenus.map((menu, index) => (
-                                <Button key={index} className='cursor-pointer whitespace-nowrap p-2 mb-2' variant={menu.variant == 'default' ? 'default' : 'outline'}>
-                                    {menu.text}
-                                </Button>
-                            ))} */}
-                        </div>
                     </CardHeader>
-                    <CardContent>
+                    <CardContent className='overflow-hidden'>
                         <FullCalendar
                             ref={calendarRef}
                             headerToolbar={{
@@ -299,19 +344,18 @@ const page = () => {
                             eventTimeFormat={{
                                 hour: '2-digit',
                                 minute: '2-digit',
-                                hour12: false,
+                                hour12: true,
                             }}
                             windowResize={handleWindowResize}
                             eventDisplay="block cursor-pointer"
-
                             plugins={[multiMonthPlugin, dayGridPlugin, timeGridPlugin, listPlugin]}
                             initialView="dayGridMonth"
                             events={filteredCoaData}
                             eventClick={handleEventClick}
                             eventClassNames={'cursor-pointer'}
                             selectable={true}
-                        />
 
+                        />
                     </CardContent>
                 </Card>
             </div>

@@ -1,4 +1,3 @@
-// context/ActivityContext.tsx
 'use client'
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { fetchCalendarOfActivity } from '@/lib/calendar-of-activity/fetch-calendar-of-activity';
@@ -8,6 +7,7 @@ interface ActivityContextProps {
   activities: Activity[];
   loading: boolean;
   error: string | null;
+  fetchActivitiesData: () => Promise<void>;
 }
 
 const CalendarOfActivityContext = createContext<ActivityContextProps | undefined>(undefined);
@@ -17,23 +17,24 @@ export const CalendarOfActivityProvider: React.FC<{ children: React.ReactNode }>
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        const data = await fetchCalendarOfActivity();
-        setActivities(data);
-      } catch (error) {
-        setError('Failed to load activities');
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchActivitiesData = async () => {
+    setLoading(true);
+    try {
+      const data = await fetchCalendarOfActivity();
+      setActivities(data);
+    } catch (error) {
+      setError('Failed to load activities');
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    loadData();
+  useEffect(() => {
+    fetchActivitiesData();
   }, []);
 
   return (
-    <CalendarOfActivityContext.Provider value={{ activities, loading, error }}>
+    <CalendarOfActivityContext.Provider value={{ activities, loading, error, fetchActivitiesData }}>
       {children}
     </CalendarOfActivityContext.Provider>
   );

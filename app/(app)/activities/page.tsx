@@ -1,17 +1,9 @@
-/* eslint-disable react-hooks/rules-of-hooks */
 'use client'
-import { DataTable } from '@/components/table/data-table'
-import { columns } from '@/components/table/data/activities/coa-columns'
-import { coaDataExample } from '@/components/table/data/activities/data-example'
-import { Badge } from '@/components/ui/badge'
-import { Button, buttonVariants } from '@/components/ui/button'
-import { cn } from '@/lib/utils'
-import Link from 'next/link'
-import React, { useEffect, useState } from 'react'
-import { fetchCalendarOfActivity } from '@/lib/calendar-of-activity/fetch-calendar-of-activity'
-import { LoadingSpinner } from '@/components/LoadingSpinner'
-import { Skeleton } from '@/components/ui/skeleton'
-import { useCalendarOfActivityContext } from '@/components/CalendarOfActivityContext'
+import React, { useEffect, useState } from 'react';
+import { DataTable } from '@/components/table/data-table';
+import { columns } from '@/components/table/data/activities/coa-columns';
+import { Skeleton } from '@/components/ui/skeleton';
+import { useCalendarOfActivityContext } from '@/components/CalendarOfActivityContext';
 import {
   Select,
   SelectContent,
@@ -20,43 +12,70 @@ import {
   SelectLabel,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { componentOptions, regionOptions, unitOptions } from '@/lib/data/filter'
+} from "@/components/ui/select";
+import { componentOptions, regionOptions, unitOptions } from '@/lib/data/filter';
 
 type Props = {}
 
-const page = (props: Props) => {
+const Page = (props: Props) => {
   const [coaData, setCoaData] = useState<any[]>([]);
+  const [filteredData, setFilteredData] = useState<any[]>([]);
+  const [selectedFilter, setSelectedFilter] = useState<string>('All');
 
   const { activities, loading, error } = useCalendarOfActivityContext();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        setCoaData(activities);
+        // Sorting activities based on 'createdAt' in descending order
+        const sortedActivities = [...activities].sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        
+        setCoaData(sortedActivities);
+        setFilteredData(sortedActivities); // Initialize filteredData with all activities sorted
       } catch (error) {
         console.error("Error fetching calendar of activity:", error);
       }
     };
     fetchData();
-  }, [activities, loading]);
+  }, [activities]);
+  
+  
 
+  useEffect(() => {
+    if (selectedFilter === 'All') {
+      setFilteredData(coaData);
+    } else {
+      const filtered = coaData.filter(item =>
+        item.user?.region === selectedFilter ||
+        item.user?.component === selectedFilter ||
+        item.user?.unit === selectedFilter
+      );
+      setFilteredData(filtered);
+    }
+  }, [selectedFilter, coaData]);
+
+  const hiddenColumns = [
+    'id',
+    'authorizeOther',
+    'target_participant',
+    'activityDescription',
+    'timeStart',
+    'timeEnd',
+    'coa_id',
+    'remarks',
+    'userName'
+  ]; // Columns to hide
 
   return (
     <div className='container relative'>
       <div className='flex flex-col gap-2 flex-wrap w-full'>
         <div className='flex flex-row gap-2 overflow-x-auto w-full scrollbar-thin'>
-          {/* {FilterMenus.map((menu, index) => (
-            <Button key={index} className='cursor-pointer whitespace-nowrap p-2 mb-2' variant={menu.variant == 'default' ? 'default' : 'outline'}>
-              {menu.text}
-            </Button>
-          ))} */}
-          <Select>
+          <Select onValueChange={(value) => setSelectedFilter(value)}>
             <SelectTrigger className="w-fit">
               <SelectValue placeholder="Select" />
             </SelectTrigger>
             <SelectContent>
-            <SelectItem value='All'>All</SelectItem>
+              <SelectItem value='All'>All</SelectItem>
               <SelectGroup>
                 <SelectLabel>Regions</SelectLabel>
                 {regionOptions.map((option, index) => (
@@ -77,11 +96,11 @@ const page = (props: Props) => {
               </SelectGroup>
             </SelectContent>
           </Select>
-        </div>
+        </div>  
 
-        {coaData.length > 0 ? (
+        {filteredData.length > 0 ? (
           <div className='w-full overflow-x-auto scrollbar-thin'>
-            <DataTable data={coaData} columns={columns} />
+            <DataTable data={filteredData} columns={columns} hiddenColumns={hiddenColumns} allowSelectRow={false}/>
           </div>
         ) : (
           <div className="flex flex-col space-y-3">
@@ -91,8 +110,7 @@ const page = (props: Props) => {
 
       </div>
     </div>
-
   )
 }
 
-export default page
+export default Page;

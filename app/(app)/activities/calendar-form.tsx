@@ -28,6 +28,7 @@ import { ColorPicker } from '@/components/ui/color-picker'
 import { useCurrentUser } from '@/components/CurrentUserContext'
 import axios from 'axios'
 import { formatDate } from '@/components/table/data/activities/coa-columns'
+import { useCalendarOfActivityContext } from '@/components/CalendarOfActivityContext'
 
 type Props = {
     setDialogClose: () => void
@@ -35,7 +36,7 @@ type Props = {
 
 const CalendarForm = ({ setDialogClose }: Props) => {
     const [isPending, startTransition] = useTransition();
-    const [loading, setLoading] = useState(false); // Initialize loading state
+    const [loadingForm, setLoadingForm] = useState(false); // Initialize loadingForm state
 
     const [error, setError] = useState<string | undefined>("");
     const [success, setSuccess] = useState<string | undefined>("");
@@ -48,6 +49,8 @@ const CalendarForm = ({ setDialogClose }: Props) => {
     const { RangePicker } = DatePicker;
 
     const { currentUser } = useCurrentUser();
+
+    const { loading, fetchActivitiesData } = useCalendarOfActivityContext();
 
     const form = useForm<z.infer<typeof CalendarOfActivitySchema>>({
         resolver: zodResolver(CalendarOfActivitySchema),
@@ -99,7 +102,7 @@ const CalendarForm = ({ setDialogClose }: Props) => {
         setError("")
         setSuccess("")
         startTransition(() => {
-            setLoading(true)
+            setLoadingForm(true)
             calendarOfActivity(values)
                 .then((data) => {
                     setError(data.error)
@@ -123,7 +126,8 @@ const CalendarForm = ({ setDialogClose }: Props) => {
                                         <ToastAction altText="Goto schedule to undo">Ok</ToastAction>
                                     ),
                                 })
-                                setDialogClose();
+
+                                fetchActivitiesData()
                             } catch (error) {
                                 console.error("Error submitting calendar activity:", error);
 
@@ -138,11 +142,14 @@ const CalendarForm = ({ setDialogClose }: Props) => {
                                     ),
                                 });
                             } finally {
-                                setLoading(false);
-                            }
 
+                                if (!loading) {
+                                    setDialogClose();
+                                    setLoadingForm(false);
+                                }
+                            }
                         }
-                        setLoading(false)
+                        setLoadingForm(false)
                     }, 2000); // Delay for 2 seconds                      
                 });
         })
@@ -237,7 +244,7 @@ const CalendarForm = ({ setDialogClose }: Props) => {
                                 <FormItem className='w-full'>
                                     <FormLabel>Activity Title</FormLabel>
                                     <FormControl>
-                                        <Input {...field} disabled={loading} placeholder="Type your activity title here." />
+                                        <Input {...field} disabled={loadingForm} placeholder="Type your activity title here." />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -257,7 +264,7 @@ const CalendarForm = ({ setDialogClose }: Props) => {
                                         <FormControl>
                                             <Checkbox
                                                 onCheckedChange={field.onChange}
-                                                disabled={loading}
+                                                disabled={loadingForm}
                                             />
 
                                         </FormControl>
@@ -282,7 +289,7 @@ const CalendarForm = ({ setDialogClose }: Props) => {
                             <FormItem className='w-full'>
                                 <FormLabel>Activity Description</FormLabel>
                                 <FormControl>
-                                    <Textarea {...field} disabled={loading} placeholder="Type your description here." />
+                                    <Textarea {...field} disabled={loadingForm} placeholder="Type your description here." />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -296,7 +303,7 @@ const CalendarForm = ({ setDialogClose }: Props) => {
                                 <FormItem className='w-full'>
                                     <FormLabel>Type</FormLabel>
                                     <FormControl>
-                                        <Select {...field} onValueChange={field.onChange} defaultValue={field.value} disabled={loading}>
+                                        <Select {...field} onValueChange={field.onChange} defaultValue={field.value} disabled={loadingForm}>
                                             <FormControl>
                                                 <SelectTrigger>
                                                     <SelectValue placeholder="Select a type" />
@@ -304,7 +311,7 @@ const CalendarForm = ({ setDialogClose }: Props) => {
                                             </FormControl>
                                             <SelectContent>
                                                 {TypeData.map((option, index) => (
-                                                    <SelectItem key={index} value={option.value || 'default_value'} disabled={loading}>{option.label}</SelectItem>
+                                                    <SelectItem key={index} value={option.value || 'default_value'} disabled={loadingForm}>{option.label}</SelectItem>
                                                 ))}
                                             </SelectContent>
                                         </Select>
@@ -320,7 +327,7 @@ const CalendarForm = ({ setDialogClose }: Props) => {
                                 <FormItem>
                                     <FormLabel>Target Participants</FormLabel>
                                     <FormControl>
-                                        <Input {...field} disabled={loading} />
+                                        <Input {...field} disabled={loadingForm} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -333,7 +340,7 @@ const CalendarForm = ({ setDialogClose }: Props) => {
                                 <FormItem>
                                     <FormLabel>Location</FormLabel>
                                     <FormControl>
-                                        <Input {...field} disabled={loading} />
+                                        <Input {...field} disabled={loadingForm} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -343,7 +350,7 @@ const CalendarForm = ({ setDialogClose }: Props) => {
                     </div>
                     <div className='flex flex-row gap-2 item-start'>
                         <div className='flex flex-row items-center justify-start gap-1 mt-5'>
-                            <Checkbox checked={allDayChecked} onClick={() => setAllDayChecked(!allDayChecked)} disabled={loading} />
+                            <Checkbox checked={allDayChecked} onClick={() => setAllDayChecked(!allDayChecked)} disabled={loadingForm} />
                             <label
                                 htmlFor="allday"
                                 className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 whitespace-nowrap">
@@ -360,7 +367,7 @@ const CalendarForm = ({ setDialogClose }: Props) => {
                                         <RangePicker
                                             defaultValue={[dayjs(), null]}
                                             onChange={(value) => handleRangePickerChange(value)}
-                                            disabled={loading}
+                                            disabled={loadingForm}
                                         />
                                         <FormMessage />
                                     </FormItem>
@@ -377,7 +384,7 @@ const CalendarForm = ({ setDialogClose }: Props) => {
                                                 className='w-full'
                                                 defaultValue={[dayjs()]}
                                                 onChange={(value) => handleDatePickerChange(value)}
-                                                disabled={loading} />
+                                                disabled={loadingForm} />
                                             <FormMessage />
                                         </FormItem>
                                     )}
@@ -391,7 +398,7 @@ const CalendarForm = ({ setDialogClose }: Props) => {
                                             <TimePicker.RangePicker
                                                 className='w-full'
                                                 onChange={(value) => handleTimeRangeChange(value)}
-                                                disabled={loading}
+                                                disabled={loadingForm}
                                             />
                                             <FormMessage />
                                         </FormItem>
@@ -410,7 +417,7 @@ const CalendarForm = ({ setDialogClose }: Props) => {
                                             <ColorPicker
                                                 background={field.value}
                                                 setBackground={(value) => handleColorPickerChange(value)}
-                                                disabled={loading} />
+                                                disabled={loadingForm} />
                                         </FormControl>
                                     </FormItem>
                                 );
@@ -421,7 +428,7 @@ const CalendarForm = ({ setDialogClose }: Props) => {
                     <Separator />
                     <FormLabel className='flex flex-row gap-2 items-centers'>
                         <label className='font-bold md:text-xl '>Preparatory List</label>
-                        <Button type='button' size={'sm'} disabled={loading} onClick={() => setNumOfPreparatoryList(prev => prev + 1)}>
+                        <Button type='button' size={'sm'} disabled={loadingForm} onClick={() => setNumOfPreparatoryList(prev => prev + 1)}>
                             <FaPlus />
                         </Button>
                         <FormDescription className='flex items-center'>
@@ -437,7 +444,7 @@ const CalendarForm = ({ setDialogClose }: Props) => {
                                     <FormItem className='w-full'>
                                         <FormLabel>Description</FormLabel>
                                         <FormControl>
-                                            <Input {...field} disabled={loading} placeholder="Enter description" />
+                                            <Input {...field} disabled={loadingForm} placeholder="Enter description" />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -451,7 +458,7 @@ const CalendarForm = ({ setDialogClose }: Props) => {
                                     <FormItem className='w-full'>
                                         <FormLabel>Status</FormLabel>
                                         <FormControl>
-                                            <Select {...field} onValueChange={field.onChange} defaultValue={field.value} disabled={loading}>
+                                            <Select {...field} onValueChange={field.onChange} defaultValue={field.value} disabled={loadingForm}>
                                                 <FormControl>
                                                     <SelectTrigger>
                                                         <SelectValue placeholder="Select a status" />
@@ -459,7 +466,7 @@ const CalendarForm = ({ setDialogClose }: Props) => {
                                                 </FormControl>
                                                 <SelectContent>
                                                     {PreparatoryActivityStatus.map((option, index) => (
-                                                        <SelectItem key={index} value={option.value || 'default_value'} disabled={loading}>{option.label}</SelectItem>
+                                                        <SelectItem key={index} value={option.value || 'default_value'} disabled={loadingForm}>{option.label}</SelectItem>
                                                     ))}
                                                 </SelectContent>
                                             </Select>
@@ -477,7 +484,7 @@ const CalendarForm = ({ setDialogClose }: Props) => {
                                             <FormItem className='w-full'>
                                                 <FormLabel>Remarks</FormLabel>
                                                 <FormControl>
-                                                    <Input {...field} className='w-full' disabled={loading} placeholder="Enter remarks" />
+                                                    <Input {...field} className='w-full' disabled={loadingForm} placeholder="Enter remarks" />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
@@ -487,7 +494,7 @@ const CalendarForm = ({ setDialogClose }: Props) => {
 
                             <Button className='w-fit' type='button' variant={'destructive'} size={'sm'}
                                 onClick={() => setNumOfPreparatoryList(prev => prev - 1)}
-                                disabled={loading || numOfPreparatoryList == 1}>
+                                disabled={loadingForm || numOfPreparatoryList == 1}>
                                 <FaMinus />
                             </Button>
 
@@ -501,7 +508,7 @@ const CalendarForm = ({ setDialogClose }: Props) => {
                             <FormItem className='w-full'>
                                 <FormLabel>Remarks</FormLabel>
                                 <FormControl>
-                                    <Textarea {...field} disabled={loading} placeholder="Type your remarks here." />
+                                    <Textarea {...field} disabled={loadingForm} placeholder="Type your remarks here." />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -513,8 +520,8 @@ const CalendarForm = ({ setDialogClose }: Props) => {
                 </div>
                 <FormSuccess message={success} />
                 <FormError message={error} />
-                <Button typeof="submit" className="w-full" disabled={loading}>
-                    {loading && <LoadingSpinner />} Submit
+                <Button typeof="submit" className="w-full" disabled={loadingForm}>
+                    {loadingForm && <LoadingSpinner />} Submit
                 </Button>
             </form>
         </Form>

@@ -41,17 +41,17 @@ export const formatTime = (timeString: string) => {
 const getStatusColor = (status: string) => {
     switch (status) {
       case 'Ongoing':
-        return '#00a354'; // Green
+        return 'bg-[#00a354]'; // Green
       case 'Upcoming':
-        return '#f2c018'; // Yellow
+        return 'bg-[#f2c018]'; // Yellow
       case 'Completed':
-        return '#4682B4'; // Blue
+        return 'bg-[#4682B4]'; // Blue
       case 'Cancelled':
-        return '#b03620'; // Red
+        return 'bg-[#b03620]'; // Red
       case 'Postponed':
-        return '#e38812'; // Orange
+        return 'bg-[#e38812]'; // Orange
       default:
-        return '#FFFFFF'; // Default color
+        return 'bg-[#FFFFFF]'; // Default color
     }
   };
 
@@ -87,7 +87,7 @@ export const columns: ColumnDef<CalendarOfActivityType>[] = [
     ),
     cell: ({ row }) => (
       <div className="flex space-x-2">
-        <span className="max-w-[500px] truncate font-medium">
+        <span className="max-w-[500px] truncate font-medium cursor-default">
           {row.getValue("id")}
         </span>
       </div>
@@ -101,7 +101,7 @@ export const columns: ColumnDef<CalendarOfActivityType>[] = [
     ),
     cell: ({ row }) => (
       <div className="flex space-x-2">
-        <span className="max-w-[500px] truncate font-medium">
+        <span className="max-w-[500px] truncate font-medium cursor-default">
           {row.getValue("authorizeOther")}
         </span>
       </div>
@@ -115,7 +115,7 @@ export const columns: ColumnDef<CalendarOfActivityType>[] = [
     ),
     cell: ({ row }) => (
       <div className="flex space-x-2">
-        <span className="max-w-[500px] truncate font-medium">
+        <span className="max-w-[500px] truncate font-medium cursor-default">
           {row.getValue("activityTitle")}
         </span>
       </div>
@@ -129,7 +129,7 @@ export const columns: ColumnDef<CalendarOfActivityType>[] = [
     ),
     cell: ({ row }) => (
       <div className="flex space-x-2">
-        <span className="max-w-[500px] truncate font-medium">
+        <span className="max-w-[500px] truncate font-medium cursor-default">
           {row.getValue("activityDescription")}
         </span>
       </div>
@@ -142,7 +142,7 @@ export const columns: ColumnDef<CalendarOfActivityType>[] = [
     ),
     cell: ({ row }) => (
       <div className="flex space-x-2">
-        <span className="max-w-[500px] truncate font-medium">
+        <span className="max-w-[500px] truncate font-medium cursor-default">
         <Badge variant='outline'> {row.getValue("type")}</Badge>
         </span>
       </div>
@@ -155,7 +155,7 @@ export const columns: ColumnDef<CalendarOfActivityType>[] = [
     ),
     cell: ({ row }) => (
       <div className="flex space-x-2">
-        <span className="max-w-[500px] truncate font-medium">
+        <span className="max-w-[500px] truncate font-medium cursor-default">
           {row.getValue("targetParticipant")}
         </span>
       </div>
@@ -168,14 +168,16 @@ export const columns: ColumnDef<CalendarOfActivityType>[] = [
     ),
     cell: ({ row }) => {
       const status = row.getValue("status") as string;
-      let variant: "secondary" | "outline" | "destructive" | "default" | null = null;
+      // let variant: "secondary" | "outline" | "destructive" | "default" | null = null;
       
       return (
         <div className="flex space-x-2">
         <span className="max-w-[500px] truncate">
           <Badge
-            variant={variant}
-            className={`font-medium ${
+            // variant={variant}
+            className={`font-medium cursor-default hover:${
+              getStatusColor(status) 
+            } ${
               getStatusColor(status) 
             }`}
           >
@@ -191,11 +193,11 @@ export const columns: ColumnDef<CalendarOfActivityType>[] = [
   {
     accessorKey: "dateFrom",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Planned From Date" />
+      <DataTableColumnHeader column={column} title="From" />
     ),
     cell: ({ row }) => (
       <div className="flex space-x-2">
-        <span className="max-w-[500px] truncate font-medium">
+        <span className="max-w-[500px] truncate font-medium cursor-default">
           {formatDate(row.getValue("dateFrom"))}
         </span>
       </div>
@@ -204,11 +206,11 @@ export const columns: ColumnDef<CalendarOfActivityType>[] = [
   {
     accessorKey: "dateTo",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Planned To Date" />
+      <DataTableColumnHeader column={column} title="To" />
     ),
     cell: ({ row }) => (
       <div className="flex space-x-2">
-        <span className="max-w-[500px] truncate font-medium">
+        <span className="max-w-[500px] truncate font-medium cursor-default">
           {formatDate(row.getValue("dateTo"))}
         </span>
       </div>
@@ -221,7 +223,7 @@ export const columns: ColumnDef<CalendarOfActivityType>[] = [
     ),
     cell: ({ row }) => (
       <div className="flex space-x-2">
-        <span className="max-w-[500px] truncate font-medium">
+        <span className="max-w-[500px] truncate font-medium cursor-default">
           {formatTime(row.getValue("timeStart"))}
         </span>
       </div>
@@ -234,7 +236,7 @@ export const columns: ColumnDef<CalendarOfActivityType>[] = [
     ),
     cell: ({ row }) => (
       <div className="flex space-x-2">
-        <span className="max-w-[500px] truncate font-medium">
+        <span className="max-w-[500px] truncate font-medium cursor-default">
           {formatTime(row.getValue("timeEnd"))}
         </span>
       </div>
@@ -247,7 +249,7 @@ export const columns: ColumnDef<CalendarOfActivityType>[] = [
     ),
     cell: ({ row }) => (
       <div className="flex space-x-2">
-        <span className="max-w-[500px] truncate font-medium">
+        <span className="max-w-[500px] truncate font-medium cursor-default">
           {row.getValue("location")}
         </span>
       </div>
@@ -260,7 +262,7 @@ export const columns: ColumnDef<CalendarOfActivityType>[] = [
     ),
     cell: ({ row }) => (
       <div className="flex space-x-2">
-        <span className="max-w-[500px] truncate font-medium">
+        <span className="max-w-[500px] truncate font-medium cursor-default">
           {row.getValue("remarks")}
         </span>
       </div>
@@ -274,7 +276,7 @@ export const columns: ColumnDef<CalendarOfActivityType>[] = [
     ),
     cell: ({ row }) => (
       <div className="flex space-x-2">
-        <span className="max-w-[500px] truncate font-medium">
+        <span className="max-w-[500px] truncate font-medium cursor-default">
           {row.getValue("userName")}
         </span>
       </div>

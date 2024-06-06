@@ -29,8 +29,20 @@ const changelogItems = [
     ],
     comments: [],
   },
+  {
+    id: 3,
+    title:'Updates on calendar of activities "Calendar"',
+    date: '2024-06-06',
+    changes: [
+      { id: 1, change: 'Limit upcoming and ongoing events on calendar to 10 only in overview and only show additional events number if its more than 10' },
+      { id: 2, change: 'Added "UPDATE" and "DELETE" function on view my activities component, with feature of select rows' },
+      { id: 3, change: 'Fixed some of calendar of activities layouts' },
+      { id: 4, change: 'Added partial UI for calendar of activities overview chart' },
+    ],
+    comments: [],
+  },
 ];
-
+const sortedChangelogItems = [...changelogItems].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 const ChangelogPage: React.FC = () => {
   return (
     <div className="container relative md:px-56">
@@ -40,7 +52,7 @@ const ChangelogPage: React.FC = () => {
         Stay updated with the latest changes and improvements to our system.
       </PageHeaderDescription>
     </PageHeader>
-    <Changelog items={changelogItems} />
+    <Changelog items={sortedChangelogItems} />
   </div>
   );
 };

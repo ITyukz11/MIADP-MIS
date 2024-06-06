@@ -6,6 +6,7 @@ import { Textarea } from '../ui/textarea';
 import { Label } from '../ui/label';
 import { Separator } from '../ui/separator';
 import { Badge } from '../ui/badge';
+import { useCurrentUser } from '../CurrentUserContext';
 
 interface ChangelogItem {
   id: number;
@@ -33,6 +34,8 @@ const Changelog: React.FC<{ items: ChangelogItem[] }> = ({ items }) => {
     setOpenComments(newOpenComments);
   };
 
+  const {currentUser} = useCurrentUser()
+
   return (
     <div className="space-y-6">
       <Label className="text-3xl font-bold">Changelogs</Label>
@@ -53,27 +56,33 @@ const Changelog: React.FC<{ items: ChangelogItem[] }> = ({ items }) => {
               ))}
             </ul>
             {openComments[index] && (
-              <div className="mt-4">
-                <h4 className="font-semibold">Comments</h4>
-                <div className="space-y-2">
-                  {item.comments.map((comment) => (
-                    <Label key={comment.id}><strong>{comment.author}:</strong> {comment.text}</Label>
-                  ))}
-                </div>
-                <div className="mt-4">
-                  <Textarea
-                    value={comment}
-                    onChange={(e) => {
-                      setCurrentItemIndex(index);
-                      setComment(e.target.value);
-                    }}
-                    placeholder="Add a comment"
-                    className="w-full"
-                  />
-                  <Button onClick={() => addComment(index)} className="mt-2">Add Comment</Button>
-                </div>
-              </div>
-            )}
+  <div className="mt-4">
+    <h4 className="font-semibold">Comments</h4>
+    <div className="space-y-2">
+      {item.comments.map((comment) => (
+        <Label key={comment.id}>
+          <strong>{currentUser?.name?.split(' ')[0]}:</strong> {comment.text}
+          <br/>
+        </Label>
+      ))}
+    </div>
+    <div className="mt-4">
+      <Textarea
+        value={comment}
+        onChange={(e) => {
+          setCurrentItemIndex(index);
+          setComment(e.target.value);
+        }}
+        placeholder="Add a comment"
+        className="w-full"
+      />
+      <Button onClick={() => addComment(index)} className="mt-2">
+        Add Comment
+      </Button>
+    </div>
+  </div>
+)}
+
           </CardContent>
         </Card>
       ))}

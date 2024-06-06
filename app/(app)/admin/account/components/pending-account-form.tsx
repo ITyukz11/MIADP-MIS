@@ -34,7 +34,7 @@ export default function PendingAccountForm({ pendingUsers }: PendingAccountFormP
 
   return (
     <div>
-      <DataTable data={pendingUsers} columns={columns} />
+      <DataTable data={pendingUsers} columns={columns} allowSelectRow={true}/>
     </div>
   );
 }

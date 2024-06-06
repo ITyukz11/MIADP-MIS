@@ -38,7 +38,7 @@ export const formatTime = (timeString: string) => {
   // If parsing fails, return the original string
   return timeString;
 };
-const getStatusColor = (status: string) => {
+export const getStatusColor = (status: string) => {
     switch (status) {
       case 'Ongoing':
         return 'bg-[#00a354]'; // Green

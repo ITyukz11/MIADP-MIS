@@ -1,6 +1,4 @@
-"use client"
-
-import * as React from "react"
+import * as React from "react";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -14,8 +12,7 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
-} from "@tanstack/react-table"
-
+} from "@tanstack/react-table";
 import {
   Table,
   TableBody,
@@ -23,70 +20,123 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
-
-import { DataTablePagination } from "./data-table-pagination"
-import { DataTableToolbar } from "./data-table-toolbar"
+} from "@/components/ui/table";
+import { DataTablePagination } from "./data-table-pagination";
+import { DataTableToolbar } from "./data-table-toolbar";
+import { Checkbox } from "@/components/ui/checkbox"; // Adjust the import according to your file structure
 
 interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[]
-  data: TData[]
+  columns: ColumnDef<TData, TValue>[];
+  data: TData[];
+  hiddenColumns?: string[];
+  onSelectedRowIdsChange?: (selectedRowIds: string[]) => void;
+  allowSelectRow: boolean
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  hiddenColumns = [],
+  onSelectedRowIdsChange,
+  allowSelectRow
 }: DataTableProps<TData, TValue>) {
-  const [rowSelection, setRowSelection] = React.useState({})
-  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({
-    id: false,
-    target_participant:false,
-    coa_id:false,
-    authorizeOther:false,
-    timeRange:false,
-    activityDescription:false,
-    color:false,
-    remarks:false,
-    timeStart:false,
-    timeEnd:false,
-    user:false,
-    planned_to_date:false
+  const [rowSelection, setRowSelection] = React.useState<Record<string, boolean>>({});
+  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>(() => {
+    const initialVisibility: VisibilityState = {};
+    hiddenColumns.forEach((columnId) => {
+      initialVisibility[columnId] = false;
+    });
+    return initialVisibility;
   });
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
-  const [sorting, setSorting] = React.useState<SortingState>([])
 
-  // Add the numbering column
+  React.useEffect(() => {
+    const updatedVisibility: VisibilityState = {};
+    hiddenColumns.forEach((columnId) => {
+      updatedVisibility[columnId] = false;
+    });
+
+    setColumnVisibility((prevVisibility) => {
+      if (JSON.stringify(prevVisibility) !== JSON.stringify(updatedVisibility)) {
+        return updatedVisibility;
+      }
+      return prevVisibility;
+    });
+  }, [hiddenColumns]);
+
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
+  const [sorting, setSorting] = React.useState<SortingState>([]);
+
   const numberingColumn: ColumnDef<TData, any> = {
-    id: 'numbering',
-    header: '#',
+    id: "numbering",
+    header: "#",
     cell: (info) => info.row.index + 1,
-  }
+  };
 
-  const columnsWithNumbering = [numberingColumn, ...columns]
+   // Add the "select" column conditionally
+   const selectColumn: ColumnDef<TData, any> = {
+    id: "select",
+    header: ({ table }) => (
+      <Checkbox
+        checked={
+          table.getIsAllPageRowsSelected() ||
+          (table.getIsSomePageRowsSelected() && "indeterminate")
+        }
+        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+        aria-label="Select all"
+        className="translate-y-[2px]"
+      />
+    ),
+    cell: ({ row }) => (
+      <Checkbox
+        checked={row.getIsSelected()}
+        onCheckedChange={(value) => row.toggleSelected(!!value)}
+        aria-label="Select row"
+        className="translate-y-[2px]"
+      />
+    ),
+    enableSorting: false,
+    enableHiding: false,
+  };
+
+   // Conditionally include the select column
+   const columnsWithNumbering = allowSelectRow
+   ? [selectColumn, numberingColumn, ...columns]
+   : [numberingColumn, ...columns];
 
   const table = useReactTable({
     data,
     columns: columnsWithNumbering,
     state: {
       sorting,
-      columnVisibility: columnVisibility,
+      columnVisibility,
       rowSelection,
       columnFilters,
     },
-    enableRowSelection: true,
+    onColumnVisibilityChange: setColumnVisibility,
+    enableRowSelection: allowSelectRow,
     onRowSelectionChange: setRowSelection,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
-    onColumnVisibilityChange: (visibility) => {
-      setColumnVisibility(visibility); // Update columnVisibility state when visibility changes
-    },
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
-  })
+  });
+
+  // Using a ref to store the latest value of the callback
+  const onSelectedRowIdsChangeRef = React.useRef(onSelectedRowIdsChange);
+  onSelectedRowIdsChangeRef.current = onSelectedRowIdsChange;
+
+  React.useEffect(() => {
+    if (onSelectedRowIdsChangeRef.current) {
+      const selectedRowIds = Object.keys(rowSelection)
+        .filter((id) => rowSelection[id])
+        .map((rowId) => table.getRow(rowId).getValue('id') as string); // Get the value of the 'id' column for selected rows and assert it as string
+      onSelectedRowIdsChangeRef.current(selectedRowIds);
+    }
+  }, [rowSelection, table]);
 
   return (
     <div className="space-y-4">
@@ -106,7 +156,7 @@ export function DataTable<TData, TValue>({
                             header.getContext()
                           )}
                     </TableHead>
-                  )
+                  );
                 })}
               </TableRow>
             ))}
@@ -143,5 +193,5 @@ export function DataTable<TData, TValue>({
       </div>
       <DataTablePagination table={table} />
     </div>
-  )
+  );
 }

@@ -66,26 +66,36 @@ export async function DELETE(request) {
       return NextResponse.json({ error: 'ID is required.' }, { status: 400 });
     }
 
-    // Find the preparatory lists associated with the calendar activity
+    const ids = Array.isArray(id) ? id : [id];
+
+    // Find the preparatory lists associated with the calendar activities
     const preparatoryLists = await prisma.preparatoryList.findMany({
-      where: { activity: id }
+      where: {
+        activity: {
+          in: ids
+        }
+      }
     });
 
     // Delete the preparatory lists
-    await Promise.all(
-      preparatoryLists.map(async (preparatoryList) => {
-        await prisma.preparatoryList.delete({
+    await prisma.$transaction(
+      preparatoryLists.map((preparatoryList) =>
+        prisma.preparatoryList.delete({
           where: { id: preparatoryList.id }
-        });
-      })
+        })
+      )
     );
 
-    // Delete the calendar activity
-    const deletedActivity = await prisma.calendarOfActivity.delete({
-      where: { id: id }
-    });
+    // Delete the calendar activities
+    const deletedActivities = await prisma.$transaction(
+      ids.map((id) =>
+        prisma.calendarOfActivity.delete({
+          where: { id: id }
+        })
+      )
+    );
 
-    return NextResponse.json({ deletedActivity }, { status: 200 });
+    return NextResponse.json({ deletedActivities }, { status: 200 });
   } catch (error) {
     console.error('Error deleting activity:', error);
     return NextResponse.json({ error: 'Internal server error.' }, { status: 500 });

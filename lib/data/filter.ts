@@ -38,4 +38,4 @@ export const unitOptions = [
 
 export const regionOptions = ["PSO","RPCO 9", "RPCO 10", "RPCO 11", "RPCO 12", "RPCO 13", "BARMM"];
 
-export const statusOptions = ["Upcoming", "Completed", "Cancelled", "Postponed"]
+export const statusOptions = ["Upcoming", "Ongoing","Completed", "Cancelled", "Postponed"]

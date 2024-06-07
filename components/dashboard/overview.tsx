@@ -62,40 +62,40 @@ const months = ["All", "January", "February", "March", "April", "May", "June", "
 export function Overview() {
   const [selectedRegion, setSelectedRegion] = useState<string>('PSO');
   const [selectedYear, setSelectedYear] = useState<string>('2024');
-  
+
   const currentMonth = new Date().toLocaleString('default', { month: 'long' });
   const [selectedMonth, setSelectedMonth] = useState<string>(currentMonth);
-  
+
 
   const filteredData = selectedMonth === "All"
     ? regionsData[selectedRegion]
     : regionsData[selectedRegion].filter(data => data.month === selectedMonth);
 
-    type CustomTooltipProps = TooltipProps<number, string>;
+  type CustomTooltipProps = TooltipProps<number, string>;
 
-    // Custom Tooltip component
-    const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
-      if (active && payload && payload.length) {
-        return (
-          <div className="p-2 bg-gray-700 text-white rounded shadow-lg">
-            <Label className="font-bold">{label}</Label>
-            {payload.map((entry, index) => (
-              <p key={index} className="text-sm" style={{ color: entry.color }}>
-                <Label>{entry.name}: {entry.value}</Label>
-              </p>
-            ))}
-          </div>
-        );
-      }
-    
-      return null;
-    };
-    
+  // Custom Tooltip component
+  const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="p-2 bg-gray-700 text-white rounded shadow-lg">
+          <Label className="font-bold">{label}</Label>
+          {payload.map((entry, index) => (
+            <p key={index} className="text-sm" style={{ color: entry.color }}>
+              <Label>{entry.name}: {entry.value}</Label>
+            </p>
+          ))}
+        </div>
+      );
+    }
+
+    return null;
+  };
+
 
   return (
     <div className="space-y-4">
       <Tabs value={selectedRegion} onValueChange={setSelectedRegion}>
-        <div className='flex flex-row gap-2'>
+        <div className='flex flex-row gap-2 flex-wrap'>
           <TabsList>
             {Object.keys(regionsData).map((region) => {
               return (
@@ -108,34 +108,35 @@ export function Overview() {
               );
             })}
           </TabsList>
-
-          <Select onValueChange={setSelectedMonth}>
-            <SelectTrigger>
-              {selectedMonth}
-            </SelectTrigger>
-            <SelectContent>
-              {months.map((month) => (
-                <SelectItem key={month} value={month}>
-                  {month}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
-          <Select onValueChange={setSelectedYear}>
-            <SelectTrigger>
-              {selectedYear}
-            </SelectTrigger>
-            <SelectContent className='w-fit'>
-              {years.map((year) => (
-                <SelectItem key={year} value={year}>
-                  {year}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <div>
+            <Select onValueChange={setSelectedMonth}>
+              <SelectTrigger>
+                {selectedMonth}
+              </SelectTrigger>
+              <SelectContent>
+                {months.map((month) => (
+                  <SelectItem key={month} value={month}>
+                    {month}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Select onValueChange={setSelectedYear}>
+              <SelectTrigger>
+                {selectedYear}
+              </SelectTrigger>
+              <SelectContent className='w-fit'>
+                {years.map((year) => (
+                  <SelectItem key={year} value={year}>
+                    {year}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
-
         {Object.keys(regionsData).map((region) => (
           <TabsContent key={region} value={region} className="mt-4">
             <ResponsiveContainer width="100%" height={350}>

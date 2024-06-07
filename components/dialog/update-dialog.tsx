@@ -29,6 +29,7 @@ import { Label } from '../ui/label';
 import { ChevronLeftCircleIcon, ChevronLeftSquare, ChevronRightCircleIcon } from 'lucide-react';
 import { ToastAction } from '../ui/toast';
 import { toast } from '../ui/use-toast';
+import moment from 'moment';
 
 
 interface UpdateActivityDialogProps {
@@ -76,6 +77,8 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
             name: '',
         },
     });
+
+
 
     useEffect(() => {
         if (activityId.length > 0 && currentIndex < activityId.length) {
@@ -181,6 +184,7 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
     };
 
     const handleDatePickerChange = (value: any) => {
+
         if (value) {
             const date = dayjs(value); // Convert the input value to a Day.js object
             const formattedDate = date.toISOString(); // Format the date as per ISO 8601
@@ -196,6 +200,8 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
     };
 
     const handleTimeRangeChange = (value: any) => {
+        console.log("value: ", value)
+
         if (value && Array.isArray(value) && value.length === 2) {
             const [timeStart, timeEnd] = value;
             const formattedStartTime = timeStart.format('HH:mm'); // Extract only the time part
@@ -222,6 +228,7 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
             event.stopPropagation();
         }
     };
+
 
     return (
         <Dialog open={openUpdateDialog} onOpenChange={setUpdateDialogClose}>
@@ -388,21 +395,25 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
                                                 )}
                                             /> :
                                             <div className='flex flex-row gap-2 mt-auto '>
-
                                                 <FormField
                                                     control={form.control}
                                                     name="timeStart"
-                                                    render={({ field }) => (
-                                                        <FormItem>
-                                                            <FormLabel>Time Range</FormLabel>
-                                                            <TimePicker.RangePicker
-                                                                className='w-full'
-                                                                onChange={(value) => handleTimeRangeChange(value)}
-                                                                disabled={loadingForm}
-                                                            />
-                                                            <FormMessage />
-                                                        </FormItem>
-                                                    )}
+                                                    render={({ field }) => {
+                                                        const defaultTimeStart = form.getValues('timeStart') ? dayjs(form.getValues('timeStart'), 'HH:mm') : undefined;
+                                                        const defaultTimeEnd = form.getValues('timeEnd') ? dayjs(form.getValues('timeEnd'), 'HH:mm') : undefined;
+                                                        return (
+                                                            <FormItem>
+                                                                <FormLabel>Time Range</FormLabel>
+                                                                <TimePicker.RangePicker
+                                                                    className='w-full'
+                                                                    defaultValue={[defaultTimeStart, defaultTimeEnd]}
+                                                                    onChange={(value) => handleTimeRangeChange(value)}
+                                                                    disabled={loadingForm}
+                                                                />
+                                                                <FormMessage />
+                                                            </FormItem>
+                                                        )
+                                                    }}
                                                 />
                                             </div>
                                         }

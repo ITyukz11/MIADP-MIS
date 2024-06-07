@@ -140,7 +140,7 @@ export default function AnnouncementsPage() {
                   <CardHeader>
                     <CardTitle>Activities Type Chart</CardTitle>
                   </CardHeader>
-                  <CardContent className="pl-2">
+                  <CardContent className="pl-2 overflow-hidden">
                     <Overview />
                   </CardContent>
                 </Card>

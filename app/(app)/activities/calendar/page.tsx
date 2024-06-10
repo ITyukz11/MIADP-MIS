@@ -22,7 +22,7 @@ import CalendarFormDialog from '../calendar-form-dialog';
 import { useRouter } from 'next/navigation';
 import { ViewMySchedDialog } from '../view-my-sched-dialog';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useCalendarOfActivityContext } from '@/components/CalendarOfActivityContext';
+import { useCalendarOfActivityContext } from '@/components/context/CalendarOfActivityContext';
 import { CalendarSheet } from '@/components/calendar-of-activity/CalendarSheet';
 import { formatTime } from '@/components/table/data/activities/coa-columns';
 
@@ -57,6 +57,7 @@ const page = () => {
     const { activities, loading, error } = useCalendarOfActivityContext();
 
     const calendarRef = useRef<FullCalendar>(null);
+    console.log("activities filteredCoaData: ", filteredCoaData)
 
     console.log("activities: ", activities)
 
@@ -71,12 +72,28 @@ const page = () => {
     useEffect(() => {
         const fetchData = () => {
             try {
-                const formatDateToISOWithoutTimezone = (date: Date) => {
+                const formatStartDateToISOWithoutTimezone = (date: Date) => {
                     const year = date.getFullYear();
                     const month = String(date.getMonth() + 1).padStart(2, '0');
                     const day = String(date.getDate()).padStart(2, '0');
+ 
+    
                     return `${year}-${month}-${day}`;
                 };
+
+                const formatEndDateToISOWithoutTimezone = (endDate: Date, startDate: Date) => {
+                    const year = endDate.getFullYear();
+                    const month = String(endDate.getMonth() + 1).padStart(2, '0');
+                    const endDay = String(endDate.getDate()).padStart(2, '0');
+                    const startDay = String(startDate.getDate()).padStart(2, '0');
+                    
+                    // Check if start day is equal to end day
+                    const calculatedDay = startDay === endDay ?  endDay: String(Number(endDay) + 1).padStart(2, '0');
+                    
+                    return `${year}-${month}-${calculatedDay}`;
+                };
+                
+                
 
                 // Function to remove the date part and leave only the time
                 const addingTimeEvent = (isoString: string | null) => {
@@ -93,8 +110,8 @@ const page = () => {
                     return {
                         id: event.id,
                         title: event.activityTitle,
-                        start: formatDateToISOWithoutTimezone(startDate) + addingTimeEvent(event.timeStart), // Format date without timezone
-                        end: formatDateToISOWithoutTimezone(endDate) + addingTimeEvent(event.timeEnd),
+                        start: formatStartDateToISOWithoutTimezone(startDate) + addingTimeEvent(event.timeStart), // Format date without timezone
+                        end: formatEndDateToISOWithoutTimezone(endDate,startDate) + addingTimeEvent(event.timeEnd),
                         timeStart: event.timeStart,
                         timeEnd: event.timeEnd,
                         color: event.user.color, // Use user color
@@ -102,7 +119,7 @@ const page = () => {
                     };
                 });
 
-                console.log(formattedData)
+                console.log("formattedData: ",formattedData)
 
                 const filteredUpcomingData = formattedData
                     .filter((event: any) => event.status === 'Upcoming')
@@ -125,8 +142,8 @@ const page = () => {
 
     const events = [
         // Replace this with your actual list of events
-        { id: '1', title: 'Orientation cum Meeting with NCIP and MIADP Staff', start: '2024-05-01T11:00:00+09:00', end: '2024-05-01T11:00:00+09:00', color: '#ff0000' },
-        { id: '2', title: 'PSO-RPCO 1st Quarter Assessment, Davao City', start: '2024-05-05', end: '2024-05-07', color: '#013220' },
+        { id: '1', title: 'Orientation cum Meeting with NCIP and MIADP Staff', start: '2024-06-01T11:00:00+09:00', end: '2024-06-03T11:00:00+09:00', color: '#ff0000' },
+        { id: '2', title: 'PSO-RPCO 1st Quarter Assessment, Davao City', start: '2024-06-05', end: '2024-06-07T00:00:01', color: '#013220' },
         {
             id: '3',
             title: 'Drone Pilot Training with Introduction to Aerial Mapping using UAVs',
@@ -134,12 +151,12 @@ const page = () => {
             end: '2024-06-02T18:00:00',   // Include time in ISO 8601 format
             color: '#0000ff'
         },
-        { id: '4', title: 'Event 1', start: '2024-05-20', end: '2024-05-20', color: '#ff0000' },
-        { id: '5', title: 'Event 2', start: '2024-05-21', end: '2024-05-07', color: '#013220' },
-        { id: '6', title: 'Event 3', start: '2024-05-26', end: '2024-05-12', color: '#0000ff' },
-        { id: '7', title: 'Event 1', start: '2024-05-30', end: '2024-05-20', color: '#ff0000' },
-        { id: '8', title: 'SDS Orientation', start: '2024-05-05', end: '2024-05-07', color: '#013220' },
-        { id: '9', title: 'Training of Trainers (TOT) - Business Plan Preparation (Modules 1 and 2) (RPCO-LGU-NCIP)', start: '2024-05-07', end: '2024-05-12', color: '#0000ff' },
+        { id: '4', title: 'Event 1', start: '2024-06-20', end: '2024-06-20', color: '#ff0000' },
+        { id: '5', title: 'Event 2', start: '2024-06-21', end: '2024-06-07', color: '#013220' },
+        { id: '6', title: 'Event 3', start: '2024-06-26', end: '2024-06-12', color: '#0000ff' },
+        { id: '7', title: 'Event 1', start: '2024-06-30', end: '2024-06-20', color: '#ff0000' },
+        { id: '8', title: 'SDS Orientation', start: '2024-06-05', end: '2024-06-07', color: '#013220' },
+        { id: '9', title: 'Training of Trainers (TOT) - Business Plan Preparation (Modules 1 and 2) (RPCO-LGU-NCIP)', start: '2024-06-07', end: '2024-06-12', color: '#0000ff' },
     ];
 
     const handleEventClick = (info: any) => {

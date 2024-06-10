@@ -7,8 +7,8 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { zodResolver } from '@hookform/resolvers/zod'
-import React, { useState, useTransition } from 'react'
-import { useForm } from 'react-hook-form'
+import React, { useEffect, useState, useTransition } from 'react'
+import { useFieldArray, useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { DatePicker } from 'antd';
 import { TimePicker } from 'antd';
@@ -29,8 +29,11 @@ import { useCurrentUser } from '@/components/context/CurrentUserContext'
 import axios from 'axios'
 import { formatDate } from '@/components/table/data/activities/coa-columns'
 import { useCalendarOfActivityContext } from '@/components/context/CalendarOfActivityContext'
-import { useUsers } from '@/components/context/UsersContext'
+import { User, useUsers } from '@/components/context/UsersContext'
 import { useSession } from 'next-auth/react'
+import { Badge } from '@/components/ui/badge'
+import { regionOptions } from '@/lib/data/filter'
+import { MdPeopleAlt } from 'react-icons/md'
 
 type Props = {
     setDialogClose: () => void
@@ -40,6 +43,8 @@ const CalendarForm = ({ setDialogClose }: Props) => {
     const { usersData, loadingUser, errorUser, fetchUsers } = useUsers();
     const { currentUser } = useCurrentUser();
 
+    const [filteredUsersData, setFilteredUsersData] = useState<User[]>([]);
+    const [selectedParticipants, setSelectedParticipants] = useState(['']);
 
     const [isPending, startTransition] = useTransition();
     const [loadingForm, setLoadingForm] = useState(false); // Initialize loadingForm state
@@ -53,11 +58,14 @@ const CalendarForm = ({ setDialogClose }: Props) => {
 
     const { RangePicker } = DatePicker;
 
+    const [includeAllRegions, setIncludeAllRegions] = useState(false)
 
     const { loading, fetchActivitiesData } = useCalendarOfActivityContext();
 
+    const [filterRegion, setFilterRegion] = useState(currentUser?.region);
+
     console.log("usersData: ", usersData)
-console.log("usersData, currentUser: ", currentUser)
+    console.log("usersData, currentUser: ", currentUser)
 
     const form = useForm<z.infer<typeof CalendarOfActivitySchema>>({
         resolver: zodResolver(CalendarOfActivitySchema),
@@ -73,6 +81,7 @@ console.log("usersData, currentUser: ", currentUser)
             timeStart: '',
             timeEnd: '',
             allDay: false,
+            participant: [{ userId: '' }],
             color: '#F5222D',
             status: '', // default value specified in the schema
             preparatoryList: [{ description: '', status: '', remarks: '' }],
@@ -80,6 +89,26 @@ console.log("usersData, currentUser: ", currentUser)
             name: currentUser?.name
         },
     })
+
+    const { control, watch } = form;
+
+    const {
+        fields: participantFields,
+        append: appendParticipant,
+        remove: removeParticipant
+    } = useFieldArray({
+        control,
+        name: 'participant'
+    });
+
+    const {
+        fields: preparatoryListFields,
+        append: appendPreparatoryList,
+        remove: removePreparatoryList
+    } = useFieldArray({
+        control,
+        name: 'preparatoryList'
+    });
 
     const onSubmit = async (values: z.infer<typeof CalendarOfActivitySchema>) => {
         console.log("submit values: ", values)
@@ -234,9 +263,21 @@ console.log("usersData, currentUser: ", currentUser)
         }
     };
 
-    const handleColorPickerChange = (value: any) => {
-        form.setValue('color', value);
-    };
+    useEffect(() => {
+        const filteredUsersData = filterRegion === 'All'
+            ? usersData
+            : usersData.filter(user => user.region === filterRegion);
+
+        setFilteredUsersData(filteredUsersData);
+    }, [currentUser?.region, usersData, filterRegion]);
+
+
+    const participants = watch('participant');
+
+    //    useEffect(() => {
+    //         const selectedIds = participants.map(participant => participant.userId);
+    //         setSelectedParticipants(selectedIds);
+    //     }, [participants]);
 
     //const [background, setBackground] = useState('#B4D455')
     return (
@@ -258,7 +299,7 @@ console.log("usersData, currentUser: ", currentUser)
                             )}
                         />
 
-                        <FormField
+                        {/* <FormField
                             control={form.control}
                             name="authorizeOther"
                             render={({ field }) => (
@@ -287,7 +328,7 @@ console.log("usersData, currentUser: ", currentUser)
 
                                 </FormItem>
                             )}
-                        />
+                        /> */}
                     </div>
                     <FormField
                         control={form.control}
@@ -334,7 +375,7 @@ console.log("usersData, currentUser: ", currentUser)
                                 <FormItem>
                                     <FormLabel>Target Participants</FormLabel>
                                     <FormControl>
-                                        <Input {...field} disabled={loadingForm} />
+                                        <Input {...field} disabled={loadingForm}  placeholder="ex. IPS, IPO, LPMIU, RPCO, PSO, etc."/>
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -347,7 +388,7 @@ console.log("usersData, currentUser: ", currentUser)
                                 <FormItem>
                                     <FormLabel>Location</FormLabel>
                                     <FormControl>
-                                        <Input {...field} disabled={loadingForm} />
+                                        <Input {...field} disabled={loadingForm} placeholder="ex. World Palace, Ecoland, Davao City"/>
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -413,43 +454,126 @@ console.log("usersData, currentUser: ", currentUser)
                                 />
                             </div>
                         }
-                        {/* <FormField
-                            name='color'
-                            render={({ field }) => {
-                                console.log(field); // Log the field object
-                                return (
-                                    <FormItem>
-                                        <FormLabel>Activity Color</FormLabel>
-                                        <FormControl className='flex items-center mt-auto'>
-                                            <ColorPicker
-                                                background={field.value}
-                                                setBackground={(value) => handleColorPickerChange(value)}
-                                                disabled={loadingForm} />
-                                        </FormControl>
-                                    </FormItem>
-                                );
-                            }}
-                        /> */}
+
                     </div>
+                    <Separator />
+                    <FormLabel className='flex flex-row gap-2 justify-between items-centers'>
+                        <div className='flex flex-row gap-2 items-center'>
+                            <label className='font-bold md:text-xl '>Participants</label>
+                            <FormDescription className='flex items-center'>
+                                Please press the plus (+) button when adding new participant, (-) to remove
+                            </FormDescription>
+                        </div>
+                        <div className='flex flex-row gap-2 justify-end items-center'>
+                            <Badge className='flex flex-row gap-1 justify-center items-center'><MdPeopleAlt/>{filteredUsersData.length}</Badge>
+                            <Select onValueChange={setFilterRegion} defaultValue={filterRegion} disabled={loadingForm}>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Filter" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value='All'>All</SelectItem>
+                                    {regionOptions.map((option, index) => (
+                                        <SelectItem key={index} value={option}>{option}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                            {/* <Button variant='outline' type='button' onClick={()=> setIncludeAllRegions(!includeAllRegions)}>
+                               <div className='h-5 w-5 rounded-full'>{filteredUsersData.length}</div> {includeAllRegions?'Filter own region':'Load all regions'} 
+                            </Button> */}
+                            <Badge variant='secondary'>{participantFields.length}</Badge>
+                            <Button type='button' size={'sm'} disabled={loadingForm} onClick={() => appendParticipant({ userId: '' })}>
+                                <FaPlus />
+                            </Button>
+                        </div>
+                    </FormLabel>
+                    {participantFields.map((field, index) => (
+                        <div key={field.id} className="flex flex-row gap-2 items-end w-full">
+                            <FormField
+                                control={control}
+                                name={`participant.${index}.userId`}
+                                render={({ field }) => (
+                                    <FormItem className='w-full'>
+                                        <FormControl>
+                                            <Select {...field} onValueChange={(value) => {
+                                                field.onChange(value);
+                                                setSelectedParticipants((prev) => {
+                                                    const newSelected = [...prev];
+                                                    if (participantFields.length === 1) {
+                                                        return [value];
+                                                    } else {
+                                                        newSelected[index] = value; // Ensure the value is set at the specific index
+                                                        return newSelected;
+                                                    }
+                                                });
+                                            }}
+                                                defaultValue={field.value} disabled={loadingForm}>
+                                                <FormControl>
+                                                    <SelectTrigger>
+                                                        <SelectValue placeholder="Select participant" />
+                                                    </SelectTrigger>
+                                                </FormControl>
+                                                <SelectContent>
+                                                    {!loadingUser ? filteredUsersData.map((option, idx) => (
+                                                        <SelectItem key={idx} value={option.id} disabled={selectedParticipants.includes(option.id)} className='cursor-pointer'>
+                                                            <Badge>{option.name}</Badge>-
+                                                            <Badge variant={'secondary'}>{option.position}</Badge>-
+                                                            <Badge variant={'secondary'}> {option.region}</Badge>-
+                                                            <Badge variant={'secondary'}>{option.component}</Badge>-
+                                                            <Badge variant={'secondary'}> {option.unit}</Badge>
+                                                        </SelectItem>
+                                                    )) : <SelectItem value={' '} disabled={true}>
+                                                        <div className='flex flex-row gap-2'> Fetching users... <LoadingSpinner /></div>
+                                                    </SelectItem>}
+                                                </SelectContent>
+                                            </Select>
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <Button
+                                className='w-fit'
+                                type='button'
+                                variant={'destructive'}
+                                size={'sm'}
+                                onClick={() => {
+                                    // Remove the participant from the form
+                                    removeParticipant(index);
+                                    // Remove the participant from selectedParticipants
+                                    setSelectedParticipants((prev) =>
+                                        prev.filter(participant => participant !== participants[index].userId) // Access the participant ID correctly
+                                    );
+                                }}
+                                disabled={loadingForm || participantFields.length === 1}
+                            >
+                                <FaMinus />
+                            </Button>
+                        </div>
+                    ))}
                     {/* Preparatory list items */}
                     <Separator />
-                    <FormLabel className='flex flex-row gap-2 items-centers'>
-                        <label className='font-bold md:text-xl '>Preparatory List</label>
-                        <Button type='button' size={'sm'} disabled={loadingForm} onClick={() => setNumOfPreparatoryList(prev => prev + 1)}>
-                            <FaPlus />
-                        </Button>
-                        <FormDescription className='flex items-center'>
-                            Please press the plus (+) button when adding new preparatory list
-                        </FormDescription>
+                    <FormLabel className='flex flex-row gap-2 justify-between items-centers'>
+                        <div className='flex flex-row gap-2 items-center'>
+                            <label className='font-bold md:text-xl '>Preparatory List</label>
+                            <FormDescription className='flex items-center'>
+                                Please press the plus (+) button when adding new preparatory list, (-) to remove
+                            </FormDescription>
+                        </div>
+                        <div className='flex flex-row gap-2 justify-end'>
+                            <Badge variant='secondary'>{preparatoryListFields.length}</Badge>
+                            <Button type='button' size={'sm'} disabled={loadingForm} onClick={() => appendPreparatoryList({ description: '', status: '', remarks: '' })}>
+                                <FaPlus />
+                            </Button>
+                        </div>
+
                     </FormLabel>
-                    {Array.from({ length: numOfPreparatoryList }).map((_, index) => (
+                    {preparatoryListFields.map((field, index) => (
                         <div key={index} className="flex flex-row gap-2 items-end w-full">
                             <FormField
                                 control={form.control}
                                 name={`preparatoryList.${index}.description`}
                                 render={({ field }) => (
                                     <FormItem className='w-full'>
-                                        <FormLabel>Description</FormLabel>
                                         <FormControl>
                                             <Input {...field} disabled={loadingForm} placeholder="Enter description" />
                                         </FormControl>
@@ -463,7 +587,6 @@ console.log("usersData, currentUser: ", currentUser)
                                 name={`preparatoryList.${index}.status`}
                                 render={({ field }) => (
                                     <FormItem className='w-full'>
-                                        <FormLabel>Status</FormLabel>
                                         <FormControl>
                                             <Select {...field} onValueChange={field.onChange} defaultValue={field.value} disabled={loadingForm}>
                                                 <FormControl>
@@ -473,7 +596,9 @@ console.log("usersData, currentUser: ", currentUser)
                                                 </FormControl>
                                                 <SelectContent>
                                                     {PreparatoryActivityStatus.map((option, index) => (
-                                                        <SelectItem key={index} value={option.value || 'default_value'} disabled={loadingForm}>{option.label}</SelectItem>
+                                                        <SelectItem key={index} value={option.value || 'default_value'} disabled={loadingForm} className='cursor-pointer'>
+                                                            <Badge variant={'outline'}>{option.label}</Badge>
+                                                        </SelectItem>
                                                     ))}
                                                 </SelectContent>
                                             </Select>
@@ -482,6 +607,7 @@ console.log("usersData, currentUser: ", currentUser)
                                     </FormItem>
                                 )}
                             />
+
                             {form.watch(`preparatoryList.${index}.status`) == "Other" &&
                                 (
                                     <FormField
@@ -489,7 +615,6 @@ console.log("usersData, currentUser: ", currentUser)
                                         name={`preparatoryList.${index}.remarks`}
                                         render={({ field }) => (
                                             <FormItem className='w-full'>
-                                                <FormLabel>Remarks</FormLabel>
                                                 <FormControl>
                                                     <Input {...field} className='w-full' disabled={loadingForm} placeholder="Enter remarks" />
                                                 </FormControl>
@@ -499,9 +624,14 @@ console.log("usersData, currentUser: ", currentUser)
                                     />
                                 )}
 
-                            <Button className='w-fit' type='button' variant={'destructive'} size={'sm'}
-                                onClick={() => setNumOfPreparatoryList(prev => prev - 1)}
-                                disabled={loadingForm || numOfPreparatoryList == 1}>
+                            <Button
+                                className='w-fit'
+                                type='button'
+                                variant={'destructive'}
+                                size={'sm'}
+                                onClick={() => removePreparatoryList(index)}
+                                disabled={loadingForm || preparatoryListFields.length === 1}
+                            >
                                 <FaMinus />
                             </Button>
 

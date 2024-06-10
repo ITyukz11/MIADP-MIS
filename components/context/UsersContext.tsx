@@ -3,7 +3,7 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import { fetchAllUsers } from '@/lib/admin/users';
 
 // Define the User type
-type User = {
+export type User = {
   id: string;
   region: string;
   name: string;

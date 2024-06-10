@@ -46,14 +46,10 @@ export async function POST(request) {
           }
         },
         participants: {
-          create: participants.map(participantId => ({
-            user: {
-              connect: {
-                id: participantId
-              }
-            }
-          }))
-        }
+          createMany: {
+            data: participants // Assuming preparatoryList is an array of objects
+          }
+        },
       }
     });
 
@@ -86,6 +82,15 @@ export async function DELETE(request) {
       }
     });
 
+       // Find the preparatory lists associated with the calendar activities
+       const participants = await prisma.calendarOfActivityParticipant.findMany({
+        where: {
+          calendarOfActivityId: {
+            in: ids
+          }
+        }
+      });
+
     // Delete the preparatory lists
     await prisma.$transaction(
       preparatoryLists.map((preparatoryList) =>
@@ -95,6 +100,20 @@ export async function DELETE(request) {
       )
     );
 
+     // Delete the participants
+     await prisma.$transaction(
+      participants.map((participant) =>
+        prisma.calendarOfActivityParticipant.delete({
+          where: {
+            calendarOfActivityId_userId: {
+              calendarOfActivityId: participant.calendarOfActivityId,
+              userId: participant.userId
+            }
+          }
+        })
+      )
+    )
+
     // Delete the calendar activities
     const deletedActivities = await prisma.$transaction(
       ids.map((id) =>
@@ -103,6 +122,7 @@ export async function DELETE(request) {
         })
       )
     );
+
 
     return NextResponse.json({ deletedActivities }, { status: 200 });
   } catch (error) {
@@ -145,6 +165,7 @@ export async function GET(request) {
             color: true
           }
         },
+        participants: true, // Include all fields from the preparatoryList model
         calendarOfActivityHistory: true, // Include all fields from the calendarOfActivityHistory model
         preparatoryList: true // Include all fields from the preparatoryList model
       },

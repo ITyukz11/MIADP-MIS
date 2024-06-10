@@ -43,6 +43,21 @@ const changelogItems = [
     ],
     comments: [],
   },
+  {
+    "id": 4,
+    "title": "Updates on Calendar of Activities",
+    "date": "2024-06-10",
+    "changes": [
+      { "id": 1, "change": "Added a new field for participants in the Calendar of Activity form. The value for this field is sourced from the registered users of the MMIS." },
+      { "id": 2, "change": "Included a region filter in the participants dropdown in the Calendar of Activity form." },
+      { "id": 3, "change": "Added additional participant information in the sheet component, accessible by clicking the activity in the full calendar component." },
+      { "id": 4, "change": "Updated the MIADP AI assistant with the revised operation manual." },
+      { "id": 5, "change": "Increased the calendar sheet width to at least 40% of the screen width." },
+      { "id": 6, "change": "Fixed the issue with the calendar end date not being accurate." }
+    ],
+    "comments": []
+  }
+  
 ];
 const sortedChangelogItems = [...changelogItems].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 const ChangelogPage: React.FC = () => {

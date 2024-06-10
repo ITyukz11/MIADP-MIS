@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { Message, useAssistant } from 'ai/react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
-import { useCurrentUser } from './CurrentUserContext';
+import { useCurrentUser } from './context/CurrentUserContext';
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
 import Image from 'next/image';
 import { Separator } from './ui/separator';

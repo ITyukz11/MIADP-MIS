@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { DataTable } from '@/components/table/data-table';
 import { columns } from '@/components/table/data/activities/coa-columns';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useCalendarOfActivityContext } from '@/components/CalendarOfActivityContext';
+import { useCalendarOfActivityContext } from '@/components/context/CalendarOfActivityContext';
 import {
   Select,
   SelectContent,

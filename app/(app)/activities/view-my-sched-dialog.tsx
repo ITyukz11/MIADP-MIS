@@ -10,9 +10,9 @@ import {
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { FaCalendarAlt } from 'react-icons/fa';
-import { useCalendarOfActivityContext } from '@/components/CalendarOfActivityContext';
+import { useCalendarOfActivityContext } from '@/components/context/CalendarOfActivityContext';
 import { DataTable } from '@/components/table/data-table';
-import { useCurrentUser } from '@/components/CurrentUserContext';
+import { useCurrentUser } from '@/components/context/CurrentUserContext';
 import { columns } from '@/components/table/data/activities/coa-columns';
 import TrashLottieAnimation from '@/components/lottie-icon-animations/Trash';
 import AssignmentLottieAnimation from '@/components/lottie-icon-animations/Assignment';

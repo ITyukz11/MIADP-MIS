@@ -6,9 +6,10 @@ import { ErrorBoundary } from "next/dist/client/components/error-boundary"
 import GlobalError from "../error"
 import { redirect } from "next/navigation"
 import { getServerSession } from "next-auth"
-import { CurrentUserProvider } from "@/components/CurrentUserContext"
-import { CalendarOfActivityProvider } from "@/components/CalendarOfActivityContext"
 import FloatingAIChat from "@/components/FloatingAIChat"
+import { UsersProvider } from "@/components/context/UsersContext"
+import { CurrentUserProvider } from "@/components/context/CurrentUserContext"
+import { CalendarOfActivityProvider } from "@/components/context/CalendarOfActivityContext"
 
 interface AppLayoutProps {
     children: React.ReactNode
@@ -23,16 +24,18 @@ export default async function AppLayout({ children }: AppLayoutProps) {
 
     return (
         <CurrentUserProvider initialUser={session.user as any}>
-            <CalendarOfActivityProvider>
-                <div className="flex flex-col">
-                    <ErrorBoundary errorComponent={GlobalError}>
-                        <SiteHeader />
-                        <main className="flex-1 mt-4 mb-auto h-full ">{children}</main>
-                        <FloatingAIChat/>
-                        <SiteFooter />
-                    </ErrorBoundary>
-                </div>
-            </CalendarOfActivityProvider>
+            <UsersProvider>
+                <CalendarOfActivityProvider>
+                    <div className="flex flex-col">
+                        <ErrorBoundary errorComponent={GlobalError}>
+                            <SiteHeader />
+                            <main className="flex-1 mt-4 mb-auto h-full ">{children}</main>
+                            <FloatingAIChat />
+                            <SiteFooter />
+                        </ErrorBoundary>
+                    </div>
+                </CalendarOfActivityProvider>
+            </UsersProvider>
         </CurrentUserProvider>
 
     )

@@ -4,7 +4,7 @@ import { MobileNav } from "./mobile-nav";
 import { ModeToggle } from "./mode-toggle";
 import { DropDownMenuComponent } from "./drop-down-menu";
 import { MdNotifications } from "react-icons/md";
-import { useCurrentUser } from "./CurrentUserContext";
+import { useCurrentUser } from "./context/CurrentUserContext";
 import NotificationLottieAnimation from "./lottie-icon-animations/Notification";
 
 export const SiteHeader = () => {

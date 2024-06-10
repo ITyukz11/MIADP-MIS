@@ -10,7 +10,7 @@ import { DatePicker, TimePicker } from 'antd';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Select, SelectItem, SelectTrigger, SelectValue, SelectContent } from '@/components/ui/select';
 import { updateCalendarOfActivity } from '@/actions/calendar-of-activity/update';
-import { useCalendarOfActivityContext } from '../CalendarOfActivityContext';
+import { useCalendarOfActivityContext } from '../context/CalendarOfActivityContext';
 import { FormError } from '@/components/form-error'
 import { FormSuccess } from '@/components/form-success'
 import { Button } from '@/components/ui/button'

@@ -6,7 +6,7 @@ import { TbCloudDataConnection } from "react-icons/tb";
 import { cn } from "@/lib/utils"
 import { navLinks } from "@/config/nav-links";
 import { Badge } from "./ui/badge";
-import { useCurrentUser } from "./CurrentUserContext";
+import { useCurrentUser } from "./context/CurrentUserContext";
 
 export const MainNav = () => {
   const pathname = usePathname()

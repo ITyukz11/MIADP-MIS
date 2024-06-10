@@ -12,7 +12,7 @@ import { Label } from "./ui/label"
 import { TbCloudDataConnection } from "react-icons/tb";
 import { navLinks } from "@/config/nav-links"
 import { Badge } from "./ui/badge"
-import { useCurrentUser } from "./CurrentUserContext"
+import { useCurrentUser } from "./context/CurrentUserContext"
 
 export function MobileNav() {
     const [open, setOpen] = React.useState(false)

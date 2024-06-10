@@ -25,16 +25,22 @@ import { calendarOfActivity } from '@/actions/calendar-of-activity/calendarofact
 import { toast } from '@/components/ui/use-toast'
 import { LoadingSpinner } from '@/components/LoadingSpinner'
 import { ColorPicker } from '@/components/ui/color-picker'
-import { useCurrentUser } from '@/components/CurrentUserContext'
+import { useCurrentUser } from '@/components/context/CurrentUserContext'
 import axios from 'axios'
 import { formatDate } from '@/components/table/data/activities/coa-columns'
-import { useCalendarOfActivityContext } from '@/components/CalendarOfActivityContext'
+import { useCalendarOfActivityContext } from '@/components/context/CalendarOfActivityContext'
+import { useUsers } from '@/components/context/UsersContext'
+import { useSession } from 'next-auth/react'
 
 type Props = {
     setDialogClose: () => void
 }
 
 const CalendarForm = ({ setDialogClose }: Props) => {
+    const { usersData, loadingUser, errorUser, fetchUsers } = useUsers();
+    const { currentUser } = useCurrentUser();
+
+
     const [isPending, startTransition] = useTransition();
     const [loadingForm, setLoadingForm] = useState(false); // Initialize loadingForm state
 
@@ -45,12 +51,13 @@ const CalendarForm = ({ setDialogClose }: Props) => {
 
     const [allDayChecked, setAllDayChecked] = useState(false)
 
-
     const { RangePicker } = DatePicker;
 
-    const { currentUser } = useCurrentUser();
 
     const { loading, fetchActivitiesData } = useCalendarOfActivityContext();
+
+    console.log("usersData: ", usersData)
+console.log("usersData, currentUser: ", currentUser)
 
     const form = useForm<z.infer<typeof CalendarOfActivitySchema>>({
         resolver: zodResolver(CalendarOfActivitySchema),

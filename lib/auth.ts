@@ -53,6 +53,10 @@ export const authOptions: NextAuthOptions = {
                 email: user.email,
                 name: user.name,
                 role: user.role,
+                region:user.region,
+                component:user.component,
+                unit:user.unit,
+                position:user.position,
                 expoPushToken:user.expoPushToken
               }
             
@@ -63,6 +67,9 @@ export const authOptions: NextAuthOptions = {
                 name: user.name,
                 role: user.role,
                 region:user.region,
+                component:user.component,
+                unit:user.unit,
+                position:user.position,
                 expoPushToken:user.expoPushToken
               };
             }
@@ -79,12 +86,23 @@ export const authOptions: NextAuthOptions = {
       async jwt({ token, user }) {
         if (user) {
           token.role = user.role; // Include the 'role' property from the user object in the token
+          token.region = user.region; 
+          token.component = user.component; 
+          token.unit = user.unit; 
+          token.position = user.position; 
         }
         return token;
       },
 
       async session({ session, token }) {
-        if(session?.user) session.user.role = token.role
+        if(session?.user) 
+          {
+            session.user.role = token.role
+            session.user.region = token.region
+            session.user.component = token.component
+            session.user.unit = token.unit
+            session.user.position = token.position; 
+          }
         return session;
       },
     },

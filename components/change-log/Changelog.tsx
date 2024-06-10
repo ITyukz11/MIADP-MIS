@@ -6,7 +6,7 @@ import { Textarea } from '../ui/textarea';
 import { Label } from '../ui/label';
 import { Separator } from '../ui/separator';
 import { Badge } from '../ui/badge';
-import { useCurrentUser } from '../CurrentUserContext';
+import { useCurrentUser } from '../context/CurrentUserContext';
 
 interface ChangelogItem {
   id: number;

@@ -11,25 +11,27 @@ datasource db {
 enum UserRole {
   ADMIN
   USER
+  USER_ADMIN
 }
 
 model User {
-  id                   String               @id @default(cuid())
-  region               String
-  name                 String               @unique
-  unit                 String
-  component            String
-  position             String
-  email                String               @unique
-  color                String
-  expoPushToken        String?
-  notification         Notifications?
-  wfpActivities        WFPActivity[]
-  calendarOfActivities CalendarOfActivity[]
-  password             String
-  status               String               @default("Approved") // Status field to track approval status (e.g., "approved", "disapproved", "pending")
-  createdAt            DateTime             @default(now()) @map(name: "created_at")
-  updatedAt            DateTime             @updatedAt @map(name: "updated_at")
+  id                            String                          @id @default(cuid())
+  region                        String
+  name                          String                          @unique
+  unit                          String
+  component                     String
+  position                      String
+  email                         String                          @unique
+  color                         String
+  CalendarOfActivityParticipant CalendarOfActivityParticipant[]
+  expoPushToken                 String?
+  notification                  Notifications?
+  wfpActivities                 WFPActivity[]
+  calendarOfActivities          CalendarOfActivity[]
+  password                      String
+  status                        String                          @default("Approved") // Status field to track approval status (e.g., "approved", "disapproved", "pending")
+  createdAt                     DateTime                        @default(now()) @map(name: "created_at")
+  updatedAt                     DateTime                        @updatedAt @map(name: "updated_at")
 
   role UserRole @default(USER)
 
@@ -113,12 +115,13 @@ model TimeFrameFinancial {
 }
 
 model CalendarOfActivity {
-  id                        String                      @id @default(cuid())
+  id                        String                          @id @default(cuid())
   authorizeOther            Boolean
   activityTitle             String
   activityDescription       String
   type                      String
   targetParticipant         String
+  participants              CalendarOfActivityParticipant[]
   location                  String
   dateFrom                  String
   dateTo                    String
@@ -128,13 +131,33 @@ model CalendarOfActivity {
   preparatoryList           PreparatoryList[]
   remarks                   String
   color                     String?
+  images                    CalendarOfActivitiesImage[]
   attachments               String?
   status                    String
   userName                  String
-  user                      User                        @relation(fields: [userName], references: [name])
+  user                      User                            @relation(fields: [userName], references: [name])
   calendarOfActivityHistory CalendarOfActivityHistory[]
-  createdAt                 DateTime                    @default(now()) @map(name: "created_at")
-  updatedAt                 DateTime                    @updatedAt @map(name: "updated_at")
+  createdAt                 DateTime                        @default(now()) @map(name: "created_at")
+  updatedAt                 DateTime                        @updatedAt @map(name: "updated_at")
+}
+
+model CalendarOfActivityParticipant {
+  calendarOfActivityId String
+  userId               String
+  CalendarOfActivity   CalendarOfActivity @relation(fields: [calendarOfActivityId], references: [id])
+  User                 User               @relation(fields: [userId], references: [id])
+
+  @@id([calendarOfActivityId, userId])
+}
+
+model CalendarOfActivitiesImage {
+  id                   String               @id @default(cuid())
+  url                  String
+  description          String?
+  calendarOfActivityId String
+  calendarOfActivity   CalendarOfActivity?   @relation(fields: [calendarOfActivityId], references: [id])
+  createdAt            DateTime             @default(now()) @map(name: "created_at")
+  updatedAt            DateTime             @updatedAt @map(name: "updated_at")
 }
 
 model PreparatoryList {
@@ -161,7 +184,7 @@ model CalendarOfActivityHistory {
 model Notifications {
   id            String   @id @default(cuid())
   expoPushToken String
-  userName      String   @unique            // Ensure this field is unique
+  userName      String   @unique // Ensure this field is unique
   user          User     @relation(fields: [userName], references: [name])
   createdAt     DateTime @default(now()) @map(name: "created_at")
   updatedAt     DateTime @updatedAt @map(name: "updated_at")

@@ -11,10 +11,10 @@ export async function POST(request) {
 
     //const userName = await getCurrentUser();
 
-    const { authorizeOther, activityTitle, activityDescription, type, targetParticipant,
+    const { authorizeOther, activityTitle, activityDescription, type, targetParticipant, participants,
       location, dateFrom, dateTo, timeStart, timeEnd, allDay, attachments, status, remarks, preparatoryList, userName } = await request.json();
     console.log('api/auth/calendar-of-activity route: ', {
-      authorizeOther, activityTitle, activityDescription, type, targetParticipant,
+      authorizeOther, activityTitle, activityDescription, type, targetParticipant, participants,
       location, dateFrom, dateTo, timeStart, timeEnd, allDay, attachments, status, remarks, preparatoryList, userName
     });
 
@@ -44,6 +44,15 @@ export async function POST(request) {
           connect: {
             name: userName
           }
+        },
+        participants: {
+          create: participants.map(participantId => ({
+            user: {
+              connect: {
+                id: participantId
+              }
+            }
+          }))
         }
       }
     });

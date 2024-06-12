@@ -257,6 +257,7 @@ export const columns: ColumnDef<WPFDATA>[] = [
 ];
 
 type WFPActivity = {
+  id:string;
   operatingUnit: string;
   componentsUnits: string;
   activities: string;

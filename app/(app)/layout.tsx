@@ -29,7 +29,7 @@ export default async function AppLayout({ children }: AppLayoutProps) {
                     <div className="flex flex-col">
                         <ErrorBoundary errorComponent={GlobalError}>
                             <SiteHeader />
-                            <main className="flex-1 mt-4 mb-auto h-full ">{children}</main>
+                            <main className="flex-1 mt-4 mb-auto h-full min-w-[320px]">{children}</main>
                             <FloatingAIChat />
                             <SiteFooter />
                         </ErrorBoundary>

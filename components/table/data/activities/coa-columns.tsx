@@ -272,7 +272,7 @@ export const columns: ColumnDef<CalendarOfActivityType>[] = [
   {
     accessorKey: "userName",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="User" />
+      <DataTableColumnHeader column={column} title="Author" />
     ),
     cell: ({ row }) => (
       <div className="flex space-x-2">

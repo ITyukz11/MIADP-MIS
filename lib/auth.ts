@@ -86,6 +86,7 @@ export const authOptions: NextAuthOptions = {
       async jwt({ token, user }) {
         if (user) {
           token.role = user.role; // Include the 'role' property from the user object in the token
+          token.id = user.id;
           token.region = user.region; 
           token.component = user.component; 
           token.unit = user.unit; 
@@ -98,6 +99,7 @@ export const authOptions: NextAuthOptions = {
         if(session?.user) 
           {
             session.user.role = token.role
+            session.user.id = token.id
             session.user.region = token.region
             session.user.component = token.component
             session.user.unit = token.unit

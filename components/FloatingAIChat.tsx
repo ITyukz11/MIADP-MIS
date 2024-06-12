@@ -26,7 +26,7 @@ export default function FloatingAIChat() {
             <Popover open={aiAssistantOpen} onOpenChange={setAiAssistantOpen}>
                 <PopoverTrigger asChild>
                     <Button variant="outline"
-                        className="fixed bottom-4 flex flex-col right-4 h-fit gap-2 rounded-lg border-2 shadow-lg focus:outline-none">
+                        className=" z-50 fixed bottom-4 flex flex-col right-4 h-fit gap-2 rounded-lg border-2 shadow-lg focus:outline-none">
                         <Image
                             className="rounded-full border-2"
                             src={'/MIADP-Assistant.png'}

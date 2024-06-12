@@ -134,6 +134,7 @@ model CalendarOfActivity {
   images                    CalendarOfActivitiesImage[]
   attachments               String?
   status                    String
+  qrCode                    String?
   userName                  String
   user                      User                            @relation(fields: [userName], references: [name])
   calendarOfActivityHistory CalendarOfActivityHistory[]

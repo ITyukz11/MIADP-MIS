@@ -24,6 +24,7 @@ import {
 import { DataTablePagination } from "./data-table-pagination";
 import { DataTableToolbar } from "./data-table-toolbar";
 import { Checkbox } from "@/components/ui/checkbox"; // Adjust the import according to your file structure
+import { Button } from "../ui/button";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -31,14 +32,20 @@ interface DataTableProps<TData, TValue> {
   hiddenColumns?: string[];
   onSelectedRowIdsChange?: (selectedRowIds: string[]) => void;
   allowSelectRow: boolean
+  allowViewCalendar?: boolean
+  setAllowViewCalendar?: () => void;
+  onViewRowId?: (id: string) => void;
 }
 
-export function DataTable<TData, TValue>({
+export function DataTable<TData extends { id: string }, TValue>({
   columns,
   data,
   hiddenColumns = [],
   onSelectedRowIdsChange,
-  allowSelectRow
+  allowSelectRow,
+  allowViewCalendar,
+  setAllowViewCalendar,
+  onViewRowId,
 }: DataTableProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = React.useState<Record<string, boolean>>({});
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>(() => {
@@ -72,8 +79,8 @@ export function DataTable<TData, TValue>({
     cell: (info) => info.row.index + 1,
   };
 
-   // Add the "select" column conditionally
-   const selectColumn: ColumnDef<TData, any> = {
+  // Add the "select" column conditionally
+  const selectColumn: ColumnDef<TData, any> = {
     id: "select",
     header: ({ table }) => (
       <Checkbox
@@ -98,10 +105,20 @@ export function DataTable<TData, TValue>({
     enableHiding: false,
   };
 
-   // Conditionally include the select column
-   const columnsWithNumbering = allowSelectRow
-   ? [selectColumn, numberingColumn, ...columns]
-   : [numberingColumn, ...columns];
+  const handleRowClick = (id: string) => {
+    if (onViewRowId) {
+      onViewRowId(id);
+      console.log("onViewRowId: ", id)
+    }
+    if (setAllowViewCalendar) {
+      setAllowViewCalendar();
+      console.log("setAllowViewCalendar")
+    }
+  };
+
+  const columnsWithNumbering = allowSelectRow
+  ? [selectColumn, numberingColumn, ...columns]
+  : [numberingColumn, ...columns];
 
   const table = useReactTable({
     data,
@@ -140,7 +157,7 @@ export function DataTable<TData, TValue>({
 
   return (
     <div className="space-y-4">
-      <DataTableToolbar data={data} table={table} selectedRows={rowSelection}/>
+      <DataTableToolbar data={data} table={table} selectedRows={rowSelection} />
       <div className="rounded-md border">
         <Table>
           <TableHeader>
@@ -152,9 +169,9 @@ export function DataTable<TData, TValue>({
                       {header.isPlaceholder
                         ? null
                         : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
                     </TableHead>
                   );
                 })}
@@ -167,16 +184,16 @@ export function DataTable<TData, TValue>({
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
+                  onClick={() => handleRowClick(row.original.id)}
+                  style={{ cursor: allowViewCalendar ? 'pointer' : 'default' }} // Conditional cursor style
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
                   ))}
                 </TableRow>
+
               ))
             ) : (
               <TableRow>
@@ -189,6 +206,7 @@ export function DataTable<TData, TValue>({
               </TableRow>
             )}
           </TableBody>
+
         </Table>
       </div>
       <DataTablePagination table={table} />

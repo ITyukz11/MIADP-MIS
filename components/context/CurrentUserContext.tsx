@@ -10,6 +10,7 @@ interface User {
   expoPushToken: string;
   component:string;
   unit:string;
+  id:string;
   // Add other user properties if needed
 }
 

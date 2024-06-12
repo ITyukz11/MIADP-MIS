@@ -62,10 +62,10 @@ export const ViewMySchedDialog = (props: Props) => {
         description: "The calendar of activity you selected has been deleted successfully.",
         duration: 5000,
         action: (
-            <ToastAction altText="Ok">Ok</ToastAction>
+          <ToastAction altText="Ok">Ok</ToastAction>
         ),
-    });
-    
+      });
+
       fetchActivitiesData()
     } else {
       setAlert({ type: 'error', message: response.error ?? 'An unexpected error occurred.' });
@@ -103,30 +103,32 @@ export const ViewMySchedDialog = (props: Props) => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="outline" className='flex flex-row items-center gap-1 justify-center'>
-          <FaCalendarAlt /> View my activity
+        <Button variant="outline" className='flex flex-row items-center gap-1 justify-center overflow-hidden'>
+          <FaCalendarAlt className='shrink-0' /> View encoded activities
         </Button>
       </DialogTrigger>
       <DialogContent className="min-w-[90vw] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>My Activities
-            
-         
-             </DialogTitle>
+          <DialogTitle>Encoded Activities
+          </DialogTitle>
           <DialogDescription className='flex flex-row'>
-            Total activities: <b>{filteredData.length}</b>. You can update and delete your activities here.
+            Total activities: <b>{filteredData.length}</b>. You can update and delete your encoded activities here.
             {loading && (
-          <Label className='text-xs flex flex-row gap-2 items-center ml-auto italic'>Fetching new data <LoadingSpinner/></Label>
-        ) }
+              <Label className='text-xs flex flex-row gap-2 items-center ml-auto italic'>Fetching new data <LoadingSpinner /></Label>
+            )}
           </DialogDescription>
           <div className='flex flex-row gap-2 mt-2'>
             <Button
               variant="outline"
               onMouseEnter={() => setIsHoveredAssignment(true)}
               onMouseLeave={() => setIsHoveredAssignment(false)}
-              onClick={()=> setOpenUpdateDialog(true)}
+              onClick={() => setOpenUpdateDialog(true)}
             >
-              <AssignmentLottieAnimation width={25} height={25} isHovered={isHoveredAssignment} />Update</Button>
+              <AssignmentLottieAnimation 
+                width={25} 
+                height={25} 
+                isHovered={isHoveredAssignment}/>
+                Update</Button>
             <Button
               variant="outline"
               onMouseEnter={() => setIsHoveredTrash(true)}
@@ -144,7 +146,7 @@ export const ViewMySchedDialog = (props: Props) => {
               openDeleteDialog={openDeleteDialog}
               setDeleteDialogClose={() => setOpenDeleteDialog(!openDeleteDialog)}
               loading={loadingDelete} />
-              
+
             <UpdateActivityDialog
               activityId={selectedRowIds}
               onCancel={handleCancelUpdate}
@@ -156,15 +158,15 @@ export const ViewMySchedDialog = (props: Props) => {
 
         </DialogHeader>
         <div className='w-full overflow-x-auto scrollbar-thin'>
-      <DataTable
+          <DataTable
             data={filteredData}
             columns={columns}
             hiddenColumns={hiddenColumns}
             onSelectedRowIdsChange={handleSelectedRowIdsChange}
             allowSelectRow={true}
           />
-      </div>
-        
+        </div>
+
       </DialogContent>
     </Dialog>
   );

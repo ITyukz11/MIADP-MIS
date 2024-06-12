@@ -32,6 +32,7 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from "@/components/ui/tooltip"
+import { ViewMyParticipatedSchedDialog } from '../view-participated-activity-dialog';
 
 
 interface Event {
@@ -193,10 +194,8 @@ const page = () => {
     const updateCardHeight = () => {
         if (cardRef.current && window.innerWidth >= 768) {
             setCardHeight(cardRef.current.offsetHeight);
-            console.log(`Updated card height: ${cardRef.current.offsetHeight}`);
         } else {
             setCardHeight(0); // Reset height for small screens
-            console.log(`Screen too small, resetting height to 0`);
         }
     };
 
@@ -227,6 +226,7 @@ const page = () => {
                                 className='flex flex-row items-center gap-1 justify-center'
                                 onClick={() => setCalendarFormOpen(true)}><FaPlusCircle /> Create new activity</Button>
                             <ViewMySchedDialog />
+                            <ViewMyParticipatedSchedDialog />
                         </CardHeader>
                     </Card>
                     <Card className='overflow-y-auto md:h-full rounded-xl'>

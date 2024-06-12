@@ -17,7 +17,6 @@ import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import 'react-quill/dist/quill.snow.css'; // Import Quill's CSS for styling
 import { FaMinus, FaPlus } from 'react-icons/fa'
 import { Separator } from '@/components/ui/separator'
 import { ActivityStatus, PreparatoryActivityStatus, TypeData } from '@/components/calendar-of-activity/data'

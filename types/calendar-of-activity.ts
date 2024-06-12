@@ -17,6 +17,14 @@ export interface User {
     createdAt: string;
     updatedAt: string;
   }
+
+   
+  export interface Participants {
+    calendarOfActivityId: string;
+    userId: string;
+    createdAt: string;
+    updatedAt: string;
+  }
   
   export interface Activity {
     id: string;
@@ -25,6 +33,7 @@ export interface User {
     activityDescription: string;
     type: string;
     targetParticipant: string;
+    participants: Participants[];
     location: string;
     dateFrom: string;
     dateTo: string;

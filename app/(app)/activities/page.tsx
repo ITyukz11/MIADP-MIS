@@ -14,6 +14,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { componentOptions, regionOptions, unitOptions } from '@/lib/data/filter';
+import { CalendarSheet } from '@/components/calendar-of-activity/CalendarSheet';
 
 type Props = {}
 
@@ -21,7 +22,15 @@ const Page = (props: Props) => {
   const [coaData, setCoaData] = useState<any[]>([]);
   const [filteredData, setFilteredData] = useState<any[]>([]);
   const [selectedFilter, setSelectedFilter] = useState<string>('All');
+  const [viewCalendarData, setViewCalendarData] = useState<any[]>([]);
+  const [viewCalendar, setViewCalendar] = useState(false)
+  const [selectedRowId, setSelectedRowId] = useState('');
 
+
+  const handleViewRowIdPressed = (viewId: string) => {
+    setSelectedRowId(viewId);
+    console.log("viewId ZZ: ", viewId)
+  };
   const { activities, loading, error } = useCalendarOfActivityContext();
 
   useEffect(() => {
@@ -39,6 +48,12 @@ const Page = (props: Props) => {
     fetchData();
   }, [activities]);
   
+  useEffect(() => {
+    const viewCalendarDataFiltered = filteredData.filter(activity =>
+      activity.id == selectedRowId
+    );
+    setViewCalendarData(viewCalendarDataFiltered);
+  }, [activities, filteredData, selectedRowId])
   
 
   useEffect(() => {
@@ -68,8 +83,8 @@ const Page = (props: Props) => {
 
   return (
     <div className='container relative'>
-      <div className='flex flex-col gap-2 flex-wrap w-full'>
-        <div className='flex flex-row gap-2 overflow-x-auto w-full scrollbar-thin'>
+      <div className='flex flex-col flex-wrap w-full'>
+        <div className='flex flex-row gap-2 overflow-x-auto w-full scrollbar-thin p-1'>
           <Select onValueChange={(value) => setSelectedFilter(value)}>
             <SelectTrigger className="w-fit">
               <SelectValue placeholder="Select" />
@@ -99,8 +114,16 @@ const Page = (props: Props) => {
         </div>  
 
         {filteredData.length > 0 ? (
-          <div className='w-full overflow-x-auto scrollbar-thin'>
-            <DataTable data={filteredData} columns={columns} hiddenColumns={hiddenColumns} allowSelectRow={false}/>
+          <div className='w-full overflow-x-auto scrollbar-thin p-1'>
+            <DataTable 
+              data={filteredData} 
+              columns={columns} 
+              hiddenColumns={hiddenColumns} 
+              allowSelectRow={false}
+              allowViewCalendar={true}
+              onViewRowId={handleViewRowIdPressed}
+              setAllowViewCalendar={()=> setViewCalendar(!viewCalendar)}
+              />
           </div>
         ) : (
           <div className="flex flex-col space-y-3">
@@ -109,6 +132,8 @@ const Page = (props: Props) => {
         )}
 
       </div>
+      <CalendarSheet activityData={viewCalendarData} openSheet={viewCalendar} closeCalendarSheet={() => setViewCalendar(!viewCalendar)} />
+
     </div>
   )
 }

@@ -46,7 +46,6 @@ const AssignmentLottieAnimation: React.FC<TAssignmentLottieAnimationProps> = ({
         width={width}
         isStopped={!autoplay && !isHovered} // Ensure it stops if not autoplay or not hovered
         ref={lottieRef}
-        style={{color:'red'}}
       />
     </div>
   );

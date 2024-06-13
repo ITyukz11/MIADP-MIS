@@ -1,6 +1,7 @@
 import * as z from "zod";
 import { RegisterSchema } from "@/schemas";
 import axios, { AxiosError } from "axios";
+import bcrypt from 'bcryptjs';
 
 interface RegisterResponse {
     success?: string;
@@ -47,7 +48,7 @@ export const pendinguser = async (values: z.infer<typeof RegisterSchema>): Promi
               } else if (values.unit in unitColors) {
                 color = unitColors[values.unit];
               }
-
+            const hashedPassword = await bcrypt.hash(values.password, 10);
             const response = await axios.post('/api/auth/pending-users', {
                 region: values.region,
                 fullname: values.fullname,
@@ -56,7 +57,8 @@ export const pendinguser = async (values: z.infer<typeof RegisterSchema>): Promi
                 unit: values.unit,
                 position: values.position,
                 color:color,
-                password: values.password
+                // password:values.password
+                password: hashedPassword
             }, {
                 auth: {
                     username: 'MIADP',

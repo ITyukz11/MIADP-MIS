@@ -25,7 +25,7 @@ export async function POST(request) {
     if (existingUser || existingPendingUser) {
       return new Response(JSON.stringify({ error: 'Email already exists' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
     } else {
-      const hashedPassword = await hash(password, 10);
+      
       const response = await prisma.pendingUser.create({
         data: {
           region,
@@ -35,7 +35,7 @@ export async function POST(request) {
           color,
           name: fullname,
           email,
-          password: hashedPassword,
+          password,
         }
       });
 

@@ -55,7 +55,7 @@ export function DataTableToolbar<TData>({
         <CSVLink data={csvData} filename="filtered_data.csv">
           <Button variant="outline"><AiOutlineExport className='w-4 h-4 shrink-0' /> Export</Button>
         </CSVLink>
-        <Button variant="outline">
+        <Button variant="outline" disabled className='cursor-not-allowed'>
           <AiOutlinePrinter className='w-5 h-5 shrink-0' /> Print
         </Button>
         {isFiltered && (

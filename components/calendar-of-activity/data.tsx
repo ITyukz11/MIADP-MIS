@@ -12,7 +12,7 @@ export const PreparatoryActivityStatus=[
     { label: "Postponed", value: "Postponed" },
     { label: "Rescheduled", value: "Rescheduled" },
     { label: "Cancelled", value: "Cancelled" },
-    { label: "Other", value: "Other" },
+    { label: "Others", value: "Other" },
 ]
 
 export const TypeData=[

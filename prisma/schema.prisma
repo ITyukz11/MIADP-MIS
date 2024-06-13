@@ -29,6 +29,7 @@ model User {
   wfpActivities                 WFPActivity[]
   calendarOfActivities          CalendarOfActivity[]
   password                      String
+  messages                      Message[]
   status                        String                          @default("Approved") // Status field to track approval status (e.g., "approved", "disapproved", "pending")
   createdAt                     DateTime                        @default(now()) @map(name: "created_at")
   updatedAt                     DateTime                        @updatedAt @map(name: "updated_at")
@@ -36,6 +37,14 @@ model User {
   role UserRole @default(USER)
 
   @@map(name: "users")
+}
+
+model Message {
+  id        Int      @id @default(autoincrement())
+  content   String
+  createdAt DateTime @default(now())
+  userId    String   // Changed from Int to String
+  user      User     @relation(fields: [userId], references: [id])
 }
 
 model PendingUser {
@@ -190,3 +199,4 @@ model Notifications {
   createdAt     DateTime @default(now()) @map(name: "created_at")
   updatedAt     DateTime @updatedAt @map(name: "updated_at")
 }
+

@@ -175,7 +175,7 @@ export const columns: ColumnDef<CalendarOfActivityType>[] = [
         <span className="max-w-[500px] truncate">
           <Badge
             // variant={variant}
-            className={`font-medium cursor-default hover:${
+            className={`font-medium m-2 cursor-default shadow-md dark:text-white hover:${
               getStatusColor(status) 
             } ${
               getStatusColor(status) 

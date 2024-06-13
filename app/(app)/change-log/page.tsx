@@ -56,6 +56,46 @@ const changelogItems = [
       { "id": 6, "change": "Fixed the issue with the calendar end date not being accurate." }
     ],
     "comments": []
+  },
+  {
+    "id": 5,
+    "title": "Updates on Calendar of Activities",
+    "date": "2024-06-13",
+    "changes": [
+      {
+        "id": 1,
+        "change": "Disabled the PRINT button as its functionality is not yet implemented."
+      },
+      {
+        "id": 2,
+        "change": "Added attachment feature to the calendar form and improved the display of form messages for incomplete data."
+      },
+      {
+        "id": 3,
+        "change": "Updated login and registration form layouts for better responsiveness."
+      },
+      {
+        "id": 4,
+        "change": "Removed the 'target participant' column as a default column in the activity table."
+      },
+      {
+        "id": 5,
+        "change": "Added the MIADP PSO logo with a round frame during component loading states."
+      },
+      {
+        "id": 6,
+        "change": "Replaced the error messages in the calendar form with a '*' indicator."
+      },
+      {
+        "id": 7,
+        "change": "Added functionality to display attachment data as links in calendar sheets."
+      },
+      {
+        "id": 8,
+        "change": "Updated status styling to include a small shadow effect."
+      }
+    ],
+    "comments": []
   }
   
 ];

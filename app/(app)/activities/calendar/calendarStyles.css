@@ -1,0 +1,53 @@
+  .fc .fc-toolbar,
+  .fc .fc-header-toolbar {
+    @apply text-sm font-light p-2;
+  }
+
+.fc .fc-button {
+    @apply inline-flex dark:text-black items-center hover:text-white bg-primary justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50;
+  }
+.fc .fc-today-button {
+    @apply dark:text-black
+  }
+  
+  .fc .fc-prev-button,
+  .fc .fc-next-button{
+    @apply hover:text-white
+  }
+
+  .fc-button{
+    @apply bg-[#0F172A]
+  }
+
+  .fc .fc-toolbar-title{
+    @apply text-base md:text-xl
+  }
+  .fc .fc-list-button,
+  .fc .fc-timeGridDay-button,
+  .fc .fc-timeGridWeek-button,
+  .fc .fc-dayGridMonth-button,
+  .fc .fc-multiMonthYear-button {
+    @apply hover:text-white;
+  }
+  
+  .fc .fc-button-icon {
+    @apply h-9 w-9;
+  }
+  
+  .fc-multiMonthYear-view,
+  .fc-daygrid-day-frame{
+    @apply dark:bg-black
+  } 
+
+  .fc-popover-header,
+  .fc-scrollgrid-sync-inner,
+  .fc-list-day-cushion,
+  .fc-multimonth-title{
+    @apply dark:bg-[#020817]
+  }
+
+  .fc-list-event{
+    @apply dark:hover:text-black
+  }
+
+  

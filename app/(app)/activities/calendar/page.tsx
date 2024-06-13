@@ -25,7 +25,6 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useCalendarOfActivityContext } from '@/components/context/CalendarOfActivityContext';
 import { CalendarSheet } from '@/components/calendar-of-activity/CalendarSheet';
 import { formatTime } from '@/components/table/data/activities/coa-columns';
-
 import {
     Tooltip,
     TooltipContent,
@@ -33,7 +32,7 @@ import {
     TooltipTrigger,
 } from "@/components/ui/tooltip"
 import { ViewMyParticipatedSchedDialog } from '../view-participated-activity-dialog';
-
+import './calendarStyles.css';
 
 interface Event {
     id: string;
@@ -217,7 +216,7 @@ const page = () => {
 
     return (
         <div className='container relative'>
-            <div className="flex flex-col md:flex-row gap-2 flex-wrap md:flex-nowrap overflow-hidden" style={{ height: cardHeight ? `${cardHeight}px` : 'auto' }}>
+            <div className="flex flex-col py-2 md:flex-row gap-2 flex-wrap md:flex-nowrap overflow-hidden" style={{ height: cardHeight ? `${cardHeight}px` : 'auto' }}>
                 <div className='flex flex-col w-full md:w-1/4 gap-2'>
                     <Card>
                         <CardHeader>
@@ -230,7 +229,7 @@ const page = () => {
                         </CardHeader>
                     </Card>
                     <Card className='overflow-y-auto md:h-full rounded-xl'>
-                        <CardHeader className="font-bold gap-2 sticky top-0 z-10 border-b bg-white dark:bg-gray-800">
+                        <CardHeader className="font-bold gap-2 sticky top-0 p-3 z-10 border-b bg-white dark:bg-gray-800">
                             <CardTitle className="flex flex-row items-center justify-start gap-10">
                                 <FaRegCalendarAlt />
                                 <div className='flex flex-row gap-2 items-center'>
@@ -291,7 +290,7 @@ const page = () => {
                         </CardContent>
                     </Card>
                     <Card className='overflow-y-auto md:h-full'>
-                        <CardHeader className="font-bold gap-2 sticky top-0 z-10 border-b bg-white dark:bg-gray-800">
+                        <CardHeader className="font-bold gap-2 p-3 sticky top-0 z-10 border-b bg-white dark:bg-gray-800">
                         <CardTitle className="flex flex-row items-center justify-start gap-10">
                                 <FaRegCalendarAlt />
                                 <div className='flex flex-row gap-2 items-center'>
@@ -346,7 +345,7 @@ const page = () => {
                         </CardContent>
                     </Card>
                 </div>
-                <Card ref={cardRef} className="h-full mb-2 w-full md:w-3/4 overflow-x-auto scrollbar-thin scrollbar-track-rounded-full">
+                <Card ref={cardRef} className="h-full min-h-screen mb-2 w-full md:w-3/4 overflow-x-auto scrollbar-thin scrollbar-track-rounded-full">
                     <CardHeader className='flex flex-row justify-end gap-2 items-center'>
                     </CardHeader>
                     <CardContent className='overflow-hidden'>
@@ -371,7 +370,6 @@ const page = () => {
                             eventClick={handleEventClick}
                             eventClassNames={'cursor-pointer'}
                             selectable={true}
-
                         />
                     </CardContent>
                 </Card>

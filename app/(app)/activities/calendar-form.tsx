@@ -18,21 +18,21 @@ import { FaMinus, FaPlus } from 'react-icons/fa'
 import { Separator } from '@/components/ui/separator'
 import { Select, SelectItem, SelectTrigger, SelectValue, SelectContent } from '@/components/ui/select'
 
-import { ActivityStatus, PreparatoryActivityStatus, TypeData } from '@/components/calendar-of-activity/data'
+import { PreparatoryActivityStatus, TypeData } from '@/components/calendar-of-activity/data'
 import { ToastAction } from '@/components/ui/toast'
 import { calendarOfActivity } from '@/actions/calendar-of-activity/calendarofactivity'
 import { toast } from '@/components/ui/use-toast'
 import { LoadingSpinner } from '@/components/LoadingSpinner'
-import { ColorPicker } from '@/components/ui/color-picker'
 import { useCurrentUser } from '@/components/context/CurrentUserContext'
 import axios from 'axios'
 import { formatDate } from '@/components/table/data/activities/coa-columns'
 import { useCalendarOfActivityContext } from '@/components/context/CalendarOfActivityContext'
 import { User, useUsers } from '@/components/context/UsersContext'
-import { useSession } from 'next-auth/react'
 import { Badge } from '@/components/ui/badge'
 import { regionOptions } from '@/lib/data/filter'
 import { MdPeopleAlt } from 'react-icons/md'
+import { Upload } from 'lucide-react'
+import { Label } from '@/components/ui/label'
 
 type Props = {
     setDialogClose: () => void
@@ -63,6 +63,9 @@ const CalendarForm = ({ setDialogClose }: Props) => {
 
     const [filterRegion, setFilterRegion] = useState(currentUser?.region);
 
+    const [participantError, setParticipantError] = useState(false)
+    const [preparatoryError, setPreparatoryError] = useState(false)
+
     console.log("usersData: ", usersData)
     console.log("usersData, currentUser: ", currentUser)
 
@@ -84,6 +87,7 @@ const CalendarForm = ({ setDialogClose }: Props) => {
             color: '#F5222D',
             status: '', // default value specified in the schema
             preparatoryList: [{ description: '', status: '', remarks: '' }],
+            attachments: '',
             remarks: '',
             name: currentUser?.name
         },
@@ -129,6 +133,31 @@ const CalendarForm = ({ setDialogClose }: Props) => {
         if (!navigator.onLine) {
             // Alert the user that there is no internet connection
             alert("No internet connection. Please check your network connection and try again.");
+            return;
+        }
+
+        let participantError = false;
+        let preparatoryError = false;
+    
+        values.participant.forEach((info) => {
+            if (info.userId.trim() === '') {
+                participantError = true;
+            }
+        });
+    
+        values.preparatoryList.forEach((info) => {
+            if (info.description.trim() === '' || info.status.trim() === '') {
+                preparatoryError = true;
+            }
+        });
+    
+        if (participantError) {
+            setParticipantError(true);
+            return;
+        }
+    
+        if (preparatoryError) {
+            setPreparatoryError(true);
             return;
         }
 
@@ -289,11 +318,10 @@ const CalendarForm = ({ setDialogClose }: Props) => {
                             name="activityTitle"
                             render={({ field }) => (
                                 <FormItem className='w-full'>
-                                    <FormLabel>Activity Title</FormLabel>
+                                    <FormLabel className='flex flex-row gap-1'>Activity Title<FormMessage /></FormLabel>
                                     <FormControl>
                                         <Input {...field} disabled={loadingForm} placeholder="Type your activity title here." />
                                     </FormControl>
-                                    <FormMessage />
                                 </FormItem>
                             )}
                         />
@@ -334,11 +362,10 @@ const CalendarForm = ({ setDialogClose }: Props) => {
                         name="activityDescription"
                         render={({ field }) => (
                             <FormItem className='w-full'>
-                                <FormLabel>Activity Description</FormLabel>
+                                <FormLabel className='flex flex-row gap-1'>Activity Description<FormMessage /></FormLabel>
                                 <FormControl>
                                     <Textarea {...field} disabled={loadingForm} placeholder="Type your description here." />
                                 </FormControl>
-                                <FormMessage />
                             </FormItem>
                         )}
                     />
@@ -348,7 +375,7 @@ const CalendarForm = ({ setDialogClose }: Props) => {
                             name='type'
                             render={({ field }) => (
                                 <FormItem className='w-full'>
-                                    <FormLabel>Type</FormLabel>
+                                    <FormLabel className='flex flex-row gap-1'>Type<FormMessage /></FormLabel>
                                     <FormControl>
                                         <Select {...field} onValueChange={field.onChange} defaultValue={field.value} disabled={loadingForm}>
                                             <FormControl>
@@ -363,7 +390,6 @@ const CalendarForm = ({ setDialogClose }: Props) => {
                                             </SelectContent>
                                         </Select>
                                     </FormControl>
-                                    <FormMessage />
                                 </FormItem>
                             )}
                         />
@@ -372,11 +398,10 @@ const CalendarForm = ({ setDialogClose }: Props) => {
                             name="targetParticipant"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Target Participants</FormLabel>
+                                       <FormLabel className='flex flex-row gap-1'>Target Participant<FormMessage /></FormLabel>
                                     <FormControl>
-                                        <Input {...field} disabled={loadingForm}  placeholder="ex. IPS, IPO, LPMIU, RPCO, PSO, etc."/>
+                                        <Input {...field} disabled={loadingForm} placeholder="ex. IPS, IPO, LPMIU, RPCO, PSO, etc." />
                                     </FormControl>
-                                    <FormMessage />
                                 </FormItem>
                             )}
                         />
@@ -385,11 +410,10 @@ const CalendarForm = ({ setDialogClose }: Props) => {
                             name="location"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Location</FormLabel>
+                                    <FormLabel className='flex flex-row gap-1'>Location<FormMessage /></FormLabel>
                                     <FormControl>
-                                        <Input {...field} disabled={loadingForm} placeholder="ex. World Palace, Ecoland, Davao City"/>
+                                        <Input {...field} disabled={loadingForm} placeholder="ex. World Palace, Ecoland, Davao City" />
                                     </FormControl>
-                                    <FormMessage />
                                 </FormItem>
                             )}
                         />
@@ -458,13 +482,19 @@ const CalendarForm = ({ setDialogClose }: Props) => {
                     <Separator />
                     <FormLabel className='flex flex-row gap-2 justify-between items-centers'>
                         <div className='flex flex-row gap-2 items-center'>
-                            <label className='font-bold md:text-xl '>Participants</label>
+                            <label
+                                className='font-bold md:text-xl'
+                                style={participantError ? { color: '#f04d44' } : {}}
+                            >
+                                Participants {participantError && '*'}
+                            </label>
+
                             <FormDescription className='flex items-center'>
                                 Please press the plus (+) button when adding new participant, (-) to remove
                             </FormDescription>
                         </div>
                         <div className='flex flex-row gap-2 justify-end items-center'>
-                            <Badge className='flex flex-row gap-1 justify-center items-center'><MdPeopleAlt/>{filteredUsersData.length}</Badge>
+                            <Badge className='flex flex-row gap-1 justify-center items-center'><MdPeopleAlt />{filteredUsersData.length}</Badge>
                             <Select onValueChange={setFilterRegion} defaultValue={filterRegion} disabled={loadingForm}>
                                 <SelectTrigger>
                                     <SelectValue placeholder="Filter" />
@@ -526,7 +556,6 @@ const CalendarForm = ({ setDialogClose }: Props) => {
                                                 </SelectContent>
                                             </Select>
                                         </FormControl>
-                                        <FormMessage />
                                     </FormItem>
                                 )}
                             />
@@ -553,7 +582,12 @@ const CalendarForm = ({ setDialogClose }: Props) => {
                     <Separator />
                     <FormLabel className='flex flex-row gap-2 justify-between items-centers'>
                         <div className='flex flex-row gap-2 items-center'>
-                            <label className='font-bold md:text-xl '>Preparatory List</label>
+                        <label
+                                className='font-bold md:text-xl'
+                                style={preparatoryError ? { color: '#f04d44' } : {}}
+                            >
+                                Preparatory List {preparatoryError && '*'}
+                            </label>
                             <FormDescription className='flex items-center'>
                                 Please press the plus (+) button when adding new preparatory list, (-) to remove
                             </FormDescription>
@@ -576,7 +610,6 @@ const CalendarForm = ({ setDialogClose }: Props) => {
                                         <FormControl>
                                             <Input {...field} disabled={loadingForm} placeholder="Enter description" />
                                         </FormControl>
-                                        <FormMessage />
                                     </FormItem>
                                 )}
                             />
@@ -602,7 +635,6 @@ const CalendarForm = ({ setDialogClose }: Props) => {
                                                 </SelectContent>
                                             </Select>
                                         </FormControl>
-                                        <FormMessage />
                                     </FormItem>
                                 )}
                             />
@@ -615,9 +647,8 @@ const CalendarForm = ({ setDialogClose }: Props) => {
                                         render={({ field }) => (
                                             <FormItem className='w-full'>
                                                 <FormControl>
-                                                    <Input {...field} className='w-full' disabled={loadingForm} placeholder="Enter remarks" />
+                                                    <Input {...field} className='w-full' disabled={loadingForm} placeholder="Please specify..." />
                                                 </FormControl>
-                                                <FormMessage />
                                             </FormItem>
                                         )}
                                     />
@@ -637,16 +668,34 @@ const CalendarForm = ({ setDialogClose }: Props) => {
                         </div>
                     ))}
                     <Separator />
+                    <div className='flex flex-row w-full items-end gap-2'>
+                        <FormField
+                            control={form.control}
+                            name="attachments"
+                            render={({ field }) => (
+                                <FormItem className='w-full'>
+                                    <FormLabel className='flex flex-row gap-1'>Attachments <Label className=' font-extralight'> (Optional)</Label></FormLabel>
+                                    <FormControl>
+                                        <Input {...field} disabled={loadingForm} placeholder="Link for you attachments here." />
+                                    </FormControl>
+                                </FormItem>
+                            )}
+                        />
+                        <div className='ml-auto'>
+                            <Button disabled size={'sm'}><Upload/></Button>
+
+                        </div>
+                    </div>
+
                     <FormField
                         control={form.control}
                         name="remarks"
                         render={({ field }) => (
                             <FormItem className='w-full'>
-                                <FormLabel>Remarks</FormLabel>
+                                <FormLabel className='flex flex-row gap-1'>Remarks <Label className=' font-extralight'> (Optional)</Label></FormLabel>
                                 <FormControl>
                                     <Textarea {...field} disabled={loadingForm} placeholder="Type your remarks here." />
                                 </FormControl>
-                                <FormMessage />
                             </FormItem>
                         )}
                     />

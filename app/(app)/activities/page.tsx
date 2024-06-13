@@ -72,7 +72,7 @@ const Page = (props: Props) => {
   const hiddenColumns = [
     'id',
     'authorizeOther',
-    'target_participant',
+    'targetParticipant',
     'activityDescription',
     'timeStart',
     'timeEnd',

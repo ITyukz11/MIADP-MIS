@@ -96,7 +96,7 @@ export const RegisterForm = ({ backToLogin }: RegisterFormProps) => {
     }
 
     return (
-        <div className="w-full">
+        <div className="w-full justify-center flex flex-col">
             {/* <CardWrapper
                 headerTitle="Sign Up"
                 headerLabel="Create an account"

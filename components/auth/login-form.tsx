@@ -88,7 +88,7 @@ export const LoginForm = () => {
 
 
     return (
-        <div className="flex flex-col gap-2 w-full">
+        <div className="flex flex-col gap-2 w-full justify-center items-center">
             {/* <CardWrapper
             headerTitle="Sign In"
             headerLabel="MIADP Management Information System"
@@ -151,8 +151,7 @@ export const LoginForm = () => {
                         <Checkbox id="remember-password" checked={isChecked} onClick={() => setIsChecked(!isChecked)} disabled={loading} />
                         <label
                             htmlFor="remember-password" // this matches the ID of the associated checkbox
-                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
-                            onClick={() => setIsChecked(!isChecked)} // Attach click event handler to the label
+                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                         >
                             Remember password
                         </label>
@@ -164,7 +163,7 @@ export const LoginForm = () => {
                         className="w-full"
                         disabled={loading}
                     >
-                        {loading && <LoadingSpinner />} Login
+                        {loading? <LoadingSpinner />:'Login'} 
                     </Button>
                 </form>
             </Form>
@@ -178,7 +177,7 @@ export const LoginForm = () => {
                     </span>
                 </div>
             </div>
-            <Button variant="outline" type="button" className=" hover:cursor-not-allowed">
+            <Button variant="outline" type="button" className=" hover:cursor-not-allowed w-full">
                 <FcGoogle className=" h-96 mr-2" /> Google
             </Button>
             {/* </CardWrapper> */}

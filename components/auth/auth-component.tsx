@@ -59,8 +59,9 @@ export default function AuthenticationPage() {
 
     return (
 
-        <div className="container relative overflow-auto z-10 scrollbar-thin">
-            <div className="border-2 border-border/80 shadow-2xl rounded-xl container relative min-h-[50vh] scrollbar-thin overflow-hidden flex-col items-center justify-center md:grid lg:max-w-none lg:grid-cols-2 lg:px-0">
+        <div className="container absolute z-10 overflow-hidden min-w-[320px] items-center">
+            <div className="my-20 border-2 border-border/80 shadow-2xl rounded-xl container relative min-h-[615px] 
+          overflow-hidden flex-col items-center justify-center flex md:grid lg:max-w-none lg:grid-cols-2 lg:px-0 transition-all ease-in-out duration-300">
                 <div className="z-10 relative rounded-l-xl rounded-bl-xl hidden h-full flex-col bg-muted p-10 text-white lg:flex dark:border-r justify-between">
                     <div className="absolute inset-0 bg-zinc-900  rounded-l-xl rounded-bl-xl" />
                     <div className="relative z-20 flex items-center text-lg font-bold">
@@ -113,9 +114,9 @@ export default function AuthenticationPage() {
                         </blockquote>
                     </div>
                 </div>
-                <div className="pt-2 pb-2 sm:p-6 w-full ">
-                    <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
-                        <div className="flex flex-row w-full">
+                <div className="pt-2 pb-2 sm:p-6 w-full h-full">
+                    <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px] h-full">
+                        <div className="flex flex-row w-full justify-center items-center h-full">
 
                         {userLogginIn?
                   
@@ -130,7 +131,7 @@ export default function AuthenticationPage() {
                         </motion.div>
                     :
                             <motion.div
-                            className="w-fit"  
+                            className="w-full h-full"  
                                 key="register"
                                 initial={{ x: '60%', opacity: 0 }}
                                 animate={{ x: 0, opacity: 1 }}

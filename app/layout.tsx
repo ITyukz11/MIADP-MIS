@@ -8,8 +8,8 @@ import Loading from "./Loading";
 
 const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
-  title: "MMIS",
-  description: "MIADP Information Management System",
+  title: "MIADP MIS",
+  description: "MIADP Management Information System",
 };
 
 interface RootLayoutProps {

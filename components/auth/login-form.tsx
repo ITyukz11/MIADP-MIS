@@ -22,8 +22,8 @@ import { Checkbox } from "../ui/checkbox";
 import { Header } from "./header";
 import { FcGoogle } from "react-icons/fc";
 import { LoadingSpinner } from "../LoadingSpinner";
-import { FaEye, FaEyeSlash } from "react-icons/fa";
-
+import { PiEyeBold, PiEyeClosedBold } from "react-icons/pi";
+import { motion } from 'framer-motion';
 
 
 export const LoginForm = () => {
@@ -129,17 +129,33 @@ export const LoginForm = () => {
                                         <div className="relative">
                                             <Input
                                                 {...field}
-                                                type={showPassword?'text':'password'}
+                                                type={showPassword ? 'text' : 'password'}
                                                 disabled={loading}
                                                 className="pr-10" // Add padding to the right to make space for the icon
                                             />
-                                            {showPassword?
-                                             <FaEye 
-                                             className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer"
-                                             onClick={()=> setShowPassword(false)} />:
-                                            <FaEyeSlash 
-                                            className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer"
-                                            onClick={()=> setShowPassword(true)} /> }
+                                            {showPassword ? (
+                                                <motion.div
+                                                    key="open"
+                                                    initial={{ scale: 0 }}
+                                                    animate={{ scale: 1 }}
+                                                    exit={{ scale: 0 }}
+                                                    className="absolute right-3 top-[0.7rem] transform -translate-y-1/2 cursor-pointer"
+                                                    onClick={() => setShowPassword(false)}
+                                                >
+                                                    <PiEyeBold />
+                                                </motion.div>
+                                            ) : (
+                                                <motion.div
+                                                    key="closed"
+                                                    initial={{ scale: 0 }}
+                                                    animate={{ scale: 1 }}
+                                                    exit={{ scale: 0 }}
+                                                    className="absolute right-3 top-[0.7rem] transform -translate-y-1/2 cursor-pointer"
+                                                    onClick={() => setShowPassword(true)}
+                                                >
+                                                    <PiEyeClosedBold />
+                                                </motion.div>
+                                            )}
                                         </div>
                                     </FormControl>
                                     <FormMessage />
@@ -163,7 +179,7 @@ export const LoginForm = () => {
                         className="w-full"
                         disabled={loading}
                     >
-                        {loading? <LoadingSpinner />:'Login'} 
+                        {loading ? <LoadingSpinner /> : 'Login'}
                     </Button>
                 </form>
             </Form>

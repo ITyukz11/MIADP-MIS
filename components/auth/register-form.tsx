@@ -25,6 +25,8 @@ import { useToast } from "../ui/use-toast";
 import { ToastAction } from "@radix-ui/react-toast";
 import { pendinguser } from "@/actions/pendinguser/pendinguser";
 import { componentOptions, regionOptions, unitOptions } from "@/lib/data/filter";
+import { PiEyeClosedBold,PiEyeBold } from "react-icons/pi";
+import { motion } from 'framer-motion';
 
 interface RegisterFormProps {
     backToLogin: () => void
@@ -41,7 +43,7 @@ export const RegisterForm = ({ backToLogin }: RegisterFormProps) => {
 
     const [component4, setComponent4] = useState(true)
     // Define the options for the component and unit select fields
-  
+    const [showPassword, setShowPassword] = useState(false)
 
 
     const form = useForm<z.infer<typeof RegisterSchema>>({
@@ -54,7 +56,7 @@ export const RegisterForm = ({ backToLogin }: RegisterFormProps) => {
             unit: "",
             position: "",
             fullname: "",
-            color:""
+            color: ""
         }
     })
 
@@ -90,7 +92,7 @@ export const RegisterForm = ({ backToLogin }: RegisterFormProps) => {
 
     }
 
-    const handleUnitDropDown = (allow:boolean) =>{
+    const handleUnitDropDown = (allow: boolean) => {
         form.setValue('unit', '');
         setComponent4(allow);
     }
@@ -111,37 +113,37 @@ export const RegisterForm = ({ backToLogin }: RegisterFormProps) => {
                     autoComplete="off" >
                     <div className="space-y-4">
                         <div className="grid grid-cols-2 gap-2">
-                        <FormField
-                            name='region'
-                            control={form.control}
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel className="flex flex-row">Region <FormMessage /></FormLabel>
-                                    <Select onValueChange={field.onChange} defaultValue={field.value} disabled={loading}>
-                                        <FormControl>
-                                            <SelectTrigger>
-                                                <SelectValue placeholder="Select a region" />
-                                            </SelectTrigger>
-                                        </FormControl>
-                                        <SelectContent>
-                                        {regionOptions.map((option, index)=>(
-                                                <SelectItem key={index} value={option}>{option}</SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
-                                </FormItem>
-                            )}
-                        />
-                         <FormField
-                            name='component'
-                            control={form.control}
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel className="flex flex-row">Component<FormMessage /></FormLabel>
-                                    <Select
+                            <FormField
+                                name='region'
+                                control={form.control}
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel className="flex flex-row">Region <FormMessage /></FormLabel>
+                                        <Select onValueChange={field.onChange} defaultValue={field.value} disabled={loading}>
+                                            <FormControl>
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Select a region" />
+                                                </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent>
+                                                {regionOptions.map((option, index) => (
+                                                    <SelectItem key={index} value={option}>{option}</SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                name='component'
+                                control={form.control}
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel className="flex flex-row">Component<FormMessage /></FormLabel>
+                                        <Select
                                             onValueChange={(newValue) => {
                                                 field.onChange(newValue)
-                                                newValue == 'Component 4' ? handleUnitDropDown(false):handleUnitDropDown(true)
+                                                newValue == 'Component 4' ? handleUnitDropDown(false) : handleUnitDropDown(true)
                                             }}
                                             defaultValue={field.value}
                                             disabled={loading}
@@ -158,18 +160,18 @@ export const RegisterForm = ({ backToLogin }: RegisterFormProps) => {
                                                 <SelectItem key={'Component5'} value={' '} disabled={true}>Component 5</SelectItem>
                                             </SelectContent>
                                         </Select>
-                                </FormItem>
-                            )}
-                        />
+                                    </FormItem>
+                                )}
+                            />
                         </div>
                         <div className="grid grid-cols-2 gap-2">
-                        <FormField
-                            name='unit'
-                            control={form.control}
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel className="flex flex-row">Unit<FormMessage /></FormLabel>
-                                    <Select
+                            <FormField
+                                name='unit'
+                                control={form.control}
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel className="flex flex-row">Unit<FormMessage /></FormLabel>
+                                        <Select
                                             onValueChange={field.onChange}
                                             defaultValue={field.value}
                                             disabled={loading || component4}
@@ -177,7 +179,7 @@ export const RegisterForm = ({ backToLogin }: RegisterFormProps) => {
                                         >
                                             <FormControl>
                                                 <SelectTrigger>
-                                                    <SelectValue placeholder="Select a unit"/>
+                                                    <SelectValue placeholder="Select a unit" />
                                                 </SelectTrigger>
                                             </FormControl>
                                             <SelectContent>
@@ -186,25 +188,25 @@ export const RegisterForm = ({ backToLogin }: RegisterFormProps) => {
                                                 ))}
                                             </SelectContent>
                                         </Select>
-                                </FormItem>
-                            )}
-                        />
-                         <FormField
-                            control={form.control}
-                            name="position"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel className="flex flex-row">Position<FormMessage /></FormLabel>
-                                    <FormControl>
-                                        <Input
-                                            {...field}
-                                            disabled={loading} />
-                                    </FormControl>
-                                </FormItem>
-                            )}
-                        />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="position"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel className="flex flex-row">Position<FormMessage /></FormLabel>
+                                        <FormControl>
+                                            <Input
+                                                {...field}
+                                                disabled={loading} />
+                                        </FormControl>
+                                    </FormItem>
+                                )}
+                            />
                         </div>
-                       
+
                         <FormField
                             control={form.control}
                             name="fullname"
@@ -238,14 +240,40 @@ export const RegisterForm = ({ backToLogin }: RegisterFormProps) => {
                             control={form.control}
                             name="password"
                             render={({ field }) => (
-                                <FormItem>
+                                <FormItem className="relative">
                                     <FormLabel className="flex flex-row">Password<FormMessage /></FormLabel>
                                     <FormControl>
-                                        <Input
-                                            {...field}
-                                            type="password"
-                                            disabled={loading} />
+                                        <div className="relative">
+                                            <Input
+                                                {...field}
+                                                type={showPassword ? 'text' : 'password'}
+                                                disabled={loading} />
+                                            {showPassword ? (
+                                                <motion.div
+                                                    key="open"
+                                                    initial={{ scale: 0 }}
+                                                    animate={{ scale: 1 }}
+                                                    exit={{ scale: 0 }}
+                                                    className="absolute right-3 top-[0.7rem] transform -translate-y-1/2 cursor-pointer"
+                                                    onClick={() => setShowPassword(false)}
+                                                >
+                                                    <PiEyeBold />
+                                                </motion.div>
+                                            ) : (
+                                                <motion.div
+                                                    key="closed"
+                                                    initial={{ scale: 0 }}
+                                                    animate={{ scale: 1 }}
+                                                    exit={{ scale: 0 }}
+                                                    className="absolute right-3 top-[0.7rem] transform -translate-y-1/2 cursor-pointer"
+                                                    onClick={() => setShowPassword(true)}
+                                                >
+                                                    <PiEyeClosedBold />
+                                                </motion.div>
+                                            )}
+                                        </div>
                                     </FormControl>
+
                                 </FormItem>
                             )}
                         />

@@ -23,7 +23,7 @@ export const calendarOfActivity = async (values: z.infer<typeof CalendarOfActivi
                 activityDescription: values.activityDescription,
                 type: values.type,
                 targetParticipant: values.targetParticipant,
-                participants:values.participant,
+                participants:values.participants,
                 location: values.location,
                 dateFrom: values.dateFrom,
                 dateTo: values.dateTo,

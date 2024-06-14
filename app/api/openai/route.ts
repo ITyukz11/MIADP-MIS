@@ -51,6 +51,13 @@ export async function POST(req: Request) {
                       tool_call_id: toolCall.id,
                       output: JSON.stringify(data),
                     };
+                  
+                  case 'get_user_data':
+                    const userData = await fetch('https://miadp-mis.vercel.app/api/auth/user').then((res) => res.json());
+                    return {
+                      tool_call_id: toolCall.id,
+                      output: JSON.stringify(userData),
+                    };
 
                   default:
                     throw new Error(`Unknown tool call function: ${toolCall.function.name}`);

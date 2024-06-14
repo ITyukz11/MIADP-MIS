@@ -12,7 +12,7 @@ export const CalendarOfActivitySchema = z.object({
   timeStart: z.string(),
   timeEnd: z.string(),
   allDay: z.boolean(),
-  participant: z.object({
+  participants: z.object({
     userId: z.string(),
   }).array(),
   preparatoryList: z.object({

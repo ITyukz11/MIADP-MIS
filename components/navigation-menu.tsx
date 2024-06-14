@@ -69,8 +69,8 @@ const ProcurementMenuData: { title: string; href: string; description: string }[
 
 export function NavigationMenuDemo() {
   return (
-    <NavigationMenu>
-      <NavigationMenuList>
+    <NavigationMenu className="flex-wrap">
+      <NavigationMenuList className="flex-wrap">
       <NavigationMenuItem>
           <Link href="/supports" legacyBehavior passHref>
             <NavigationMenuLink className={navigationMenuTriggerStyle()}>
@@ -78,9 +78,9 @@ export function NavigationMenuDemo() {
             </NavigationMenuLink>
           </Link>
         </NavigationMenuItem>
-        <NavigationMenuItem>
+        <NavigationMenuItem >
           <NavigationMenuTrigger className="flex gap-1"><TbGraph/> Finance Module</NavigationMenuTrigger>
-          <NavigationMenuContent>
+          <NavigationMenuContent className="flex flex-wrap">
             <ul className="grid gap-3 p-6 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
               {FinancialMenuData.map((data) => (
                 <ListItem

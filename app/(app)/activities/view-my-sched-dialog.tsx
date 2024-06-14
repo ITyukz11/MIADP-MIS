@@ -93,7 +93,7 @@ export const ViewMySchedDialog = (props: Props) => {
   const hiddenColumns = [
     'id',
     'authorizeOther',
-    'target_participant',
+    'targetParticipant',
     'activityDescription',
     'timeStart',
     'timeEnd',

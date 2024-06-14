@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Label } from "./ui/label"
-import { TbCloudDataConnection } from "react-icons/tb";
+import { TbCloudDataConnection } from "react-icons/tb"
 import { navLinks } from "@/config/nav-links"
 import { Badge } from "./ui/badge"
 import { useCurrentUser } from "./context/CurrentUserContext"
@@ -17,8 +17,9 @@ import { useCurrentUser } from "./context/CurrentUserContext"
 export function MobileNav() {
     const [open, setOpen] = React.useState(false)
     const pathname = usePathname()
-
-    const {currentUser} = useCurrentUser();
+    const router = useRouter()
+    const { currentUser } = useCurrentUser()
+    
     return (
         <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>
@@ -70,28 +71,30 @@ export function MobileNav() {
                     <div className="flex flex-col space-y-3">
 
                         {navLinks.map((link, index) => (
-                            <Link
+                            <MobileLink
                                 key={index}
                                 href={link.href}
+                                onOpenChange={setOpen}
                                 className={cn(
                                     "transition-colors hover:text-foreground/80",
                                     pathname === link.href ? "text-foreground" : "text-foreground/60"
                                 )}
                             >
                                 {link.text}
-                            </Link>
+                            </MobileLink>
                         ))}
                            {currentUser?.role == "ADMIN" &&
-          <Link
+          <MobileLink
             key={currentUser?.name}
             href='/admin/account'
+            onOpenChange={setOpen}
             className={cn(
               "transition-colors hover:text-foreground/80",
               pathname === '/admin/account' ? "text-foreground" : "text-foreground/60"
             )}
           >
             <Badge>Admin</Badge>
-          </Link>
+          </MobileLink>
         }
                     </div>
                     <div className="flex flex-col space-y-2">

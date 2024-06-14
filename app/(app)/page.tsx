@@ -16,6 +16,7 @@ import {
 import { CalendarDateRangePicker } from "@/components/dashboard/date-range-picker"
 import { Overview } from "@/components/dashboard/overview"
 import { Announcements } from "@/components/dashboard/announcements"
+import { Label } from "@/components/ui/label"
 
 
 export default function AnnouncementsPage() {
@@ -23,15 +24,20 @@ export default function AnnouncementsPage() {
     <div className="container relative">
       <div className="flex-col md:flex">
         <div className="flex-1 space-y-4 p-8 pt-6">
-          <div className="flex items-center justify-between space-y-2">
+          <div className="flex items-center justify-between space-y-2 flex-wrap">
             <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
-            <div className="flex items-center space-x-2">
-              <CalendarDateRangePicker />
+            <Label className='text-xs text-gray-500'>
+              ** All data here are still not real **
+            </Label>
+            <div className="flex items-center space-x-2 flex-wrap justify-center">
+              <div className="hidden sm:block">
+                <CalendarDateRangePicker />
+              </div>
               <Button>Download</Button>
             </div>
           </div>
           <Tabs defaultValue="overview" className="space-y-4">
-            <TabsList>
+            <TabsList className="hidden sm:flex w-fit">
               <TabsTrigger value="overview">Overview</TabsTrigger>
               <TabsTrigger value="analytics" disabled>
                 Analytics
@@ -135,8 +141,8 @@ export default function AnnouncementsPage() {
                   </CardContent>
                 </Card>
               </div>
-              <div className="w-full">
-                <Card className="col-span-4">
+              <div className="grid gap-4 grid-cols-1 md:grid-cols-3 lg:grid-cols-4 md:h-[500px]">
+                <Card className="shadow-lg h-full lg:col-span-3 md:col-span-2">
                   <CardHeader>
                     <CardTitle>Activities Type Chart</CardTitle>
                   </CardHeader>
@@ -144,17 +150,17 @@ export default function AnnouncementsPage() {
                     <Overview />
                   </CardContent>
                 </Card>
-                {/* <Card className="col-span-3">
+                <Card className="h-full shadow-lg overflow-hidden overflow-y-auto scrollbar-thin lg:col-span-1 md:col-span-1">
                   <CardHeader>
                     <CardTitle>Announcements</CardTitle>
                     <CardDescription>
-                      3 new announcement today.
+                      10 new announcements today.
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
                     <Announcements />
                   </CardContent>
-                </Card> */}
+                </Card>
               </div>
             </TabsContent>
           </Tabs>

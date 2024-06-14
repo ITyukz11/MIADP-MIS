@@ -26,7 +26,7 @@ export default async function AppLayout({ children }: AppLayoutProps) {
         <CurrentUserProvider initialUser={session.user as any}>
             <UsersProvider>
                 <CalendarOfActivityProvider>
-                    <div className="flex flex-col">
+                    <div className="flex flex-col min-w-[320px]">
                         <ErrorBoundary errorComponent={GlobalError}>
                             <SiteHeader />
                             <main className="flex-1 mt-4 mb-auto h-full min-w-[320px]">{children}</main>

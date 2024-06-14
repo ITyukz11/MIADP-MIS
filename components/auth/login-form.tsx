@@ -196,6 +196,13 @@ export const LoginForm = () => {
             <Button variant="outline" type="button" className=" hover:cursor-not-allowed w-full">
                 <FcGoogle className=" h-96 mr-2" /> Google
             </Button>
+            <div className="relative flex justify-center text-xs uppercase">
+                <Button 
+                    variant={'link'} 
+                    disabled={loading} 
+                    className="bg-background px-2 text-muted-foreground"
+                    onClick={()=> alert("Sorry, the forgot password feature is still under development.")}>Forgot password?</Button>
+            </div>
             {/* </CardWrapper> */}
         </div>
 

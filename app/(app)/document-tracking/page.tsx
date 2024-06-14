@@ -1,15 +1,21 @@
-/* eslint-disable react-hooks/rules-of-hooks */
 "use client";
-import { Textarea } from "@/components/ui/textarea";
-import { useChat } from "ai/react";
-import { Button } from "@/components/ui/button";
-import { Send } from "lucide-react";
-import { useRef } from "react";
+import { PageHeader, PageHeaderHeading, PageHeaderDescription } from "@/components/page-header";
 
 function page() {
   return (
-    <div >
-  </div>
+    <div className="xs:container relative">
+      <PageHeader>
+        <PageHeaderHeading>
+          Document Tracking
+        </PageHeaderHeading>
+
+        <div className=''>
+          <PageHeaderDescription>
+            This Document Tracking page is still under development. It will be available for use soon. Please be patient as PSO currently has only one programmer.
+          </PageHeaderDescription>
+        </div>
+      </PageHeader>
+    </div>
   );
 }
 

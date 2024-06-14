@@ -60,6 +60,16 @@ const changelogItems = [
   {
     "id": 5,
     "title": "Updates on Calendar of Activities",
+    "date": "2024-06-12",
+    "changes": [
+      { "id": 1, "change": "Fixed calendar layout to fit to light and dark mode" },
+      { "id": 2, "change": "Added initial data structure for messenger feature" },
+    ],
+    "comments": []
+  },
+  {
+    "id": 6,
+    "title": "Updates on Calendar of Activities",
     "date": "2024-06-13",
     "changes": [
       {

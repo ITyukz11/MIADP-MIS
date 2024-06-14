@@ -15,7 +15,7 @@ export function SiteFooter() {
           </a>
           . If you have any inquiries, please contact the{" "}
           <a
-            href='https://m.me/joseph.rico.56/'
+            href='https://m.me/nelson.faustino.33'
             target="_blank"
             rel="noreferrer"
             className="font-medium underline underline-offset-4"

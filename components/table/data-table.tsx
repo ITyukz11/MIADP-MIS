@@ -156,7 +156,7 @@ export function DataTable<TData extends { id: string }, TValue>({
   }, [rowSelection, table]);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 flex-wrap">
       <DataTableToolbar data={data} table={table} selectedRows={rowSelection} />
       <div className="rounded-md border">
         <Table>
@@ -188,7 +188,7 @@ export function DataTable<TData extends { id: string }, TValue>({
                   style={{ cursor: allowViewCalendar ? 'pointer' : 'default' }} // Conditional cursor style
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
+                    <TableCell key={cell.id} className="text-xs sm:text-sm">
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
                   ))}

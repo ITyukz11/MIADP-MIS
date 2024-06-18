@@ -2,7 +2,7 @@ import React from 'react'
 
 function page() {
   return (
-    <div className='container relative'>report page</div>
+    <div className='px-8 mx-auto relative'>report page</div>
   )
 }
 

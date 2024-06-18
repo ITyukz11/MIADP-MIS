@@ -70,7 +70,7 @@ export const ViewMyParticipatedSchedDialog = (props: Props) => {
     <>
       <Dialog>
         <DialogTrigger asChild>
-          <Button variant="outline" className='flex flex-row items-center gap-1 justify-center overflow-hidden'>
+          <Button variant="outline" className='flex flex-row items-center gap-1 justify-center overflow-hidden text-xs lg:text-sm'>
             <FaPeopleGroup className='shrink-0' /> View participated activities
           </Button>
         </DialogTrigger>

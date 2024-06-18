@@ -15,13 +15,17 @@ import {
 } from "@/components/ui/select";
 import { componentOptions, regionOptions, unitOptions } from '@/lib/data/filter';
 import { CalendarSheet } from '@/components/calendar-of-activity/CalendarSheet';
+import { useCurrentUser } from '@/components/context/CurrentUserContext';
 
 type Props = {}
 
 const Page = (props: Props) => {
   const [coaData, setCoaData] = useState<any[]>([]);
   const [filteredData, setFilteredData] = useState<any[]>([]);
-  const [selectedFilter, setSelectedFilter] = useState<string>('All');
+
+  const {currentUser} = useCurrentUser();
+  const [selectedFilter, setSelectedFilter] = useState(currentUser?.region);
+
   const [viewCalendarData, setViewCalendarData] = useState<any[]>([]);
   const [viewCalendar, setViewCalendar] = useState(false)
   const [selectedRowId, setSelectedRowId] = useState('');
@@ -82,12 +86,12 @@ const Page = (props: Props) => {
   ]; // Columns to hide
 
   return (
-    <div className='container relative'>
+    <div className='mx-auto px-8 relative'>
       <div className='flex flex-col flex-wrap w-full'>
         <div className='flex flex-row gap-2 overflow-x-auto w-full scrollbar-thin p-1'>
           <Select onValueChange={(value) => setSelectedFilter(value)}>
             <SelectTrigger className="w-fit">
-              <SelectValue placeholder="Select" />
+              <SelectValue placeholder={currentUser?.region? currentUser?.region:"Filter"} />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value='All'>All</SelectItem>

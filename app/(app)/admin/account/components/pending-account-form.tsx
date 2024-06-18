@@ -23,6 +23,10 @@ interface PendingAccountFormProps {
 }
 
 // Define the PendingAccountForm component
+const hiddenColumns = [
+  'color',
+  
+]
 export default function PendingAccountForm({ pendingUsers }: PendingAccountFormProps) {
   if (!pendingUsers) {
     return (
@@ -34,7 +38,7 @@ export default function PendingAccountForm({ pendingUsers }: PendingAccountFormP
 
   return (
     <div>
-      <DataTable data={pendingUsers} columns={columns} allowSelectRow={true}/>
+      <DataTable data={pendingUsers} columns={columns} allowSelectRow={true} hiddenColumns={hiddenColumns}/>
     </div>
   );
 }

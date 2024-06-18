@@ -8,31 +8,6 @@ import { PendingUserType } from "./schema"
 
 export const columns: ColumnDef<PendingUserType>[] = [
   {
-    id: "select",
-    header: ({ table }) => (
-      <Checkbox
-        checked={
-          table.getIsAllPageRowsSelected() ||
-          (table.getIsSomePageRowsSelected() && "indeterminate")
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-        className="translate-y-[2px]"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-        className="translate-y-[2px]"
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
-  },
-
-  {
     accessorKey: "name",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Name" />
@@ -57,6 +32,21 @@ export const columns: ColumnDef<PendingUserType>[] = [
         <div className="flex space-x-2">
           <span className="max-w-[500px] truncate font-medium">
             {row.getValue("component")}
+          </span>
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: "region",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Component" />
+    ),
+    cell: ({ row }) => {
+      return (
+        <div className="flex space-x-2">
+          <span className="max-w-[500px] truncate font-medium">
+            {row.getValue("region")}
           </span>
         </div>
       );
@@ -92,21 +82,21 @@ export const columns: ColumnDef<PendingUserType>[] = [
       );
     },
   },
-  {
-    accessorKey: "color",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Color" />
-    ),
-    cell: ({ row }) => {
-      return (
-        <div className="flex space-x-2">
-          <span className="max-w-[500px] truncate font-medium">
-            {row.getValue("color")}
-          </span>
-        </div>
-      );
-    },
-  },
+  // {
+  //   accessorKey: "color",
+  //   header: ({ column }) => (
+  //     <DataTableColumnHeader column={column} title="Color" />
+  //   ),
+  //   cell: ({ row }) => {
+  //     return (
+  //       <div className="flex space-x-2">
+  //         <span className="max-w-[500px] truncate font-medium">
+  //           {row.getValue("color")}
+  //         </span>
+  //       </div>
+  //     );
+  //   },
+  // },
   {
     accessorKey: "status",
     header: ({ column }) => (

@@ -15,24 +15,29 @@ export default function SettingsAccountPage() {
   const [pendingUsers, setPendingUsers] = useState<PendingUserType[] | null>(null);
   
   const [showAll, setShowAll] = useState(false)
+
   useEffect(() => {
     const fetchData = async () => {
       try {
-      
-          const data = await fetchPendingUsers();
-          setPendingUsers(data);
-          setFilteredPendingUsers(data.filter((user: PendingUserType) => user.status.toLocaleLowerCase() == "pending"));
-         
+        const data = await fetchPendingUsers();
+
+        const sortedData =data.sort((a:any, b:any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+        const filteredData = data.filter((user: PendingUserType) => user.status.toLowerCase() === "pending");
+        const sortedFilteredData = filteredData.sort((a:any, b:any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+        setPendingUsers(sortedData);
+        setFilteredPendingUsers(sortedFilteredData);
         setLoading(false);
       } catch (error) {
         console.error("Error fetching pending users:", error);
         setLoading(false);
       }
     };
-  
+
     fetchData();
   }, []);
-  
+    
   
 
 

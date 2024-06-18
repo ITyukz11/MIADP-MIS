@@ -38,18 +38,17 @@ interface DialogViewProps {
 function DialogView({ viewDatas, open, close}: DialogViewProps) {
   const [loading, setLoading] = useState(false); // Initialize loading state
   const form = useForm<z.infer<typeof RegisterSchema>>({
-
     resolver: zodResolver(RegisterSchema),
     defaultValues: {
       region: viewDatas.region,
       email: viewDatas.email,
-      component: viewDatas.unit,
+      component: viewDatas.component,
       unit: viewDatas.unit,
       position: viewDatas.position,
       fullname: viewDatas.name,
     }
   })
-
+console.log("viewDatas: ", viewDatas)
   const pendingUserData = [
     {
       name: "fullname" as "fullname",

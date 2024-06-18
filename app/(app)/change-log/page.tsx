@@ -112,7 +112,7 @@ const changelogItems = [
 const sortedChangelogItems = [...changelogItems].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 const ChangelogPage: React.FC = () => {
   return (
-    <div className="container relative md:px-56">
+    <div className="px-8 mx-auto flex justify-center relative md:px-56">
     <PageHeader>
       <PageHeaderHeading>MIADP MIS System Updates</PageHeaderHeading>
       <PageHeaderDescription>

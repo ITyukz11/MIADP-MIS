@@ -1,6 +1,6 @@
   .fc .fc-toolbar,
   .fc .fc-header-toolbar {
-    @apply text-sm font-light p-2;
+    @apply text-xs sm:text-sm  font-light p-2 flex flex-wrap justify-center gap-1 lg:justify-between;
   }
 
 .fc .fc-button {
@@ -20,7 +20,7 @@
   }
 
   .fc .fc-toolbar-title{
-    @apply text-base md:text-xl
+    @apply text-xs sm:text-base md:text-xl
   }
   .fc .fc-list-button,
   .fc .fc-timeGridDay-button,
@@ -46,8 +46,38 @@
     @apply dark:bg-[#020817]
   }
 
+
+  .fc .fc-multimonth-header-table,
+  .fc .fc-scrollgrid-section-header{
+    @apply dark:bg-[#020817] bg-[#F2F2F2]
+  }
+
+  .fc-multimonth-title{
+    @apply dark:bg-[#020817] bg-[#dfdfdf]
+  }
+
   .fc-list-event{
     @apply dark:hover:text-black
   }
 
-  
+  .fc{
+    @apply text-xs sm:text-sm
+  }
+
+  .fc .fc-scroller{
+    @apply scrollbar-none
+  }
+  .fc .fc-daygrid-day-frame,
+  .fc .fc-scrollgrid-sync-inner{
+    @apply h-fit
+  }
+
+
+  .fc .fc-h-event,
+  .fc .fc-event-time{
+    @apply overflow-visible
+  }
+
+  .fc .fc-scroller-liquid-absolute{
+    @apply relative
+  }

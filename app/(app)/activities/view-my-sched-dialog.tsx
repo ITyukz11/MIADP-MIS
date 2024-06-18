@@ -103,7 +103,7 @@ export const ViewMySchedDialog = (props: Props) => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="outline" className='flex flex-row items-center gap-1 justify-center overflow-hidden'>
+        <Button variant="outline" className='flex flex-row items-center gap-1 justify-center overflow-hidden text-xs lg:text-sm'>
           <FaCalendarAlt className='shrink-0' /> View encoded activities
         </Button>
       </DialogTrigger>

@@ -40,14 +40,29 @@ export const pendinguser = async (values: z.infer<typeof RegisterSchema>): Promi
                 'Legal':'#A64D79',
                 'Secretary':'#674EA7'
               };
+
+              const regionColors: ColorMapping ={
+                'PSO':'#C80000',
+                'RPCO 9':'#ffc124',
+                'RPCO 10':'#9117c2',
+                'RPCO 11':'#0173bc',
+                'RPCO 12':'#ff6f00',
+                'RPCO 13':'#ff0090',
+                'BARMM':'#3cb54b'
+              }
               
               let color = "";
               
-              if (values.component in componentColors) {
-                color = componentColors[values.component];
-              } else if (values.unit in unitColors) {
-                color = unitColors[values.unit];
-              }
+            //   if (values.component in componentColors) {
+            //     color = componentColors[values.component];
+            //   } else if (values.unit in unitColors) {
+            //     color = unitColors[values.unit];
+            //   }
+
+            if(values.region in regionColors){
+                color=regionColors[values.region]
+            }
+            
             const hashedPassword = await bcrypt.hash(values.password, 10);
             const response = await axios.post('/api/auth/pending-users', {
                 region: values.region,

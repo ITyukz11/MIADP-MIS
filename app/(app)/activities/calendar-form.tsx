@@ -7,14 +7,14 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { zodResolver } from '@hookform/resolvers/zod'
-import React, { useEffect, useState, useTransition } from 'react'
+import React, { useCallback, useEffect, useRef, useState, useTransition } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { DatePicker } from 'antd';
 import { TimePicker } from 'antd';
 import dayjs from 'dayjs'
 import { CalendarOfActivitySchema } from '@/schemas/calendar-of-activity'
-import { FaMinus, FaPlus } from 'react-icons/fa'
+import { FaMinus, FaPlus, FaTrash } from 'react-icons/fa'
 import { Separator } from '@/components/ui/separator'
 import { Select, SelectItem, SelectTrigger, SelectValue, SelectContent } from '@/components/ui/select'
 
@@ -33,6 +33,7 @@ import { regionOptions } from '@/lib/data/filter'
 import { MdPeopleAlt } from 'react-icons/md'
 import { Upload } from 'lucide-react'
 import { Label } from '@/components/ui/label'
+import { FancyMultiSelect, Framework } from '@/components/MultiSelect'
 
 type Props = {
     setDialogClose: () => void
@@ -43,7 +44,9 @@ const CalendarForm = ({ setDialogClose }: Props) => {
     const { currentUser } = useCurrentUser();
 
     const [filteredUsersData, setFilteredUsersData] = useState<User[]>([]);
-    const [selectedParticipants, setSelectedParticipants] = useState(['']);
+    const [selectedParticipants, setSelectedParticipants] = useState<String[]>([]);
+
+    const [multiSelectUsersDropdownData, setMultiSelectUsersDropdownData] = useState<Framework[]>([])
 
     const [isPending, startTransition] = useTransition();
     const [loadingForm, setLoadingForm] = useState(false); // Initialize loadingForm state
@@ -51,13 +54,9 @@ const CalendarForm = ({ setDialogClose }: Props) => {
     const [error, setError] = useState<string | undefined>("");
     const [success, setSuccess] = useState<string | undefined>("");
 
-    const [numOfPreparatoryList, setNumOfPreparatoryList] = useState(1)
-
     const [allDayChecked, setAllDayChecked] = useState(false)
 
     const { RangePicker } = DatePicker;
-
-    const [includeAllRegions, setIncludeAllRegions] = useState(false)
 
     const { loading, fetchActivitiesData } = useCalendarOfActivityContext();
 
@@ -65,9 +64,6 @@ const CalendarForm = ({ setDialogClose }: Props) => {
 
     const [participantError, setParticipantError] = useState(false)
     const [preparatoryError, setPreparatoryError] = useState(false)
-
-    console.log("usersData: ", usersData)
-    console.log("usersData, currentUser: ", currentUser)
 
     const form = useForm<z.infer<typeof CalendarOfActivitySchema>>({
         resolver: zodResolver(CalendarOfActivitySchema),
@@ -83,7 +79,7 @@ const CalendarForm = ({ setDialogClose }: Props) => {
             timeStart: '',
             timeEnd: '',
             allDay: false,
-            participants: [{ userId: '' }],
+            participants: [],
             color: '#F5222D',
             status: '', // default value specified in the schema
             preparatoryList: [{ description: '', status: '', remarks: '' }],
@@ -138,24 +134,37 @@ const CalendarForm = ({ setDialogClose }: Props) => {
 
         let participantError = false;
         let preparatoryError = false;
-    
-        values.participants.forEach((info) => {
-            if (info.userId.trim() === '') {
-                participantError = true;
-            }
-        });
-    
+
+        const participants = selectedParticipants.map((participantId) => ({
+            userId: participantId.toString(),
+        }));
+
+        values.participants = participants;
+
+        console.log("Updated values with participants: ", values.participants);
+
+
+        if (values.participants.length > 0) {
+            values.participants.forEach((info) => {
+                if (info.userId.trim() === '') {
+                    participantError = true;
+                }
+            });
+        } else {
+            participantError = true; // If no participants are selected
+        }
+
         values.preparatoryList.forEach((info) => {
             if (info.description.trim() === '' || info.status.trim() === '') {
                 preparatoryError = true;
             }
         });
-    
+
         if (participantError) {
             setParticipantError(true);
             return;
         }
-    
+
         if (preparatoryError) {
             setPreparatoryError(true);
             alert("Preparatory list contains blank data. Please fill out all fields.");
@@ -242,7 +251,6 @@ const CalendarForm = ({ setDialogClose }: Props) => {
         }
     };
 
-
     const handleRangePickerChange = (value: any) => {
         if (value && Array.isArray(value) && value.length === 2) {
             const [startDate, endDate] = value.map((date: any) => dayjs(date).toISOString());
@@ -292,16 +300,28 @@ const CalendarForm = ({ setDialogClose }: Props) => {
         }
     };
 
+    const convertUsersToDropdownData = (users: User[]) => {
+        return users.map(user => ({ value: user.id, label: `${user.region} - ${user.name}` }));
+    };
+
     useEffect(() => {
         const filteredUsersData = filterRegion === 'All'
             ? usersData
             : usersData.filter(user => user.region === filterRegion);
 
+        const multiSelectUsersDropdownData = convertUsersToDropdownData(filteredUsersData)
+        setMultiSelectUsersDropdownData(multiSelectUsersDropdownData)
         setFilteredUsersData(filteredUsersData);
     }, [currentUser?.region, usersData, filterRegion]);
 
-
     const participants = watch('participants');
+
+    useEffect(() => {
+        const selectedIds = participants.map(participant => participant.userId);
+        setSelectedParticipants(selectedIds);
+    }, [participants]);
+
+    // const participants = watch('participants');
 
     //    useEffect(() => {
     //         const selectedIds = participants.map(participant => participant.userId);
@@ -309,11 +329,25 @@ const CalendarForm = ({ setDialogClose }: Props) => {
     //     }, [participants]);
 
     //const [background, setBackground] = useState('#B4D455')
+
+
+    // const [multiSelectFunctions, setMultiSelectFunctions] = useState<{
+    //     clear: () => void;
+    //     selectAll: () => void;
+    //   } | null>(null);
+
+    //   const handleSetMultiSelectFunction = (funcs: { clear: () => void; selectAll: () => void }) => {
+    //     setMultiSelectFunctions(() => funcs);
+    //   };
+
+    const clearFunctionRef = useRef<() => void | null>(null);
+    const selectAllFunctionRef = useRef<() => void | null>(null);
+
     return (
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 w-full" autoComplete="off">
-                <div className="space-y-4 w-full">
-                    <div className='flex flex-row gap-2 w-full'>
+                <div className="space-y-4 w-full flex flex-col flex-wrap">
+                    <div className='flex flex-row gap-2 w-full flex-wrap'>
                         <FormField
                             control={form.control}
                             name="activityTitle"
@@ -365,30 +399,30 @@ const CalendarForm = ({ setDialogClose }: Props) => {
                             <FormItem className='w-full'>
                                 <FormLabel className='flex flex-row gap-1 text-xs sm:text-sm'>Activity Description<FormMessage /></FormLabel>
                                 <FormControl>
-                                    <Textarea {...field} disabled={loadingForm}  className='text-xs sm:text-sm' placeholder="Type your description here." />
+                                    <Textarea {...field} disabled={loadingForm} className='text-xs sm:text-sm' placeholder="Type your description here." />
                                 </FormControl>
                             </FormItem>
                         )}
                     />
-                    <div className='grid grid-cols-3 gap-2'>
+                    <div className='flex flex-row flex-wrap sm:grid grid-cols-3 gap-2'>
                         <FormField
                             control={form.control}
                             name='type'
                             render={({ field }) => (
-                                <FormItem className='mt-auto'>
+                                <FormItem className='mt-auto w-full'>
                                     <FormLabel className='flex flex-row gap-1 text-xs sm:text-sm'>Type<FormMessage /></FormLabel>
                                     <FormControl>
                                         <Select {...field} onValueChange={field.onChange} defaultValue={field.value} disabled={loadingForm}>
                                             <FormControl
                                                 className="text-xs sm:text-sm">
                                                 <SelectTrigger>
-                                                    <SelectValue placeholder="Select a type"/>
+                                                    <SelectValue placeholder="Select a type" />
                                                 </SelectTrigger>
                                             </FormControl>
                                             <SelectContent>
                                                 {TypeData.map((option, index) => (
-                                                    <SelectItem key={index} 
-                                                        value={option.value || 'default_value'} 
+                                                    <SelectItem key={index}
+                                                        value={option.value || 'default_value'}
                                                         disabled={loadingForm}
                                                         className="text-xs sm:text-sm">{option.label}</SelectItem>
                                                 ))}
@@ -402,8 +436,8 @@ const CalendarForm = ({ setDialogClose }: Props) => {
                             control={form.control}
                             name="targetParticipant"
                             render={({ field }) => (
-                                <FormItem className='mt-auto'>
-                                       <FormLabel className='flex flex-row gap-1 text-xs sm:text-sm flex-nowrap'>Target Participant<FormMessage /></FormLabel>
+                                <FormItem className='mt-auto w-full'>
+                                    <FormLabel className='flex flex-row gap-1 text-xs sm:text-sm flex-nowrap'>Target Participant<FormMessage /></FormLabel>
                                     <FormControl>
                                         <Input {...field} disabled={loadingForm} className='text-xs sm:text-sm' placeholder="ex. IPS, IPO, LPMIU, RPCO, PSO, etc." />
                                     </FormControl>
@@ -414,7 +448,7 @@ const CalendarForm = ({ setDialogClose }: Props) => {
                             control={form.control}
                             name="location"
                             render={({ field }) => (
-                                <FormItem className='mt-auto'>
+                                <FormItem className='mt-auto w-full'>
                                     <FormLabel className='flex flex-row gap-1 text-xs sm:text-sm'>Location<FormMessage /></FormLabel>
                                     <FormControl>
                                         <Input {...field} disabled={loadingForm} className='text-xs sm:text-sm' placeholder="ex. World Palace, Ecoland, Davao City" />
@@ -424,7 +458,7 @@ const CalendarForm = ({ setDialogClose }: Props) => {
                         />
 
                     </div>
-                    <div className='flex flex-row gap-2 item-start'>
+                    <div className='flex flex-row gap-2 item-start flex-wrap'>
                         <div className='flex flex-row items-center justify-start gap-1 mt-5'>
                             <Checkbox checked={allDayChecked} onClick={() => setAllDayChecked(!allDayChecked)} disabled={loadingForm} />
                             <label
@@ -486,30 +520,30 @@ const CalendarForm = ({ setDialogClose }: Props) => {
 
                     </div>
                     <Separator />
-                    <FormLabel className='flex flex-row gap-2 justify-between items-centers'>
+                    <FormLabel className='flex flex-row gap-2 justify-between items-center'>
                         <div className='flex flex-row gap-2 items-center'>
                             <label
-                                className='font-bold md:text-xl'
-                                style={participantError ? { color: '#f04d44' } : {}}
+                                className='font-bold md:text-xl mr-auto hidden sm:block'
+                                style={participantError ? { color: '#f04d44' } : {}}    
                             >
                                 Participants {participantError && '*'}
                             </label>
 
                             <FormDescription className='items-center hidden sm:flex'>
-                                Please press the plus (+) button when adding new participant, (-) to remove
+                                Please press (All) to select all participants, (trash icon) to remove all
                             </FormDescription>
                         </div>
-                        <div className='flex flex-row gap-2 justify-end items-center'>
+                        <div className='flex flex-row gap-2 justify-center sm:justify-end items-center w-full sm:w-fit'>
                             <Badge className='flex flex-row gap-1 justify-center items-center'><MdPeopleAlt />{filteredUsersData.length}</Badge>
                             <Select onValueChange={setFilterRegion} defaultValue={filterRegion} disabled={loadingForm}>
                                 <SelectTrigger className='text-xs sm:text-sm'>
-                                    <SelectValue placeholder="Filter"/>
+                                    <SelectValue placeholder="Filter" />
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value='All' className='text-xs sm:text-sm'>All</SelectItem>
                                     {regionOptions.map((option, index) => (
-                                        <SelectItem 
-                                            key={index} 
+                                        <SelectItem
+                                            key={index}
                                             value={option}
                                             className="text-xs sm:text-sm">{option}</SelectItem>
                                     ))}
@@ -518,12 +552,35 @@ const CalendarForm = ({ setDialogClose }: Props) => {
                             {/* <Button variant='outline' type='button' onClick={()=> setIncludeAllRegions(!includeAllRegions)}>
                                <div className='h-5 w-5 rounded-full'>{filteredUsersData.length}</div> {includeAllRegions?'Filter own region':'Load all regions'} 
                             </Button> */}
-                            <Badge variant='secondary'>{participantFields.length}</Badge>
-                            <Button type='button' size={'sm'} disabled={loadingForm} onClick={() => appendParticipant({ userId: '' })}>
-                                <FaPlus />
+                            <Badge className='flex flex-row gap-1 justify-center items-center' variant='secondary'><MdPeopleAlt />{selectedParticipants.length}</Badge>
+                            <Button
+                                variant={'destructive'}
+                                type='button' size={'sm'}
+                                disabled={loadingForm || selectedParticipants.length == 0}
+                                onClick={() => {
+                                    if (clearFunctionRef.current) clearFunctionRef.current();
+                                }}>
+                                <FaTrash />
+                            </Button>
+                            <Button
+                                type='button'
+                                size={'sm'}
+                                disabled={loadingForm}
+                                onClick={() => {
+                                    if (selectAllFunctionRef.current) selectAllFunctionRef.current();
+                                }}>
+                                All
                             </Button>
                         </div>
                     </FormLabel>
+                    <FancyMultiSelect
+                        data={multiSelectUsersDropdownData}
+                        onSelectionChange={(selected) => setSelectedParticipants(selected)}
+                        clearFunctionRef={clearFunctionRef}
+                        selectAllFunctionRef={selectAllFunctionRef}
+                        disabled={loadingForm}
+                    />
+
                     {participantFields.map((field, index) => (
                         <div key={field.id} className="flex flex-row gap-2 items-end w-full">
                             <FormField
@@ -595,7 +652,7 @@ const CalendarForm = ({ setDialogClose }: Props) => {
                     <Separator />
                     <FormLabel className='flex flex-row gap-2 justify-between items-centers'>
                         <div className='flex flex-row gap-2 items-center'>
-                        <label
+                            <label
                                 className='font-bold md:text-xl'
                                 style={preparatoryError ? { color: '#f04d44' } : {}}
                             >
@@ -605,8 +662,8 @@ const CalendarForm = ({ setDialogClose }: Props) => {
                                 Please press the plus (+) button when adding new preparatory list, (-) to remove
                             </FormDescription>
                         </div>
-                        <div className='flex flex-row gap-2 justify-end'>
-                            <Badge variant='secondary'>{preparatoryListFields.length}</Badge>
+                        <div className='flex flex-row gap-2 justify-end items-center'>
+                            <Badge variant='secondary' className='h-fit'>{preparatoryListFields.length}</Badge>
                             <Button type='button' size={'sm'} disabled={loadingForm} onClick={() => appendPreparatoryList({ description: '', status: '', remarks: '' })}>
                                 <FaPlus />
                             </Button>
@@ -641,10 +698,10 @@ const CalendarForm = ({ setDialogClose }: Props) => {
                                                 </FormControl>
                                                 <SelectContent>
                                                     {PreparatoryActivityStatus.map((option, index) => (
-                                                        <SelectItem 
-                                                            key={index} 
-                                                            value={option.value || 'default_value'} 
-                                                            disabled={loadingForm} 
+                                                        <SelectItem
+                                                            key={index}
+                                                            value={option.value || 'default_value'}
+                                                            disabled={loadingForm}
                                                             className='cursor-pointer text-xs sm:text-sm'>
                                                             <Badge variant={'outline'}>{option.label}</Badge>
                                                         </SelectItem>
@@ -699,7 +756,7 @@ const CalendarForm = ({ setDialogClose }: Props) => {
                             )}
                         />
                         <div className='ml-auto'>
-                            <Button disabled size={'sm'}><Upload/></Button>
+                            <Button disabled size={'sm'}><Upload /></Button>
 
                         </div>
                     </div>
@@ -711,7 +768,7 @@ const CalendarForm = ({ setDialogClose }: Props) => {
                             <FormItem className='w-full'>
                                 <FormLabel className='flex flex-row gap-1 text-xs sm:text-sm'>Remarks <Label className=' font-extralight text-xs sm:text-sm'> (Optional)</Label></FormLabel>
                                 <FormControl>
-                                    <Textarea {...field} disabled={loadingForm}  className='text-xs sm:text-sm' placeholder="Type your remarks here." />
+                                    <Textarea {...field} disabled={loadingForm} className='text-xs sm:text-sm' placeholder="Type your remarks here." />
                                 </FormControl>
                             </FormItem>
                         )}

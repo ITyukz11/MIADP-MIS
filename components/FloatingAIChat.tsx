@@ -37,7 +37,7 @@ export default function FloatingAIChat() {
                         Ask AI
                     </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-[30rem] h-[35rem] p-0 rounded-lg shadow-lg flex flex-col mr-4">
+                <PopoverContent className="w-[99%] sm:w-[30rem] h-[35rem] p-0 rounded-lg shadow-lg flex flex-col sm:mr-4">
                     <div className="flex justify-between items-center p-4 rounded-t-lg">
                         <div className='flex flex-row gap-1 items-center'>
                             <Image
@@ -108,14 +108,15 @@ export default function FloatingAIChat() {
 
                         {!input && messages.length == 0 && (
                             <div className="absolute inset-y-0 left-4 ml-4 flex items-center pointer-events-none">
-                                <Label className=' text-gray-500'>
+                                <Label className='text-gray-500'>
                                     <Typewriter
                                         words={[
+                                            'Hi!',
                                             'Ask me anything...',
                                             'What is MIADP?',
+                                            'Unsa ang MIADP?',
+                                            'Ano ang MIADP?',
                                             'Need assistance? Just ask!',
-                                            'Want to know the 4 components?',
-                                            'Feel free to ask any question...',
                                         ]}
                                         loop={5}
                                         cursor
@@ -131,7 +132,7 @@ export default function FloatingAIChat() {
                             disabled={isInputDisabled}
                             value={input}
                             onChange={handleInputChange}
-                            className="border rounded-l-md focus:outline-none focus:ring-2 bg-transparent"
+                            className="border rounded-l-md focus:outline-none focus:ring-2 bg-transparent overflow-hidden"
                         />
                         <Button
                             type="submit"

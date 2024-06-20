@@ -86,7 +86,7 @@ const Page = (props: Props) => {
   ]; // Columns to hide
 
   return (
-    <div className='mx-auto px-8 relative'>
+    <div className='mx-auto px-2 sm:px-8 relative'>
       <div className='flex flex-col flex-wrap w-full'>
         <div className='flex flex-row gap-2 overflow-x-auto w-full scrollbar-thin p-1'>
           <Select onValueChange={(value) => setSelectedFilter(value)}>

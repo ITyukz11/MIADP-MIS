@@ -3,7 +3,7 @@ import React from 'react'
 
 function page() {
   return (
-    <div className='px-8 mx-auto flex justify-center w-full relative'>users page</div>
+    <div className='px-2 sm:px-8 mx-auto flex justify-center w-full relative'>users page</div>
   )
 }
 

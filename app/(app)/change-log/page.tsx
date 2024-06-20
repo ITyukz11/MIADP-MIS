@@ -106,13 +106,23 @@ const changelogItems = [
       }
     ],
     "comments": []
-  }
+  },
+  {
+    "id": 7,
+    "title": "Updates on Calendar of Activities",
+    "date": "2024-06-18",
+    "changes": [
+      { "id": 1, "change": "Modified color code activities, now its based on assigned regions" },
+      { "id": 2, "change": "Fixed layout for wider screens" },
+    ],
+    "comments": []
+  },
   
 ];
 const sortedChangelogItems = [...changelogItems].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 const ChangelogPage: React.FC = () => {
   return (
-    <div className="px-8 mx-auto flex justify-center relative md:px-56">
+    <div className="px-2 sm:px-8 mx-auto flex justify-center relative md:px-56 flex-col">
     <PageHeader>
       <PageHeaderHeading>MIADP MIS System Updates</PageHeaderHeading>
       <PageHeaderDescription>

@@ -21,7 +21,7 @@ import { Label } from "@/components/ui/label"
 
 export default function AnnouncementsPage() {
   return (
-    <div className="mx-10 my-5 relative">
+    <div className="px-2 sm:mx-10 my-5 relative">
       <div className="flex-col md:flex">
         <div className="flex-1 space-y-4">
           <div className="flex items-center justify-between space-y-2 flex-wrap">

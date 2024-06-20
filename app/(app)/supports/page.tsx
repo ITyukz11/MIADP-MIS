@@ -37,7 +37,7 @@ export default function Page() {
   console.log("WPFACTIVITY: ",WPFActivityData)
 
   return (
-    <div className='container relative'>
+    <div className='w-full px-2 sm:px-8 relative'>
       <div>
         <NavigationMenuDemo />
       </div>

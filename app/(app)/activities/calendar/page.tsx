@@ -325,7 +325,7 @@ const page = () => {
     };
 
     return (
-        <div className='px-8 mx-auto w-full relative'>
+        <div className='px-2 sm:px-8 mx-auto w-full relative'>
             <div className="flex flex-col py-2 md:flex-row gap-2 flex-wrap md:flex-nowrap overflow-hidden justify-center"
                 style={{
                     ...{ height: cardHeight ? `${cardHeight}px` : 'auto' },

@@ -18,7 +18,7 @@ export const formatTime = (timeString: string) => {
   const timePattern = /^([01]?\d|2[0-3]):([0-5]\d)$/;
   if (timePattern.test(timeString)) {
     const [hours, minutes] = timeString.split(':').map(Number);
-    const amOrPm = hours >= 12 ? 'PM' : 'AM';
+    const amOrPm = hours >= 12 ? 'pm' : 'am';
     const formattedHours = hours % 12 || 12; // Convert to 12-hour format
     const formattedMinutes = minutes < 10 ? '0' + minutes : minutes;
     return `${formattedHours}:${formattedMinutes} ${amOrPm}`;
@@ -29,7 +29,7 @@ export const formatTime = (timeString: string) => {
   if (!isNaN(date.getTime())) {
     const hours = date.getHours();
     const minutes = date.getMinutes();
-    const amOrPm = hours >= 12 ? 'PM' : 'AM';
+    const amOrPm = hours >= 12 ? 'pm' : 'am';
     const formattedHours = hours % 12 || 12; // Convert to 12-hour format
     const formattedMinutes = minutes < 10 ? '0' + minutes : minutes;
     return `${formattedHours}:${formattedMinutes} ${amOrPm}`;

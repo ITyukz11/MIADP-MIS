@@ -74,8 +74,8 @@ const CalendarForm = ({ setDialogClose }: Props) => {
             targetParticipant: '',
             location: '', // optional field, can be omitted if you don't want a default value
             type: '',
-            dateFrom: dayjs().toString(),
-            dateTo: dayjs().toString(),
+            dateFrom: dayjs().format('YYYY/MM/DD'),
+            dateTo: dayjs().format('YYYY/MM/DD'),
             timeStart: '',
             timeEnd: '',
             allDay: false,
@@ -110,7 +110,6 @@ const CalendarForm = ({ setDialogClose }: Props) => {
     });
 
     const onSubmit = async (values: z.infer<typeof CalendarOfActivitySchema>) => {
-        console.log("submit values: ", values)
         const today = new Date();
         const todayFormatted = new Date(today.getFullYear(), today.getMonth(), today.getDate());
         let status = 'Upcoming';
@@ -141,9 +140,6 @@ const CalendarForm = ({ setDialogClose }: Props) => {
 
         values.participants = participants;
 
-        console.log("Updated values with participants: ", values.participants);
-
-
         if (values.participants.length > 0) {
             values.participants.forEach((info) => {
                 if (info.userId.trim() === '') {
@@ -172,6 +168,8 @@ const CalendarForm = ({ setDialogClose }: Props) => {
         }
 
         values.status = status
+        values.dateFrom = values.dateFrom.split('T')[0],
+        values.dateTo = values.dateTo.split('T')[0],
 
         setError("")
         setSuccess("")
@@ -251,19 +249,25 @@ const CalendarForm = ({ setDialogClose }: Props) => {
         }
     };
 
+    const addOneDay = (date: string): string => {
+        return dayjs(date).add(1, 'day').toISOString().split('T')[0];
+    };
+    
     const handleRangePickerChange = (value: any) => {
         if (value && Array.isArray(value) && value.length === 2) {
             const [startDate, endDate] = value.map((date: any) => dayjs(date).toISOString());
+    
+            // Add one day to startDate and endDate
+            const newStartDate = addOneDay(startDate);
+            const newEndDate = addOneDay(endDate);
+    
+            form.setValue('dateFrom', newStartDate);
+            form.setValue('dateTo', newEndDate);
 
-            form.setValue('dateFrom', startDate);
-            form.setValue('dateTo', endDate);
-
-            console.log("startDate: ", startDate);
-            console.log("endDate: ", endDate);
         } else {
             // Clear the value if no range is selected
-            form.setValue('dateFrom', '');
-            form.setValue('dateTo', '');
+            form.setValue('dateFrom', dayjs().format('YYYY/MM/DD'));
+            form.setValue('dateTo', dayjs().format('YYYY/MM/DD'),);
         }
     };
 
@@ -271,10 +275,12 @@ const CalendarForm = ({ setDialogClose }: Props) => {
         if (value) {
             const date = dayjs(value); // Convert the input value to a Day.js object
             const formattedDate = date.toISOString(); // Format the date as per ISO 8601
-
-            form.setValue('dateFrom', formattedDate);
-            form.setValue('dateTo', formattedDate);
-            console.log(formattedDate);
+    
+            // Add one day to the date
+            const newDate = addOneDay(formattedDate);
+    
+            form.setValue('dateFrom', newDate);
+            form.setValue('dateTo', newDate);
         } else {
             // Clear the value if no range is selected
             form.setValue('dateFrom', '');
@@ -291,8 +297,6 @@ const CalendarForm = ({ setDialogClose }: Props) => {
             form.setValue('timeStart', formattedStartTime);
             form.setValue('timeEnd', formattedEndTime);
 
-            console.log('timeStart', formattedStartTime);
-            console.log('timeEnd', formattedEndTime);
         } else {
             // Clear the value if no range is selected
             form.setValue('timeStart', '');
@@ -321,28 +325,15 @@ const CalendarForm = ({ setDialogClose }: Props) => {
         setSelectedParticipants(selectedIds);
     }, [participants]);
 
-    // const participants = watch('participants');
-
-    //    useEffect(() => {
-    //         const selectedIds = participants.map(participant => participant.userId);
-    //         setSelectedParticipants(selectedIds);
-    //     }, [participants]);
-
-    //const [background, setBackground] = useState('#B4D455')
-
-
-    // const [multiSelectFunctions, setMultiSelectFunctions] = useState<{
-    //     clear: () => void;
-    //     selectAll: () => void;
-    //   } | null>(null);
-
-    //   const handleSetMultiSelectFunction = (funcs: { clear: () => void; selectAll: () => void }) => {
-    //     setMultiSelectFunctions(() => funcs);
-    //   };
-
     const clearFunctionRef = useRef<() => void | null>(null);
     const selectAllFunctionRef = useRef<() => void | null>(null);
 
+    const handleAllDayChecked = ()=>{
+        setAllDayChecked(!allDayChecked)
+        form.setValue('dateFrom', dayjs().format('YYYY/MM/DD'));
+        form.setValue('timeStart', '');
+        form.setValue('timeEnd', '');
+    }
     return (
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 w-full" autoComplete="off">
@@ -460,7 +451,7 @@ const CalendarForm = ({ setDialogClose }: Props) => {
                     </div>
                     <div className='flex flex-row gap-2 item-start flex-wrap'>
                         <div className='flex flex-row items-center justify-start gap-1 mt-5'>
-                            <Checkbox checked={allDayChecked} onClick={() => setAllDayChecked(!allDayChecked)} disabled={loadingForm} />
+                            <Checkbox checked={allDayChecked} onClick={handleAllDayChecked} disabled={loadingForm} />
                             <label
                                 htmlFor="allday"
                                 className="text-xs sm:text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 whitespace-nowrap">
@@ -472,11 +463,12 @@ const CalendarForm = ({ setDialogClose }: Props) => {
                                 control={form.control}
                                 name="dateTo"
                                 render={({ field }) => (
-                                    <FormItem className='flex flex-col mt-auto w-full'>
+                                    <FormItem className='flex flex-col mt-auto w-fit'>
                                         <FormLabel className='text-xs sm:text-sm'>Planned Date Range</FormLabel>
                                         <RangePicker
                                             className='text-xs sm:text-sm'
                                             defaultValue={[dayjs(), null]}
+                                            format={'YYYY/MM/DD'}
                                             onChange={(value) => handleRangePickerChange(value)}
                                             disabled={loadingForm}
                                         />
@@ -549,9 +541,7 @@ const CalendarForm = ({ setDialogClose }: Props) => {
                                     ))}
                                 </SelectContent>
                             </Select>
-                            {/* <Button variant='outline' type='button' onClick={()=> setIncludeAllRegions(!includeAllRegions)}>
-                               <div className='h-5 w-5 rounded-full'>{filteredUsersData.length}</div> {includeAllRegions?'Filter own region':'Load all regions'} 
-                            </Button> */}
+           
                             <Badge className='flex flex-row gap-1 justify-center items-center' variant='secondary'><MdPeopleAlt />{selectedParticipants.length}</Badge>
                             <Button
                                 variant={'destructive'}

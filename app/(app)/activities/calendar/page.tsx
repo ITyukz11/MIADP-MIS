@@ -41,6 +41,7 @@ import { useCurrentUser } from '@/components/context/CurrentUserContext';
 import { OpenInNewWindowIcon } from '@radix-ui/react-icons';
 import Link from 'next/link';
 import { FullscreenIcon } from 'lucide-react';
+import dayjs from 'dayjs';
 
 interface Event {
     id: string;
@@ -323,6 +324,9 @@ const page = () => {
             cardRef.current.focus();
         }
     };
+    const subtractOneDay = (dateString: string): string => {
+        return dayjs(dateString).subtract(1, 'day').format('YYYY-MM-DD');
+    };
 
     return (
         <div className='px-2 sm:px-8 mx-auto w-full relative'>
@@ -368,16 +372,14 @@ const page = () => {
                                     filteredUpcomingEvents.length > 0 ? filteredUpcomingEvents
                                         .slice(0, 10) // Limit to top 10 events
                                         .map((event: any) => {
-                                            const startDate = new Date(event.start);
-                                            const endDate = new Date(event.end);
-                                            const timeStart = new Date(event.timeStart)
-                                            const timeEnd = new Date(event.timeEnd)
+                                            const startDate = formatDate(event.start);
+                                            const endDate = formatDate(subtractOneDay(event.end));
                                                 
                                             // Format the date and time
-                                            const startDateString = startDate.toLocaleDateString(); // Get date string
+                                           
                                             // const startTimeString = timeStart.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); // Get time string without seconds
                                             const startTimeString = formatTime(event.timeStart);
-                                            const endDateString = endDate.toLocaleDateString(); // Get date string
+                                           
                                             // const endTimeString = timeEnd.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); // Get time string without seconds
                                             const endTimeString = formatTime(event.timeEnd)
                                             return (
@@ -391,11 +393,13 @@ const page = () => {
                                                             {/** - ${endDateString} ${endTimeString} */}
                                                             <div className='flex gap-3 flex-row flex-wrap'>
                                                                 {/* <Label className="font-extralight">{`${startDateString}-${endDateString}`}</Label> */}
-                                                                <Label className="font-extralight">{`${formatDate(event.start)}-${formatDate(event.end)}`}</Label>
-                                                                <Label className="font-extralight">{startTimeString ? startTimeString : '-All Day'}-{endTimeString && endTimeString}</Label>
+                                                                <Label className="font-extralight text-xs sm:text-sm">
+                                                                {startDate === endDate ? startDate : `${startDate} - ${endDate}`}
+                                                                </Label>
+                                                                <Label className="font-extralight text-xs sm:text-sm">{startTimeString ? startTimeString : 'All Day'}{endTimeString && endTimeString}</Label>
                                                             </div>
 
-                                                            <Label>{event.title}</Label>
+                                                            <Label className=' text-xs sm:text-sm'>{event.title}</Label>
                                                         </div>
                                                     </div>
                                                     <Separator />
@@ -435,16 +439,8 @@ const page = () => {
                                     </div> :
                                     filteredOnGoingEvents.length > 0 ? filteredOnGoingEvents
                                         .map((event: any) => {
-                                            const startDate = new Date(event.start);
-                                            const endDate = new Date(event.end);
-                                            const timeStart = new Date(event.timeStart)
-                                            const timeEnd = new Date(event.timeEnd)
-
-                                            // Format the date and time
-                                            const startDateString = startDate.toLocaleDateString(); // Get date string
-                                            const startTimeString = timeStart.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); // Get time string without seconds
-                                            const endDateString = endDate.toLocaleDateString(); // Get date string
-                                            const endTimeString = timeEnd.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); // Get time string without seconds
+                                            const startDate = formatDate(event.start);
+                                            const endDate = formatDate(subtractOneDay(event.end));
 
                                             return (
                                                 <div className='mt-3 hover:cursor-pointer z-10' key={event.id} onClick={() => handleEventClick2(event.id)}>
@@ -455,7 +451,9 @@ const page = () => {
                                                         </svg>
                                                         <div className='flex flex-col justify-center gap-3 w-full text-left'>
                                                             {/** - ${endDateString} ${endTimeString} */}
-                                                            <Label className="font-extralight">{`${startDateString}-${endDateString}`}</Label>
+                                                                <Label className="font-extralight text-xs sm:text-sm">
+                                                                {startDate === endDate ? startDate : `${startDate} - ${endDate}`}
+                                                                    </Label>
                                                             <Label className='text-xs md:text-sm'>{event.title}</Label>
                                                         </div>
                                                     </div>

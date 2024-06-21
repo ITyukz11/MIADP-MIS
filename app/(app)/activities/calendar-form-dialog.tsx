@@ -18,9 +18,21 @@ interface CalendarFormDialogProps{
 }
 
 export default function CalendarFormDialog({open, setClose}:CalendarFormDialogProps) {
+  const avoidDefaultDomBehavior = (e: Event) => {
+    e.preventDefault();
+};
+
+const handleKeyDown = (event: React.KeyboardEvent) => {
+    if (event.key === 'Escape' || event.keyCode === 27) {
+        event.stopPropagation();
+    }
+};
   return (
     <Dialog open={open} onOpenChange={setClose}>
-      <DialogContent className="min-w-[99%] md:min-w-[90%] lg:min-w-[60%] overflow-y-auto scrollbar-thin max-h-[95vh] rounded-lg">
+      <DialogContent className="min-w-[99%] md:min-w-[90%] lg:min-w-[60%] overflow-y-auto scrollbar-thin max-h-[95vh] rounded-lg"
+      onPointerDownOutside={avoidDefaultDomBehavior}
+      onInteractOutside={avoidDefaultDomBehavior}
+      onKeyDown={handleKeyDown}>
         <DialogHeader>
           <DialogTitle>Create new activity form</DialogTitle>
           <DialogDescription>

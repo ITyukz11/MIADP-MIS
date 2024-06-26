@@ -7,9 +7,8 @@ import GlobalError from "../error"
 import { redirect } from "next/navigation"
 import { getServerSession } from "next-auth"
 import FloatingAIChat from "@/components/FloatingAIChat"
-import { UsersProvider } from "@/components/context/UsersContext"
 import { CurrentUserProvider } from "@/components/context/CurrentUserContext"
-import { CalendarOfActivityProvider } from "@/components/context/CalendarOfActivityContext"
+import ReduxProvider from "@/components/ReduxProvider"
 
 interface AppLayoutProps {
     children: React.ReactNode
@@ -23,20 +22,17 @@ export default async function AppLayout({ children }: AppLayoutProps) {
     }
 
     return (
-        <CurrentUserProvider initialUser={session.user as any}>
-            <UsersProvider>
-                <CalendarOfActivityProvider>
-                    <div className="flex flex-col min-w-[320px]">
-                        <ErrorBoundary errorComponent={GlobalError}>
-                            <SiteHeader />
-                            <main className="flex-1 mt-4 mb-auto h-full min-w-[320px]">{children}</main>
-                            <FloatingAIChat />
-                            <SiteFooter />
-                        </ErrorBoundary>
-                    </div>
-                </CalendarOfActivityProvider>
-            </UsersProvider>
-        </CurrentUserProvider>
-
+        <ReduxProvider>
+            <CurrentUserProvider initialUser={session.user as any}>
+                <div className="flex flex-col min-w-[320px] items-center">
+                    <ErrorBoundary errorComponent={GlobalError}>
+                        <SiteHeader />
+                        <main className="flex-1 mt-4 mb-auto h-full min-w-[320px] max-w-[2560px] w-[98vw] px-2 sm:px-8 relative">{children}</main>
+                        <FloatingAIChat />
+                        <SiteFooter />
+                    </ErrorBoundary>
+                </div>
+            </CurrentUserProvider>
+        </ReduxProvider>
     )
 }

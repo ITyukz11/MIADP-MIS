@@ -1,5 +1,5 @@
 'use client'
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Dialog, DialogContent, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -10,14 +10,13 @@ import { DatePicker, TimePicker } from 'antd';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Select, SelectItem, SelectTrigger, SelectValue, SelectContent } from '@/components/ui/select';
 import { updateCalendarOfActivity } from '@/actions/calendar-of-activity/update';
-import { useCalendarOfActivityContext } from '../context/CalendarOfActivityContext';
 import { FormError } from '@/components/form-error'
 import { FormSuccess } from '@/components/form-success'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
-import { FaMinus, FaPlus } from 'react-icons/fa'
+import { FaMinus, FaPlus, FaTrash } from 'react-icons/fa'
 import { Separator } from '@/components/ui/separator'
 import { ActivityStatus, PreparatoryActivityStatus, TypeData } from '@/components/calendar-of-activity/data'
 import { LoadingSpinner } from '@/components/LoadingSpinner'
@@ -28,10 +27,13 @@ import { Label } from '../ui/label';
 import { ChevronLeftCircleIcon, ChevronLeftSquare, ChevronRightCircleIcon } from 'lucide-react';
 import { ToastAction } from '../ui/toast';
 import { toast } from '../ui/use-toast';
-import moment from 'moment';
-import { User, useUsers } from '../context/UsersContext';
 import { useCurrentUser } from '../context/CurrentUserContext';
 import { MdPeopleAlt } from 'react-icons/md';
+import { useDispatch, useSelector } from '@/app/store/store';
+import { User } from '@/types/users/userType';
+import { fetchActivitiesData } from '@/app/store/activityAction';
+import FancyMultiSelect, { Framework } from '../MultiSelect';
+import FancyMultiSelectUpdateActivity from '../MultiSelectUpdateActivity';
 
 
 interface UpdateActivityDialogProps {
@@ -54,7 +56,11 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
     const [success, setSuccess] = useState<string | undefined>('');
     const [currentIndex, setCurrentIndex] = useState(0);
 
-    const { activities, loading, fetchActivitiesData } = useCalendarOfActivityContext();
+    // const { activities, loading, fetchActivitiesData } = useCalendarOfActivityContext();
+    const { activitiesData, activityError, activityLoading } = useSelector((state) => state.activity)
+
+    const dispatch = useDispatch()
+
     const [allDayChecked, setAllDayChecked] = useState(false);
     const { RangePicker } = DatePicker;
 
@@ -62,12 +68,18 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
     const [participantError, setParticipantError] = useState(false)
     const [preparatoryError, setPreparatoryError] = useState(false)
 
-    const { usersData, loadingUser, errorUser, fetchUsers } = useUsers();
+    // const { usersData, loadingUser, errorUser, fetchUsers } = useUsers();
+    const { usersData, loadingUser, errorUser } = useSelector((state) => state.users)
+
     const { currentUser } = useCurrentUser();
 
     const [filterRegion, setFilterRegion] = useState(currentUser?.region);
 
     const [filteredUsersData, setFilteredUsersData] = useState<User[]>([]);
+
+    const [multiSelectUsersDropdownData, setMultiSelectUsersDropdownData] = useState<Framework[]>([])
+
+    const [selectedData, setSelectedData] = useState<Framework[]>([])
 
     const form = useForm<z.infer<typeof CalendarOfActivitySchema>>({
         resolver: zodResolver(CalendarOfActivitySchema),
@@ -91,6 +103,28 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
         },
     });
 
+    const convertUsersToDropdownData = (users: User[]) => {
+        return users.map(user => ({ value: user.id, label: `${user.region} - ${user.name}` }));
+    };
+    console.log("selectedParticipants: " , selectedParticipants)
+    const participants = form.watch('participants');
+
+    const convertUsersToSelectedParticipantData = useCallback((): Framework[] => {
+        return participants
+          .map((participant: any) => {
+            const matchedUser = usersData.find((user: any) => user.id === participant.userId);
+            if (matchedUser) {
+              return { value: matchedUser.id, label: `${matchedUser.region} - ${matchedUser.name}` };
+            }
+            return null; // or handle the case when there's no match found
+          })
+          .filter((user): user is Framework => user !== null); // filter out any null values
+      }, [participants, usersData]);
+      
+      useEffect(() => {
+        setSelectedData(convertUsersToSelectedParticipantData());
+        setSelectedParticipants(participants.map((participant) => participant.userId));
+      }, [activityId, currentIndex, openUpdateDialog, participants, usersData, setSelectedData, setSelectedParticipants, convertUsersToSelectedParticipantData]);
 
     useEffect(() => {
         const filteredUsersData = filterRegion === 'All'
@@ -98,12 +132,21 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
             : usersData.filter(user => user.region === filterRegion);
 
         setFilteredUsersData(filteredUsersData);
+
+        const multiSelectUsersDropdownDatas = convertUsersToDropdownData(filteredUsersData)
+        setMultiSelectUsersDropdownData(multiSelectUsersDropdownDatas);
+
     }, [currentUser?.region, usersData, filterRegion]);
 
+    console.log("filteredUsersData: ", filteredUsersData)
+    console.log("MultiSelectUsersDropdownData: ", multiSelectUsersDropdownData)
+
+    console.log("form.participants", form.watch('participants'))
+console.log("selectedData: ", selectedData)
     useEffect(() => {
         if (activityId.length > 0 && currentIndex < activityId.length) {
             setLoadingForm(true);
-            const activityData = activities.find(activity => activity.id === activityId[currentIndex]);
+            const activityData = activitiesData.find(activity => activity.id === activityId[currentIndex]);
             if (activityData) {
                 form.reset({
                     activityTitle: activityData.activityTitle,
@@ -122,11 +165,11 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
                     preparatoryList: activityData.preparatoryList.length > 0 ? activityData.preparatoryList : [{ description: '', status: '', remarks: '' }],
                     remarks: activityData.remarks,
                 });
-                setAllDayChecked(activityData.allDay);
+                setAllDayChecked(activityData.dateFrom != activityData.dateTo);
             }
             setLoadingForm(false);
         }
-    }, [activityId, currentIndex, activities, form]);
+    }, [activityId, currentIndex, activitiesData, form]);
 
     const { control, watch } = form;
 
@@ -148,7 +191,6 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
         name: 'preparatoryList'
     });
 
-    const participants = watch('participants');
 
     const onSubmit = async (values: any) => {
         setError('');
@@ -156,8 +198,8 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
         setLoadingForm(true);
 
         // Transform participants to match Prisma's expected structure
-        const formattedParticipants = values.participants.map((item: { userId: any }) => ({
-            userId: item.userId,
+        const formattedParticipants = selectedParticipants.map((item:any) => ({
+            userId: item,
         }));
         // Transform preparatoryList to match Prisma's expected structure
         const formattedPreparatoryList = values.preparatoryList.map((item: { id: any; description: any; status: any; remarks: any; }) => ({
@@ -176,7 +218,8 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
                 }
             }
         };
-    
+        console.log("submitting values: ", formattedValues);
+
         if (formattedParticipants.length > 0) {
             formattedValues.participants = {
                 deleteMany: {}, // This will delete all participants for the given CalendarOfActivity
@@ -185,87 +228,102 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
                 }
             };
         }
+        if (formattedParticipants.length == 0) {
 
-        console.log("submitting values: ", formattedValues);
-
-        try {
-            const result = await updateCalendarOfActivity(activityId[currentIndex], formattedValues);
-
-            if (result.success) {
-                toast({
-                    className:"bg-green-500",
-                    title: "Success",
-                    description: result.success,
-                    duration: 5000,
-                    action: (
-                        <ToastAction altText="Ok">Ok</ToastAction>
-                    ),
-                });
-
-                console.log("submitting result: ", result);
-
-                if (currentIndex < activityId.length - 1) {
-                    setCurrentIndex(prev => prev + 1);
-                } else {
-                    setUpdateDialogClose(false);
-                }
-
-                fetchActivitiesData();
-            } else if (result.error) {
-                toast({
-                    variant: "destructive",
-                    title: "Error",
-                    description: result.error,
-                    duration: 5000,
-                    action: (
-                        <ToastAction altText="Ok">Ok</ToastAction>
-                    ),
-                });
-            }
-        } catch (err) {
-            console.error('Failed to update activity:', err);
-            setError('Failed to update activity. Please try again.');
             toast({
                 variant: "destructive",
                 title: "Error",
-                description: "Failed to update activity. Please try again.",
+                description: "Please update your participants",
                 duration: 5000,
                 action: (
                     <ToastAction altText="Ok">Ok</ToastAction>
                 ),
             });
-        } finally {
-            setLoadingForm(false);
+        } else {
+
+            try {
+                const result = await updateCalendarOfActivity(activityId[currentIndex], formattedValues);
+
+                if (result.success) {
+                    toast({
+                        title: "Success",
+                        description: result.success,
+                        duration: 5000,
+                        action: (
+                            <ToastAction altText="Ok">Ok</ToastAction>
+                        ),
+                    });
+
+                    console.log("submitting result: ", result);
+
+                    if (currentIndex < activityId.length - 1) {
+                        setCurrentIndex(prev => prev + 1);
+                    } else {
+                        setUpdateDialogClose(false);
+                    }
+
+                    dispatch(fetchActivitiesData())
+                } else if (result.error) {
+                    toast({
+                        variant: "destructive",
+                        title: "Error",
+                        description: result.error,
+                        duration: 5000,
+                        action: (
+                            <ToastAction altText="Ok">Ok</ToastAction>
+                        ),
+                    });
+                }
+            } catch (err) {
+                console.error('Failed to update activity:', err);
+                setError('Failed to update activity. Please try again.');
+                toast({
+                    variant: "destructive",
+                    title: "Error",
+                    description: "Failed to update activity. Please try again.",
+                    duration: 5000,
+                    action: (
+                        <ToastAction altText="Ok">Ok</ToastAction>
+                    ),
+                });
+            } finally {
+                setLoadingForm(false);
+            }
         }
     };
 
-
+    const addOneDay = (date: string): string => {
+        return dayjs(date).add(1, 'day').toISOString().split('T')[0];
+    };
 
     const handleRangePickerChange = (value: any) => {
         if (value && Array.isArray(value) && value.length === 2) {
             const [startDate, endDate] = value.map((date: any) => dayjs(date).toISOString());
 
-            form.setValue('dateFrom', startDate);
-            form.setValue('dateTo', endDate);
+            // Add one day to startDate and endDate
+            const newStartDate = addOneDay(startDate);
+            const newEndDate = addOneDay(endDate);
 
-            console.log("startDate: ", startDate);
-            console.log("endDate: ", endDate);
+            form.setValue('dateFrom', newStartDate);
+            form.setValue('dateTo', newEndDate);
+
         } else {
             // Clear the value if no range is selected
-            form.setValue('dateFrom', '');
-            form.setValue('dateTo', '');
+            form.setValue('dateFrom', dayjs().format('YYYY/MM/DD'));
+            form.setValue('dateTo', dayjs().format('YYYY/MM/DD'),);
         }
     };
 
     const handleDatePickerChange = (value: any) => {
-
         if (value) {
             const date = dayjs(value); // Convert the input value to a Day.js object
             const formattedDate = date.toISOString(); // Format the date as per ISO 8601
 
-            form.setValue('dateFrom', formattedDate);
-            form.setValue('dateTo', formattedDate);
-            console.log(formattedDate);
+            // Add one day to the date
+            const newDate = addOneDay(formattedDate);
+
+            form.setValue('dateFrom', newDate);
+            form.setValue('dateTo', newDate);
         } else {
             // Clear the value if no range is selected
             form.setValue('dateFrom', '');
@@ -274,8 +332,6 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
     };
 
     const handleTimeRangeChange = (value: any) => {
-        console.log("value: ", value)
-
         if (value && Array.isArray(value) && value.length === 2) {
             const [timeStart, timeEnd] = value;
             const formattedStartTime = timeStart.format('HH:mm'); // Extract only the time part
@@ -284,8 +340,6 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
             form.setValue('timeStart', formattedStartTime);
             form.setValue('timeEnd', formattedEndTime);
 
-            console.log('timeStart', formattedStartTime);
-            console.log('timeEnd', formattedEndTime);
         } else {
             // Clear the value if no range is selected
             form.setValue('timeStart', '');
@@ -303,10 +357,19 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
         }
     };
 
+    const handleAllDayChecked = () => {
+        setAllDayChecked(!allDayChecked)
+        form.setValue('dateFrom', dayjs().format('YYYY/MM/DD'));
+        form.setValue('timeStart', '');
+        form.setValue('timeEnd', '');
+    }
+
+    const clearFunctionRef = useRef<() => void | null>(null);
+    const selectAllFunctionRef = useRef<() => void | null>(null);
 
     return (
         <Dialog open={openUpdateDialog} onOpenChange={setUpdateDialogClose}>
-            <DialogContent className='w-full md:min-w-[60%] overflow-y-auto scrollbar-thin max-h-[95vh]'
+            <DialogContent className="min-w-[99%] md:min-w-[90%] lg:min-w-[60%] overflow-y-auto scrollbar-thin max-h-[95vh] rounded-lg"
                 onPointerDownOutside={avoidDefaultDomBehavior}
                 onInteractOutside={avoidDefaultDomBehavior}
                 onKeyDown={handleKeyDown}>
@@ -338,8 +401,8 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
                             Don&apos;t forget to press update when finished.
                         </DialogDescription>
                         <Form {...form}>
-                            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 w-full md:min-w-[60%]" autoComplete="off">
-                                <div className="space-y-4">
+                            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 w-full" autoComplete="off">
+                                <div className="space-y-4 w-full flex flex-col flex-wrap">
                                     <div className='flex flex-row gap-2 w-full'>
                                         <FormField
                                             control={form.control}
@@ -368,28 +431,31 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
                                             </FormItem>
                                         )}
                                     />
-                                    <div className='grid grid-cols-3 gap-2'>
+                                    <div className='flex flex-row flex-wrap sm:grid grid-cols-3 gap-2'>
                                         <FormField
                                             control={form.control}
                                             name='type'
                                             render={({ field }) => (
-                                                <FormItem className='mt-auto'>
-                                                    <FormLabel className='text-xs sm:text-sm'>Type</FormLabel>
+                                                <FormItem className='mt-auto w-full'>
+                                                    <FormLabel className='flex flex-row gap-1 text-xs sm:text-sm'>Type<FormMessage /></FormLabel>
                                                     <FormControl>
-                                                        <Select {...field} onValueChange={field.onChange} defaultValue={field.value} disabled={loadingForm}>
-                                                            <FormControl>
-                                                                <SelectTrigger className='text-xs sm:text-sm'>
+                                                        <Select onValueChange={field.onChange} defaultValue={field.value} disabled={loadingForm}>
+                                                            <FormControl
+                                                                className="text-xs sm:text-sm">
+                                                                <SelectTrigger>
                                                                     <SelectValue placeholder="Select a type" />
                                                                 </SelectTrigger>
                                                             </FormControl>
                                                             <SelectContent>
                                                                 {TypeData.map((option, index) => (
-                                                                    <SelectItem className='text-xs sm:text-sm' key={index} value={option.value || 'default_value'} disabled={loadingForm}>{option.label}</SelectItem>
+                                                                    <SelectItem key={index}
+                                                                        value={option.value || 'default_value'}
+                                                                        disabled={loadingForm}
+                                                                        className="text-xs sm:text-sm">{option.label}</SelectItem>
                                                                 ))}
                                                             </SelectContent>
                                                         </Select>
                                                     </FormControl>
-                                                    <FormMessage />
                                                 </FormItem>
                                             )}
                                         />
@@ -397,12 +463,11 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
                                             control={form.control}
                                             name="targetParticipant"
                                             render={({ field }) => (
-                                                <FormItem className='mt-auto'>
-                                                    <FormLabel className='text-xs sm:text-sm'>Target Participants</FormLabel>
+                                                <FormItem className='mt-auto w-full'>
+                                                    <FormLabel className='flex flex-row gap-1 text-xs sm:text-sm flex-nowrap'>Target Participant<FormMessage /></FormLabel>
                                                     <FormControl>
-                                                        <Input className='text-xs sm:text-sm' {...field} disabled={loadingForm} />
+                                                        <Input {...field} disabled={loadingForm} className='text-xs sm:text-sm' placeholder="ex. IPS, IPO, LPMIU, RPCO, PSO, etc." />
                                                     </FormControl>
-                                                    <FormMessage />
                                                 </FormItem>
                                             )}
                                         />
@@ -410,57 +475,36 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
                                             control={form.control}
                                             name="location"
                                             render={({ field }) => (
-                                                <FormItem className='mt-auto'>
-                                                    <FormLabel className='text-xs sm:text-sm'>Location</FormLabel>
+                                                <FormItem className='mt-auto w-full'>
+                                                    <FormLabel className='flex flex-row gap-1 text-xs sm:text-sm'>Location<FormMessage /></FormLabel>
                                                     <FormControl>
-                                                        <Input className='text-xs sm:text-sm' {...field} disabled={loadingForm} />
+                                                        <Input {...field} disabled={loadingForm} className='text-xs sm:text-sm' placeholder="ex. World Palace, Ecoland, Davao City" />
                                                     </FormControl>
-                                                    <FormMessage />
                                                 </FormItem>
                                             )}
                                         />
 
                                     </div>
-                                    <div className='grid grid-cols-3 gap-2'>
-                                        <div className='flex flex-row items-center justify-start gap-2 mt-5'>
-                                            <div className='flex flex-row gap-1 items-center justify-center'>
-                                                <Checkbox checked={allDayChecked} onClick={() => setAllDayChecked(!allDayChecked)} disabled={loadingForm} />
-                                                <Label
-                                                    htmlFor="allday"
-                                                    className="text-xs sm:text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 whitespace-nowrap">
-                                                    All day
-                                                </Label>
-                                            </div>
-
-                                            {!allDayChecked && (
-                                                <FormField
-                                                    control={form.control}
-                                                    name="dateFrom"
-                                                    render={({ field }) => (
-                                                        <FormItem>
-                                                            <FormLabel className='text-xs sm:text-sm'>Planned Date</FormLabel>
-                                                            <DatePicker
-                                                                className='w-full'
-                                                                defaultValue={[dayjs(form.getValues('dateFrom'))]}
-                                                                onChange={(value) => handleDatePickerChange(value)}
-                                                                disabled={loadingForm} />
-                                                            <FormMessage />
-                                                        </FormItem>
-                                                    )}
-                                                />
-                                            )}
-
+                                    <div className='flex flex-row gap-2 item-start flex-wrap'>
+                                        <div className='flex flex-row items-center justify-start gap-1 mt-5'>
+                                            <Checkbox checked={allDayChecked} onClick={handleAllDayChecked} disabled={loadingForm} />
+                                            <label
+                                                htmlFor="allday"
+                                                className="text-xs sm:text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 whitespace-nowrap">
+                                                All day
+                                            </label>
                                         </div>
-
                                         {allDayChecked ?
                                             <FormField
                                                 control={form.control}
                                                 name="dateTo"
                                                 render={({ field }) => (
-                                                    <FormItem className='flex flex-col mt-auto w-full'>
+                                                    <FormItem className='flex flex-col mt-auto w-fit'>
                                                         <FormLabel className='text-xs sm:text-sm'>Planned Date Range</FormLabel>
                                                         <RangePicker
-                                                            defaultValue={[dayjs(form.getValues('dateFrom')), dayjs(form.getValues('dateTo'))]}
+                                                            className='text-xs sm:text-sm dark:bg-[#020817] dark:text-[#f8fafc] dark:border-[#182334]'
+                                                            defaultValue={[dayjs(form.watch('dateFrom')), dayjs(form.watch('dateTo'))]}
+                                                            format={'YYYY/MM/DD'}
                                                             onChange={(value) => handleRangePickerChange(value)}
                                                             disabled={loadingForm}
                                                         />
@@ -471,23 +515,33 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
                                             <div className='flex flex-row gap-2 mt-auto '>
                                                 <FormField
                                                     control={form.control}
+                                                    name="dateFrom"
+                                                    render={({ field }) => (
+                                                        <FormItem>
+                                                            <FormLabel className='text-xs sm:text-sm'>Planned Date</FormLabel>
+                                                            <DatePicker
+                                                                className='w-full text-xs sm:text-sm dark:bg-[#020817] dark:text-[#f8fafc] dark:border-[#182334]'
+                                                                defaultValue={[dayjs(form.watch('dateFrom'))]}
+                                                                onChange={(value) => handleDatePickerChange(value)}
+                                                                disabled={loadingForm} />
+                                                            <FormMessage />
+                                                        </FormItem>
+                                                    )}
+                                                />
+                                                <FormField
+                                                    control={form.control}
                                                     name="timeStart"
-                                                    render={({ field }) => {
-                                                        const defaultTimeStart = form.getValues('timeStart') ? dayjs(form.getValues('timeStart'), 'HH:mm') : undefined;
-                                                        const defaultTimeEnd = form.getValues('timeEnd') ? dayjs(form.getValues('timeEnd'), 'HH:mm') : undefined;
-                                                        return (
-                                                            <FormItem>
-                                                                <FormLabel className='text-xs sm:text-sm'>Time Range</FormLabel>
-                                                                <TimePicker.RangePicker
-                                                                    className='w-full'
-                                                                    defaultValue={[defaultTimeStart, defaultTimeEnd]}
-                                                                    onChange={(value) => handleTimeRangeChange(value)}
-                                                                    disabled={loadingForm}
-                                                                />
-                                                                <FormMessage />
-                                                            </FormItem>
-                                                        )
-                                                    }}
+                                                    render={({ field }) => (
+                                                        <FormItem className='mt-auto'>
+                                                            <FormLabel className='text-xs sm:text-sm'>Time Range</FormLabel>
+                                                            <TimePicker.RangePicker
+                                                                className='w-full text-xs sm:text-sm dark:bg-[#020817] dark:text-[#f8fafc] dark:border-[#182334]'
+                                                                onChange={(value) => handleTimeRangeChange(value)}
+                                                                disabled={loadingForm}
+                                                            />
+                                                            <FormMessage />
+                                                        </FormItem>
+                                                    )}
                                                 />
                                             </div>
                                         }
@@ -498,7 +552,7 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
                                                 <FormItem className='w-full mt-auto'>
                                                     <FormLabel className='text-xs sm:text-sm'>Status</FormLabel>
                                                     <FormControl>
-                                                        <Select {...field} onValueChange={field.onChange} defaultValue={field.value} disabled={loadingForm}>
+                                                        <Select onValueChange={field.onChange} defaultValue={field.value} disabled={loadingForm}>
                                                             <FormControl>
                                                                 <SelectTrigger>
                                                                     <SelectValue placeholder="Select a status" />
@@ -520,8 +574,70 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
                                             )}
                                         />
                                     </div>
+
                                     <Separator />
-                                    <FormLabel className='flex flex-row gap-2 justify-between items-centers'>
+
+                                    <FormLabel className='flex flex-row gap-2 justify-between items-center'>
+                                        <div className='flex flex-row gap-2 items-center'>
+                                            <label
+                                                className='font-bold md:text-xl mr-auto hidden sm:block'
+                                                style={participantError ? { color: '#f04d44' } : {}}
+                                            >
+                                                Participants {participantError && '*'}
+                                            </label>
+
+                                            <FormDescription className='items-center hidden sm:flex'>
+                                                Please press (All) to select all participants, (trash icon) to remove all
+                                            </FormDescription>
+                                        </div>
+                                        <div className='flex flex-row gap-2 justify-center sm:justify-end items-center w-full sm:w-fit'>
+                                            <Badge className='flex flex-row gap-1 justify-center items-center'><MdPeopleAlt />{filteredUsersData.length}</Badge>
+                                            <Select onValueChange={setFilterRegion} defaultValue={filterRegion} disabled={loadingForm}>
+                                                <SelectTrigger className='text-xs sm:text-sm'>
+                                                    <SelectValue placeholder="Filter" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value='All' className='text-xs sm:text-sm'>All</SelectItem>
+                                                    {regionOptions.map((option, index) => (
+                                                        <SelectItem
+                                                            key={index}
+                                                            value={option}
+                                                            className="text-xs sm:text-sm">{option}</SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+
+                                            <Badge className='flex flex-row gap-1 justify-center items-center' variant='secondary'><MdPeopleAlt />{selectedParticipants.length}</Badge>
+                                            <Button
+                                                variant={'destructive'}
+                                                type='button' size={'sm'}
+                                                disabled={loadingForm || selectedParticipants.length == 0}
+                                                onClick={() => {
+                                                    if (clearFunctionRef.current) clearFunctionRef.current();
+                                                }}>
+                                                <FaTrash />
+                                            </Button>
+                                            <Button
+                                                type='button'
+                                                size={'sm'}
+                                                disabled={loadingForm}
+                                                onClick={() => {
+                                                    if (selectAllFunctionRef.current) selectAllFunctionRef.current();
+                                                }}>
+                                                All
+                                            </Button>
+                                        </div>
+                                    </FormLabel>
+                                    <FancyMultiSelectUpdateActivity
+                                        data={multiSelectUsersDropdownData}
+                                        onSelectionChange={(selected) => setSelectedParticipants(selected)}
+                                        clearFunctionRef={clearFunctionRef}
+                                        selectAllFunctionRef={selectAllFunctionRef}
+                                        disabled={loadingForm}
+                                        selectedData={selectedData}
+                                    />
+
+                                    {/* <FormLabel className='flex flex-row gap-2 justify-between items-centers'>
                                         <div className='flex flex-row gap-2 items-center'>
                                             <label
                                                 className='font-bold md:text-xl'
@@ -541,22 +657,19 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
                                                     <SelectValue placeholder="Filter" />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                    <SelectItem value='All'  className='text-xs sm:text-sm'>All</SelectItem>
+                                                    <SelectItem value='All' className='text-xs sm:text-sm'>All</SelectItem>
                                                     {regionOptions.map((option, index) => (
-                                                        <SelectItem  className='text-xs sm:text-sm' key={index} value={option}>{option}</SelectItem>
+                                                        <SelectItem className='text-xs sm:text-sm' key={index} value={option}>{option}</SelectItem>
                                                     ))}
                                                 </SelectContent>
                                             </Select>
-                                            {/* <Button variant='outline' type='button' onClick={()=> setIncludeAllRegions(!includeAllRegions)}>
-                               <div className='h-5 w-5 rounded-full'>{filteredUsersData.length}</div> {includeAllRegions?'Filter own region':'Load all regions'} 
-                            </Button> */}
                                             <Badge variant='secondary'>{participantFields.length}</Badge>
                                             <Button type='button' size={'sm'} disabled={loadingForm} onClick={() => appendParticipant({ userId: '' })}>
                                                 <FaPlus />
                                             </Button>
                                         </div>
-                                    </FormLabel>
-                                    {participantFields.map((field, index) => (
+                                    </FormLabel> */}
+                                    {/* {participantFields.map((field, index) => (
                                         <div key={field.id} className="flex flex-row gap-2 items-end w-full">
                                             <FormField
                                                 control={control}
@@ -618,7 +731,7 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
                                                 <FaMinus />
                                             </Button>
                                         </div>
-                                    ))}
+                                    ))} */}
                                     {/* Preparatory list items */}
                                     <Separator />
                                     <FormLabel className='flex flex-row gap-2 items-centers'>
@@ -638,8 +751,8 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
                                                 render={({ field }) => (
                                                     <FormItem className='w-full text-xs sm:text-sm'>
                                                         <FormControl>
-                                                            <Input {...field} disabled={loadingForm} placeholder="Enter description" 
-                                                            className='text-xs sm:text-sm'/>
+                                                            <Input {...field} disabled={loadingForm} placeholder="Enter description"
+                                                                className='text-xs sm:text-sm' />
                                                         </FormControl>
                                                     </FormItem>
                                                 )}
@@ -651,7 +764,7 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
                                                 render={({ field }) => (
                                                     <FormItem className='w-full'>
                                                         <FormControl>
-                                                            <Select {...field} onValueChange={field.onChange} defaultValue={field.value} disabled={loadingForm}>
+                                                            <Select onValueChange={field.onChange} defaultValue={field.value} disabled={loadingForm}>
                                                                 <FormControl>
                                                                     <SelectTrigger className='text-xs sm:text-sm'>
                                                                         <SelectValue placeholder="Select a status" />
@@ -669,7 +782,6 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
                                                     </FormItem>
                                                 )}
                                             />
-
                                             {form.watch(`preparatoryList.${index}.status`) == "Other" &&
                                                 (
                                                     <FormField
@@ -684,7 +796,6 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
                                                         )}
                                                     />
                                                 )}
-
                                             <Button
                                                 className='w-fit'
                                                 type='button'
@@ -712,16 +823,9 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
                                             </FormItem>
                                         )}
                                     />
-
-
-
                                 </div>
-
-
                                 {/* <FormSuccess message={success} /> */}
                                 <FormError message={error} />
-
-
                             </form>
                         </Form>
                         <DialogFooter>

@@ -3,7 +3,6 @@ import React, { useEffect, useState } from 'react';
 import { DataTable } from '@/components/table/data-table';
 import { columns } from '@/components/table/data/activities/coa-columns';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useCalendarOfActivityContext } from '@/components/context/CalendarOfActivityContext';
 import {
   Select,
   SelectContent,
@@ -16,6 +15,9 @@ import {
 import { componentOptions, regionOptions, unitOptions } from '@/lib/data/filter';
 import { CalendarSheet } from '@/components/calendar-of-activity/CalendarSheet';
 import { useCurrentUser } from '@/components/context/CurrentUserContext';
+import { useDispatch, useSelector } from '@/app/store/store';
+import { fetchActivitiesData } from '@/app/store/activityAction';
+import { fetchUsersData } from '@/app/store/userAction';
 
 type Props = {}
 
@@ -33,15 +35,24 @@ const Page = (props: Props) => {
 
   const handleViewRowIdPressed = (viewId: string) => {
     setSelectedRowId(viewId);
-    console.log("viewId ZZ: ", viewId)
+    // console.log("viewId ZZ: ", viewId)
   };
-  const { activities, loading, error } = useCalendarOfActivityContext();
+  // const { activities, loading, error } = useCalendarOfActivityContext();
+  const dispatch = useDispatch();
+  const { activitiesData, activityLoading, activityError } = useSelector((state) => state.activity);
+
+  useEffect(() => {
+    if (activitiesData.length === 0) {
+      dispatch(fetchActivitiesData());
+    }
+  }, [dispatch, activitiesData.length]);
+
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         // Sorting activities based on 'createdAt' in descending order
-        const sortedActivities = [...activities].sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        const sortedActivities = [...activitiesData].sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
         
         setCoaData(sortedActivities);
         setFilteredData(sortedActivities); // Initialize filteredData with all activities sorted
@@ -50,14 +61,14 @@ const Page = (props: Props) => {
       }
     };
     fetchData();
-  }, [activities]);
+  }, [activitiesData]);
   
   useEffect(() => {
     const viewCalendarDataFiltered = filteredData.filter(activity =>
       activity.id == selectedRowId
     );
     setViewCalendarData(viewCalendarDataFiltered);
-  }, [activities, filteredData, selectedRowId])
+  }, [activitiesData, filteredData, selectedRowId])
   
 
   useEffect(() => {
@@ -86,7 +97,7 @@ const Page = (props: Props) => {
   ]; // Columns to hide
 
   return (
-    <div className='mx-auto px-2 sm:px-8 relative'>
+    <div>
       <div className='flex flex-col flex-wrap w-full'>
         <div className='flex flex-row gap-2 overflow-x-auto w-full scrollbar-thin p-1'>
           <Select onValueChange={(value) => setSelectedFilter(value)}>
@@ -127,6 +138,7 @@ const Page = (props: Props) => {
               allowViewCalendar={true}
               onViewRowId={handleViewRowIdPressed}
               setAllowViewCalendar={()=> setViewCalendar(!viewCalendar)}
+              allowDateRange={true}
               />
           </div>
         ) : (
@@ -137,7 +149,6 @@ const Page = (props: Props) => {
 
       </div>
       <CalendarSheet activityData={viewCalendarData} openSheet={viewCalendar} closeCalendarSheet={() => setViewCalendar(!viewCalendar)} />
-
     </div>
   )
 }

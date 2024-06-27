@@ -17,7 +17,6 @@ import { CalendarOfActivitySchema } from '@/schemas/calendar-of-activity'
 import { FaMinus, FaPlus, FaTrash } from 'react-icons/fa'
 import { Separator } from '@/components/ui/separator'
 import { Select, SelectItem, SelectTrigger, SelectValue, SelectContent } from '@/components/ui/select'
-
 import { PreparatoryActivityStatus, TypeData } from '@/components/calendar-of-activity/data'
 import { ToastAction } from '@/components/ui/toast'
 import { calendarOfActivity } from '@/actions/calendar-of-activity/calendarofactivity'
@@ -26,21 +25,24 @@ import { LoadingSpinner } from '@/components/LoadingSpinner'
 import { useCurrentUser } from '@/components/context/CurrentUserContext'
 import axios from 'axios'
 import { formatDate } from '@/components/table/data/activities/coa-columns'
-import { useCalendarOfActivityContext } from '@/components/context/CalendarOfActivityContext'
-import { User, useUsers } from '@/components/context/UsersContext'
 import { Badge } from '@/components/ui/badge'
 import { regionOptions } from '@/lib/data/filter'
 import { MdPeopleAlt } from 'react-icons/md'
 import { Upload } from 'lucide-react'
 import { Label } from '@/components/ui/label'
 import { FancyMultiSelect, Framework } from '@/components/MultiSelect'
+import { User } from '@/types/users/userType'
+import { fetchActivitiesData } from '@/app/store/activityAction'
+import { useDispatch, useSelector } from '@/app/store/store'
+import { TypeOfActivity } from '@/components/forms/data'
 
 type Props = {
     setDialogClose: () => void
 }
 
 const CalendarForm = ({ setDialogClose }: Props) => {
-    const { usersData, loadingUser, errorUser, fetchUsers } = useUsers();
+    // const { usersData, loadingUser, errorUser, fetchUsers } = useUsers();
+    const { usersData, loadingUser, errorUser } = useSelector((state) => state.users);
     const { currentUser } = useCurrentUser();
 
     const [filteredUsersData, setFilteredUsersData] = useState<User[]>([]);
@@ -58,7 +60,9 @@ const CalendarForm = ({ setDialogClose }: Props) => {
 
     const { RangePicker } = DatePicker;
 
-    const { loading, fetchActivitiesData } = useCalendarOfActivityContext();
+    // const { loading, fetchActivitiesData } = useCalendarOfActivityContext();
+    const { activityLoading } = useSelector((state) => state.activity);
+    const dispatch = useDispatch();
 
     const [filterRegion, setFilterRegion] = useState(currentUser?.region);
 
@@ -169,9 +173,9 @@ const CalendarForm = ({ setDialogClose }: Props) => {
 
         values.status = status
         values.dateFrom = values.dateFrom.split('T')[0],
-        values.dateTo = values.dateTo.split('T')[0],
+            values.dateTo = values.dateTo.split('T')[0],
 
-        setError("")
+            setError("")
         setSuccess("")
         startTransition(() => {
             setLoadingForm(true)
@@ -199,7 +203,7 @@ const CalendarForm = ({ setDialogClose }: Props) => {
                                     ),
                                 })
 
-                                fetchActivitiesData()
+                                dispatch(fetchActivitiesData())
                             } catch (error) {
                                 console.error("Error submitting calendar activity:", error);
 
@@ -215,7 +219,7 @@ const CalendarForm = ({ setDialogClose }: Props) => {
                                 });
                             } finally {
 
-                                if (!loading) {
+                                if (!activityLoading) {
                                     setDialogClose();
                                     setLoadingForm(false);
                                 }
@@ -252,15 +256,15 @@ const CalendarForm = ({ setDialogClose }: Props) => {
     const addOneDay = (date: string): string => {
         return dayjs(date).add(1, 'day').toISOString().split('T')[0];
     };
-    
+
     const handleRangePickerChange = (value: any) => {
         if (value && Array.isArray(value) && value.length === 2) {
             const [startDate, endDate] = value.map((date: any) => dayjs(date).toISOString());
-    
+
             // Add one day to startDate and endDate
             const newStartDate = addOneDay(startDate);
             const newEndDate = addOneDay(endDate);
-    
+
             form.setValue('dateFrom', newStartDate);
             form.setValue('dateTo', newEndDate);
 
@@ -275,10 +279,10 @@ const CalendarForm = ({ setDialogClose }: Props) => {
         if (value) {
             const date = dayjs(value); // Convert the input value to a Day.js object
             const formattedDate = date.toISOString(); // Format the date as per ISO 8601
-    
+
             // Add one day to the date
             const newDate = addOneDay(formattedDate);
-    
+
             form.setValue('dateFrom', newDate);
             form.setValue('dateTo', newDate);
         } else {
@@ -328,7 +332,7 @@ const CalendarForm = ({ setDialogClose }: Props) => {
     const clearFunctionRef = useRef<() => void | null>(null);
     const selectAllFunctionRef = useRef<() => void | null>(null);
 
-    const handleAllDayChecked = ()=>{
+    const handleAllDayChecked = () => {
         setAllDayChecked(!allDayChecked)
         form.setValue('dateFrom', dayjs().format('YYYY/MM/DD'));
         form.setValue('timeStart', '');
@@ -351,37 +355,6 @@ const CalendarForm = ({ setDialogClose }: Props) => {
                                 </FormItem>
                             )}
                         />
-
-                        {/* <FormField
-                            control={form.control}
-                            name="authorizeOther"
-                            render={({ field }) => (
-                                <FormItem className="">
-                                    <FormLabel>
-                                        Authorized?
-                                    </FormLabel>
-                                    <div className='flex space-x-3 space-y-0'>
-
-                                        <FormControl>
-                                            <Checkbox
-                                                onCheckedChange={field.onChange}
-                                                disabled={loadingForm}
-                                            />
-
-                                        </FormControl>
-                                        <div className="space-y-1 leading-none">
-                                            <FormLabel>
-                                                Yes
-                                            </FormLabel>
-                                            <FormDescription>
-                                                Please check if you&apos;re creating this activity for other user.
-                                            </FormDescription>
-                                        </div>
-                                    </div>
-
-                                </FormItem>
-                            )}
-                        /> */}
                     </div>
                     <FormField
                         control={form.control}
@@ -403,7 +376,7 @@ const CalendarForm = ({ setDialogClose }: Props) => {
                                 <FormItem className='mt-auto w-full'>
                                     <FormLabel className='flex flex-row gap-1 text-xs sm:text-sm'>Type<FormMessage /></FormLabel>
                                     <FormControl>
-                                        <Select {...field} onValueChange={field.onChange} defaultValue={field.value} disabled={loadingForm}>
+                                        <Select onValueChange={field.onChange} defaultValue={field.value} disabled={loadingForm}>
                                             <FormControl
                                                 className="text-xs sm:text-sm">
                                                 <SelectTrigger>
@@ -466,7 +439,7 @@ const CalendarForm = ({ setDialogClose }: Props) => {
                                     <FormItem className='flex flex-col mt-auto w-fit'>
                                         <FormLabel className='text-xs sm:text-sm'>Planned Date Range</FormLabel>
                                         <RangePicker
-                                            className='text-xs sm:text-sm'
+                                            className='text-xs sm:text-sm dark:bg-[#020817] dark:text-[#f8fafc] dark:border-[#182334]'
                                             defaultValue={[dayjs(), null]}
                                             format={'YYYY/MM/DD'}
                                             onChange={(value) => handleRangePickerChange(value)}
@@ -484,7 +457,7 @@ const CalendarForm = ({ setDialogClose }: Props) => {
                                         <FormItem>
                                             <FormLabel className='text-xs sm:text-sm'>Planned Date</FormLabel>
                                             <DatePicker
-                                                className='w-full text-xs sm:text-sm'
+                                                className='w-full text-xs sm:text-sm dark:bg-[#020817] dark:text-[#f8fafc] dark:border-[#182334]'
                                                 defaultValue={[dayjs()]}
                                                 onChange={(value) => handleDatePickerChange(value)}
                                                 disabled={loadingForm} />
@@ -499,7 +472,7 @@ const CalendarForm = ({ setDialogClose }: Props) => {
                                         <FormItem className='mt-auto'>
                                             <FormLabel className='text-xs sm:text-sm'>Time Range</FormLabel>
                                             <TimePicker.RangePicker
-                                                className='w-full text-xs sm:text-sm'
+                                                className='w-full text-xs sm:text-sm dark:bg-[#020817] dark:text-[#f8fafc] dark:border-[#182334]'
                                                 onChange={(value) => handleTimeRangeChange(value)}
                                                 disabled={loadingForm}
                                             />
@@ -511,12 +484,13 @@ const CalendarForm = ({ setDialogClose }: Props) => {
                         }
 
                     </div>
+
                     <Separator />
                     <FormLabel className='flex flex-row gap-2 justify-between items-center'>
                         <div className='flex flex-row gap-2 items-center'>
                             <label
                                 className='font-bold md:text-xl mr-auto hidden sm:block'
-                                style={participantError ? { color: '#f04d44' } : {}}    
+                                style={participantError ? { color: '#f04d44' } : {}}
                             >
                                 Participants {participantError && '*'}
                             </label>
@@ -541,7 +515,7 @@ const CalendarForm = ({ setDialogClose }: Props) => {
                                     ))}
                                 </SelectContent>
                             </Select>
-           
+
                             <Badge className='flex flex-row gap-1 justify-center items-center' variant='secondary'><MdPeopleAlt />{selectedParticipants.length}</Badge>
                             <Button
                                 variant={'destructive'}
@@ -571,7 +545,7 @@ const CalendarForm = ({ setDialogClose }: Props) => {
                         disabled={loadingForm}
                     />
 
-                    {participantFields.map((field, index) => (
+                    {/* {participantFields.map((field, index) => (
                         <div key={field.id} className="flex flex-row gap-2 items-end w-full">
                             <FormField
                                 control={control}
@@ -579,7 +553,7 @@ const CalendarForm = ({ setDialogClose }: Props) => {
                                 render={({ field }) => (
                                     <FormItem className='w-full'>
                                         <FormControl>
-                                            <Select {...field} onValueChange={(value) => {
+                                            <Select onValueChange={(value) => {
                                                 field.onChange(value);
                                                 setSelectedParticipants((prev) => {
                                                     const newSelected = [...prev];
@@ -599,10 +573,10 @@ const CalendarForm = ({ setDialogClose }: Props) => {
                                                 </FormControl>
                                                 <SelectContent className='cursor-pointer text-xs sm:text-sm'>
                                                     {!loadingUser ? filteredUsersData.map((option, idx) => (
-                                                        <SelectItem 
-                                                            key={idx} 
-                                                            value={option.id} 
-                                                            disabled={selectedParticipants.includes(option.id)} 
+                                                        <SelectItem
+                                                            key={idx}
+                                                            value={option.id}
+                                                            disabled={selectedParticipants.includes(option.id)}
                                                             className='cursor-pointer text-xs sm:text-sm'>
                                                             <Badge className='cursor-pointer'>{option.name}</Badge>-
                                                             <Badge variant={'secondary'}>{option.position}</Badge>-
@@ -637,7 +611,7 @@ const CalendarForm = ({ setDialogClose }: Props) => {
                                 <FaMinus />
                             </Button>
                         </div>
-                    ))}
+                    ))} */}
                     {/* Preparatory list items */}
                     <Separator />
                     <FormLabel className='flex flex-row gap-2 justify-between items-centers'>
@@ -679,26 +653,22 @@ const CalendarForm = ({ setDialogClose }: Props) => {
                                 name={`preparatoryList.${index}.status`}
                                 render={({ field }) => (
                                     <FormItem className='w-full'>
-                                        <FormControl>
-                                            <Select {...field} onValueChange={field.onChange} defaultValue={field.value} disabled={loadingForm}>
-                                                <FormControl>
-                                                    <SelectTrigger className='text-xs sm:text-sm'>
-                                                        <SelectValue placeholder="Select a status" />
-                                                    </SelectTrigger>
-                                                </FormControl>
-                                                <SelectContent>
-                                                    {PreparatoryActivityStatus.map((option, index) => (
-                                                        <SelectItem
-                                                            key={index}
-                                                            value={option.value || 'default_value'}
-                                                            disabled={loadingForm}
-                                                            className='cursor-pointer text-xs sm:text-sm'>
-                                                            <Badge variant={'outline'}>{option.label}</Badge>
-                                                        </SelectItem>
-                                                    ))}
-                                                </SelectContent>
-                                            </Select>
-                                        </FormControl>
+                                        <Select onValueChange={field.onChange} defaultValue={field.value} disabled={loadingForm}>
+                                            <SelectTrigger className='text-xs sm:text-sm'>
+                                                <SelectValue placeholder="Select a status" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {PreparatoryActivityStatus.map((option, index) => (
+                                                    <SelectItem
+                                                        key={index}
+                                                        value={option.value || 'default_value'}
+                                                        disabled={loadingForm}
+                                                        className='cursor-pointer text-xs sm:text-sm'>
+                                                        <Badge variant={'outline'}>{option.label}</Badge>
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
                                     </FormItem>
                                 )}
                             />

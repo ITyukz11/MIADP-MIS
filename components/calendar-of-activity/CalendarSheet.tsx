@@ -24,13 +24,14 @@ import { formatDate, formatTime, getStatusColor } from "../table/data/activities
 import { Badge } from "../ui/badge"
 import Image from "next/image"
 import { TbNotes, TbStatusChange } from "react-icons/tb"
-import { useUsers } from "../context/UsersContext"
 import { FaQrcode } from "react-icons/fa"
 import { useEffect, useState } from "react"
 import { GenerateQRCodeWithLogo } from "../GenerateQrCodeWithLogo"
 import { MdAttachment } from "react-icons/md"
 import Profile from "../profile/Profile"
 import Link from "next/link"
+import { useDispatch, useSelector } from "@/app/store/store"
+import { fetchUsersData } from "@/app/store/userAction"
 
 interface CalendarSheetProps {
   activityData: any[]
@@ -38,7 +39,16 @@ interface CalendarSheetProps {
   closeCalendarSheet: () => void
 }
 export function CalendarSheet({ activityData, openSheet, closeCalendarSheet }: CalendarSheetProps) {
-  const { usersData } = useUsers();
+
+  const dispatch = useDispatch();
+  const {usersData, loadingUser,errorUser} = useSelector((state)=> state.users)
+
+  useEffect(() => {
+    if (usersData.length === 0) {
+      dispatch(fetchUsersData());
+    }
+  }, [dispatch, usersData.length]);
+
   const [qrCode, setQrCode] = useState<string | null>(null);
   const [openProfile, setOpenProfile] = useState(false)
 
@@ -124,8 +134,6 @@ ${formattedPreparatoryList}`;
     participants,
     preparatoryList
   } = activityData[0];
-
-  console.log("activityData", activityData[0])
 
   const isValidUrl = (string: string) => {
     try {

@@ -22,7 +22,6 @@ import CalendarFormDialog from '../calendar-form-dialog';
 import { useRouter } from 'next/navigation';
 import { ViewMySchedDialog } from '../view-my-sched-dialog';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useCalendarOfActivityContext } from '@/components/context/CalendarOfActivityContext';
 import { CalendarSheet } from '@/components/calendar-of-activity/CalendarSheet';
 import { formatDate, formatTime } from '@/components/table/data/activities/coa-columns';
 import {
@@ -42,6 +41,8 @@ import { OpenInNewWindowIcon } from '@radix-ui/react-icons';
 import Link from 'next/link';
 import { FullscreenIcon } from 'lucide-react';
 import dayjs from 'dayjs';
+import { useDispatch, useSelector } from '@/app/store/store';
+import { fetchActivitiesData } from '@/app/store/activityAction';
 
 interface Event {
     id: string;
@@ -64,7 +65,8 @@ const page = () => {
     const [filteredUpcomingEvents, setFilteredUpcomingEvents] = useState<Event[]>([]);
     const [filteredOnGoingEvents, setFilteredOnGoingEvents] = useState<Event[]>([]);
 
-    const { activities, loading, error } = useCalendarOfActivityContext();
+    // const { activities, loading, error } = useCalendarOfActivityContext();
+    const { activitiesData, activityLoading, activityError } = useSelector((state) => state.activity);
     const { currentUser } = useCurrentUser();
 
     const [selectedFilter, setSelectedFilter] = useState(currentUser?.region);
@@ -75,8 +77,16 @@ const page = () => {
     const calendarRef = useRef<FullCalendar>(null);
     console.log("activities filteredCoaData: ", filteredCoaData)
 
-    console.log("activities: ", activities)
+    console.log("activities: ", activitiesData)
 
+    const dispatch = useDispatch()
+
+    useEffect(() => {
+        if (activitiesData.length === 0) {
+          dispatch(fetchActivitiesData());
+        }
+      }, [dispatch, activitiesData.length]);
+      
     const formatDateToISOWithoutTimezone = (date: Date) => {
         const year = date.getFullYear();
         const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -90,26 +100,26 @@ const page = () => {
         const day = String(date.getDate()).padStart(2, '0');
         return `${year}-${month}-${day}`;
     };
-    
+
     const formatEndDateToISOWithoutTimezone = (endDate: Date, startDate: Date) => {
         const year = endDate.getFullYear();
         const month = String(endDate.getMonth() + 1).padStart(2, '0');
         const endDay = endDate.getDate();
         const startDay = startDate.getDate();
-    
+
         // If the end day is the same as the start day, no need to add a day
         if (startDay === endDay) {
             return `${year}-${month}-${String(endDay).padStart(2, '0')}`;
         }
-    
+
         // Otherwise, add one day to the end day, and handle month/day boundaries
         const nextDay = new Date(endDate);
         nextDay.setDate(endDay + 1);
-    
+
         const nextYear = nextDay.getFullYear();
         const nextMonth = String(nextDay.getMonth() + 1).padStart(2, '0');
         const calculatedDay = String(nextDay.getDate()).padStart(2, '0');
-    
+
         return `${nextYear}-${nextMonth}-${calculatedDay}`;
     };
 
@@ -118,7 +128,7 @@ const page = () => {
         if (!isoString) {
             return ""; // Return an empty string if isoString is null or undefined
         }
-        
+
         const addHoursToTime = (date: Date, hours: number) => {
             date.setHours(date.getHours() + hours);
             return date;
@@ -134,17 +144,17 @@ const page = () => {
             const newMinutes = String(date.getMinutes()).padStart(2, '0');
             return `T${newHours}:${newMinutes}:00.000Z`; // Convert to full time format with added 8 hours
         }
-    
+
         // Otherwise, assume it's an ISO date string and extract the time part
         return 'T' + isoString.split('T')[1];
     };
-    
+
 
     useEffect(() => {
         const fetchData = () => {
             try {
 
-                const formattedData = activities.map((event: any) => {
+                const formattedData = activitiesData.map((event: any) => {
                     const startDate = new Date(event.dateFrom);
                     const endDate = new Date(event.dateTo);
 
@@ -174,14 +184,14 @@ const page = () => {
                 setFilteredUpcomingEvents(filteredUpcomingData)
                 setFilteredOnGoingEvents(filteredOnGoingEvents)
                 console.log("filteredCoaData:", filteredCoaData)
-            console.log("filteredUpcomingData: ",filteredUpcomingData)
+                console.log("filteredUpcomingData: ", filteredUpcomingData)
 
             } catch (error) {
                 console.error("Error fetching calendar of activity:", error);
             }
         };
         fetchData()
-    }, [activities, loading])
+    }, [activitiesData, activityLoading])
 
     console.log("filteredData: ", filteredData)
 
@@ -200,7 +210,7 @@ const page = () => {
             setFilteredUpcomingEvents(filteredUpcomingData)
             setFilteredOnGoingEvents(filteredOnGoingEvents)
         } else {
-            const filtered = activities.filter(item =>
+            const filtered = activitiesData.filter(item =>
                 item.user?.region === selectedFilter ||
                 item.user?.component === selectedFilter ||
                 item.user?.unit === selectedFilter
@@ -234,7 +244,7 @@ const page = () => {
             setFilteredUpcomingEvents(filteredUpcomingData)
             setFilteredOnGoingEvents(filteredOnGoingEvents)
 
-            console.log("filteredUpcomingData: ",filteredUpcomingData)
+            console.log("filteredUpcomingData: ", filteredUpcomingData)
         }
     }, [selectedFilter, filteredCoaData]);
 
@@ -258,13 +268,13 @@ const page = () => {
     ];
 
     const handleEventClick = (info: any) => {
-        const activity = activities.filter(activity => activity.id === info.event.id);
+        const activity = activitiesData.filter(activity => activity.id === info.event.id);
         setActivityData(activity)
         setCalendarSheetOpen(true)
     };
 
     const handleEventClick2 = (id: any) => {
-        const activity = activities.filter(activity => activity.id === id);
+        const activity = activitiesData.filter(activity => activity.id === id);
         setActivityData(activity)
         setCalendarSheetOpen(true)
     };
@@ -278,18 +288,18 @@ const page = () => {
         setView(newView);
     };
 
-    useEffect(() => {
-        handleWindowResize()
-    }, [])
+    // useEffect(() => {
+    //     handleWindowResize()
+    // }, [])
 
-    const handleWindowResize = () => {
-        const calendarApi = calendarRef.current?.getApi();
-        if (window.innerWidth < 768) {
-            calendarApi?.changeView('timeGridDay');
-        } else {
-            calendarApi?.changeView('dayGridMonth');
-        }
-    };
+    // const handleWindowResize = () => {
+    //     const calendarApi = calendarRef.current?.getApi();
+    //     if (window.innerWidth < 768) {
+    //         calendarApi?.changeView('timeGridDay');
+    //     } else {
+    //         calendarApi?.changeView('dayGridMonth');
+    //     }
+    // };
 
     const cardRef = useRef<HTMLDivElement>(null);
     const [cardHeight, setCardHeight] = useState(0);
@@ -329,15 +339,14 @@ const page = () => {
     };
 
     return (
-        <div className='px-2 sm:px-8 mx-auto w-full relative'>
-            <div className="flex flex-col py-2 md:flex-row gap-2 flex-wrap md:flex-nowrap overflow-hidden justify-center"
+        <div className='w-full flex justify-center'>
+            <div className="flex flex-col py-2 md:flex-row gap-5 flex-wrap md:flex-nowrap overflow-hidden w-full max-w-[1800px]"
                 style={{
-                    ...{ height: cardHeight ? `${cardHeight}px` : 'auto' },
-                    ...(fullScreenCalendar ? { width: '100%', height: '100%' } : {})
+                    ...(fullScreenCalendar ? { width: '100%'} : {})
                 }}>
                 {!fullScreenCalendar &&
-                    (<div className='flex flex-col w-full md:w-1/4 gap-2 justify-center'>
-                        <Card>
+                    (<div className='flex flex-col w-full md:w-1/4 gap-4 justify-start items-center'>
+                        <Card className='w-full'>
                             <CardHeader>
                                 <Button
                                     variant="default"
@@ -347,7 +356,7 @@ const page = () => {
                                 <ViewMyParticipatedSchedDialog />
                             </CardHeader>
                         </Card>
-                        <Card className='overflow-y-auto md:h-full rounded-xl scrollbar-thin scrollbar-track-rounded-full'>
+                        <Card className='overflow-y-auto w-full md:max-h-[400px] rounded-xl scrollbar-thin scrollbar-track-rounded-full'>
                             <CardHeader className="font-bold gap-2 sticky top-0 p-3 z-10 border-b bg-white dark:bg-gray-800">
                                 <CardTitle className="flex flex-row items-center justify-start gap-10">
                                     <FaRegCalendarAlt />
@@ -364,7 +373,7 @@ const page = () => {
                             <Separator />
                             <CardContent>
                                 {/* Display the top 5 nearest events */}
-                                {loading ?
+                                {activityLoading ?
                                     <div className="space-y-2 mt-3 p-2">
                                         <Skeleton className="h-4 w-full" />
                                         <Skeleton className="h-4 w-full" />
@@ -374,12 +383,12 @@ const page = () => {
                                         .map((event: any) => {
                                             const startDate = formatDate(event.start);
                                             const endDate = formatDate(subtractOneDay(event.end));
-                                                
+
                                             // Format the date and time
-                                           
+
                                             // const startTimeString = timeStart.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); // Get time string without seconds
                                             const startTimeString = formatTime(event.timeStart);
-                                           
+
                                             // const endTimeString = timeEnd.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); // Get time string without seconds
                                             const endTimeString = formatTime(event.timeEnd)
                                             return (
@@ -389,14 +398,14 @@ const page = () => {
                                                         <svg width="10" height="10" className='flex items-start'>
                                                             <circle cx="5" cy="5" r="4" fill={event.color} />
                                                         </svg>
-                                                        <div className='flex flex-col justify-center gap-3 w-full text-left text-xs'>
+                                                        <div className='flex flex-col justify-center gap-1 w-full text-left text-xs'>
                                                             {/** - ${endDateString} ${endTimeString} */}
                                                             <div className='flex gap-3 flex-row flex-wrap'>
                                                                 {/* <Label className="font-extralight">{`${startDateString}-${endDateString}`}</Label> */}
                                                                 <Label className="font-extralight text-xs sm:text-sm">
-                                                                {startDate === endDate ? startDate : `${startDate} - ${endDate}`}
+                                                                    {startDate === endDate ? startDate : `${startDate} - ${endDate}`}
                                                                 </Label>
-                                                                <Label className="font-extralight text-xs sm:text-sm">{startTimeString ? startTimeString : 'All Day'}{endTimeString && endTimeString}</Label>
+                                                                <Label className="font-extralight text-xs sm:text-sm">{startTimeString ? `${startTimeString} - ${endTimeString}` : 'All Day'}</Label>
                                                             </div>
 
                                                             <Label className=' text-xs sm:text-sm'>{event.title}</Label>
@@ -406,7 +415,7 @@ const page = () => {
                                                 </div>
                                             );
                                         }) :
-                                        <div className="flex justify-center mt-3 p-2">
+                                        <div className="flex justify-center mt-3 p-2 text-sm md:text-base">
                                             No upcoming event
                                         </div>
 
@@ -415,7 +424,7 @@ const page = () => {
 
                             </CardContent>
                         </Card>
-                        <Card className='overflow-y-auto md:h-full rounded-xl scrollbar-thin scrollbar-track-rounded-full'>
+                        <Card className='overflow-y-auto w-full md:max-h-[400px] rounded-xl scrollbar-thin scrollbar-track-rounded-full'>
                             <CardHeader className="font-bold gap-2 p-3 sticky top-0 z-10 border-b bg-white dark:bg-gray-800">
                                 <CardTitle className="flex flex-row items-center justify-start gap-10">
                                     <FaRegCalendarAlt />
@@ -432,7 +441,7 @@ const page = () => {
                             <Separator />
                             <CardContent>
                                 {/* Display the top 5 nearest events */}
-                                {loading ?
+                                {activityLoading ?
                                     <div className="space-y-2 mt-3 p-2">
                                         <Skeleton className="h-4 w-full" />
                                         <Skeleton className="h-4 w-full" />
@@ -441,7 +450,8 @@ const page = () => {
                                         .map((event: any) => {
                                             const startDate = formatDate(event.start);
                                             const endDate = formatDate(subtractOneDay(event.end));
-
+                                            const startTimeString = formatTime(event.timeStart);
+                                            const endTimeString = formatTime(event.timeEnd)
                                             return (
                                                 <div className='mt-3 hover:cursor-pointer z-10' key={event.id} onClick={() => handleEventClick2(event.id)}>
                                                     <div className="mb-2 flex gap-5">
@@ -451,9 +461,12 @@ const page = () => {
                                                         </svg>
                                                         <div className='flex flex-col justify-center gap-3 w-full text-left'>
                                                             {/** - ${endDateString} ${endTimeString} */}
+                                                            <div className='flex gap-3 flex-row flex-wrap'>
                                                                 <Label className="font-extralight text-xs sm:text-sm">
-                                                                {startDate === endDate ? startDate : `${startDate} - ${endDate}`}
-                                                                    </Label>
+                                                                    {startDate === endDate ? startDate : `${startDate} - ${endDate}`}
+                                                                </Label>
+                                                                <Label className="font-extralight text-xs sm:text-sm">{startTimeString ? `${startTimeString} - ${endTimeString}` : 'All Day'}</Label>
+                                                            </div>
                                                             <Label className='text-xs md:text-sm'>{event.title}</Label>
                                                         </div>
                                                     </div>
@@ -470,10 +483,10 @@ const page = () => {
                         </Card>
                     </div>)}
                 <Card ref={cardRef}
-                    className="h-full min-h-screen mb-2 w-full md:w-3/4 overflow-x-auto scrollbar-thin scrollbar-track-rounded-full"
+                    className="h-fit w-full min-h-[700px] mb-2 md:w-3/4 overflow-x-auto scrollbar-thin scrollbar-track-rounded-full"
                     style={fullScreenCalendar ? { width: '100%', height: '100%' } : undefined}>
                     <div ref={cardRef} className='flex justify-between flex-row gap-2 p-1 px-5 pt-2'>
-                        <Select onValueChange={(value) => setSelectedFilter(value)} disabled={loading}>
+                        <Select onValueChange={(value) => setSelectedFilter(value)} disabled={activityLoading}>
                             <SelectTrigger className="w-fit">
                                 <SelectValue placeholder={currentUser?.region ? currentUser?.region : "Filter"} />
                             </SelectTrigger>
@@ -500,7 +513,7 @@ const page = () => {
                             </SelectContent>
                         </Select>
                         <Button
-                            disabled={loading}
+                            disabled={activityLoading}
                             onClick={toggleFullScreen}
                             variant='link'
                             className='flex-row justify-center gap-1 items-center hidden md:flex'
@@ -523,7 +536,7 @@ const page = () => {
                                 minute: '2-digit',
                                 hour12: true,
                             }}
-                            windowResize={handleWindowResize}
+                            // windowResize={handleWindowResize}
                             eventDisplay="block cursor-pointer"
                             plugins={[multiMonthPlugin, dayGridPlugin, timeGridPlugin, listPlugin]}
                             initialView="dayGridMonth"

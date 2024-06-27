@@ -32,7 +32,7 @@ interface SettingsLayoutProps {
 
 export default function SettingsLayout({ children }: SettingsLayoutProps) {
   return (
-    <div className="w-full px-2 sm:px-8 relative">
+    <div className="w-full relative">
       <div className="space-y-6">
         <div className="space-y-0.5">
           <h2 className="text-2xl font-bold tracking-tight">Admin Settings</h2>

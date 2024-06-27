@@ -15,7 +15,7 @@ interface ActivitiesLayoutProps {
 export default function ActivitiesLayout({ children }: ActivitiesLayoutProps) {
   const [calendarFormOpen, setCalendarFormOpen] = useState(false)
   return (
-    <div className="xs:container relative">
+    <div className="xs:container">
       <PageHeader>
         <PageHeaderHeading className="hidden md:block">
           Welcome to the Calendar of Activities

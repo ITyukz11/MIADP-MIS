@@ -13,7 +13,7 @@ export const MainNav = () => {
   // Define an array of navigation links
   const { currentUser } = useCurrentUser();
 
-  console.log("currentUser: ", currentUser)
+  // console.log("currentUser: ", currentUser)
   return (
     <div className="mr-4 hidden md:flex">
       <Link href="/" className="mr-6 flex items-center space-x-2">

@@ -50,7 +50,7 @@ export function Announcements() {
           <div className="flex items-center">
             <Avatar className="h-9 w-9">
               {/* Replace the src with the actual path */}
-              <AvatarImage src={`/avatars/${announcement.avatar}.png`} alt="Avatar" />
+              <AvatarImage alt="Avatar" />
               <AvatarFallback>{announcement.avatar}</AvatarFallback>
             </Avatar>
             <div className="ml-4 space-y-1">

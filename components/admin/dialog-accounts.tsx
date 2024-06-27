@@ -28,7 +28,7 @@ interface DialogApprovePendingUsersProps<TData> {
 
 export function DialogApprovePendingUsers<TData>({ approvedPendingUsersData, disable }: DialogApprovePendingUsersProps<TData>): JSX.Element {
     const [loading, setLoading] = useState(false)
-    console.log("approvedPendingUsersData: ", approvedPendingUsersData)
+    // console.log("approvedPendingUsersData: ", approvedPendingUsersData)
     const [open, setOpen] = useState(false)
 
     const form = useForm<z.infer<typeof RegisterSchema>>({

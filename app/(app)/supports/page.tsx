@@ -34,10 +34,10 @@ export default function Page() {
 
     fetchData();
   }, []);
-  console.log("WPFACTIVITY: ",WPFActivityData)
+  // console.log("WPFACTIVITY: ",WPFActivityData)
 
   return (
-    <div className='w-full px-2 sm:px-8 relative'>
+    <div className='w-full relative'>
       <div>
         <NavigationMenuDemo />
       </div>

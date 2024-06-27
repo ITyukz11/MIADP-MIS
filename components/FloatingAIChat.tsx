@@ -16,11 +16,12 @@ export default function FloatingAIChat() {
     const { status, messages, input, submitMessage, handleInputChange } = useAssistant({ api: '/api/openai' });
     const { currentUser } = useCurrentUser();
 
-    console.log("messages: ", messages)
-    console.log("status: ", status)
-    console.log("input: ", input)
+    // console.log("messages: ", messages)
+    // console.log("status: ", status)
+    // console.log("input: ", input)
     const isInputDisabled = status !== 'awaiting_message';
 
+    const maintenance = true;
     return (
         <>
             <Popover open={aiAssistantOpen} onOpenChange={setAiAssistantOpen}>
@@ -37,7 +38,7 @@ export default function FloatingAIChat() {
                         Ask AI
                     </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-[99%] sm:w-[30rem] h-[35rem] p-0 rounded-lg shadow-lg flex flex-col sm:mr-4">
+                <PopoverContent className="w-[90vw]  sm:w-[30rem] h-[35rem] p-0 rounded-lg shadow-lg flex flex-col mr-4">
                     <div className="flex justify-between items-center p-4 rounded-t-lg">
                         <div className='flex flex-row gap-1 items-center'>
                             <Image
@@ -48,13 +49,21 @@ export default function FloatingAIChat() {
                                 height={40}
                             />
                             <Label className='font-bold'> MIADP Assistant</Label>
-                            <div className={`rounded-full w-3 h-3 border-1 ${status ? 'bg-green-500' : 'bg-red-500'} border-white`}></div>
-                            <Label>{status ? 'online' : 'offline'}</Label>
+                            <div className={`rounded-full w-3 h-3 border-1 ${status && !maintenance? 'bg-green-500' : 'bg-red-500'} border-white`}></div>
+                            <Label>{status && !maintenance? 'online' : 'offline'}</Label>
                         </div>
                         <button onClick={() => setAiAssistantOpen(false)} className="text-xl font-bold">&times;</button>
                     </div>
                     <Separator />
                     <div className="flex-1 overflow-y-auto p-4 scrollbar-thin scrollbar-track-rounded-full">
+                        {maintenance && (
+                            <Image 
+                                className='rounded-xl'
+                                src={'/miadp-assistant-maintenance.png'} 
+                                alt={'MIADP Maintenance Image'}
+                                width={800}
+                                height={800}/>
+                        )}
                         {messages.map((m: Message) => (
                             <div key={m.id}>
                                 <div className={`mb-2 p-2 rounded-lg w-fit flex-col`}>
@@ -106,7 +115,7 @@ export default function FloatingAIChat() {
 
                     <form onSubmit={submitMessage} className="p-4 rounded-b-lg flex gap-2 relative">
 
-                        {!input && messages.length == 0 && (
+                        {!input && messages.length == 0 && !maintenance && (
                             <div className="absolute inset-y-0 left-4 ml-4 flex items-center pointer-events-none">
                                 <Label className='text-gray-500'>
                                     <Typewriter
@@ -129,7 +138,7 @@ export default function FloatingAIChat() {
                             </div>
                         )}
                         <Input
-                            disabled={isInputDisabled}
+                            disabled={isInputDisabled || maintenance}
                             value={input}
                             onChange={handleInputChange}
                             className="border rounded-l-md focus:outline-none focus:ring-2 bg-transparent overflow-hidden"
@@ -137,7 +146,7 @@ export default function FloatingAIChat() {
                         <Button
                             type="submit"
                             variant={'outline'}
-                            disabled={status !== 'awaiting_message'}
+                            disabled={status !== 'awaiting_message' || maintenance}
                             className="rounded-r-md"
                         >
                             Send

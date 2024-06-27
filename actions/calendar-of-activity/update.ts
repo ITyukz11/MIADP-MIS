@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { Activity } from '@/types/calendar-of-activity';
 
 interface UpdateActivityResponse {
   success?: string;

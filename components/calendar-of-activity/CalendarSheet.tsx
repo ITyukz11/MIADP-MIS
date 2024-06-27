@@ -146,7 +146,7 @@ ${formattedPreparatoryList}`;
   return (
     <>
       <Sheet open={openSheet} onOpenChange={closeCalendarSheet}>
-        <SheetContent className=" rounded-l-3xl overflow-y-auto scrollbar-thin sm:min-w-[600px] h-full">
+        <SheetContent className="overflow-y-auto scrollbar-thin sm:min-w-[600px] h-full">
           <SheetHeader>
             <SheetTitle className="flex flex-row gap-2 items-center">
               <div

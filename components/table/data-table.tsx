@@ -35,6 +35,7 @@ interface DataTableProps<TData, TValue> {
   allowViewCalendar?: boolean
   setAllowViewCalendar?: () => void;
   onViewRowId?: (id: string) => void;
+  allowDateRange?:boolean;
 }
 
 export function DataTable<TData extends { id: string }, TValue>({
@@ -46,6 +47,7 @@ export function DataTable<TData extends { id: string }, TValue>({
   allowViewCalendar,
   setAllowViewCalendar,
   onViewRowId,
+  allowDateRange=false
 }: DataTableProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = React.useState<Record<string, boolean>>({});
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>(() => {
@@ -108,11 +110,11 @@ export function DataTable<TData extends { id: string }, TValue>({
   const handleRowClick = (id: string) => {
     if (onViewRowId) {
       onViewRowId(id);
-      console.log("onViewRowId: ", id)
+      // console.log("onViewRowId: ", id)
     }
     if (setAllowViewCalendar) {
       setAllowViewCalendar();
-      console.log("setAllowViewCalendar")
+      // console.log("setAllowViewCalendar")
     }
   };
 
@@ -157,7 +159,7 @@ export function DataTable<TData extends { id: string }, TValue>({
 
   return (
     <div className="space-y-4 flex-wrap">
-      <DataTableToolbar data={data} table={table} selectedRows={rowSelection} />
+      <DataTableToolbar data={data} table={table} selectedRows={rowSelection} allowDateRange={allowDateRange}/>
       <div className="rounded-md border">
         <Table>
           <TableHeader>

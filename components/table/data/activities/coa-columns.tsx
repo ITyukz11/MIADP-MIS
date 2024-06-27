@@ -5,6 +5,7 @@ import { DataTableColumnHeader } from "../../data-table-column-header";
 import { DataTableRowActions } from "../pending-users/data-table-row-actions";
 import { Badge } from "../../../ui/badge";
 import { CalendarOfActivityType } from '@/schemas/calendar-of-activity';
+import { dateInRangeFilter } from '../../date-range-filter';
 
 export const formatDate = (dateString: string) => {
   const date = new Date(dateString);
@@ -202,6 +203,7 @@ export const columns: ColumnDef<CalendarOfActivityType>[] = [
         </span>
       </div>
     ),
+    filterFn: dateInRangeFilter,
   },
   {
     accessorKey: "dateTo",
@@ -215,6 +217,7 @@ export const columns: ColumnDef<CalendarOfActivityType>[] = [
         </span>
       </div>
     ),
+    filterFn: dateInRangeFilter,
   },
   {
     accessorKey: "timeStart",

@@ -8,7 +8,6 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from '@/components/ui/button';
-import { useCalendarOfActivityContext } from '@/components/context/CalendarOfActivityContext';
 import { DataTable } from '@/components/table/data-table';
 import { useCurrentUser } from '@/components/context/CurrentUserContext';
 import { columns } from '@/components/table/data/activities/coa-columns';
@@ -19,12 +18,14 @@ import { ToastAction } from '@/components/ui/toast';
 import { FaPeopleGroup } from "react-icons/fa6";
 import { Label } from '@/components/ui/label';
 import { CalendarSheet } from '@/components/calendar-of-activity/CalendarSheet';
+import { useSelector } from '@/app/store/store';
 
 
 type Props = {};
 
 export const ViewMyParticipatedSchedDialog = (props: Props) => {
-  const { activities, loading, error, fetchActivitiesData } = useCalendarOfActivityContext();
+  // const { activities, loading, error, fetchActivitiesData } = useCalendarOfActivityContext();
+  const { activitiesData, activityLoading, activityError } = useSelector((state)=> state.activity)
   const { currentUser } = useCurrentUser();
   const [filteredData, setFilteredData] = useState<any[]>([]);
   const [viewCalendarData, setViewCalendarData] = useState<any[]>([]);
@@ -34,18 +35,18 @@ export const ViewMyParticipatedSchedDialog = (props: Props) => {
 
   const handleViewRowIdPressed = (viewId: string) => {
     setSelectedRowId(viewId);
-    console.log("viewId ZZ: ", viewId)
+    // console.log("viewId ZZ: ", viewId)
   };
 
   useEffect(() => {
-    console.log("currentUser.id: ", currentUser?.id)
+    // console.log("currentUser.id: ", currentUser?.id)
     if (currentUser && currentUser.name) {
-      const filtered = activities.filter(activity =>
+      const filtered = activitiesData.filter(activity =>
         activity.participants.some(participant => participant.userId === currentUser?.id)
       );
       setFilteredData(filtered);
     }
-  }, [currentUser, activities]);
+  }, [currentUser, activitiesData]);
 
 
   useEffect(() => {
@@ -53,7 +54,7 @@ export const ViewMyParticipatedSchedDialog = (props: Props) => {
       activity.id == selectedRowId
     );
     setViewCalendarData(viewCalendarDataFiltered);
-  }, [activities, currentUser?.id, filteredData, selectedRowId])
+  }, [activitiesData, currentUser?.id, filteredData, selectedRowId])
 
 
   const hiddenColumns = [
@@ -82,7 +83,7 @@ export const ViewMyParticipatedSchedDialog = (props: Props) => {
             </DialogTitle>
             <DialogDescription className='flex flex-row'>
               Total activities: <b> {filteredData.length}</b>. These activities are listed in the calendar, and you have been selected as a participant for these events.
-              {loading && (
+              {activityLoading && (
                 <Label className='text-xs flex flex-row gap-2 items-center ml-auto italic'>Fetching new data <LoadingSpinner /></Label>
               )}
             </DialogDescription>
@@ -96,6 +97,7 @@ export const ViewMyParticipatedSchedDialog = (props: Props) => {
               allowViewCalendar={true}
               onViewRowId={handleViewRowIdPressed}
               setAllowViewCalendar={() => setViewCalendar(!viewCalendar)}
+              allowDateRange={true}
             />
           </div>
 

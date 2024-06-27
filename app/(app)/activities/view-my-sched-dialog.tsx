@@ -10,7 +10,6 @@ import {
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { FaCalendarAlt } from 'react-icons/fa';
-import { useCalendarOfActivityContext } from '@/components/context/CalendarOfActivityContext';
 import { DataTable } from '@/components/table/data-table';
 import { useCurrentUser } from '@/components/context/CurrentUserContext';
 import { columns } from '@/components/table/data/activities/coa-columns';
@@ -20,17 +19,19 @@ import ConfirmDeleteDialog from '@/components/dialog/delete-dialog';
 import { deleteCalendarOfActivity } from '@/actions/calendar-of-activity/delete';
 import { Skeleton } from '@/components/ui/skeleton';
 import UpdateActivityDialog from '@/components/dialog/update-dialog';
-import { Activity } from '@/types/calendar-of-activity';
 import { updateCalendarOfActivity } from '@/actions/calendar-of-activity/update';
 import { Label } from '@/components/ui/label';
 import { LoadingSpinner } from '@/components/LoadingSpinner';
 import { toast } from '@/components/ui/use-toast';
 import { ToastAction } from '@/components/ui/toast';
+import { useDispatch, useSelector } from '@/app/store/store';
+import { fetchActivitiesData } from '@/app/store/activityAction';
 
 type Props = {};
 
 export const ViewMySchedDialog = (props: Props) => {
-  const { activities, loading, error, fetchActivitiesData } = useCalendarOfActivityContext();
+  // const { activities, loading, error, fetchActivitiesData } = useCalendarOfActivityContext();
+  const {activitiesData, activityLoading, activityError} =useSelector((state)=> state.activity)
   const { currentUser } = useCurrentUser();
 
   const [filteredData, setFilteredData] = useState<any[]>([]);
@@ -44,6 +45,8 @@ export const ViewMySchedDialog = (props: Props) => {
 
   const [loadingDelete, setLoadingDelete] = useState(false);
   const [alert, setAlert] = useState<{ type: 'success' | 'error', message: string } | null>(null);
+
+  const dispatch = useDispatch()
 
   const handleSelectedRowIdsChange = (selectedIds: string[]) => {
     setSelectedRowIds(selectedIds);
@@ -66,11 +69,11 @@ export const ViewMySchedDialog = (props: Props) => {
         ),
       });
 
-      fetchActivitiesData()
+      dispatch(fetchActivitiesData())
     } else {
       setAlert({ type: 'error', message: response.error ?? 'An unexpected error occurred.' });
     }
-    if (!loading && !loadingDelete) {
+    if (!activityLoading && !loadingDelete) {
       setOpenDeleteDialog(false);
     }
   };
@@ -86,10 +89,10 @@ export const ViewMySchedDialog = (props: Props) => {
 
   useEffect(() => {
     if (currentUser && currentUser.name) {
-      const filtered = activities.filter(activity => activity.userName === currentUser.name);
+      const filtered = activitiesData.filter(activity => activity.userName === currentUser.name);
       setFilteredData(filtered);
     }
-  }, [currentUser, activities]);
+  }, [currentUser, activitiesData]);
   const hiddenColumns = [
     'id',
     'authorizeOther',
@@ -113,7 +116,7 @@ export const ViewMySchedDialog = (props: Props) => {
           </DialogTitle>
           <DialogDescription className='flex flex-row'>
             Total activities: <b>{filteredData.length}</b>. You can update and delete your encoded activities here.
-            {loading && (
+            {activityLoading && (
               <Label className='text-xs flex flex-row gap-2 items-center ml-auto italic'>Fetching new data <LoadingSpinner /></Label>
             )}
           </DialogDescription>
@@ -152,7 +155,7 @@ export const ViewMySchedDialog = (props: Props) => {
               onCancel={handleCancelUpdate}
               openUpdateDialog={openUpdateDialog}
               setUpdateDialogClose={setOpenUpdateDialog}
-              loadingUpdate={loading}
+              loadingUpdate={activityLoading}
             />
           </div>
 
@@ -164,6 +167,7 @@ export const ViewMySchedDialog = (props: Props) => {
             hiddenColumns={hiddenColumns}
             onSelectedRowIdsChange={handleSelectedRowIdsChange}
             allowSelectRow={true}
+            allowDateRange={true}
           />
         </div>
 

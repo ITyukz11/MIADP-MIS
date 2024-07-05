@@ -95,20 +95,6 @@ export const columns: ColumnDef<CalendarOfActivityType>[] = [
     ),
   },
   {
-    accessorKey: "authorizeOther",
-   // enableHiding: false,
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Authorized" />
-    ),
-    cell: ({ row }) => (
-      <div className="flex space-x-2">
-        <span className="max-w-[500px] truncate font-medium cursor-default">
-          {row.getValue("authorizeOther")}
-        </span>
-      </div>
-    ),
-  },
-  {
     accessorKey: "activityTitle",
    // enableHiding: false,
     header: ({ column }) => (
@@ -116,8 +102,10 @@ export const columns: ColumnDef<CalendarOfActivityType>[] = [
     ),
     cell: ({ row }) => (
       <div className="flex space-x-2">
-        <span className="max-w-[500px] truncate font-medium cursor-default">
-          {row.getValue("activityTitle")}
+        <span className="max-w-[500px] truncate font-medium cursor-default gap-1 flex">
+        <Badge variant={'outline'}>
+          {row.original.user?.unit? row.original.user?.unit: row.original.user?.component}</Badge>
+        {row.getValue("activityTitle")}
         </span>
       </div>
     ),
@@ -144,7 +132,7 @@ export const columns: ColumnDef<CalendarOfActivityType>[] = [
     cell: ({ row }) => (
       <div className="flex space-x-2">
         <span className="max-w-[500px] truncate font-medium cursor-default">
-        <Badge variant='outline'> {row.getValue("type")}</Badge>
+        <Badge variant={'secondary'}> {row.getValue("type")}</Badge>
         </span>
       </div>
     ),

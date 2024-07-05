@@ -126,6 +126,8 @@ model TimeFrameFinancial {
 model CalendarOfActivity {
   id                        String                          @id @default(cuid())
   authorizeOther            Boolean
+  individualActivity        Boolean                         @default(false) // Adding a default value
+  WFPYear                   String?
   activityTitle             String
   activityDescription       String
   type                      String
@@ -138,6 +140,7 @@ model CalendarOfActivity {
   timeEnd                   String
   allDay                    Boolean
   preparatoryList           PreparatoryList[]
+  preparatoryContent        String?
   remarks                   String
   color                     String?
   images                    CalendarOfActivitiesImage[]

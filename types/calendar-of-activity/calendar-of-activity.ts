@@ -29,6 +29,7 @@ export interface User {
   export interface Activity {
     id: string;
     authorizeOther: boolean;
+    individualActivity:boolean;
     activityTitle: string;
     activityDescription: string;
     type: string;
@@ -50,5 +51,6 @@ export interface User {
     user: User;
     calendarOfActivityHistory: any[];
     preparatoryList: PreparatoryList[];
+    preparatoryContent:string;
   }
   

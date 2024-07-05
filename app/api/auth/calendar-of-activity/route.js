@@ -11,17 +11,19 @@ export async function POST(request) {
 
     //const userName = await getCurrentUser();
 
-    const { authorizeOther, activityTitle, activityDescription, type, targetParticipant, participants,
-      location, dateFrom, dateTo, timeStart, timeEnd, allDay, attachments, status, remarks, preparatoryList, userName } = await request.json();
+    const { authorizeOther, individualActivity, WFPYear, activityTitle, activityDescription, type, targetParticipant, participants,
+      location, dateFrom, dateTo, timeStart, timeEnd, allDay, attachments, status, remarks,preparatoryContent, preparatoryList, userName } = await request.json();
     console.log('api/auth/calendar-of-activity route: ', {
-      authorizeOther, activityTitle, activityDescription, type, targetParticipant, participants,
-      location, dateFrom, dateTo, timeStart, timeEnd, allDay, attachments, status, remarks, preparatoryList, userName
+      authorizeOther, individualActivity, WFPYear, activityTitle, activityDescription, type, targetParticipant, participants,
+      location, dateFrom, dateTo, timeStart, timeEnd, allDay, attachments, status, remarks, preparatoryContent,preparatoryList, userName
     });
 
     // Create the new calendar of activity
     const newCalendarOfActivity = await prisma.calendarOfActivity.create({
       data: {
         authorizeOther,
+        individualActivity,
+        WFPYear,
         activityTitle,
         activityDescription,
         type,
@@ -35,6 +37,7 @@ export async function POST(request) {
         attachments,
         status,
         remarks,
+        preparatoryContent,
         preparatoryList: {
           createMany: {
             data: preparatoryList // Assuming preparatoryList is an array of objects

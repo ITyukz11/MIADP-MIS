@@ -19,6 +19,8 @@ export const calendarOfActivity = async (values: z.infer<typeof CalendarOfActivi
         } else {
             const response = await axios.post('/api/auth/calendar-of-activity', {
                 authorizeOther: values.authorizeOther,
+                individualActivity:values.individualActivity,
+                WFPYear:values.WFPYear,
                 activityTitle:values.activityTitle,
                 activityDescription: values.activityDescription,
                 type: values.type,
@@ -33,6 +35,7 @@ export const calendarOfActivity = async (values: z.infer<typeof CalendarOfActivi
                 status: values.status,
                 color: values.color,
                 remarks: values.remarks,
+                preparatoryContent:values.preparatoryContent,
                 preparatoryList: values.preparatoryList,
                 attachments:values.attachments,
                 userName:values.name

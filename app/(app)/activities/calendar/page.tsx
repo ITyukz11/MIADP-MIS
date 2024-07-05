@@ -43,6 +43,7 @@ import { FullscreenIcon } from 'lucide-react';
 import dayjs from 'dayjs';
 import { useDispatch, useSelector } from '@/app/store/store';
 import { fetchActivitiesData } from '@/app/store/activityAction';
+import MajorOrIndividualDialog from '../major-or-individual-dialog';
 
 interface Event {
     id: string;
@@ -74,19 +75,24 @@ const page = () => {
 
     const [fullScreenCalendar, setFullScreenCalendar] = useState(false)
 
-    const calendarRef = useRef<FullCalendar>(null);
-    console.log("activities filteredCoaData: ", filteredCoaData)
+    const [individualActivity, setIndividualActivity] = useState(false)
+    const [planningActivityOpen, setPlanningActivityOpen] = useState(false)
 
-    console.log("activities: ", activitiesData)
+    const handleSetIndividualActivity = (isIndividual: boolean) => {
+        // Logic to handle setting individual activity state or any other actions
+        setIndividualActivity(isIndividual)
+    };
+
+    const calendarRef = useRef<FullCalendar>(null);
 
     const dispatch = useDispatch()
 
     useEffect(() => {
         if (activitiesData.length === 0) {
-          dispatch(fetchActivitiesData());
+            dispatch(fetchActivitiesData());
         }
-      }, [dispatch, activitiesData.length]);
-      
+    }, [dispatch, activitiesData.length]);
+
     const formatDateToISOWithoutTimezone = (date: Date) => {
         const year = date.getFullYear();
         const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -102,13 +108,17 @@ const page = () => {
     };
 
     const formatEndDateToISOWithoutTimezone = (endDate: Date, startDate: Date) => {
-        const year = endDate.getFullYear();
-        const month = String(endDate.getMonth() + 1).padStart(2, '0');
-        const endDay = endDate.getDate();
-        const startDay = startDate.getDate();
+        const dateEnd = new Date(endDate)
+        const dateStart = new Date(startDate)
+        const year = dateEnd.getFullYear();
+        const month = String(dateEnd.getMonth() + 1).padStart(2, '0');
+        const endDay = dateEnd.getDate();
+        const startDay = dateStart.getDate();
 
         // If the end day is the same as the start day, no need to add a day
+        console.log("startDay endDay: ", startDay, endDay)
         if (startDay === endDay) {
+            console.log(`${year}-${month}-${String(endDay).padStart(2, '0')}`)
             return `${year}-${month}-${String(endDay).padStart(2, '0')}`;
         }
 
@@ -149,28 +159,36 @@ const page = () => {
         return 'T' + isoString.split('T')[1];
     };
 
-
+    const timeStartFormat = (time:string | null | undefined)=>{
+        if (!time) {
+            return ""; // Return an empty string if isoString is null or undefined
+        }else{
+            return "T"+time;
+        }
+    }
     useEffect(() => {
         const fetchData = () => {
             try {
 
                 const formattedData = activitiesData.map((event: any) => {
-                    const startDate = new Date(event.dateFrom);
-                    const endDate = new Date(event.dateTo);
+                    // const startDate = new Date(event.dateFrom);
+                    // const endDate = new Date(event.dateTo);
+                     const startDate =event.dateFrom
+                    const endDate = event.dateTo
 
                     return {
                         id: event.id,
                         title: event.activityTitle,
-                        start: formatStartDateToISOWithoutTimezone(startDate) + addingTimeEvent(event.timeStart), // Format date without timezone
-                        end: formatEndDateToISOWithoutTimezone(endDate, startDate) + addingTimeEvent(event.timeEnd),
+                        // start: formatStartDateToISOWithoutTimezone(startDate) + addingTimeEvent(event.timeStart), // Format date without timezone
+                        // end: formatEndDateToISOWithoutTimezone(endDate, startDate) + addingTimeEvent(event.timeEnd),
+                        start:startDate+timeStartFormat(event.timeStart),
+                        end:formatEndDateToISOWithoutTimezone(endDate,startDate),
                         timeStart: event.timeStart,
                         timeEnd: event.timeEnd,
                         color: event.user.color, // Use user color
-                        status: event.status
+                        status: event.status,
                     };
                 });
-
-                console.log("formattedData: ", formattedData)
 
                 const filteredUpcomingData = formattedData
                     .filter((event: any) => event.status === 'Upcoming')
@@ -183,8 +201,6 @@ const page = () => {
                 setFilteredCoaData(formattedData);
                 setFilteredUpcomingEvents(filteredUpcomingData)
                 setFilteredOnGoingEvents(filteredOnGoingEvents)
-                console.log("filteredCoaData:", filteredCoaData)
-                console.log("filteredUpcomingData: ", filteredUpcomingData)
 
             } catch (error) {
                 console.error("Error fetching calendar of activity:", error);
@@ -193,7 +209,6 @@ const page = () => {
         fetchData()
     }, [activitiesData, activityLoading])
 
-    console.log("filteredData: ", filteredData)
 
     useEffect(() => {
         if (selectedFilter === 'All') {
@@ -217,18 +232,22 @@ const page = () => {
             );
 
             const formattedData = filtered.map((event: any) => {
-                const startDate = new Date(event.dateFrom);
-                const endDate = new Date(event.dateTo);
+                // const startDate = new Date(event.dateFrom);
+                // const endDate = new Date(event.dateTo);
+                 const startDate =event.dateFrom
+                const endDate = event.dateTo
 
                 return {
                     id: event.id,
                     title: event.activityTitle,
-                    start: formatStartDateToISOWithoutTimezone(startDate) + addingTimeEvent(event.timeStart), // Format date without timezone
-                    end: formatEndDateToISOWithoutTimezone(endDate, startDate) + addingTimeEvent(event.timeEnd),
+                    // start: formatStartDateToISOWithoutTimezone(startDate) + addingTimeEvent(event.timeStart), // Format date without timezone
+                    // end: formatEndDateToISOWithoutTimezone(endDate, startDate) + addingTimeEvent(event.timeEnd),
+                    start:startDate+timeStartFormat(event.timeStart),
+                    end:formatEndDateToISOWithoutTimezone(endDate,startDate),
                     timeStart: event.timeStart,
                     timeEnd: event.timeEnd,
                     color: event.user.color, // Use user color
-                    status: event.status
+                    status: event.status,
                 };
             });
 
@@ -244,27 +263,56 @@ const page = () => {
             setFilteredUpcomingEvents(filteredUpcomingData)
             setFilteredOnGoingEvents(filteredOnGoingEvents)
 
-            console.log("filteredUpcomingData: ", filteredUpcomingData)
         }
     }, [selectedFilter, filteredCoaData]);
 
     const events = [
         // Replace this with your actual list of events
-        { id: '1', title: 'Orientation cum Meeting with NCIP and MIADP Staff', start: '2024-06-01T11:00:00+09:00', end: '2024-06-03T11:00:00+09:00', color: '#ff0000' },
-        { id: '2', title: 'PSO-RPCO 1st Quarter Assessment, Davao City', start: '2024-06-05', end: '2024-06-07T00:00:01', color: '#013220' },
+        {   id: '1', 
+            title: 'Orientation cum Meeting with NCIP and MIADP Staff', 
+            start: '2024-07-01T13:00', 
+            end: '2024-07-01', 
+            color: '#ff0000'    
+        },
+        {   id: '2', 
+            title: 'PSO-RPCO 1st Quarter Assessment, Davao City', 
+            start: '2024-07-05', 
+            end: '2024-07-07', 
+            color: '#013220' 
+        },
         {
             id: '3',
             title: 'Drone Pilot Training with Introduction to Aerial Mapping using UAVs',
-            start: '2024-06-02T10:00:00', // Include time in ISO 8601 format
-            end: '2024-06-02T18:00:00',   // Include time in ISO 8601 format
+            start: '2024-07-02T10:00:00', // Include time in ISO 8601 format
+            end: '2024-07-02',   // Include time in ISO 8601 format
             color: '#0000ff'
         },
-        { id: '4', title: 'Event 1', start: '2024-06-20', end: '2024-06-20', color: '#ff0000' },
-        { id: '5', title: 'Event 2', start: '2024-06-21', end: '2024-06-07', color: '#013220' },
-        { id: '6', title: 'Event 3', start: '2024-06-26', end: '2024-06-12', color: '#0000ff' },
-        { id: '7', title: 'Event 1', start: '2024-06-30', end: '2024-06-20', color: '#ff0000' },
-        { id: '8', title: 'SDS Orientation', start: '2024-06-05', end: '2024-06-07', color: '#013220' },
-        { id: '9', title: 'Training of Trainers (TOT) - Business Plan Preparation (Modules 1 and 2) (RPCO-LGU-NCIP)', start: '2024-06-07', end: '2024-06-12', color: '#0000ff' },
+        {   id: '4', 
+            title: 'Event 1', 
+            start: '2024-07-20', 
+            end: '2024-07-25', 
+            color: '#ff0000' 
+        },
+        {   id: '5', 
+            title: 'Event 2', 
+            start: '2024-07-21', 
+            end: '2024-07-07', 
+            color: '#013220' 
+        },
+        {   id: '6', 
+            title: 'Event 3', 
+            start: '2024-07-26', 
+            end: '2024-07-12', 
+            color: '#0000ff' 
+        },
+        {   id: '7', 
+            title: 'Event 1', 
+            start: '2024-07-30', 
+            end: '2024-07-20', 
+            color: '#ff0000' 
+        },
+        { id: '8', title: 'SDS Orientation', start: '2024-07-05', end: '2024-07-07', color: '#013220' },
+        { id: '9', title: 'Training of Trainers (TOT) - Business Plan Preparation (Modules 1 and 2) (RPCO-LGU-NCIP)', start: '2024-07-07', end: '2024-07-12', color: '#0000ff' },
     ];
 
     const handleEventClick = (info: any) => {
@@ -338,24 +386,26 @@ const page = () => {
         return dayjs(dateString).subtract(1, 'day').format('YYYY-MM-DD');
     };
 
+    console.log("filteredData: ", filteredData)
+
     return (
         <div className='w-full flex justify-center'>
             <div className="flex flex-col py-2 md:flex-row gap-5 flex-wrap md:flex-nowrap overflow-hidden w-full max-w-[1800px]"
                 style={{
-                    ...(fullScreenCalendar ? { width: '100%'} : {})
+                    ...(fullScreenCalendar ? { width: '100%' } : {})
                 }}>
                 {!fullScreenCalendar &&
                     (<div className='flex flex-col w-full md:w-1/4 gap-4 justify-start items-center'>
-                        <Card className='w-full'>
+                        {/* <Card className='w-full'>
                             <CardHeader>
                                 <Button
                                     variant="default"
                                     className='flex flex-row items-center gap-1 justify-center text-xs lg:text-sm'
-                                    onClick={() => setCalendarFormOpen(true)}><FaPlusCircle className='shrink-0' /> Create new activity</Button>
+                                    onClick={() => setPlanningActivityOpen(true)}><FaPlusCircle className='shrink-0' /> Create new activity</Button>
                                 <ViewMySchedDialog />
                                 <ViewMyParticipatedSchedDialog />
                             </CardHeader>
-                        </Card>
+                        </Card> */}
                         <Card className='overflow-y-auto w-full md:max-h-[400px] rounded-xl scrollbar-thin scrollbar-track-rounded-full'>
                             <CardHeader className="font-bold gap-2 sticky top-0 p-3 z-10 border-b bg-white dark:bg-gray-800">
                                 <CardTitle className="flex flex-row items-center justify-start gap-10">
@@ -403,7 +453,7 @@ const page = () => {
                                                             <div className='flex gap-3 flex-row flex-wrap'>
                                                                 {/* <Label className="font-extralight">{`${startDateString}-${endDateString}`}</Label> */}
                                                                 <Label className="font-extralight text-xs sm:text-sm">
-                                                                    {startDate === endDate ? startDate : `${startDate} - ${endDate}`}
+                                                                    {startDate === endDate || startTimeString? startDate : `${startDate} - ${endDate}`}
                                                                 </Label>
                                                                 <Label className="font-extralight text-xs sm:text-sm">{startTimeString ? `${startTimeString} - ${endTimeString}` : 'All Day'}</Label>
                                                             </div>
@@ -450,6 +500,9 @@ const page = () => {
                                         .map((event: any) => {
                                             const startDate = formatDate(event.start);
                                             const endDate = formatDate(subtractOneDay(event.end));
+                                            const minus1dayEndDate = formatDate(subtractOneDay(event.end));
+                                            // const endDate = event.start == event.end ? formatDate(event.end):minus1dayEndDate
+
                                             const startTimeString = formatTime(event.timeStart);
                                             const endTimeString = formatTime(event.timeEnd)
                                             return (
@@ -463,7 +516,7 @@ const page = () => {
                                                             {/** - ${endDateString} ${endTimeString} */}
                                                             <div className='flex gap-3 flex-row flex-wrap'>
                                                                 <Label className="font-extralight text-xs sm:text-sm">
-                                                                    {startDate === endDate ? startDate : `${startDate} - ${endDate}`}
+                                                                    {startDate === endDate || startTimeString? startDate : `${startDate} - ${endDate}`}
                                                                 </Label>
                                                                 <Label className="font-extralight text-xs sm:text-sm">{startTimeString ? `${startTimeString} - ${endTimeString}` : 'All Day'}</Label>
                                                             </div>
@@ -524,6 +577,7 @@ const page = () => {
                     </div>
                     <CardContent>
                         <FullCalendar
+                            locale={'en'}
                             ref={calendarRef}
                             headerToolbar={{
                                 left: 'today prev,next',
@@ -548,8 +602,16 @@ const page = () => {
                     </CardContent>
                 </Card>
             </div>
+            <MajorOrIndividualDialog
+                open={planningActivityOpen}
+                setClose={() => setPlanningActivityOpen(!planningActivityOpen)}
+                setCalendarFormOpen={() => setCalendarFormOpen(true)}
+                setIndividualActivity={handleSetIndividualActivity}
+            />
+
             <CalendarFormDialog open={calendarFormOpen}
-                setClose={() => setCalendarFormOpen(false)} />
+                setClose={() => setCalendarFormOpen(false)}
+                individualActivity_={individualActivity} />
             <CalendarSheet activityData={activityData} openSheet={calendarSheetOpen} closeCalendarSheet={() => setCalendarSheetOpen(!calendarSheetOpen)} />
         </div>
     );

@@ -25,7 +25,7 @@ export default function AnnouncementsPage() {
       <div className="flex-col md:flex">
         <div className="flex-1 space-y-4">
           <div className="flex items-center justify-between space-y-2 flex-wrap">
-            <h2 className="text-3xl font-bold tracking-tight">Dashboard</h2>
+            <h2 className="text-xl md:text-3xl font-bold tracking-tight">Dashboard</h2>
             <Label className='text-xs text-gray-500'>
               ** All data here are still not real **
             </Label>

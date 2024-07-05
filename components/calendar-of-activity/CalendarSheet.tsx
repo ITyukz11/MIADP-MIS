@@ -209,7 +209,7 @@ ${formattedPreparatoryList}`;
               </div>
               <div className="flex items-center space-x-2 mt-2">
                 <FlagTriangleRight className="h-5 w-5 shrink-0" />
-                <Badge className="font-medium shadow-md">{type}</Badge>
+                <Badge variant={'secondary'} className="font-medium shadow-md">{type}</Badge>
               </div>
               <div className="flex items-center space-x-2 mt-2">
                 <CalendarFold className="h-5 w-5 shrink-0" />

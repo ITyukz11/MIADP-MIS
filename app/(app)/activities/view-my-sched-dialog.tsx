@@ -50,7 +50,7 @@ export const ViewMySchedDialog = (props: Props) => {
 
   const handleSelectedRowIdsChange = (selectedIds: string[]) => {
     setSelectedRowIds(selectedIds);
-    console.log('Selected row IDs:', selectedIds);
+    // console.log('Selected row IDs:', selectedIds);
   };
 
   const handleConfirmDelete = async () => {
@@ -107,7 +107,7 @@ export const ViewMySchedDialog = (props: Props) => {
     <Dialog>
       <DialogTrigger asChild>
         <Button variant="outline" className='flex flex-row items-center gap-1 justify-center overflow-hidden text-xs lg:text-sm'>
-          <FaCalendarAlt className='shrink-0' /> View encoded activities
+          <FaCalendarAlt className='shrink-0' size={20}/> View encoded activities
         </Button>
       </DialogTrigger>
       <DialogContent className="min-w-[90vw] max-h-[90vh] overflow-y-auto">

@@ -17,7 +17,6 @@ import { CalendarSheet } from '@/components/calendar-of-activity/CalendarSheet';
 import { useCurrentUser } from '@/components/context/CurrentUserContext';
 import { useDispatch, useSelector } from '@/app/store/store';
 import { fetchActivitiesData } from '@/app/store/activityAction';
-import { fetchUsersData } from '@/app/store/userAction';
 
 type Props = {}
 
@@ -51,8 +50,11 @@ const Page = (props: Props) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Sorting activities based on 'createdAt' in descending order
-        const sortedActivities = [...activitiesData].sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        // Filter out activities where 'individualActivity' is false
+        const filteredActivities = activitiesData.filter((activity: any) => !activity.individualActivity);
+        
+        // Sort activities based on 'createdAt' in descending order
+        const sortedActivities = filteredActivities.sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
         
         setCoaData(sortedActivities);
         setFilteredData(sortedActivities); // Initialize filteredData with all activities sorted
@@ -62,6 +64,7 @@ const Page = (props: Props) => {
     };
     fetchData();
   }, [activitiesData]);
+  
   
   useEffect(() => {
     const viewCalendarDataFiltered = filteredData.filter(activity =>

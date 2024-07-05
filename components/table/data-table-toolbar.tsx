@@ -82,7 +82,7 @@ export function DataTableToolbar<TData>({
             placeholder="Filter..."
             value={filterInput}
             onChange={(event) => setFilterInput(event.target.value)}
-            className="h-8 w-[150px] lg:w-[250px]"
+            className="h-8 w-[150px] lg:w-[250px] pr-6"
           />
           <SearchIcon className='absolute right-2 top-2 h-4 w-4' />
         </div>

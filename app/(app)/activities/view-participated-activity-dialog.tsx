@@ -19,6 +19,8 @@ import { FaPeopleGroup } from "react-icons/fa6";
 import { Label } from '@/components/ui/label';
 import { CalendarSheet } from '@/components/calendar-of-activity/CalendarSheet';
 import { useSelector } from '@/app/store/store';
+import { IoPeopleCircle } from 'react-icons/io5';
+import { MdPeople } from 'react-icons/md';
 
 
 type Props = {};
@@ -72,7 +74,7 @@ export const ViewMyParticipatedSchedDialog = (props: Props) => {
       <Dialog>
         <DialogTrigger asChild>
           <Button variant="outline" className='flex flex-row items-center gap-1 justify-center overflow-hidden text-xs lg:text-sm'>
-            <FaPeopleGroup className='shrink-0' /> View participated activities
+            <MdPeople className='shrink-0'size={25}/> View participated activities
           </Button>
         </DialogTrigger>
         <DialogContent className="min-w-[90vw] max-h-[90vh] overflow-y-auto">

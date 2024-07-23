@@ -5,8 +5,10 @@ import React, { createContext, useState, useContext, ReactNode, FC } from 'react
 // Define the shape of the user
 interface User {
   name: string;
+  email:string;
   role: string;
   region: string;
+  position:string;
   expoPushToken: string;
   component:string;
   unit:string;

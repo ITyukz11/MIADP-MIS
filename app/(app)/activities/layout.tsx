@@ -97,7 +97,7 @@ export default function ActivitiesLayout({ children }: ActivitiesLayoutProps) {
         </div>
         <Card className='flex flex-row gap-2 w-full shadow-none'>
           <CardContent className='flex items-center justify-center md:justify-between gap-2 w-full p-4 flex-wrap'>
-            <div className='flex flex-row gap-2'>
+            <div className='flex flex-wrap justify-center md:justify-start sm:flex-row gap-2 '>
               <Button
                 variant="default"
                 className='flex flex-row items-center gap-1 justify-center text-xs lg:text-sm'
@@ -105,7 +105,7 @@ export default function ActivitiesLayout({ children }: ActivitiesLayoutProps) {
               <ViewMySchedDialog />
               <ViewMyParticipatedSchedDialog />
             </div>
-            <div className='flex flex-row gap-2'>
+            <div className='flex sm:flex-row gap-2 flex-wrap justify-center sm:justify-end'>
               <Link href="/activities" className={cn(buttonVariants({ variant: 'secondary' }), "rounded-[6px] xs:w-[200px] md:w-fit flex flex-row gap-1 items-center justify-center overflow-hidden text-xs lg:text-sm")}>
                 <TableIcon size={22} /> Table
               </Link>

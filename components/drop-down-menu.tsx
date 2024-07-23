@@ -17,6 +17,8 @@ import { MdLiveHelp, MdLogout } from "react-icons/md";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { signOut } from "next-auth/react";
 import { TbPlugConnectedX } from "react-icons/tb";
+import { useState } from "react";
+import { ProfileDialog } from "./profile/dialog/profile-dialog";
 
 
 interface DropDownMenuComponentProps {
@@ -24,6 +26,11 @@ interface DropDownMenuComponentProps {
 }
 
 export const DropDownMenuComponent = ({ }: DropDownMenuComponentProps) => {
+  const [profileDialog, setProfileDialog] = useState<boolean>(false)
+
+  const handleProfile = ()=> {
+    setProfileDialog(true)
+  }
   return (
     <>
       <DropdownMenu>
@@ -37,7 +44,7 @@ export const DropDownMenuComponent = ({ }: DropDownMenuComponentProps) => {
           <DropdownMenuLabel>My Account</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={handleProfile}>
               <FaUser />  Profile
             </DropdownMenuItem>
             <DropdownMenuItem disabled>
@@ -53,6 +60,8 @@ export const DropDownMenuComponent = ({ }: DropDownMenuComponentProps) => {
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
+
+      <ProfileDialog open={profileDialog} setClose={()=> setProfileDialog(!profileDialog)}/>
     </>
   )
 }

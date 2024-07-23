@@ -22,11 +22,12 @@
 export const componentOptions = ["Component 1", "Component 2", "Component 3", "Component 4"];
 
 export const unitOptions = [
+    { value: "ODPD", label: 'ODPD' },
+    { value: "ODPD - Info Links", label: 'ODPD - Info Links' },
     { value: "Finance", label: 'FINANCE' },
     { value: "Admin", label: 'ADMIN' },
     { value: "Procurement", label: 'Procurement' },
     { value: "GGU", label: 'GGU' },
-    { value: "ODPD", label: 'ODPD' },
     { value: "SES", label: 'SES' },
     { value: "PMEU", label: 'PMEU' },
     { value: "Economist", label: 'Economist' },
@@ -39,3 +40,14 @@ export const unitOptions = [
 export const regionOptions = ["PSO","RPCO 9", "RPCO 10", "RPCO 11", "RPCO 12", "RPCO 13", "BARMM"];
 
 export const statusOptions = ["Upcoming", "Ongoing","Completed", "Cancelled", "Postponed"]
+
+export const correspondencePurposeOptions = [
+    "For compliance", 
+    "Give Priority/RUSH/URGENT",
+    "For appropriate action pls.",
+    "For your information & reference",
+    "For your comments/recommendation",
+    "For your files",
+    "For review",
+    "Pls. draft a reply"
+]

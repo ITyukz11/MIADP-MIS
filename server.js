@@ -1,34 +1,22 @@
-const { createServer } = require('http');
-const { parse } = require('url');
-const next = require('next');
-const socketIo = require('socket.io');
+//https://clouddevs.com/next/real-time-notifications-with-websockets/
+const http = require('http');
+const { Server } = require('socket.io');
 
-const dev = process.env.NODE_ENV !== 'production';
-const app = next({ dev });
-const handle = app.getRequestHandler();
+const server = http.createServer();
+const io = new Server(server, {
+  cors: {
+    origin: '*',
+  },
+});
 
-app.prepare().then(() => {
-  const server = createServer((req, res) => {
-    const parsedUrl = parse(req.url, true);
-    handle(req, res, parsedUrl);
+io.on('connection', (socket) => {
+  console.log('A user connected');
+
+  socket.on('disconnect', () => {
+    console.log('A user disconnected');
   });
+});
 
-  const io = socketIo(server);
-
-  io.on('connection', (socket) => {
-    console.log('a user connected');
-
-    socket.on('message', (msg) => {
-      io.emit('message', msg);
-    });
-
-    socket.on('disconnect', () => {
-      console.log('user disconnected');
-    });
-  });
-
-  server.listen(3000, (err) => {
-    if (err) throw err;
-    console.log('> Ready on http://localhost:3000');
-  });
+server.listen(3001, () => {
+  console.log('WebSocket server is listening on port 3001');
 });

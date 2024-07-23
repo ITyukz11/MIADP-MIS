@@ -23,8 +23,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { SearchIcon } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Notebook, RouterIcon, SearchIcon } from "lucide-react";
+import { Button, buttonVariants } from "@/components/ui/button";
+import Link from "next/link";
+import { cn } from "@/lib/utils";
+import { FcDocument } from "react-icons/fc";
+import { HiDocumentCheck } from "react-icons/hi2";
+import { IoDocumentAttach } from "react-icons/io5";
 
 
 function page() {
@@ -35,13 +40,6 @@ function page() {
   ];
   return (
     <div className="xs:container space-y-4">
-      <div className='flex flex-col'>
-        <h2 className="text-xl md:text-3xl font-bold tracking-tight">Document Tracking</h2>
-        <Label className='text-xs sm:text-sm text-muted-foreground'>
-          This Document Tracking page is still under development. It will be available for use soon. Please be patient as PSO currently has only one programmer.
-
-        </Label>
-      </div>
       <div className="w-full flex flex-col gap-2">
         <div className="w-full flex flex-row gap-2 overflow-x-auto">
           <Select>
@@ -68,7 +66,7 @@ function page() {
             <SearchIcon size={20} />Search
           </Button>
         </div>
-
+{/* 
         <Card className="rounded-sm">
           <CardContent className="w-full min-h-fit">
             <Table>
@@ -113,7 +111,7 @@ function page() {
               </TableFooter>
             </Table>
           </CardContent>
-        </Card>
+        </Card> */}
       </div>
     </div>
   );

@@ -24,6 +24,7 @@ import { FcGoogle } from "react-icons/fc";
 import { LoadingSpinner } from "../LoadingSpinner";
 import { PiEyeBold, PiEyeClosedBold } from "react-icons/pi";
 import { motion } from 'framer-motion';
+import { ForgotPasswordDialog } from "./forgot-password-dialog";
 
 
 export const LoginForm = () => {
@@ -34,6 +35,8 @@ export const LoginForm = () => {
 
     const [isChecked, setIsChecked] = useState(false);
     const router = useRouter(); // Initialize useRouter
+
+    const [forgotPass, setForgotPass] = useState<boolean>(false)
 
     const [showPassword, setShowPassword] = useState(false)
 
@@ -201,9 +204,9 @@ export const LoginForm = () => {
                     variant={'link'} 
                     disabled={loading} 
                     className="bg-background px-2 text-muted-foreground"
-                    onClick={()=> alert("Sorry, the forgot password feature is still under development.")}>Forgot password?</Button>
+                    onClick={()=> setForgotPass(true)}>Forgot password?</Button>
             </div>
-            {/* </CardWrapper> */}
+            <ForgotPasswordDialog open={forgotPass} setClose={()=> setForgotPass(!forgotPass)}/>
         </div>
 
     )

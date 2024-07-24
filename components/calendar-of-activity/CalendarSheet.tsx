@@ -73,7 +73,8 @@ export function CalendarSheet({ activityData, openSheet, closeCalendarSheet }: C
       remarks,
       userName,
       preparatoryList,
-      participants
+      participants,
+      preparatoryContent
     } = activityData[0];
 
     // Format preparatoryList and participants
@@ -132,7 +133,8 @@ ${formattedPreparatoryList}`;
     attachments,
     remarks,
     participants,
-    preparatoryList
+    preparatoryList,
+    preparatoryContent
   } = activityData[0];
 
   const isValidUrl = (string: string) => {
@@ -302,34 +304,49 @@ ${formattedPreparatoryList}`;
                   </AccordionContent>
                 </AccordionItem>
               </Accordion>
-              <Accordion type="single" collapsible>
-                {preparatoryList.map((prep: any, index: number) => (
-                  <AccordionItem key={prep.id} value={prep.id}>
-                    <AccordionTrigger className="flex items-center justify-start space-x-2">
-                      <div className="flex flex-row flex-start gap-2 items-center">
-                        <NotebookPen className="h-5 w-5 shrink-0" />
-                        <Label className="cursor-pointer">Preparatory List {index + 1}</Label>
-                      </div>
-                    </AccordionTrigger>
-                    <AccordionContent>
-                      <div className="flex flex-col space-y-2 p-2 border rounded-lg shadow-md">
-                        <div>
-                          <strong>Description:</strong> {prep.description}
-                        </div>
-                        <div>
-                          <strong>Status:</strong> {prep.status || 'None'}
-                        </div>
-                        <div>
-                          <strong>Remarks:</strong> {prep.remarks || 'None'}
-                        </div>
-                        <div>
-                          <strong>Created At:</strong> {new Date(prep.createdAt).toLocaleString()}
-                        </div>
-                      </div>
-                    </AccordionContent>
-                  </AccordionItem>
-                ))}
-              </Accordion>
+              {preparatoryContent?
+                       <Accordion type="single" collapsible>
+                       <AccordionItem value={"2"}>
+                             <AccordionTrigger className="flex items-center justify-start space-x-2">
+                               <div className="flex flex-row flex-start gap-2 items-center">
+                                 <NotebookPen className="h-5 w-5 shrink-0" />
+                                 <Label className="cursor-pointer">Preparatory Content</Label>
+                               </div>
+                             </AccordionTrigger>
+                             <AccordionContent>
+                             <div className="flex flex-col space-y-2 p-2 border rounded-lg shadow-md" dangerouslySetInnerHTML={{ __html: preparatoryContent }} />
+                             </AccordionContent>
+                           </AccordionItem>
+                       </Accordion>:
+                        <Accordion type="single" collapsible>
+                        {preparatoryList.map((prep: any, index: number) => (
+                          <AccordionItem key={prep.id} value={prep.id}>
+                            <AccordionTrigger className="flex items-center justify-start space-x-2">
+                              <div className="flex flex-row flex-start gap-2 items-center">
+                                <NotebookPen className="h-5 w-5 shrink-0" />
+                                <Label className="cursor-pointer">Preparatory List {index + 1}</Label>
+                              </div>
+                            </AccordionTrigger>
+                            <AccordionContent>
+                              <div className="flex flex-col space-y-2 p-2 border rounded-lg shadow-md">
+                                <div>
+                                  <strong>Description:</strong> {prep.description}
+                                </div>
+                                <div>
+                                  <strong>Status:</strong> {prep.status || 'None'}
+                                </div>
+                                <div>
+                                  <strong>Remarks:</strong> {prep.remarks || 'None'}
+                                </div>
+                                <div>
+                                  <strong>Created At:</strong> {new Date(prep.createdAt).toLocaleString()}
+                                </div>
+                              </div>
+                            </AccordionContent>
+                          </AccordionItem>
+                        ))}
+                      </Accordion>
+                       }
               {qrCode && (
                 <div className="flex flex-col">
                   <div className="flex flex-row gap-2 mb-2">

@@ -161,6 +161,7 @@ export async function GET(request) {
       include: {
         user: {
           select: {
+            id:true,
             component: true,
             unit: true,
             position: true,

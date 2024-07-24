@@ -1,6 +1,7 @@
 // types/Activity.ts
 
 export interface User {
+    id: string;
     component: string;
     unit: string;
     position: string;

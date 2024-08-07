@@ -1,18 +1,17 @@
 'use client'
-// CurrentUserContext.tsx
-import React, { createContext, useState, useContext, ReactNode, FC } from 'react';
+import React, { createContext, useState, useContext, ReactNode, FC, useEffect } from 'react';
 
 // Define the shape of the user
-interface User {
-  name: string;
-  email:string;
-  role: string;
-  region: string;
-  position:string;
-  expoPushToken: string;
-  component:string;
-  unit:string;
-  id:string;
+export interface User {
+  name?: string;
+  email?: string;
+  role?: string;
+  region?: string;
+  position?: string;
+  expoPushToken?: string;
+  component?: string;
+  unit?: string;
+  id?: string;
   // Add other user properties if needed
 }
 
@@ -32,7 +31,25 @@ interface CurrentUserProviderProps {
 }
 
 export const CurrentUserProvider: FC<CurrentUserProviderProps> = ({ children, initialUser }) => {
-  const [currentUser, setCurrentUser] = useState<User | null>(initialUser);
+  // Initialize state from localStorage or use initialUser
+  const [currentUser, setCurrentUserState] = useState<User | null>(() => {
+    const storedUser = localStorage.getItem('currentUser');
+    return storedUser ? JSON.parse(storedUser) : initialUser;
+  });
+
+  // Update localStorage when currentUser changes
+  useEffect(() => {
+    if (currentUser) {
+      localStorage.setItem('currentUser', JSON.stringify(currentUser));
+    } else {
+      localStorage.removeItem('currentUser');
+    }
+  }, [currentUser]);
+
+  // Create a setter function that also updates localStorage
+  const setCurrentUser = (user: User | null) => {
+    setCurrentUserState(user);
+  };
 
   return (
     <CurrentUserContext.Provider value={{ currentUser, setCurrentUser }}>

@@ -72,6 +72,15 @@ export const ViewMySchedDialog = (props: Props) => {
       dispatch(fetchActivitiesData())
     } else {
       setAlert({ type: 'error', message: response.error ?? 'An unexpected error occurred.' });
+      toast({
+        title: "Error",
+        variant:'destructive',
+        description: response.error ?? 'An unexpected error occurred.',
+        duration: 5000,
+        action: (
+          <ToastAction altText="Ok">Ok</ToastAction>
+        ),
+      });
     }
     if (!activityLoading && !loadingDelete) {
       setOpenDeleteDialog(false);

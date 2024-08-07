@@ -28,6 +28,7 @@ model User {
   notification                  Notifications?
   wfpActivities                 WFPActivity[]
   calendarOfActivities          CalendarOfActivity[]
+  userLog                       UserLog[]
   password                      String
   messages                      Message[]
   status                        String                          @default("Approved") // Status field to track approval status (e.g., "approved", "disapproved", "pending")
@@ -131,6 +132,7 @@ model CalendarOfActivity {
   activityTitle             String
   activityDescription       String
   type                      String
+  otherType                 String?
   targetParticipant         String
   participants              CalendarOfActivityParticipant[]
   location                  String
@@ -150,6 +152,7 @@ model CalendarOfActivity {
   userName                  String
   user                      User                            @relation(fields: [userName], references: [name])
   calendarOfActivityHistory CalendarOfActivityHistory[]
+  calendarOfActivityAttachment CalendarOfActivityAttachments[]
   createdAt                 DateTime                        @default(now()) @map(name: "created_at")
   updatedAt                 DateTime                        @updatedAt @map(name: "updated_at")
 }
@@ -203,3 +206,20 @@ model Notifications {
   updatedAt     DateTime @updatedAt @map(name: "updated_at")
 }
 
+model UserLog {
+  id            String   @id @default(cuid())
+  userName      String   
+  user          User     @relation(fields: [userName], references: [name])
+  action        String
+  remarks       String
+  createdAt     DateTime @default(now()) @map(name: "created_at")
+}
+
+model CalendarOfActivityAttachments {
+  id            String   @id @default(cuid())
+  details       String
+  link          String
+  activity      String
+  calendarOfActivity CalendarOfActivity @relation(fields: [activity], references: [id])
+  createdAt     DateTime @default(now()) @map(name: "created_at")
+}

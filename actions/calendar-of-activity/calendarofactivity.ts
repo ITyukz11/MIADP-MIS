@@ -24,6 +24,7 @@ export const calendarOfActivity = async (values: z.infer<typeof CalendarOfActivi
                 activityTitle:values.activityTitle,
                 activityDescription: values.activityDescription,
                 type: values.type,
+                otherType: values.otherType,
                 targetParticipant: values.targetParticipant,
                 participants:values.participants,
                 location: values.location,
@@ -37,7 +38,7 @@ export const calendarOfActivity = async (values: z.infer<typeof CalendarOfActivi
                 remarks: values.remarks,
                 preparatoryContent:values.preparatoryContent,
                 preparatoryList: values.preparatoryList,
-                attachments:values.attachments,
+                calendarOfActivityAttachment:values.calendarOfActivityAttachment,
                 userName:values.name
                 });
 

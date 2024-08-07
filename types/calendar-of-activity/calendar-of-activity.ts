@@ -19,6 +19,14 @@ export interface User {
     updatedAt: string;
   }
 
+  export interface CalendarOfActivityAttachment {
+    id: string;
+    details: string;
+    link: string;
+    activity: string;
+    createdAt: string;
+  }
+
    
   export interface Participants {
     calendarOfActivityId: string;
@@ -50,8 +58,24 @@ export interface User {
     createdAt: string;
     updatedAt: string;
     user: User;
+    calendarOfActivityAttachment:CalendarOfActivityAttachment[];
     calendarOfActivityHistory: any[];
+    listMode:boolean;
     preparatoryList: PreparatoryList[];
     preparatoryContent:string;
   }
+
+  export interface CountActivity {
+    [region: string]: number;
+  }
+
+  export interface ComponentCounts {
+    [component: string]: number;
+  }
+  
+  // Define a type for all regions with their component counts
+  export interface CountComponentActivity {
+    [region: string]: ComponentCounts;
+  }
+  
   

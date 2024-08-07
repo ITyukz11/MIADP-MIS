@@ -39,6 +39,9 @@ import { TooltipComponent } from '@/components/Tooltip'
 import { IoInformationCircleOutline } from "react-icons/io5";
 import dynamic from 'next/dynamic';
 import 'react-quill/dist/quill.snow.css'; // Import Quill styles
+import { Switch } from '@/components/ui/switch'
+import { FaX } from 'react-icons/fa6'
+import { userAgent } from 'next/server'
 
 
 export const QuillEditor = dynamic(() => import('react-quill'), { ssr: false });
@@ -115,8 +118,6 @@ const CalendarForm = ({ setDialogClose, individualActivity_ }: Props) => {
 
     const [WFPYear, setWFPYear] = useState(new Date().getFullYear().toString());
 
-
-
     const form = useForm<z.infer<typeof CalendarOfActivitySchema>>({
         resolver: zodResolver(CalendarOfActivitySchema),
         defaultValues: {
@@ -128,6 +129,7 @@ const CalendarForm = ({ setDialogClose, individualActivity_ }: Props) => {
             targetParticipant: '',
             location: '', // optional field, can be omitted if you don't want a default value
             type: '',
+            otherType: '',
             dateFrom: dayjs().format('YYYY-MM-DD'),
             dateTo: dayjs().format('YYYY-MM-DD'),
             timeStart: '',
@@ -136,19 +138,21 @@ const CalendarForm = ({ setDialogClose, individualActivity_ }: Props) => {
             participants: [],
             color: '#F5222D',
             status: '', // default value specified in the schema
+            listMode: false,
             preparatoryList: [{ description: '', status: '', remarks: '' }],
             preparatoryContent: '',
-            attachments: '',
+            calendarOfActivityAttachment: [{ details: '', link: '' }],
             remarks: '',
             name: currentUser?.name
         },
     })
 
+    console.log("preparatoryContent: ", form.watch('preparatoryContent'))
 
     const handleEditorChange = (newContent: any) => {
         form.setValue('preparatoryContent', newContent)
     };
-    const { control, watch } = form;
+    const { control, watch, formState: { errors } } = form;
 
     const {
         fields: participantFields,
@@ -166,6 +170,34 @@ const CalendarForm = ({ setDialogClose, individualActivity_ }: Props) => {
     } = useFieldArray({
         control,
         name: 'preparatoryList'
+    });
+
+
+    const validatePreparatoryList = () => {
+        const preparatoryList = watch('preparatoryList');
+
+        for (const item of preparatoryList as any) {
+            // Check if description is blank and status is blank
+            if (!item.description || !item.status) {
+                return false;
+            }
+
+            // If status is 'Other', check if remarks is blank
+            if (item.status === 'Other' && !item.remarks) {
+                return false;
+            }
+        }
+
+        return true;
+    };
+
+    const {
+        fields: attachmentFields,
+        append: appendAttachments,
+        remove: removeAttachments
+    } = useFieldArray({
+        control,
+        name: 'calendarOfActivityAttachment'
     });
 
     const onSubmit = async (values: z.infer<typeof CalendarOfActivitySchema>) => {
@@ -196,38 +228,18 @@ const CalendarForm = ({ setDialogClose, individualActivity_ }: Props) => {
         let scheduleError = false;
         let dateToError = false;
 
-        if (!individualActivity_) {
-            const participants = selectedParticipants.map((participantId) => ({
-                userId: participantId.toString(),
-            }));
-
-            values.participants = participants;
-
-            if (values.participants.length > 0) {
-                values.participants.forEach((info) => {
-                    if (info.userId.trim() === '') {
-                        participantError = true;
-                    }
-                });
-            } else {
-                participantError = true; // If no participants are selected
-                setParticipantError(false)
-            }
-
-        }
-
         if (!allDayChecked) {
             if (!values.timeStart || !values.timeEnd) {
                 scheduleError = true
             }
-            else{
-            setScheduleError(false)
-            scheduleError = false
+            else {
+                setScheduleError(false)
+                scheduleError = false
             }
         }
 
         if (allDayChecked) {
-            if (values.dateFrom==values.dateTo) {
+            if (values.dateFrom == values.dateTo) {
                 dateToError = true
             }
             else {
@@ -236,19 +248,10 @@ const CalendarForm = ({ setDialogClose, individualActivity_ }: Props) => {
             }
         }
 
-        // values.preparatoryList?.forEach((info) => {
-        //     if (info.description.trim() === '' || info.status.trim() === '') {
-        //         preparatoryError = true;
-        //     }else{
-        //         preparatoryError = false;
-        //     }
-        // });
-
-
         if (scheduleError) {
             setScheduleError(true);
             return;
-        }else{
+        } else {
             setScheduleError(false);
         }
 
@@ -260,28 +263,22 @@ const CalendarForm = ({ setDialogClose, individualActivity_ }: Props) => {
         if (participantError) {
             setParticipantError(true);
             return;
-        }else{
+        } else {
             setParticipantError(false);
         }
-
-        if(!watch('preparatoryContent') && !individualActivity_){
+        const isValid = validatePreparatoryList();
+        if (!form.watch('listMode') && !watch('preparatoryContent') || form.watch('listMode') && !isValid) {
             setPreparatoryContentError(true)
             return
-        }else{
+        } else {
             setPreparatoryContentError(false)
         }
-        // if (preparatoryError) {
-        //     setPreparatoryError(true);
-        //     alert("Preparatory list contains blank data. Please fill out all fields.");
-        //     return;
-        // }
 
         values.status = status
         values.dateFrom = values.dateFrom.split('T')[0],
-        values.dateTo = values.dateTo.split('T')[0],
-        setError("")
+            values.dateTo = values.dateTo.split('T')[0],
+            setError("")
         setSuccess("")
-        console.log("submit values: ", values)
         startTransition(() => {
             setLoadingForm(true)
             calendarOfActivity(values)
@@ -427,13 +424,6 @@ const CalendarForm = ({ setDialogClose, individualActivity_ }: Props) => {
         setFilteredUsersData(filteredUsersData);
     }, [currentUser?.region, usersData, filterRegion]);
 
-    const participants = watch('participants');
-
-    useEffect(() => {
-        const selectedIds = participants?.map(participant => participant.userId);
-        setSelectedParticipants(selectedIds || []);
-    }, [participants]);
-
     const clearFunctionRef = useRef<() => void | null>(null);
     const selectAllFunctionRef = useRef<() => void | null>(null);
 
@@ -450,6 +440,16 @@ const CalendarForm = ({ setDialogClose, individualActivity_ }: Props) => {
         form.setValue('individualActivity', allDayChecked)
     }
     const WFPYears = ['2023', '2024', '2025', '2026', '2027', '2028']
+
+    const handleListChange = () => {
+        form.setValue("preparatoryList", [{ description: '', status: '', remarks: '' }])
+        form.setValue("preparatoryContent", "")
+    }
+    console.log("preparatoryList: ", form.watch('preparatoryList'))
+    console.log("preparatoryContent: ", form.watch('preparatoryContent'))
+
+    console.log("formState: ", form.formState.errors);
+
     return (
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 w-full" autoComplete="off">
@@ -462,7 +462,8 @@ const CalendarForm = ({ setDialogClose, individualActivity_ }: Props) => {
                                 <FormItem className='w-full'>
                                     <FormLabel className='flex flex-row gap-1 text-xs sm:text-sm'>Activity Title<FormMessage /></FormLabel>
                                     <FormControl>
-                                        <Input {...field} disabled={loadingForm} className='text-xs sm:text-sm' placeholder="Type your activity title here." />
+                                        <Input {...field} disabled={loadingForm} className='text-xs sm:text-sm' placeholder="Type your activity title here."
+                                            tabIndex={0} />
                                     </FormControl>
                                 </FormItem>
                             )}
@@ -500,33 +501,68 @@ const CalendarForm = ({ setDialogClose, individualActivity_ }: Props) => {
                         )}
                     />
                     <div className='flex flex-row flex-wrap sm:grid grid-cols-3 gap-2'>
-                        <FormField
-                            control={form.control}
-                            name='type'
-                            render={({ field }) => (
-                                <FormItem className='mt-auto w-full'>
-                                    <FormLabel className='flex flex-row gap-1 text-xs sm:text-sm'>Type<FormMessage /></FormLabel>
-                                    <FormControl>
-                                        <Select onValueChange={field.onChange} defaultValue={field.value} disabled={loadingForm}>
-                                            <FormControl
-                                                className="text-xs sm:text-sm">
-                                                <SelectTrigger>
-                                                    <SelectValue placeholder="Select a type" />
-                                                </SelectTrigger>
-                                            </FormControl>
-                                            <SelectContent>
-                                                {TypeData.map((option, index) => (
-                                                    <SelectItem key={index}
-                                                        value={option.value || 'default_value'}
-                                                        disabled={loadingForm}
-                                                        className="text-xs sm:text-sm">{option.label}</SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-                                    </FormControl>
-                                </FormItem>
-                            )}
-                        />
+                        {form.watch('type') === "Other" ?
+                            <FormField
+                                control={form.control}
+                                name={'otherType'}
+                                render={({ field }) => (
+                                    <FormItem className='mt-auto w-full'>
+                                        <FormLabel className='flex flex-row justify-between gap-1 text-xs sm:text-sm'>
+                                            <div className='flex flex-row gap-1'>
+                                                Type<FormMessage />
+                                            </div>
+                                            <div>
+                                                <Label className='text-xs sm:text-sm font-light flex flex-row gap-1 items-center'>
+                                                    (Other)
+                                                    <FaX size={10} className='cursor-pointer' onClick={() => {
+                                                        form.resetField('otherType');
+                                                        form.resetField('type')
+                                                    }} />
+                                                </Label>
+                                            </div>
+                                        </FormLabel>
+                                        <FormControl>
+                                            <Input {...field} disabled={loadingForm} value={form.watch('otherType')} className='text-xs sm:text-sm' placeholder="Please specify..." />
+                                        </FormControl>
+                                    </FormItem>
+                                )}
+                            /> :
+                            <FormField
+                                control={form.control}
+                                name={'type'}
+                                render={({ field }) => (
+                                    <FormItem className='mt-auto w-full'>
+                                        <FormLabel className='flex flex-row justify-between gap-1 text-xs sm:text-sm'>
+                                            <div className='flex flex-row gap-1'>
+                                                Type<FormMessage />
+                                            </div>
+                                        </FormLabel>
+                                        <FormControl>
+                                            <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value} disabled={loadingForm}>
+                                                <FormControl className="text-xs sm:text-sm">
+                                                    <SelectTrigger>
+                                                        <SelectValue placeholder="Select a type" />
+                                                    </SelectTrigger>
+                                                </FormControl>
+                                                <SelectContent>
+                                                    {TypeData.map((option, index) => (
+                                                        <SelectItem
+                                                            key={index}
+                                                            value={option.value || 'default_value'}
+                                                            disabled={loadingForm}
+                                                            className="text-xs sm:text-sm"
+                                                        >
+                                                            {option.label}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                        </FormControl>
+                                    </FormItem>
+                                )}
+                            />
+                        }
+
                         <FormField
                             control={form.control}
                             name="targetParticipant"
@@ -574,13 +610,12 @@ const CalendarForm = ({ setDialogClose, individualActivity_ }: Props) => {
                     <div className='flex flex-row gap-2 item-start flex-wrap'>
                         {allDayChecked ?
                             <div className='flex flex-col mt-auto w-fit'>
-                                <FormLabel 
-                                    className='text-xs sm:text-sm' 
+                                <FormLabel
+                                    className='text-xs sm:text-sm'
                                     style={dateToError ? { color: '#f04d44' } : {}}>
-                                        Planned Date Range</FormLabel>
+                                    Planned Date Range</FormLabel>
                                 <RangePicker
                                     className='text-xs sm:text-sm dark:bg-[#020817] dark:text-[#f8fafc] dark:border-[#182334]'
-                                    
                                     defaultValue={[dayjs(), null]}
                                     format={'YYYY-MM-DD'}
                                     onChange={(value) => handleRangePickerChange(value)}
@@ -590,7 +625,7 @@ const CalendarForm = ({ setDialogClose, individualActivity_ }: Props) => {
                             :
                             <div className='flex flex-row gap-2 mt-auto '>
                                 <div className='mt-auto'>
-                                    <FormLabel className='text-xs sm:text-sm'>Planned Date</FormLabel>
+                                    <FormLabel className='text-xs sm:text-sm'>Planned Date </FormLabel>
                                     <DatePicker
                                         className='w-full text-xs sm:text-sm dark:bg-[#020817] dark:text-[#f8fafc] dark:border-[#182334]'
                                         defaultValue={[dayjs()]}
@@ -617,7 +652,7 @@ const CalendarForm = ({ setDialogClose, individualActivity_ }: Props) => {
                         }
 
                     </div>
-                    {!individualActivity_ && <>
+                    {/* {!individualActivity_ && <>
                         <Separator />
                         <FormLabel className='flex flex-row gap-2 justify-between items-center flex-wrap'>
                             <div className='flex flex-row gap-2 items-center'>
@@ -625,7 +660,7 @@ const CalendarForm = ({ setDialogClose, individualActivity_ }: Props) => {
                                     className='font-bold md:text-xl mr-auto'
                                     style={participantError ? { color: '#f04d44' } : {}}
                                 >
-                                    Participants {participantError && '*'}
+                                    Participants {participantError && '*'} <FormMessage />
                                 </label>
                                 <TooltipComponent
                                     trigger={<button type='button' className='flex items-center'><IoInformationCircleOutline size={24} /></button>}
@@ -677,122 +712,254 @@ const CalendarForm = ({ setDialogClose, individualActivity_ }: Props) => {
                             selectAllFunctionRef={selectAllFunctionRef}
                             disabled={loadingForm}
                         />
-                    </>}
+                    </>} */}
 
-
-
-                    {/* Preparatory list items */}
                     {!individualActivity_ && <>
-                        <Separator />
-                        <FormLabel className='flex flex-row gap-2 justify-between items-centers'>
-                            <div className='flex flex-row gap-2 items-center'>
-                                <label
-                                    className='font-bold md:text-xl'
-                                style={preparatoryContentError ? { color: '#f04d44' } : {}}
-                                >
-                                    Preparatory List
-                                </label>
-                                <TooltipComponent
-                                    trigger={<button type='button' className='flex items-center'><IoInformationCircleOutline size={24} /></button>}
-                                    description="Please enter your preparatory list below. For clarity, consider using bullet points or numbering."
-                                />
-                            </div>
-                            {/* <div className='flex flex-row gap-2 justify-end items-center'>
-                            <Badge variant='secondary' className='h-fit'>{preparatoryListFields.length}</Badge>
-                            <Button type='button' size={'sm'} disabled={loadingForm} onClick={() => appendPreparatoryList({ description: '', status: '', remarks: '' })}>
-                                <FaPlus />
-                            </Button>
-                        </div> */}
+                        <div className='flex flex-row gap-2 justify-between items-center flex-wrap'>
+                            <FormLabel>
+                                <div className='flex flex-row gap-2 items-center'>
+                                    <label
+                                        className='font-bold md:text-xl mr-auto flex flex-row'
+                                    >
+                                        Participants
+                                    </label>
+                                    <TooltipComponent
+                                        trigger={<button type='button' className='flex items-center'><IoInformationCircleOutline size={24} /></button>}
+                                        description="Please press (All) to select all participants, (trash icon) to remove all"
+                                    />
+                                </div>
+                            </FormLabel>
 
-                        </FormLabel>
-                        <QuillEditor
-                            readOnly={loadingForm}
-                            value={watch('preparatoryContent')}
-                            onChange={handleEditorChange}
-                            modules={quillModules}
-                            formats={quillFormats}
-                            className="w-full"
-                            
+                            <div className='flex flex-row gap-2 justify-center sm:justify-end items-center w-full sm:w-fit'>
+                                <Badge className='flex flex-row gap-1 justify-center items-center'><MdPeopleAlt />{filteredUsersData.length}</Badge>
+                                <Select onValueChange={setFilterRegion} defaultValue={filterRegion} disabled={loadingForm}>
+                                    <SelectTrigger className='text-xs sm:text-sm'>
+                                        <SelectValue placeholder="Filter" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value='All' className='text-xs sm:text-sm'>All</SelectItem>
+                                        {regionOptions.map((option, index) => (
+                                            <SelectItem
+                                                key={index}
+                                                value={option}
+                                                className="text-xs sm:text-sm">{option}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+
+                                <Badge className='flex flex-row gap-1 justify-center items-center'
+                                    variant='secondary'><MdPeopleAlt />{form.watch('participants')?.length}</Badge>
+                                <Button
+                                    variant={'destructive'}
+                                    type='button' size={'sm'}
+                                    disabled={loadingForm || form.watch('participants')?.length == 0}
+                                    onClick={() => {
+                                        if (clearFunctionRef.current) clearFunctionRef.current();
+                                    }}>
+                                    <FaTrash />
+                                </Button>
+                                <Button
+                                    type='button'
+                                    size={'sm'}
+                                    disabled={loadingForm}
+                                    onClick={() => {
+                                        if (selectAllFunctionRef.current) selectAllFunctionRef.current();
+                                    }}>
+                                    All
+                                </Button>
+                            </div>
+                        </div>
+                        <FormField
+                            control={form.control}
+                            name="participants"
+                            render={({ field }) => (
+                                <FormItem className='mt-auto w-full'>
+
+                                    <FormMessage />
+
+                                    <FormControl>
+                                        <FancyMultiSelect
+                                            {...field}
+                                            data={multiSelectUsersDropdownData}
+                                            onSelectionChange={(selected) => {
+                                                const formattedParticipants = selected.map(user => ({ userId: user }));
+                                                field.onChange(formattedParticipants);  // Ensure this matches the format
+                                            }}
+                                            clearFunctionRef={clearFunctionRef}
+                                            selectAllFunctionRef={selectAllFunctionRef}
+                                            disabled={loadingForm}
+                                        />
+                                    </FormControl>
+                                </FormItem>
+                            )}
                         />
                     </>}
 
-                    {/* {preparatoryListFields.map((field, index) => (
-                        <div key={index} className="flex flex-row gap-2 items-end w-full">
-                            <FormField
-                                control={form.control}
-                                name={`preparatoryList.${index}.description`}
-                                render={({ field }) => (
-                                    <FormItem className='w-full'>
-                                        <FormControl>
-                                            <Input {...field} disabled={loadingForm} className='text-xs sm:text-sm' placeholder="Enter description" />
-                                        </FormControl>
-                                    </FormItem>
-                                )}
-                            />
+                    <Separator />
 
-                            <FormField
-                                control={form.control}
-                                name={`preparatoryList.${index}.status`}
-                                render={({ field }) => (
-                                    <FormItem className='w-full'>
-                                        <Select onValueChange={field.onChange} defaultValue={field.value} disabled={loadingForm}>
-                                            <SelectTrigger className='text-xs sm:text-sm'>
-                                                <SelectValue placeholder="Select a status" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                {PreparatoryActivityStatus.map((option, index) => (
-                                                    <SelectItem
-                                                        key={index}
-                                                        value={option.value || 'default_value'}
-                                                        disabled={loadingForm}
-                                                        className='cursor-pointer text-xs sm:text-sm'>
-                                                        <Badge variant={'outline'}>{option.label}</Badge>
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-                                    </FormItem>
-                                )}
-                            />
-
-                            {form.watch(`preparatoryList.${index}.status`) == "Other" &&
-                                (
-                                    <FormField
-                                        control={form.control}
-                                        name={`preparatoryList.${index}.remarks`}
-                                        render={({ field }) => (
-                                            <FormItem className='w-full'>
-                                                <FormControl>
-                                                    <Input {...field} className='w-full' disabled={loadingForm} placeholder="Please specify..." />
-                                                </FormControl>
-                                            </FormItem>
-                                        )}
-                                    />
-                                )}
-
-                            <Button
-                                className='w-fit'
-                                type='button'
-                                variant={'destructive'}
-                                size={'sm'}
-                                onClick={() => removePreparatoryList(index)}
-                                disabled={loadingForm || preparatoryListFields.length === 1}
+                    {/* Preparatory list items */}
+                    <FormLabel className='flex flex-row gap-2 justify-between items-centers'>
+                        <div className='flex flex-row gap-2 items-center'>
+                            <label
+                                className='font-bold md:text-xl'
+                                style={preparatoryContentError ? { color: '#f04d44' } : {}}
                             >
-                                <FaMinus />
-                            </Button>
+                                Preparatory {form.watch('listMode') ? 'List' : 'Content'}
+                            </label>
+                            <TooltipComponent
+                                trigger={<button type='button' className='flex items-center'><IoInformationCircleOutline size={24} /></button>}
+                                description="Please enter your preparatory list below. For clarity, consider using bullet points or numbering."
+                            />
+                            <FormField control={form.control}
+                                name="listMode"
+                                render={({ field }) => (
+                                    <div className="flex items-center space-x-2">
+                                        <Switch id="list-mode" checked={field.value} onCheckedChange={(value) => { field.onChange(value); handleListChange() }} disabled={loadingForm} />
+                                        <Label htmlFor="list-mode" className='text-xs sm:text-sm'>List mode</Label>
+                                    </div>
+                                )} />
 
                         </div>
-                    ))} */}
+                        {form.watch('listMode') &&
+                            <div className='flex flex-row gap-2 justify-end items-center'>
+                                <Badge variant='secondary' className='h-fit'>{preparatoryListFields.length}</Badge>
+                                <Button type='button' size={'sm'} disabled={loadingForm} onClick={() => appendPreparatoryList({ description: '', status: '', remarks: '' })}>
+                                    <FaPlus />
+                                </Button>
+                            </div>
+                        }
+
+                        <FormMessage />
+                    </FormLabel>
+                    {!form.watch('listMode') ? <>
+                        <FormField
+                            control={form.control}
+                            name="preparatoryContent"
+                            render={({ field }) => (
+                                <FormItem className='w-full'>
+                                    <FormMessage />
+                                    <FormControl>
+                                        <QuillEditor
+                                            readOnly={loadingForm}
+                                            value={field.value}
+                                            defaultValue={field.value}
+                                            onChange={field.onChange}
+                                            modules={quillModules}
+                                            formats={quillFormats}
+                                            className="w-full"
+                                        />
+                                    </FormControl>
+                                </FormItem>
+                            )}
+                        />
+
+                    </> :
+                        <>
+                            {preparatoryListFields.map((field, index) => (
+                                <FormField
+                                    control={form.control}
+                                    name={'preparatoryList'}
+                                    key={index}
+                                    render={({ field }) => (
+                                        <FormItem className='w-full'>
+                                            <FormControl>
+                                                <div key={index} className="flex flex-row gap-2 items-end w-full">
+                                                    <FormField
+                                                        control={form.control}
+                                                        name={`preparatoryList.${index}.description`}
+                                                        render={({ field }) => (
+                                                            <FormItem className='w-full'>
+                                                                <FormMessage />
+                                                                <FormControl>
+                                                                    <Input {...field} disabled={loadingForm} className='text-xs sm:text-sm' placeholder="Enter description" />
+                                                                </FormControl>
+                                                            </FormItem>
+                                                        )}
+                                                    />
+
+                                                    <FormField
+                                                        control={form.control}
+                                                        name={`preparatoryList.${index}.status`}
+                                                        render={({ field }) => (
+                                                            <FormItem className='w-full'>
+                                                                <FormMessage />
+                                                                <Select onValueChange={field.onChange} defaultValue={field.value} disabled={loadingForm}>
+                                                                    <SelectTrigger className='text-xs sm:text-sm'>
+                                                                        <SelectValue placeholder="Select a status" />
+                                                                    </SelectTrigger>
+                                                                    <SelectContent>
+                                                                        {PreparatoryActivityStatus.map((option, index) => (
+                                                                            <SelectItem
+                                                                                key={index}
+                                                                                value={option.value || 'default_value'}
+                                                                                disabled={loadingForm}
+                                                                                className='cursor-pointer text-xs sm:text-sm'>
+                                                                                <Badge variant={'outline'}>{option.label}</Badge>
+                                                                            </SelectItem>
+                                                                        ))}
+                                                                    </SelectContent>
+                                                                </Select>
+                                                            </FormItem>
+                                                        )}
+                                                    />
+                                                    {form.watch(`preparatoryList.${index}.status`) == "Other" &&
+                                                        (
+                                                            <FormField
+                                                                control={form.control}
+                                                                name={`preparatoryList.${index}.remarks`}
+                                                                render={({ field }) => (
+                                                                    <FormItem className='w-full'>
+                                                                        <FormMessage />
+                                                                        <FormControl>
+                                                                            <Input {...field} className='w-full' disabled={loadingForm} placeholder="Please specify..." />
+                                                                        </FormControl>
+                                                                    </FormItem>
+                                                                )}
+                                                            />
+                                                        )}
+                                                    <Button
+                                                        className='w-fit'
+                                                        type='button'
+                                                        variant={'destructive'}
+                                                        size={'sm'}
+                                                        onClick={() => removePreparatoryList(index)}
+                                                        disabled={loadingForm || preparatoryListFields.length === 1}
+                                                    >
+                                                        <FaMinus />
+                                                    </Button>
+                                                </div>
+                                            </FormControl>
+                                        </FormItem>
+                                    )}
+                                />
+
+                            ))}
+                        </>
+                    }
+
                     <Separator />
-                    <div className='flex flex-row w-full items-end gap-2'>
+                    {/* <div className='flex flex-row w-full items-end gap-2'>
                         <FormField
                             control={form.control}
                             name="attachments"
+                            key={index}
                             render={({ field }) => (
                                 <FormItem className='w-full'>
-                                    <FormLabel className='flex flex-row gap-1 text-xs sm:text-sm'>Attachments <Label className=' font-extralight text-xs sm:text-sm'> (Optional)</Label></FormLabel>
+                                    <div className='flex flex-row gap-2 justify-between items-center'>
+                                        <FormLabel className='flex flex-row gap-1 text-xs sm:text-sm'>Attachments
+                                            <Label className=' font-extralight text-xs sm:text-sm'>
+                                                (Optional)
+                                            </Label>
+                                        </FormLabel>
+                                        <Button type='button' size={'sm'} disabled={loadingForm} onClick={() => appendPreparatoryList({ description: '', status: '', remarks: '' })}>
+                                            <FaPlus />
+                                        </Button>
+                                    </div>
+
                                     <FormControl>
+                                    <div key={index} className="flex flex-row gap-2 items-end w-full">
                                         <Input {...field} disabled={loadingForm} className='text-xs sm:text-sm' placeholder="Link for you attachments here." />
+                                    </div>
                                     </FormControl>
                                 </FormItem>
                             )}
@@ -801,7 +968,79 @@ const CalendarForm = ({ setDialogClose, individualActivity_ }: Props) => {
                             <Button disabled size={'sm'}><Upload /></Button>
 
                         </div>
-                    </div>
+                    </div> */}
+                    <FormLabel className='flex items-center justify-between -pb-10'>
+                        <div className='flex flex-row items-center gap-1'>
+                        <label
+                                className='font-bold md:text-xl'
+                      
+                            >
+                                Attachments 
+                            </label>
+                            <TooltipComponent
+                                    trigger={<button type='button' className='flex items-center'><IoInformationCircleOutline size={24} /></button>}
+                                    description="If you add any attachment here, the attachment fields will be required."
+                                />
+                            <Label className=' font-extralight text-xs sm:text-sm'>
+                             (Optional)
+                            </Label>
+                        </div>
+                        <Button type='button' size={'sm'} disabled={loadingForm} onClick={() => appendAttachments({ details: '', link: '' })}>
+                            <FaPlus />
+                        </Button>
+                    </FormLabel>
+                    {attachmentFields.map((field, index) => (
+                        <FormField
+                            control={form.control}
+                            name={'calendarOfActivityAttachment'}
+                            key={index}
+                            render={({ field }) => (
+                                <FormItem className='w-full pt-0 mt-0'>
+                                    <FormControl>
+                                        <div key={index} className="flex flex-row gap-2 items-end w-full">
+                                            <FormField
+                                                control={form.control}
+                                                name={`calendarOfActivityAttachment.${index}.details`}
+                                                render={({ field }) => (
+                                                    <FormItem className='w-full'>
+                                                        <FormMessage />
+                                                        <FormControl>
+                                                            <Input {...field} disabled={loadingForm} className='text-xs sm:text-sm' placeholder="Enter details" />
+                                                        </FormControl>
+                                                    </FormItem>
+                                                )}
+                                            />
+
+                                            <FormField
+                                                control={form.control}
+                                                name={`calendarOfActivityAttachment.${index}.link`}
+                                                render={({ field }) => (
+                                                    <FormItem className='w-full'>
+                                                        <FormMessage />
+                                                        <FormControl>
+                                                            <Input {...field} disabled={loadingForm} className='text-xs sm:text-sm text-blue-500' placeholder="Paste link here." />
+                                                        </FormControl>
+                                                    </FormItem>
+                                                )}
+                                            />
+                                            <Button
+                                                className='w-fit'
+                                                type='button'
+                                                variant={'destructive'}
+                                                size={'sm'}
+                                                onClick={() => removeAttachments(index)}
+                                                disabled={loadingForm || attachmentFields.length === 1}
+                                            >
+                                                <FaMinus />
+                                            </Button>
+                                        </div>
+                                    </FormControl>
+                                </FormItem>
+                            )}
+                        />
+
+                    ))}
+
 
                     <FormField
                         control={form.control}
@@ -821,6 +1060,7 @@ const CalendarForm = ({ setDialogClose, individualActivity_ }: Props) => {
                 </div>
                 <FormSuccess message={success} />
                 <FormError message={error} />
+
                 <Button typeof="submit" className="w-full" disabled={loadingForm}>
                     {loadingForm && <LoadingSpinner />} Submit
                 </Button>

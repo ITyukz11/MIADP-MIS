@@ -1,15 +1,9 @@
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import {
   Sheet,
-  SheetClose,
   SheetContent,
-  SheetDescription,
-  SheetFooter,
   SheetHeader,
   SheetTitle,
-  SheetTrigger,
 } from "@/components/ui/sheet"
 
 import {
@@ -19,7 +13,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion"
 
-import { CalendarFold, Clock, Component, FlagTriangleRight, Info, InfoIcon, Map, NotebookPen, TargetIcon, UserCircle, Users } from "lucide-react"
+import { CalendarFold, Clock, Component, FlagTriangleRight, Info, Map, NotebookPen, TargetIcon, UserCircle, Users } from "lucide-react"
 import { formatDate, formatTime, getStatusColor } from "../table/data/activities/coa-columns"
 import { Badge } from "../ui/badge"
 import Image from "next/image"
@@ -27,11 +21,13 @@ import { TbNotes, TbStatusChange } from "react-icons/tb"
 import { FaQrcode } from "react-icons/fa"
 import { useEffect, useState } from "react"
 import { GenerateQRCodeWithLogo } from "../GenerateQrCodeWithLogo"
-import { MdAttachment } from "react-icons/md"
+import { MdAttachment, MdDateRange, MdOutlineDateRange } from "react-icons/md"
 import Profile from "../profile/Profile"
 import Link from "next/link"
 import { useDispatch, useSelector } from "@/app/store/store"
 import { fetchUsersData } from "@/app/store/userAction"
+import { TooltipComponent } from "../Tooltip"
+import { RiAttachmentLine } from "react-icons/ri"
 
 interface CalendarSheetProps {
   activityData: any[]
@@ -41,7 +37,7 @@ interface CalendarSheetProps {
 export function CalendarSheet({ activityData, openSheet, closeCalendarSheet }: CalendarSheetProps) {
 
   const dispatch = useDispatch();
-  const {usersData, loadingUser,errorUser} = useSelector((state)=> state.users)
+  const { usersData, loadingUser, errorUser } = useSelector((state) => state.users)
 
   useEffect(() => {
     if (usersData.length === 0) {
@@ -62,6 +58,7 @@ export function CalendarSheet({ activityData, openSheet, closeCalendarSheet }: C
       activityTitle,
       activityDescription,
       type,
+      otherType,
       targetParticipant,
       location,
       dateFrom,
@@ -72,9 +69,11 @@ export function CalendarSheet({ activityData, openSheet, closeCalendarSheet }: C
       status,
       remarks,
       userName,
+      calendarOfActivityAttachment,
       preparatoryList,
       participants,
-      preparatoryContent
+      preparatoryContent,
+      createdAt
     } = activityData[0];
 
     // Format preparatoryList and participants
@@ -95,6 +94,7 @@ Preparatory Item ${index + 1}:
     const qrData = `Activity Title: ${activityTitle}\n
 Activity Description: ${activityDescription}\n
 Type: ${type}\n
+${otherType ? `Other Type: ${otherType}` : ''}
 Target Participant: ${targetParticipant}\n
 Location: ${location}\n
 Date From: ${formatDate(dateFrom) || '-'}\n
@@ -127,14 +127,17 @@ ${formattedPreparatoryList}`;
     timeEnd,
     activityDescription,
     type,
+    otherType,
     targetParticipant,
     location,
     status,
     attachments,
     remarks,
     participants,
+    calendarOfActivityAttachment,
     preparatoryList,
-    preparatoryContent
+    preparatoryContent,
+    createdAt
   } = activityData[0];
 
   const isValidUrl = (string: string) => {
@@ -145,6 +148,26 @@ ${formattedPreparatoryList}`;
       return false;
     }
   };
+  console.log("activityData: ",activityData)
+  const formatProperDateTime = (timestamp: string): string => {
+    const date = new Date(timestamp);
+
+    const options: Intl.DateTimeFormatOptions = {
+        month: 'short', // 'Aug'
+        day: 'numeric', // '6'
+        year: 'numeric', // '2024'
+        hour: '2-digit', // 'hh'
+        minute: '2-digit', // 'mm'
+        hour12: true // am/pm
+    };
+
+    // Format date and time
+    const formattedDate = date.toLocaleString('en-US', options);
+
+    // Format output as 'Aug 6, 2024 - hh:mm am/pm'
+    return `${formattedDate.replace(/,/, ' -')}`;
+};
+
   return (
     <>
       <Sheet open={openSheet} onOpenChange={closeCalendarSheet}>
@@ -161,7 +184,11 @@ ${formattedPreparatoryList}`;
           <div className="mt-4 gap-5 grid grid-cols-1 md:grid-cols-2 auto-rows-min">
             <div className="flex flex-col space-y-2 gap-5">
               <div className="flex items-center">
-                <UserCircle className="h-5 w-5 shrink-0" />
+                <TooltipComponent
+                  trigger={<div className='flex items-center cursor-help'><UserCircle className="h-5 w-5 shrink-0" /></div>}
+                  description="Encoder"
+                />
+
                 <div className="flex space-x-2 justify-start items-center ml-1">
                   <div className="flex space-x-2">
                     <Label className="flex items-center space-x-1 p-1 rounded-full border-2 shadow-md cursor-pointer" onClick={() => setOpenProfile(true)}>
@@ -188,15 +215,23 @@ ${formattedPreparatoryList}`;
                 </div>
               </div>
               <div className="flex items-center space-x-2">
-                <Component className="h-5 w-5 shrink-0" />
-                <Badge variant={'outline'} className="shadow-sm"> 
-                {user.component}
-                {user.unit && <>- {user.unit}</>}
+                <TooltipComponent
+                  trigger={<div className='flex items-center cursor-help'><Component className="h-5 w-5 shrink-0" /></div>}
+                  description="Region - Component - Unit (if any)"
+                />
+                <Badge variant={'outline'} className="shadow-sm">
+                  {user.region}-
+                  {user.component}
+                  {user.unit && <>-{user.unit}</>}
                 </Badge>
-              
+
               </div>
               <div className="flex items-center space-x-2">
-                <TbStatusChange className="h-5 w-5 shrink-0" />
+                <TooltipComponent
+                  trigger={<div className='flex items-center cursor-help'><TbStatusChange className="h-5 w-5 shrink-0" /></div>}
+                  description="Activity Status"
+                />
+
                 <Badge
                   // variant={variant}
                   className={`font-medium cursor-default shadow-md  dark:text-white hover:${getStatusColor(status)
@@ -210,11 +245,24 @@ ${formattedPreparatoryList}`;
                 </Badge>
               </div>
               <div className="flex items-center space-x-2 mt-2">
-                <FlagTriangleRight className="h-5 w-5 shrink-0" />
-                <Badge variant={'secondary'} className="font-medium shadow-md">{type}</Badge>
+                <TooltipComponent
+                  trigger={<div className='flex items-center cursor-help'><MdOutlineDateRange size={24} /></div>}
+                  description="Date Created"
+                />
+                <Badge variant={'outline'} className="font-medium shadow-md">{formatProperDateTime(createdAt)}</Badge>
               </div>
               <div className="flex items-center space-x-2 mt-2">
-                <CalendarFold className="h-5 w-5 shrink-0" />
+                <TooltipComponent
+                  trigger={<div className='flex items-center cursor-help'><FlagTriangleRight size={24} /></div>}
+                  description="Activity Type"
+                />
+                <Badge variant={'secondary'} className="font-medium shadow-md">{type} {otherType ? ' - ' + otherType : ''}</Badge>
+              </div>
+              <div className="flex items-center space-x-2 mt-2">
+                <TooltipComponent
+                  trigger={<div className='flex items-center cursor-help'><CalendarFold className="h-5 w-5 shrink-0" /></div>}
+                  description="Activity Date"
+                />
                 <Badge variant='outline' className="shadow-sm">
                   {dateFrom === dateTo
                     ? formatDate(dateFrom)
@@ -223,23 +271,36 @@ ${formattedPreparatoryList}`;
               </div>
               {timeEnd && (
                 <div className="flex items-center space-x-2 mt-2">
-                  <Clock className="h-5 w-5 shrink-0" />
+                  <TooltipComponent
+                    trigger={<div className='flex items-center cursor-help'><Clock className="h-5 w-5 shrink-0" /></div>}
+                    description="Activity Time"
+                  />
                   <Badge variant='outline' className="shadow-sm">
                     {formatTime(timeStart)} - {formatTime(timeEnd)}
                   </Badge>
                 </div>
               )}
               <div className="flex items-center space-x-2 mt-2">
-                <Map className="h-5 w-5 shrink-0" /> <Badge variant='outline' className="shadow-sm">{location}</Badge>
+                <TooltipComponent
+                  trigger={<div className='flex items-center cursor-help'><Map className="h-5 w-5 shrink-0" /></div>}
+                  description="Activity Location"
+                />
+                <Badge variant='outline' className="shadow-sm">{location}</Badge>
               </div>
               <div className="flex items-start space-x-2 mt-4">
-                <TargetIcon className="h-5 w-5 shrink-0" />
+                <TooltipComponent
+                  trigger={<div className='flex items-center cursor-help'><TargetIcon className="h-5 w-5 shrink-0" /></div>}
+                  description="Activity Target Participants"
+                />
                 <Badge variant={'outline'} className=" shadow-sm">
                   <p className="text-xs">{targetParticipant}</p>
                 </Badge>
               </div>
               <div className="flex items-start space-x-2 mt-4">
-                <Info className="h-5 w-5 shrink-0" />
+                <TooltipComponent
+                  trigger={<div className='flex items-center cursor-help'><Info className="h-5 w-5 shrink-0" /></div>}
+                  description="Activity Description"
+                />
                 <Badge variant={'outline'} className=" shadow-sm">
                   <p className="text-xs">{activityDescription}</p>
                 </Badge>
@@ -249,7 +310,10 @@ ${formattedPreparatoryList}`;
             <div className="flex flex-col space-y-2">
               {attachments && (
                 <div className="flex items-center space-x-2 mt-2">
-                  <MdAttachment className="h-5 w-5 shrink-0" />
+                  <TooltipComponent
+                    trigger={<div className='flex items-center cursor-help'><MdAttachment className="h-5 w-5 shrink-0" /></div>}
+                    description="Activity Attachment"
+                  />
                   {isValidUrl(attachments) ? (
                     <Link href={attachments} passHref>
                       <a target="_blank" rel="noopener noreferrer">
@@ -263,7 +327,10 @@ ${formattedPreparatoryList}`;
               )}
               {remarks && (
                 <div className="flex items-center space-x-2 mt-2">
-                  <TbNotes className="h-5 w-5 shrink-0" />
+                  <TooltipComponent
+                    trigger={<div className='flex items-center cursor-help'><TbNotes className="h-5 w-5 shrink-0" /></div>}
+                    description="Activity Remarks"
+                  />
                   <Label>{remarks}</Label>
                 </div>
               )}
@@ -272,7 +339,10 @@ ${formattedPreparatoryList}`;
                 <AccordionItem value="participants">
                   <AccordionTrigger className="flex items-center justify-start space-x-2">
                     <div className="flex flex-row flex-start gap-2 items-center">
-                      <Users className="shrink-0" />
+                      <TooltipComponent
+                        trigger={<div className='flex items-center cursor-help'><Users className="shrink-0" /></div>}
+                        description="Activity Participants"
+                      />
                       <Label className="cursor-pointer">Participants</Label><Badge variant="outline">{participants.length}</Badge>
                     </div>
                   </AccordionTrigger>
@@ -304,53 +374,100 @@ ${formattedPreparatoryList}`;
                   </AccordionContent>
                 </AccordionItem>
               </Accordion>
-              {preparatoryContent?
-                       <Accordion type="single" collapsible>
-                       <AccordionItem value={"2"}>
-                             <AccordionTrigger className="flex items-center justify-start space-x-2">
-                               <div className="flex flex-row flex-start gap-2 items-center">
-                                 <NotebookPen className="h-5 w-5 shrink-0" />
-                                 <Label className="cursor-pointer">Preparatory Content</Label>
-                               </div>
-                             </AccordionTrigger>
-                             <AccordionContent>
-                             <div className="flex flex-col space-y-2 p-2 border rounded-lg shadow-md" dangerouslySetInnerHTML={{ __html: preparatoryContent }} />
-                             </AccordionContent>
-                           </AccordionItem>
-                       </Accordion>:
-                        <Accordion type="single" collapsible>
-                        {preparatoryList.map((prep: any, index: number) => (
-                          <AccordionItem key={prep.id} value={prep.id}>
-                            <AccordionTrigger className="flex items-center justify-start space-x-2">
-                              <div className="flex flex-row flex-start gap-2 items-center">
-                                <NotebookPen className="h-5 w-5 shrink-0" />
-                                <Label className="cursor-pointer">Preparatory List {index + 1}</Label>
-                              </div>
-                            </AccordionTrigger>
-                            <AccordionContent>
-                              <div className="flex flex-col space-y-2 p-2 border rounded-lg shadow-md">
-                                <div>
-                                  <strong>Description:</strong> {prep.description}
-                                </div>
-                                <div>
-                                  <strong>Status:</strong> {prep.status || 'None'}
-                                </div>
-                                <div>
-                                  <strong>Remarks:</strong> {prep.remarks || 'None'}
-                                </div>
-                                <div>
-                                  <strong>Created At:</strong> {new Date(prep.createdAt).toLocaleString()}
-                                </div>
-                              </div>
-                            </AccordionContent>
-                          </AccordionItem>
-                        ))}
-                      </Accordion>
-                       }
+              {preparatoryContent ?
+                <Accordion type="single" collapsible>
+                  <AccordionItem value={"2"}>
+                    <AccordionTrigger className="flex items-center justify-start space-x-2">
+                      <div className="flex flex-row flex-start gap-2 items-center">
+                        <TooltipComponent
+                          trigger={<div className='flex items-center cursor-help'><NotebookPen className="h-5 w-5 shrink-0" /></div>}
+                          description="Activity Preparatories"
+                        />
+                        <Label className="cursor-pointer">Preparatory Content</Label>
+                      </div>
+                    </AccordionTrigger>
+                    <AccordionContent>
+                      <div className="flex flex-col space-y-2 p-2 border rounded-lg shadow-md" dangerouslySetInnerHTML={{ __html: preparatoryContent }} />
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion> :
+                <Accordion type="single" collapsible>
+                  {preparatoryList.map((prep: any, index: number) => (
+                    <AccordionItem key={prep.id} value={prep.id}>
+                      <AccordionTrigger className="flex items-center justify-start space-x-2">
+                        <div className="flex flex-row flex-start gap-2 items-center">
+                          <TooltipComponent
+                            trigger={<div className='flex items-center cursor-help'><NotebookPen className="h-5 w-5 shrink-0" /></div>}
+                            description="Activity Preparatories"
+                          />
+                          <Label className="cursor-pointer">Preparatory List {index + 1}</Label>
+                        </div>
+                      </AccordionTrigger>
+                      <AccordionContent>
+                        <div className="flex flex-col space-y-2 p-2 border rounded-lg shadow-md">
+                          <div>
+                            <strong>Description:</strong> {prep.description}
+                          </div>
+                          <div>
+                            <strong>Status:</strong> {prep.status || 'None'}
+                          </div>
+                          <div>
+                            <strong>Remarks:</strong> {prep.remarks || 'None'}
+                          </div>
+                          <div>
+                            <strong>Created At:</strong> {new Date(prep.createdAt).toLocaleString()}
+                          </div>
+                        </div>
+                      </AccordionContent>
+                    </AccordionItem>
+                  ))}
+                </Accordion>
+              }
+              {calendarOfActivityAttachment && (
+                <Accordion type="single" collapsible>
+                  {calendarOfActivityAttachment.map((attachment: any, index: number) => (
+                    <AccordionItem key={attachment.id} value={attachment.id}>
+                      <AccordionTrigger className="flex items-center justify-start space-x-2">
+                        <div className="flex flex-row flex-start gap-2 items-center">
+                          <TooltipComponent
+                            trigger={<div className='flex items-center cursor-help'><RiAttachmentLine className="h-5 w-5 shrink-0" /></div>}
+                            description="Activity Attachments"
+                          />
+                          <Label className="cursor-pointer">Attachment {index + 1}</Label>
+                        </div>
+                      </AccordionTrigger>
+                      <AccordionContent>
+                        <div className="flex flex-col space-y-2 p-2 border rounded-lg shadow-md pr-2">
+                          <div>
+                            <strong>Details:</strong> <Label className="break-words"> {attachment.details}</Label>
+                          </div>
+                          <div>
+                            <strong>Link: </strong>
+                            {isValidUrl(attachment.link) ? (
+                              <Link href={attachment.link} passHref target="_blank" rel="noopener noreferrer"
+                                className=" text-blue-500 hover:text-blue-400 cursor-pointer break-words">
+                                <Label>{attachment.link}</Label>
+                              </Link>
+                            ) : (
+                              <Label>(Not a link) {attachment.link}</Label>
+                            )}
+                          </div>
+                          <div>
+                            <strong>Created At:</strong> {new Date(attachment.createdAt).toLocaleString()}
+                          </div>
+                        </div>
+                      </AccordionContent>
+                    </AccordionItem>
+                  ))}
+                </Accordion>
+              )}
               {qrCode && (
                 <div className="flex flex-col">
                   <div className="flex flex-row gap-2 mb-2">
-                    <FaQrcode />
+                    <TooltipComponent
+                      trigger={<div className='flex items-center cursor-help'><FaQrcode /></div>}
+                      description="Scanned me!"
+                    />
                     <Label className="font-semibold">QR Code:</Label>
                   </div>
                   <Image src={qrCode} className="shadow-md" width={250} height={250} alt="QR Code" />

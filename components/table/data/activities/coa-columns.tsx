@@ -4,8 +4,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { DataTableColumnHeader } from "../../data-table-column-header";
 import { DataTableRowActions } from "../pending-users/data-table-row-actions";
 import { Badge } from "../../../ui/badge";
-import { CalendarOfActivityType } from '@/schemas/calendar-of-activity';
 import { dateInRangeFilter } from '../../date-range-filter';
+import { Activity } from '@/types/calendar-of-activity/calendar-of-activity';
 
 export const formatDate = (dateString: string) => {
   const date = new Date(dateString);
@@ -56,7 +56,7 @@ export const getStatusColor = (status: string) => {
     }
   };
 
-export const columns: ColumnDef<CalendarOfActivityType>[] = [
+export const columns: ColumnDef<Activity>[] = [
   // {
   //   id: "select",
   //   header: ({ table }) => (

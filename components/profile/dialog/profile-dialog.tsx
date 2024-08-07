@@ -34,7 +34,7 @@ interface ProfileDialogProps {
 export function ProfileDialog({ open, setClose }: ProfileDialogProps) {
     const [enterPassDialog, setEnterPassDialog] = useState<boolean>(false)
     const [editProfile, setEditProfile] = useState<boolean>(true)
-    const { currentUser } = useCurrentUser();
+    const { currentUser, setCurrentUser } = useCurrentUser();
     const [loading, setLoading] = useState<boolean>()
     const [error, setError] = useState<string | null>(null);
     const [component4, setComponent4] = useState<boolean>(!currentUser?.component)
@@ -42,6 +42,7 @@ export function ProfileDialog({ open, setClose }: ProfileDialogProps) {
     const form = useForm<z.infer<typeof UserSchema>>({
         resolver: zodResolver(UserSchema),
         defaultValues: {
+            id:'',
             name: currentUser?.name || '',
             email: currentUser?.email || '',
             position: currentUser?.position || '',
@@ -51,35 +52,83 @@ export function ProfileDialog({ open, setClose }: ProfileDialogProps) {
         },
     });
 
+    const onSubmit = async (values: z.infer<typeof UserSchema>) => {
+        setLoading(true)
+        setError(null);
+        const changes = [];
+        values.id = currentUser?.id || ''
+        console.log("values: ",values)
+
+        const logs = {
+            userName:currentUser?.name,
+            action: "Update Profile",
+            remarks: ""
+        }
+
+        if (currentUser?.name !== values.name) {
+            changes.push("name");
+        }
+        if (currentUser?.email !== values.email) {
+            changes.push("email");
+        }
+        if (currentUser?.position !== values.position) {
+            changes.push("position");
+        }
+        if (currentUser?.unit !== values.unit) {
+            changes.push("unit");
+        }
+        if (currentUser?.component !== values.component) {
+            changes.push("component");
+        }
+        if (currentUser?.region !== values.region) {
+            changes.push("region");
+        }
+
+        if (changes.length > 0) {
+            logs.remarks = `Changed fields: ${changes.join(", ")}`;
+        } else {
+            logs.remarks = "No changes made";
+        }
+        try {
+            await updateprofile(values, logs)
+                .then((data) => {
+                    setError(data.error || null)
+                    setLoading(false)
+
+                    if (!data.error) {
+                        toast({
+                            title: "Success",
+                            description: "You have successfully updated your profile.",
+                            duration: 5000,
+                            action: (
+                                <ToastAction altText="OK">Ok</ToastAction>
+                            ),
+                        })
+                        // Update currentUser context
+                        setCurrentUser(values);
+                        setClose()
+                    }
+                    setEditProfile(true)
+                
+                })
+        } catch (error) {
+            toast({
+                variant: 'destructive',
+                title: "Error",
+                description: "An error occured updating your profile: " + error,
+                duration: 5000,
+                action: (
+                    <ToastAction altText="OK">Ok</ToastAction>
+                ),
+            })
+        }
+
+    };
+
     const handleUnitDropDown = (allow: boolean) => {
         form.setValue('unit', '');
         setComponent4(allow);
     }
-
-    const onSubmit = async (values: z.infer<typeof UserSchema>) => {
-        console.log("submit profile dialog:", values);
-        setLoading(true)
-        setError(null);
-        updateprofile(values)
-            .then((data) => {
-                setError(data.error || null)
-                setLoading(false)
-
-                if (!data.error) {
-                    toast({
-                        title: "Success",
-                        description: "You have successfully updated your profile.",
-                        duration: 5000,
-                        action: (
-                            <ToastAction altText="OK">Ok</ToastAction>
-                        ),
-                    })
-                }
-
-                setEditProfile(true)
-                setClose()
-            })
-    };
 
     const avoidDefaultDomBehavior = (e: Event) => {
         e.preventDefault();
@@ -92,11 +141,11 @@ export function ProfileDialog({ open, setClose }: ProfileDialogProps) {
     };
 
     useEffect(() => {
-      if(!error){
-        setLoading(false)
-      }
+        if (!error) {
+            setLoading(false)
+        }
     }, [error])
-    
+
     return (
         <>
             <Dialog open={open} onOpenChange={setClose}>
@@ -168,91 +217,91 @@ export function ProfileDialog({ open, setClose }: ProfileDialogProps) {
                                         </FormItem>
                                     )}
                                 />
-                                {currentUser?.unit  && (
-                                   <FormField
-                                   name='unit'
-                                   control={form.control}
-                                   render={({ field }) => (
-                                    <FormItem className="grid grid-cols-4 items-center gap-4">
-                                          <FormLabel className="text-xs sm:text-sm text-right">Unit<FormMessage /></FormLabel>
-                                           <Select
-                                               onValueChange={field.onChange}
-                                               defaultValue={field.value}
-                                               disabled={editProfile || loading || component4}
-                                               value={field.value}
-                                           >
-                                               <FormControl className="col-span-3">
-                                                   <SelectTrigger>
-                                                       <SelectValue placeholder="Select a unit" />
-                                                   </SelectTrigger>
-                                               </FormControl>
-                                               <SelectContent>
-                                                   {unitOptions.map((option, index) => (
-                                                       <SelectItem key={index} value={option.value}>{option.label}</SelectItem>
-                                                   ))}
-                                               </SelectContent>
-                                           </Select>
-                                       </FormItem>
-                                   )}
-                               />
+                                {currentUser?.unit || form.watch("component") == 'Component 4' && (
+                                    <FormField
+                                        name='unit'
+                                        control={form.control}
+                                        render={({ field }) => (
+                                            <FormItem className="grid grid-cols-4 items-center gap-4">
+                                                <FormLabel className="text-xs sm:text-sm text-right">Unit<FormMessage /></FormLabel>
+                                                <Select
+                                                    onValueChange={field.onChange}
+                                                    defaultValue={field.value}
+                                                    disabled={editProfile || loading || component4}
+                                                    value={field.value}
+                                                >
+                                                    <FormControl className="col-span-3">
+                                                        <SelectTrigger>
+                                                            <SelectValue placeholder="Select a unit" />
+                                                        </SelectTrigger>
+                                                    </FormControl>
+                                                    <SelectContent>
+                                                        {unitOptions.map((option, index) => (
+                                                            <SelectItem key={index} value={option.value}>{option.label}</SelectItem>
+                                                        ))}
+                                                    </SelectContent>
+                                                </Select>
+                                            </FormItem>
+                                        )}
+                                    />
                                 )}
                                 <FormField
-                                name='component'
-                                control={form.control}
-                                render={({ field }) => (
-                                    <FormItem className="grid grid-cols-4 items-center gap-4">
-                                        <FormLabel className="text-xs sm:text-sm text-right">Component<FormMessage /></FormLabel>
-                                        <Select
-                                            onValueChange={(newValue) => {
-                                                field.onChange(newValue)
-                                                newValue == 'Component 4' ? handleUnitDropDown(false) : handleUnitDropDown(true)
-                                            }}
-                                            defaultValue={field.value}
-                                            disabled={editProfile || loading}
-                                            
-                                        >
-                                            <FormControl className="col-span-3">
-                                                <SelectTrigger>
-                                                    <SelectValue placeholder="Select a component" />
-                                                </SelectTrigger>
-                                            </FormControl>
-                                            <SelectContent>
-                                                {componentOptions.map((option, index) => (
-                                                    <SelectItem key={index} value={option}>{option}</SelectItem>
-                                                ))}
-                                                <SelectItem key={'Component5'} value={' '} disabled={true}>Component 5</SelectItem>
-                                            </SelectContent>
-                                        </Select>
-                                    </FormItem>
-                                )}
-                            />
-                                 <FormField
-                                name='region'
-                                control={form.control}
-                                render={({ field }) => (
-                                    <FormItem className="grid grid-cols-4 items-center gap-4">
-                                        <FormLabel className="text-xs sm:text-sm text-right">Region <FormMessage /></FormLabel>
-                                        <Select onValueChange={field.onChange} defaultValue={field.value} disabled={editProfile || loading}>
-                                            <FormControl className="col-span-3">
-                                                <SelectTrigger>
-                                                    <SelectValue placeholder="Select a region" />
-                                                </SelectTrigger>
-                                            </FormControl>
-                                            <SelectContent>
-                                                {regionOptions.map((option, index) => (
-                                                    <SelectItem key={index} value={option}>{option}</SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-                                    </FormItem>
-                                )}
-                            />
+                                    name='component'
+                                    control={form.control}
+                                    render={({ field }) => (
+                                        <FormItem className="grid grid-cols-4 items-center gap-4">
+                                            <FormLabel className="text-xs sm:text-sm text-right">Component<FormMessage /></FormLabel>
+                                            <Select
+                                                onValueChange={(newValue) => {
+                                                    field.onChange(newValue)
+                                                    newValue == 'Component 4' ? handleUnitDropDown(false) : handleUnitDropDown(true)
+                                                }}
+                                                defaultValue={field.value}
+                                                disabled={editProfile || loading}
+
+                                            >
+                                                <FormControl className="col-span-3">
+                                                    <SelectTrigger>
+                                                        <SelectValue placeholder="Select a component" />
+                                                    </SelectTrigger>
+                                                </FormControl>
+                                                <SelectContent>
+                                                    {componentOptions.map((option, index) => (
+                                                        <SelectItem key={index} value={option}>{option}</SelectItem>
+                                                    ))}
+                                                    <SelectItem key={'Component5'} value={' '} disabled={true}>Component 5</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    name='region'
+                                    control={form.control}
+                                    render={({ field }) => (
+                                        <FormItem className="grid grid-cols-4 items-center gap-4">
+                                            <FormLabel className="text-xs sm:text-sm text-right">Region <FormMessage /></FormLabel>
+                                            <Select onValueChange={field.onChange} defaultValue={field.value} disabled={editProfile || loading}>
+                                                <FormControl className="col-span-3">
+                                                    <SelectTrigger>
+                                                        <SelectValue placeholder="Select a region" />
+                                                    </SelectTrigger>
+                                                </FormControl>
+                                                <SelectContent>
+                                                    {regionOptions.map((option, index) => (
+                                                        <SelectItem key={index} value={option}>{option}</SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                        </FormItem>
+                                    )}
+                                />
                             </div>
                             <DialogFooter className="flex justify-between">
-                                <Label className=" text-destructive">{error}</Label> 
+                                <Label className=" text-destructive">{error}</Label>
                                 {!editProfile ?
                                     <>
-                                        <Button type="submit" disabled={loading}> {loading? <LoadingSpinner/>:'Submit changes'}</Button>
+                                        <Button type="submit" disabled={loading}> {loading ? <LoadingSpinner /> : 'Submit changes'}</Button>
 
                                         <Button type="button" disabled={loading} onClick={() => setEditProfile(true)} variant={'destructive'}>Cancel</Button>
                                     </>

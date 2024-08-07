@@ -7,21 +7,17 @@ interface RegisterResponse {
     error?: string;
 }
 
-export const updateprofile = async (values:z.infer<typeof UserSchema>): Promise<RegisterResponse> => {
+export const updateprofile = async (values:z.infer<typeof UserSchema>, logs:any): Promise<RegisterResponse> => {
     console.log("values: ",values)
     const validatedFields = UserSchema.safeParse(values);
     if (!validatedFields.success) {
       return { error: "Invalid fields!" };
     }
     try {
-            const response = await axios.post('/api/update-profile', {
-                name:values.name,
-                email:values.email,
-                position:values.position,
-                unit:values.unit,
-                component:values.component,
-                region:values.region
-            });
+        const response = await axios.post('/api/update-profile', {
+            ...values,
+            logs
+        });
     
             // Check if the response contains an error message
             if (response.data.error) {

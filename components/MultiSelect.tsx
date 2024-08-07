@@ -137,11 +137,13 @@ export function FancyMultiSelect({
                     />
                     {open && selectables.length > 0 ? (
                         <FaChevronUp
+                        size={20}
                             className="cursor-pointer mt-auto"
                             onClick={!disabled ? () => setOpen(false) : undefined}
                         />
                     ) : (
                         <FaChevronDown
+                        size={20}
                             className="cursor-pointer mt-auto"
                             onClick={!disabled ? () => setOpen(true) : undefined}
                         />

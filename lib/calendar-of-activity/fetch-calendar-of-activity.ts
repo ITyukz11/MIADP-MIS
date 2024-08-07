@@ -9,7 +9,7 @@ export async function fetchCalendarOfActivity() {
     const response = await instance.get('/api/auth/calendar-of-activity');
     return response.data;
   } catch (error) {
-    console.error('Error fetching pcalendar-of-activity:', error);
+    console.error('Error fetching calendar-of-activity:', error);
     throw new Error('Internal Server Error');
   }
 }

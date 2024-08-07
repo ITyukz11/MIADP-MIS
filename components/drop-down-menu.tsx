@@ -19,6 +19,7 @@ import { signOut } from "next-auth/react";
 import { TbPlugConnectedX } from "react-icons/tb";
 import { useState } from "react";
 import { ProfileDialog } from "./profile/dialog/profile-dialog";
+import { useCurrentUser } from "./context/CurrentUserContext";
 
 
 interface DropDownMenuComponentProps {
@@ -27,7 +28,6 @@ interface DropDownMenuComponentProps {
 
 export const DropDownMenuComponent = ({ }: DropDownMenuComponentProps) => {
   const [profileDialog, setProfileDialog] = useState<boolean>(false)
-
   const handleProfile = ()=> {
     setProfileDialog(true)
   }
@@ -55,7 +55,7 @@ export const DropDownMenuComponent = ({ }: DropDownMenuComponentProps) => {
           <DropdownMenuItem disabled><MdLiveHelp />  Help</DropdownMenuItem>
           <DropdownMenuItem disabled><TbPlugConnectedX /> API</DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => signOut()}>
+          <DropdownMenuItem onClick={() => {signOut(); localStorage.removeItem('currentUser');}}>
             <MdLogout /> Log out
           </DropdownMenuItem>
         </DropdownMenuContent>

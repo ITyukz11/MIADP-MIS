@@ -16,7 +16,6 @@ export const PreparatoryActivityStatus=[
 ]
 
 export const TypeData=[
-    { label: "Select Type *", value: "" },
     { label: "Meeting", value: "Meeting" },
     { label: "Training", value: "Training" },
     { label: "Training Workshop", value: "Training Workshop" },

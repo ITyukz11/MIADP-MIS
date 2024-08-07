@@ -11,11 +11,11 @@ export async function POST(request) {
 
     //const userName = await getCurrentUser();
 
-    const { authorizeOther, individualActivity, WFPYear, activityTitle, activityDescription, type, targetParticipant, participants,
-      location, dateFrom, dateTo, timeStart, timeEnd, allDay, attachments, status, remarks,preparatoryContent, preparatoryList, userName } = await request.json();
+    const { authorizeOther, individualActivity, WFPYear, activityTitle, activityDescription, type, otherType, targetParticipant, participants,
+      location, dateFrom, dateTo, timeStart, timeEnd, allDay, attachments, status, remarks,preparatoryContent, preparatoryList, calendarOfActivityAttachment, userName } = await request.json();
     console.log('api/auth/calendar-of-activity route: ', {
-      authorizeOther, individualActivity, WFPYear, activityTitle, activityDescription, type, targetParticipant, participants,
-      location, dateFrom, dateTo, timeStart, timeEnd, allDay, attachments, status, remarks, preparatoryContent,preparatoryList, userName
+      authorizeOther, individualActivity, WFPYear, activityTitle, activityDescription, type, otherType, targetParticipant, participants,
+      location, dateFrom, dateTo, timeStart, timeEnd, allDay, attachments, status, remarks, preparatoryContent,preparatoryList,calendarOfActivityAttachment, userName
     });
 
     // Create the new calendar of activity
@@ -27,6 +27,7 @@ export async function POST(request) {
         activityTitle,
         activityDescription,
         type,
+        otherType,
         targetParticipant,
         location,
         dateFrom,
@@ -34,10 +35,14 @@ export async function POST(request) {
         timeStart,
         timeEnd,
         allDay,
-        attachments,
         status,
         remarks,
         preparatoryContent,
+        calendarOfActivityAttachment:{
+          createMany:{
+            data: calendarOfActivityAttachment
+          }
+        },
         preparatoryList: {
           createMany: {
             data: preparatoryList // Assuming preparatoryList is an array of objects
@@ -85,6 +90,14 @@ export async function DELETE(request) {
       }
     });
 
+    const calendarOfActivityAttachments = await prisma.calendarOfActivityAttachments.findMany({
+      where: {
+        activity: {
+          in: ids
+        }
+      }
+    });
+
        // Find the preparatory lists associated with the calendar activities
        const participants = await prisma.calendarOfActivityParticipant.findMany({
         where: {
@@ -99,6 +112,14 @@ export async function DELETE(request) {
       preparatoryLists.map((preparatoryList) =>
         prisma.preparatoryList.delete({
           where: { id: preparatoryList.id }
+        })
+      )
+    );
+
+    await prisma.$transaction(
+      calendarOfActivityAttachments.map((attachments) =>
+        prisma.calendarOfActivityAttachments.delete({
+          where: { id: attachments.id }
         })
       )
     );
@@ -171,6 +192,7 @@ export async function GET(request) {
         },
         participants: true, // Include all fields from the preparatoryList model
         calendarOfActivityHistory: true, // Include all fields from the calendarOfActivityHistory model
+        calendarOfActivityAttachment:true, //Include all calendar of activities attachments
         preparatoryList: true // Include all fields from the preparatoryList model
       },
       cacheStrategy: { ttl: 3600, swr: 300 },

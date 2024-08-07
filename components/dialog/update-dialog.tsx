@@ -1,13 +1,13 @@
 'use client'
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Dialog, DialogContent, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { CalendarOfActivitySchema } from '@/schemas/calendar-of-activity';
 import { zodResolver } from '@hookform/resolvers/zod';
 import dayjs from 'dayjs';
 import { DatePicker, TimePicker } from 'antd';
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Select, SelectItem, SelectTrigger, SelectValue, SelectContent } from '@/components/ui/select';
 import { updateCalendarOfActivity } from '@/actions/calendar-of-activity/update';
 import { FormError } from '@/components/form-error'
@@ -18,13 +18,13 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { FaMinus, FaPlus, FaTrash } from 'react-icons/fa'
 import { Separator } from '@/components/ui/separator'
-import { ActivityStatus, PreparatoryActivityStatus, TypeData } from '@/components/calendar-of-activity/data'
+import { PreparatoryActivityStatus, TypeData } from '@/components/calendar-of-activity/data'
 import { LoadingSpinner } from '@/components/LoadingSpinner'
 import { regionOptions, statusOptions } from '@/lib/data/filter';
 import { getStatusColor } from '../table/data/activities/coa-columns';
 import { Badge } from '../ui/badge';
 import { Label } from '../ui/label';
-import { ChevronLeftCircleIcon, ChevronLeftSquare, ChevronRightCircleIcon } from 'lucide-react';
+import { ChevronLeftCircleIcon, ChevronRightCircleIcon } from 'lucide-react';
 import { ToastAction } from '../ui/toast';
 import { toast } from '../ui/use-toast';
 import { useCurrentUser } from '../context/CurrentUserContext';
@@ -32,10 +32,13 @@ import { MdPeopleAlt } from 'react-icons/md';
 import { useDispatch, useSelector } from '@/app/store/store';
 import { User } from '@/types/users/userType';
 import { fetchActivitiesData } from '@/app/store/activityAction';
-import FancyMultiSelect, { Framework } from '../MultiSelect';
+import { Framework } from '../MultiSelect';
 import FancyMultiSelectUpdateActivity from '../MultiSelectUpdateActivity';
 import { QuillEditor, quillFormats, quillModules } from '@/app/(app)/activities/calendar-form';
 import { HiUser, HiUserGroup } from 'react-icons/hi2';
+import { TooltipComponent } from '../Tooltip';
+import { IoInformationCircleOutline } from 'react-icons/io5';
+import { Switch } from '../ui/switch';
 
 
 interface UpdateActivityDialogProps {
@@ -84,11 +87,15 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
 
     const [selectedData, setSelectedData] = useState<Framework[]>([])
 
+    const [WFPYear, setWFPYear] = useState(new Date().getFullYear().toString());
+    const WFPYears = ['2023', '2024', '2025', '2026', '2027', '2028']
+
     const form = useForm<z.infer<typeof CalendarOfActivitySchema>>({
         resolver: zodResolver(CalendarOfActivitySchema),
         defaultValues: {
             activityTitle: '',
             individualActivity: false,
+            WFPYear: WFPYear,
             activityDescription: '',
             targetParticipant: '',
             location: '',
@@ -101,13 +108,14 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
             color: '',
             status: '',
             participants: [{ userId: '' }],
+            listMode: false,
             preparatoryContent: '',
             preparatoryList: [{ description: '', status: '', remarks: '' }],
+            calendarOfActivityAttachment: [{ details: '', link: '' }],
             remarks: '',
             name: '',
         },
     });
-
     const convertUsersToDropdownData = (users: User[]) => {
         return users.map(user => ({ value: user.id, label: `${user.region} - ${user.name}` }));
     };
@@ -157,6 +165,7 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
 
     // console.log("form.participants", form.watch('participants'))
     // console.log("selectedData: ", selectedData)
+
     useEffect(() => {
         if (activityId.length > 0 && currentIndex < activityId.length) {
             setLoadingForm(true);
@@ -177,8 +186,10 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
                     color: activityData.color || '',
                     status: activityData.status,
                     participants: activityData.participants.length > 0 ? activityData.participants : [{ userId: '' }],
+                    listMode: activityData.preparatoryContent ? false : true,
                     preparatoryContent: activityData.preparatoryContent,
                     preparatoryList: activityData.preparatoryList.length > 0 ? activityData.preparatoryList : [{ description: '', status: '', remarks: '' }],
+                    calendarOfActivityAttachment: activityData.calendarOfActivityAttachment && activityData.calendarOfActivityAttachment.length > 0 ? activityData.calendarOfActivityAttachment : [{ details: '', link: '' }],
                     remarks: activityData.remarks,
                 });
                 setAllDayChecked(activityData.dateFrom != activityData.dateTo);
@@ -187,6 +198,8 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
         }
     }, [activityId, currentIndex, activitiesData, form]);
 
+
+    console.log("activityData: ", activitiesData)
     const { control, watch } = form;
 
     const {
@@ -207,8 +220,16 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
         name: 'preparatoryList'
     });
 
-
-    const onSubmit = async (values: any) => {
+    const {
+        fields: attachmentFields,
+        append: appendAttachments,
+        remove: removeAttachments
+    } = useFieldArray({
+        control,
+        name: 'calendarOfActivityAttachment'
+    });
+    const onSubmit = async (values: z.infer<typeof CalendarOfActivitySchema>) => {
+        console.log("updatedvalues: ", values)
         setError('');
         setSuccess('');
 
@@ -218,7 +239,7 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
             userId: item,
         }));
 
-        if(!allDayChecked){
+        if (!allDayChecked) {
             values.dateTo = values.dateFrom
         }
 
@@ -227,13 +248,13 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
                 setTimeError(true)
                 return
             }
-            else{
+            else {
                 setTimeError(false)
             }
         }
 
         if (allDayChecked) {
-            if (values.dateFrom==values.dateTo) {
+            if (values.dateFrom == values.dateTo) {
                 setDateToError(true)
                 return
             }
@@ -241,14 +262,23 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
                 setDateToError(false)
             }
         }
-        // Transform preparatoryList to match Prisma's expected structure
-        const formattedPreparatoryList = values.preparatoryList.map((item: { id: any; description: any; status: any; remarks: any; }) => ({
-            id: item.id,
+        // Check for id presence in preparatoryList items
+        const formattedPreparatoryList = values.preparatoryList?.map((item: { id?: any; description?: string; status?: string; remarks?: string }) => ({
+            id: item.id || '', // Handle cases where id might be missing
             description: item.description,
             status: item.status,
             remarks: item.remarks,
-        }));
+        })) || [];
 
+        // Check for id presence in calendarOfActivityAttachment items
+        const formattedAttachments = values.calendarOfActivityAttachment?.map((item: { id?: any; details?: string; link?: string }) => ({
+            id: item.id || '', // Handle cases where id might be missing
+            details: item.details,
+            link: item.link,
+        })) || [];
+
+
+        //Final updated values
         const formattedValues: any = {
             ...values,
             preparatoryList: {
@@ -256,9 +286,16 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
                 createMany: {
                     data: individualActivity ? [] : formattedPreparatoryList
                 }
+            },
+            calendarOfActivityAttachment: {
+                deleteMany: {}, // This will delete all preparatory list items for the given CalendarOfActivity
+                createMany: {
+                    data: formattedAttachments
+                }
             }
         };
-        // console.log("submitting values: ", formattedValues);
+
+
 
         if (formattedParticipants.length > 0) {
             formattedValues.participants = {
@@ -415,9 +452,10 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
     const clearFunctionRef = useRef<() => void | null>(null);
     const selectAllFunctionRef = useRef<() => void | null>(null);
 
-    const handleEditorChange = (newContent: any) => {
-        form.setValue('preparatoryContent', newContent)
-    };
+    const handleListChange = () => {
+        form.setValue("preparatoryList", [{ description: '', status: '', remarks: '' }])
+        form.setValue("preparatoryContent", "")
+    }
 
     return (
         <Dialog open={openUpdateDialog} onOpenChange={setUpdateDialogClose}>
@@ -459,28 +497,46 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
                                             name="activityTitle"
                                             render={({ field }) => (
                                                 <FormItem className='w-full'>
-                                                    <FormLabel className='text-xs sm:text-sm'>Activity Title</FormLabel>
+                                                    <FormLabel className='flex flex-row gap-1 text-xs sm:text-sm'>Activity Title<FormMessage /></FormLabel>
                                                     <FormControl>
-                                                        <Textarea className='text-xs sm:text-sm'  {...field} disabled={loadingForm} placeholder="Type your activity title here." />
+                                                        <Input {...field} className='text-xs sm:text-sm' disabled={loadingForm} placeholder="Type your activity title here." />
                                                     </FormControl>
-                                                    <FormMessage />
                                                 </FormItem>
                                             )}
                                         />
+                                        <div className='mt-auto'>
+                                            <Select onValueChange={(value) => setWFPYear(value)} defaultValue={WFPYear} disabled={loadingForm}>
+                                                <SelectTrigger className='text-xs sm:text-sm'>
+                                                    <SelectValue placeholder="Year" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {WFPYears.map((year, index) => (
+                                                        <SelectItem
+                                                            key={index}
+                                                            value={year}
+                                                            disabled={loadingForm}
+                                                            className="text-xs sm:text-sm"
+                                                        >
+                                                            {year}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
                                     </div>
                                     <FormField
                                         control={form.control}
                                         name="activityDescription"
                                         render={({ field }) => (
                                             <FormItem className='w-full'>
-                                                <FormLabel className='text-xs sm:text-sm'>Activity Description</FormLabel>
+                                                <FormLabel className='flex flex-row gap-1 text-xs sm:text-sm'>Activity Description<FormMessage /></FormLabel>
                                                 <FormControl>
                                                     <Textarea className='text-xs sm:text-sm'  {...field} disabled={loadingForm} placeholder="Type your description here." />
                                                 </FormControl>
-                                                <FormMessage />
                                             </FormItem>
                                         )}
                                     />
+
                                     <div className='flex flex-row flex-wrap sm:grid grid-cols-3 gap-2'>
                                         <FormField
                                             control={form.control}
@@ -584,7 +640,7 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
                                                     render={({ field }) => (
                                                         <FormItem className='mt-auto'>
                                                             <FormLabel className='text-xs sm:text-sm'
-                                                             style={timeError ? { color: '#f04d44' } : {}}
+                                                                style={timeError ? { color: '#f04d44' } : {}}
                                                             >Time Range {timeError && '*'}</FormLabel>
                                                             <TimePicker.RangePicker
                                                                 className='w-full text-xs sm:text-sm dark:bg-[#020817] dark:text-[#f8fafc] dark:border-[#182334]'
@@ -629,95 +685,271 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
                                         />
                                     </div>
                                     <Separator />
-                                    {!watch('individualActivity') && (
-                                        <>
-                                            <FormLabel className='flex flex-row gap-2 justify-between items-center'>
+                                    {!watch('individualActivity') && <>
+                                        <div className='flex flex-row gap-2 justify-between items-center flex-wrap'>
+                                            <FormLabel>
                                                 <div className='flex flex-row gap-2 items-center'>
                                                     <label
-                                                        className='font-bold md:text-xl mr-auto hidden sm:block'
-                                                        style={participantError ? { color: '#f04d44' } : {}}
+                                                        className='font-bold md:text-xl mr-auto flex flex-row'
                                                     >
-                                                        Participants {participantError && '*'}
+                                                        Participants
                                                     </label>
-
-                                                    <FormDescription className='items-center hidden sm:flex'>
-                                                        Please press (All) to select all participants, (trash icon) to remove all
-                                                    </FormDescription>
-                                                </div>
-                                                <div className='flex flex-row gap-2 justify-center sm:justify-end items-center w-full sm:w-fit'>
-                                                    <Badge className='flex flex-row gap-1 justify-center items-center'><MdPeopleAlt />{filteredUsersData.length}</Badge>
-                                                    <Select onValueChange={setFilterRegion} defaultValue={filterRegion} disabled={loadingForm}>
-                                                        <SelectTrigger className='text-xs sm:text-sm'>
-                                                            <SelectValue placeholder="Filter" />
-                                                        </SelectTrigger>
-                                                        <SelectContent>
-                                                            <SelectItem value='All' className='text-xs sm:text-sm'>All</SelectItem>
-                                                            {regionOptions.map((option, index) => (
-                                                                <SelectItem
-                                                                    key={index}
-                                                                    value={option}
-                                                                    className="text-xs sm:text-sm">{option}</SelectItem>
-                                                            ))}
-                                                        </SelectContent>
-                                                    </Select>
-
-                                                    <Badge className='flex flex-row gap-1 justify-center items-center' variant='secondary'><MdPeopleAlt />{selectedParticipants.length}</Badge>
-                                                    <Button
-                                                        variant={'destructive'}
-                                                        type='button' size={'sm'}
-                                                        disabled={loadingForm || selectedParticipants.length == 0}
-                                                        onClick={() => {
-                                                            if (clearFunctionRef.current) clearFunctionRef.current();
-                                                        }}>
-                                                        <FaTrash />
-                                                    </Button>
-                                                    <Button
-                                                        type='button'
-                                                        size={'sm'}
-                                                        disabled={loadingForm}
-                                                        onClick={() => {
-                                                            if (selectAllFunctionRef.current) selectAllFunctionRef.current();
-                                                        }}>
-                                                        All
-                                                    </Button>
+                                                    <TooltipComponent
+                                                        trigger={<button type='button' className='flex items-center'><IoInformationCircleOutline size={24} /></button>}
+                                                        description="Please press (All) to select all participants, (trash icon) to remove all"
+                                                    />
                                                 </div>
                                             </FormLabel>
-                                            <FancyMultiSelectUpdateActivity
-                                                data={multiSelectUsersDropdownData}
-                                                onSelectionChange={(selected) => setSelectedParticipants(selected)}
-                                                clearFunctionRef={clearFunctionRef}
-                                                selectAllFunctionRef={selectAllFunctionRef}
-                                                disabled={loadingForm}
-                                                selectedData={selectedData}
-                                            />
-                                            <Separator />
-                                        </>
-                                    )}
+
+                                            <div className='flex flex-row gap-2 justify-center sm:justify-end items-center w-full sm:w-fit'>
+                                                <Badge className='flex flex-row gap-1 justify-center items-center'><MdPeopleAlt />{filteredUsersData.length}</Badge>
+                                                <Select onValueChange={setFilterRegion} defaultValue={filterRegion} disabled={loadingForm}>
+                                                    <SelectTrigger className='text-xs sm:text-sm'>
+                                                        <SelectValue placeholder="Filter" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectItem value='All' className='text-xs sm:text-sm'>All</SelectItem>
+                                                        {regionOptions.map((option, index) => (
+                                                            <SelectItem
+                                                                key={index}
+                                                                value={option}
+                                                                className="text-xs sm:text-sm">{option}</SelectItem>
+                                                        ))}
+                                                    </SelectContent>
+                                                </Select>
+
+                                                <Badge className='flex flex-row gap-1 justify-center items-center'
+                                                    variant='secondary'><MdPeopleAlt />{form.watch('participants')?.length}</Badge>
+                                                <Button
+                                                    variant={'destructive'}
+                                                    type='button' size={'sm'}
+                                                    disabled={loadingForm || form.watch('participants')?.length == 0}
+                                                    onClick={() => {
+                                                        if (clearFunctionRef.current) clearFunctionRef.current();
+                                                    }}>
+                                                    <FaTrash />
+                                                </Button>
+                                                <Button
+                                                    type='button'
+                                                    size={'sm'}
+                                                    disabled={loadingForm}
+                                                    onClick={() => {
+                                                        if (selectAllFunctionRef.current) selectAllFunctionRef.current();
+                                                    }}>
+                                                    All
+                                                </Button>
+                                            </div>
+                                        </div>
+                                        <FormField
+                                            control={form.control}
+                                            name="participants"
+                                            render={({ field }) => (
+                                                <FormItem className='mt-auto w-full'>
+
+                                                    <FormMessage />
+
+                                                    <FormControl>
+                                                        <FancyMultiSelectUpdateActivity
+                                                            {...field}
+                                                            data={multiSelectUsersDropdownData}
+                                                            onSelectionChange={(selected) => {
+                                                                const formattedParticipants = selected.map(user => ({ userId: user }));
+                                                                field.onChange(formattedParticipants);  // Ensure this matches the format
+                                                            }}
+                                                            clearFunctionRef={clearFunctionRef}
+                                                            selectAllFunctionRef={selectAllFunctionRef}
+                                                            disabled={loadingForm}
+                                                            selectedData={selectedData}
+
+                                                        />
+                                                    </FormControl>
+                                                </FormItem>
+                                            )}
+                                        />
+                                    </>}
 
                                     {!watch('individualActivity') &&
                                         <>
-                                            {!watch('preparatoryContent') ?
-                                                <>
-                                                    {/* Preparatory list items */}
-                                                    <FormLabel className='flex flex-row gap-2 items-centers'>
-                                                        <label className='font-bold md:text-xl '>Preparatory List</label>
+
+                                            {/* Preparatory list items */}
+                                            <FormLabel className='flex flex-row gap-2 justify-between items-centers'>
+                                                <div className='flex flex-row gap-2 items-center'>
+                                                    <label
+                                                        className='font-bold md:text-xl'
+                                                    >
+                                                        Preparatory {form.watch('listMode') ? 'List' : 'Content'}
+                                                    </label>
+                                                    <TooltipComponent
+                                                        trigger={<button type='button' className='flex items-center'><IoInformationCircleOutline size={24} /></button>}
+                                                        description="Please enter your preparatory list below. For clarity, consider using bullet points or numbering."
+                                                    />
+                                                    <FormField control={form.control}
+                                                        name="listMode"
+                                                        render={({ field }) => (
+                                                            <div className="flex items-center space-x-2">
+                                                                <Switch id="list-mode" checked={field.value} onCheckedChange={(value) => { field.onChange(value); handleListChange() }} disabled={loadingForm} />
+                                                                <Label htmlFor="list-mode" className='text-xs sm:text-sm'>List mode</Label>
+                                                            </div>
+                                                        )} />
+
+                                                </div>
+                                                {form.watch('listMode') &&
+                                                    <div className='flex flex-row gap-2 justify-end items-center'>
+                                                        <Badge variant='secondary' className='h-fit'>{preparatoryListFields.length}</Badge>
                                                         <Button type='button' size={'sm'} disabled={loadingForm} onClick={() => appendPreparatoryList({ description: '', status: '', remarks: '' })}>
                                                             <FaPlus />
                                                         </Button>
-                                                        <FormDescription className='items-center hidden sm:flex'>
-                                                            Please press the plus (+) button when adding new preparatory list
-                                                        </FormDescription>
-                                                    </FormLabel>
+                                                    </div>
+                                                }
+
+                                                <FormMessage />
+                                            </FormLabel>
+                                            {!form.watch('listMode') ? <>
+                                                <FormField
+                                                    control={form.control}
+                                                    name="preparatoryContent"
+                                                    render={({ field }) => (
+                                                        <FormItem className='w-full'>
+                                                            <FormMessage />
+                                                            <FormControl>
+                                                                <QuillEditor
+                                                                    readOnly={loadingForm}
+                                                                    value={field.value}
+                                                                    defaultValue={field.value}
+                                                                    onChange={field.onChange}
+                                                                    modules={quillModules}
+                                                                    formats={quillFormats}
+                                                                    className="w-full"
+                                                                />
+                                                            </FormControl>
+                                                        </FormItem>
+                                                    )}
+                                                />
+
+                                            </> :
+                                                <>
                                                     {preparatoryListFields.map((field, index) => (
+                                                        <FormField
+                                                            control={form.control}
+                                                            name={'preparatoryList'}
+                                                            key={index}
+                                                            render={({ field }) => (
+                                                                <FormItem className='w-full'>
+                                                                    <FormControl>
+                                                                        <div key={index} className="flex flex-row gap-2 items-end w-full">
+                                                                            <FormField
+                                                                                control={form.control}
+                                                                                name={`preparatoryList.${index}.description`}
+                                                                                render={({ field }) => (
+                                                                                    <FormItem className='w-full'>
+                                                                                        <FormMessage />
+                                                                                        <FormControl>
+                                                                                            <Input {...field} disabled={loadingForm} className='text-xs sm:text-sm' placeholder="Enter description" />
+                                                                                        </FormControl>
+                                                                                    </FormItem>
+                                                                                )}
+                                                                            />
+
+                                                                            <FormField
+                                                                                control={form.control}
+                                                                                name={`preparatoryList.${index}.status`}
+                                                                                render={({ field }) => (
+                                                                                    <FormItem className='w-full'>
+                                                                                        <FormMessage />
+                                                                                        <Select onValueChange={field.onChange} defaultValue={field.value} disabled={loadingForm}>
+                                                                                            <SelectTrigger className='text-xs sm:text-sm'>
+                                                                                                <SelectValue placeholder="Select a status" />
+                                                                                            </SelectTrigger>
+                                                                                            <SelectContent>
+                                                                                                {PreparatoryActivityStatus.map((option, index) => (
+                                                                                                    <SelectItem
+                                                                                                        key={index}
+                                                                                                        value={option.value || 'default_value'}
+                                                                                                        disabled={loadingForm}
+                                                                                                        className='cursor-pointer text-xs sm:text-sm'>
+                                                                                                        <Badge variant={'outline'}>{option.label}</Badge>
+                                                                                                    </SelectItem>
+                                                                                                ))}
+                                                                                            </SelectContent>
+                                                                                        </Select>
+                                                                                    </FormItem>
+                                                                                )}
+                                                                            />
+                                                                            {form.watch(`preparatoryList.${index}.status`) == "Other" &&
+                                                                                (
+                                                                                    <FormField
+                                                                                        control={form.control}
+                                                                                        name={`preparatoryList.${index}.remarks`}
+                                                                                        render={({ field }) => (
+                                                                                            <FormItem className='w-full'>
+                                                                                                <FormMessage />
+                                                                                                <FormControl>
+                                                                                                    <Input {...field} className='w-full' disabled={loadingForm} placeholder="Please specify..." />
+                                                                                                </FormControl>
+                                                                                            </FormItem>
+                                                                                        )}
+                                                                                    />
+                                                                                )}
+                                                                            <Button
+                                                                                className='w-fit'
+                                                                                type='button'
+                                                                                variant={'destructive'}
+                                                                                size={'sm'}
+                                                                                onClick={() => removePreparatoryList(index)}
+                                                                                disabled={loadingForm || preparatoryListFields.length === 1}
+                                                                            >
+                                                                                <FaMinus />
+                                                                            </Button>
+                                                                        </div>
+                                                                    </FormControl>
+                                                                </FormItem>
+                                                            )}
+                                                        />
+
+                                                    ))}
+                                                </>
+                                            }
+
+                                        </>
+
+                                    }
+                                    <FormLabel className='flex items-center justify-between -pb-10'>
+                                        <div className='flex flex-row items-center gap-1'>
+                                            <label
+                                                className='font-bold md:text-xl'
+
+                                            >
+                                                Attachments
+                                            </label>
+                                            <TooltipComponent
+                                                trigger={<button type='button' className='flex items-center'><IoInformationCircleOutline size={24} /></button>}
+                                                description="If you add any attachment here, the attachment fields will be required."
+                                            />
+                                            <Label className=' font-extralight text-xs sm:text-sm'>
+                                                (Optional)
+                                            </Label>
+                                        </div>
+                                        <Button type='button' size={'sm'} disabled={loadingForm} onClick={() => appendAttachments({ details: '', link: '' })}>
+                                            <FaPlus />
+                                        </Button>
+                                    </FormLabel>
+                                    {attachmentFields.map((field, index) => (
+                                        <FormField
+                                            control={form.control}
+                                            name={'calendarOfActivityAttachment'}
+                                            key={index}
+                                            render={({ field }) => (
+                                                <FormItem className='w-full pt-0 mt-0'>
+                                                    <FormControl>
                                                         <div key={index} className="flex flex-row gap-2 items-end w-full">
                                                             <FormField
                                                                 control={form.control}
-                                                                name={`preparatoryList.${index}.description`}
+                                                                name={`calendarOfActivityAttachment.${index}.details`}
                                                                 render={({ field }) => (
-                                                                    <FormItem className='w-full text-xs sm:text-sm'>
+                                                                    <FormItem className='w-full'>
+                                                                        <FormMessage />
                                                                         <FormControl>
-                                                                            <Input {...field} disabled={loadingForm} placeholder="Enter description"
-                                                                                className='text-xs sm:text-sm' />
+                                                                            <Input {...field} disabled={loadingForm} className='text-xs sm:text-sm' placeholder="Enter details" />
                                                                         </FormControl>
                                                                     </FormItem>
                                                                 )}
@@ -725,108 +957,59 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
 
                                                             <FormField
                                                                 control={form.control}
-                                                                name={`preparatoryList.${index}.status`}
+                                                                name={`calendarOfActivityAttachment.${index}.link`}
                                                                 render={({ field }) => (
                                                                     <FormItem className='w-full'>
+                                                                        <FormMessage />
                                                                         <FormControl>
-                                                                            <Select onValueChange={field.onChange} defaultValue={field.value} disabled={loadingForm}>
-                                                                                <FormControl>
-                                                                                    <SelectTrigger className='text-xs sm:text-sm'>
-                                                                                        <SelectValue placeholder="Select a status" />
-                                                                                    </SelectTrigger>
-                                                                                </FormControl>
-                                                                                <SelectContent className='text-xs sm:text-sm'>
-                                                                                    {PreparatoryActivityStatus.map((option, index) => (
-                                                                                        <SelectItem className='text-xs sm:text-sm cursor-pointer' key={index} value={option.value || 'default_value'} disabled={loadingForm}>
-                                                                                            <Badge variant={'outline'}>{option.label}</Badge>
-                                                                                        </SelectItem>
-                                                                                    ))}
-                                                                                </SelectContent>
-                                                                            </Select>
+                                                                            <Input {...field} disabled={loadingForm} className='text-xs sm:text-sm text-blue-500' placeholder="Paste link here." />
                                                                         </FormControl>
                                                                     </FormItem>
                                                                 )}
                                                             />
-                                                            {form.watch(`preparatoryList.${index}.status`) == "Other" &&
-                                                                (
-                                                                    <FormField
-                                                                        control={form.control}
-                                                                        name={`preparatoryList.${index}.remarks`}
-                                                                        render={({ field }) => (
-                                                                            <FormItem className='w-full'>
-                                                                                <FormControl>
-                                                                                    <Input {...field} className='w-full' disabled={loadingForm} placeholder="Please specify..." />
-                                                                                </FormControl>
-                                                                            </FormItem>
-                                                                        )}
-                                                                    />
-                                                                )}
                                                             <Button
                                                                 className='w-fit'
                                                                 type='button'
                                                                 variant={'destructive'}
                                                                 size={'sm'}
-                                                                onClick={() => removePreparatoryList(index)}
-                                                                disabled={loadingForm || preparatoryListFields.length === 1}
+                                                                onClick={() => removeAttachments(index)}
+                                                                disabled={loadingForm || attachmentFields.length === 1}
                                                             >
                                                                 <FaMinus />
                                                             </Button>
-
                                                         </div>
-                                                    ))}
-                                                </> :
-                                                <>
-                                                    <QuillEditor
-                                                        readOnly={loadingForm}
-                                                        value={watch('preparatoryContent')}
-                                                        onChange={handleEditorChange}
-                                                        modules={quillModules}
-                                                        formats={quillFormats}
-                                                        className="w-full"
+                                                    </FormControl>
+                                                </FormItem>
+                                            )}
+                                        />
 
-                                                    />
-                                                    <Separator />
-
-                                                </>}
-
-                                        </>
-
-                                    }
-
+                                    ))}
 
                                     <FormField
                                         control={form.control}
                                         name="remarks"
                                         render={({ field }) => (
                                             <FormItem className='w-full'>
-                                                <FormLabel className='text-xs sm:text-sm'>Remarks</FormLabel>
+                                                <FormLabel className='flex flex-row gap-1 text-xs sm:text-sm'>Remarks <Label className=' font-extralight text-xs sm:text-sm'> (Optional)</Label></FormLabel>
                                                 <FormControl>
                                                     <Textarea className='text-xs sm:text-sm'  {...field} disabled={loadingForm} placeholder="Type your remarks here." />
                                                 </FormControl>
-                                                <FormMessage />
                                             </FormItem>
                                         )}
                                     />
                                 </div>
                                 {/* <FormSuccess message={success} /> */}
                                 <FormError message={error} />
+                                <div className='flex flex-row justify-end gap-2'>
+                                    <Button variant="secondary" onClick={onCancel} disabled={loadingForm}>
+                                        Cancel
+                                    </Button>
+                                    <Button typeof="submit" disabled={loadingForm}>
+                                        {loadingForm ? <LoadingSpinner /> : 'Update'}
+                                    </Button>
+                                </div>
                             </form>
                         </Form>
-                        <DialogFooter>
-                            <div className='flex flex-row justify-end gap-2'>
-                                <Button variant="secondary" onClick={onCancel} disabled={loadingForm}>
-                                    Cancel
-                                </Button>
-                                <Button
-                                    type="button"
-                                    onClick={() => onSubmit(form.getValues())}
-                                    disabled={loadingForm}
-                                >
-                                    {loadingForm ? <LoadingSpinner /> : 'Update'}
-                                </Button>
-
-                            </div>
-                        </DialogFooter>
                     </>
                 ) : <>
                     <DialogDescription>Please select an activity first</DialogDescription>

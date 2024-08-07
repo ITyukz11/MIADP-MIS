@@ -10,11 +10,15 @@ const persistConfig = {
 };
 
 const persistedActivityReducer = persistReducer(persistConfig, activityReducer);
+const persistedCountActivityReducer = persistReducer(persistConfig, countActivityReducer);
+const persistedCountByComponentActivityReducer = persistReducer(persistConfig, countComponentActivityReducer);
   
 const store = configureStore({
   reducer: {
     activity: persistedActivityReducer,
     users: userReducer,
+    countActivity: persistedCountActivityReducer,
+    countByComponentActivity: persistedCountByComponentActivityReducer
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
@@ -31,6 +35,8 @@ export type AppDispatch = typeof store.dispatch;
 
 import { TypedUseSelectorHook, useDispatch as useDispatchBase, useSelector as useSelectorBase } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
+import countActivityReducer from './countActivityReducer';
+import countComponentActivityReducer from './countComponentActivityReducer';
 
 export const useDispatch = () => useDispatchBase<AppDispatch>();
 export const useSelector: TypedUseSelectorHook<RootState> = useSelectorBase;

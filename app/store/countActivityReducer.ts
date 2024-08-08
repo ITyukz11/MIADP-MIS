@@ -15,8 +15,8 @@ const initialState: CountActivityState = {
     countActivityError: null,
 };
 
-const activitySlice = createSlice({
-  name: 'activities',
+const countActivitySlice = createSlice({
+  name: 'countActivity',
   initialState,
   reducers: {},
   extraReducers: (builder) => {
@@ -37,6 +37,6 @@ const activitySlice = createSlice({
   
 });
 
-export default activitySlice.reducer;
+export default countActivitySlice.reducer;
 
 

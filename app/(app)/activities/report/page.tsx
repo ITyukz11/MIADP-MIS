@@ -2,9 +2,11 @@
 import { fetchCountActivitiesData } from '@/app/store/countActivityAction';
 import { fetchComponentCountsData } from '@/app/store/countComponentActivityAction';
 import { useDispatch, useSelector } from '@/app/store/store';
+import { LoadingSpinner } from '@/components/LoadingSpinner';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
+import { Skeleton } from '@/components/ui/skeleton';
 import { CountComponentActivity } from '@/types/calendar-of-activity/calendar-of-activity';
 import Image from 'next/image';
 import React, { useEffect } from 'react';
@@ -29,16 +31,15 @@ const Page = () => {
     const { countActivitiesData, countActivityLoading, countActivityError } = useSelector((state) => state.countActivity);
 
     useEffect(() => {
-        if (countActivitiesData.length === 0) {
+        if (Object.keys(countActivitiesData).length === 0) {
             dispatch(fetchCountActivitiesData());
         }
-    }, [dispatch, countActivitiesData.length]);
+    }, [dispatch, countActivitiesData.length, countActivitiesData]);
 
     // Ensure the data is typed correctly
     const sortedActivities = Object.entries(countActivitiesData).sort(
         ([, countA]: [string, number], [, countB]: [string, number]) => countB - countA
     );
-
     const { componentActivityCountsData, componentActivityCountsLoading, componentActivityCountsError } = useSelector((state) => state.countByComponentActivity);
 
     useEffect(() => {
@@ -69,7 +70,6 @@ const Page = () => {
             components.forEach(component => {
                 transformed[component] = counts[component] || 0;
             });
-            console.log(transformed)
             return transformed;
         });
     };
@@ -87,32 +87,42 @@ const Page = () => {
                     </CardTitle>
                 </CardHeader>
                 <CardContent>
-    <div className='w-full h-96 overflow-y-auto scrollbar-thin'>
-        <ol className='space-y-3'>
-            {sortedActivities.map(([region, count], index) => (
-                <React.Fragment key={index}>
-                    <li
-                        className={`flex items-center p-2 rounded-md ${index === 0 ? 'bg-yellow-100 border border-yellow-300' : ''}`}
-                    >
-                        <div className='flex-shrink-0 mr-3'>
-                            <Image src='/miadp-logo.png' alt='region image' className='rounded-full' width={40} height={40} />
-                        </div>
-                        <div className='flex flex-col'>
-                            <div className='flex items-center'>
-                                <span className={`text-lg font-semibold ${index === 0 && 'text-black'}`}>{region}</span>
-                                {index === 0 && (
-                                    <FaCrown className='ml-2 text-yellow-500' size={24} /> // Display crown icon for the top item
-                                )}
-                            </div>
-                            <span className='text-sm text-gray-500 dark:text-gray-400'>{count} activities</span>
-                        </div>
-                    </li>
-                    <Separator />
-                </React.Fragment>
-            ))}
-        </ol>
-    </div>
-</CardContent>
+                    <div className='w-full h-96 overflow-y-auto scrollbar-thin'>
+                        <ol className='space-y-3'>
+                            {countActivityLoading &&
+                                <>
+                                    <Skeleton className="h-24 w-full" />
+                                    <Skeleton className="h-24 w-full" />
+                                    <Skeleton className="h-24 w-full" />
+                                    <Skeleton className="h-24 w-full" />
+                                    <Skeleton className="h-24 w-full" />
+                                    <Skeleton className="h-24 w-full" />
+                                </>}
+                            {sortedActivities && sortedActivities.map(([region, count], index) => (
+                                <React.Fragment key={index}>
+                                    <li
+                                        className={`flex items-center p-2 rounded-md ${index === 0 ? 'bg-yellow-100 border border-yellow-300' : ''}`}
+                                    >
+                                        <div className='flex-shrink-0 mr-3'>
+                                            <Image src='/miadp-logo.png' alt='region image' className='rounded-full' width={40} height={40} />
+                                        </div>
+                                        <div className='flex flex-col'>
+                                            <div className='flex items-center'>
+                                                <span className={`text-lg font-semibold ${index === 0 && 'text-black'}`}>{region}</span>
+                                                {index === 0 && (
+                                                    <FaCrown className='ml-2 text-yellow-500' size={24} /> // Display crown icon for the top item
+                                                )}
+                                            </div>
+                                            <span className='text-sm text-gray-500 dark:text-gray-400'>{count} activities</span>
+                                        </div>
+                                    </li>
+                                    <Separator />
+                                </React.Fragment>
+                            ))}
+                            {countActivityError && <Label className='text-red-500'>*{countActivityError}</Label>}
+                        </ol>
+                    </div>
+                </CardContent>
             </Card>
             <Card className='col-span-8'>
                 <CardHeader>
@@ -121,10 +131,13 @@ const Page = () => {
                         <Label className='text-xs text-gray-500 ml-5'>
                             ** All data presented here represents the totals from the major activities encoded over time. **
                         </Label>
+                        {componentActivityCountsLoading && <LoadingSpinner/>}
+
                     </CardTitle>
                 </CardHeader>
                 <CardContent>
                     <div style={{ width: '100%', height: 400 }}>
+                        {componentActivityCountsError && <Label className='text-red-500'>{componentActivityCountsError}</Label>}
                         <ResponsiveContainer width="100%" height="100%">
                             <BarChart
                                 width={500}

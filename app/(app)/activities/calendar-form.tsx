@@ -147,7 +147,7 @@ const CalendarForm = ({ setDialogClose, individualActivity_ }: Props) => {
         },
     })
 
-    console.log("preparatoryContent: ", form.watch('preparatoryContent'))
+    // console.log("preparatoryContent: ", form.watch('preparatoryContent'))
 
     const handleEditorChange = (newContent: any) => {
         form.setValue('preparatoryContent', newContent)
@@ -201,7 +201,6 @@ const CalendarForm = ({ setDialogClose, individualActivity_ }: Props) => {
     });
 
     const onSubmit = async (values: z.infer<typeof CalendarOfActivitySchema>) => {
-        console.log("values: ", values)
         const today = new Date();
         const todayFormatted = new Date(today.getFullYear(), today.getMonth(), today.getDate());
         let status = 'Upcoming';
@@ -445,11 +444,6 @@ const CalendarForm = ({ setDialogClose, individualActivity_ }: Props) => {
         form.setValue("preparatoryList", [{ description: '', status: '', remarks: '' }])
         form.setValue("preparatoryContent", "")
     }
-    console.log("preparatoryList: ", form.watch('preparatoryList'))
-    console.log("preparatoryContent: ", form.watch('preparatoryContent'))
-
-    console.log("formState: ", form.formState.errors);
-
     return (
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 w-full" autoComplete="off">

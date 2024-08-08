@@ -12,7 +12,7 @@ export const deleteCalendarOfActivity = async (activityDataIds: string[]): Promi
     });
 
     if (response.status === 200) {
-      console.log('Activities deleted successfully');
+      // console.log('Activities deleted successfully');
       return { success: response.data.message || 'Activities deleted successfully' };
     } else {
       console.error('Error deleting calendar activities. Status:', response.status);

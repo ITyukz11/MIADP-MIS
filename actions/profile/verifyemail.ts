@@ -8,7 +8,7 @@ interface RegisterResponse {
 }
 
 export const verifyemail = async (values:any): Promise<RegisterResponse> => {
-    console.log("values: ",values)
+    // console.log("values: ",values)
 
     try {
             const response = await axios.post('/api/verify-email', {

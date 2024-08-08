@@ -116,9 +116,9 @@ const page = () => {
         const startDay = dateStart.getDate();
 
         // If the end day is the same as the start day, no need to add a day
-        console.log("startDay endDay: ", startDay, endDay)
+        // console.log("startDay endDay: ", startDay, endDay)
         if (startDay === endDay) {
-            console.log(`${year}-${month}-${String(endDay).padStart(2, '0')}`)
+            // console.log(`${year}-${month}-${String(endDay).padStart(2, '0')}`)
             return `${year}-${month}-${String(endDay).padStart(2, '0')}`;
         }
 

@@ -9,8 +9,8 @@ interface RegisterResponse {
 
 export const register = async (values: z.infer<typeof RegisterSchema>): Promise<RegisterResponse> => {
     const validatedFields = RegisterSchema.safeParse(values);
-    console.log("server values: ",values)
-    console.log("console.log(validatedFields.error): ", validatedFields);
+    // console.log("server values: ",values)
+    // console.log("console.log(validatedFields.error): ", validatedFields);
     try {
         if (!validatedFields.success) {
             console.log(validatedFields.error); // Log the validation error

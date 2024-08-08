@@ -9,8 +9,8 @@ interface InsertActivityResponse {
 
 export const calendarOfActivity = async (values: z.infer<typeof CalendarOfActivitySchema>): Promise<InsertActivityResponse> => {
     const validatedFields = CalendarOfActivitySchema.safeParse(values);
-    console.log("server values: ", values)
-    console.log("console.log(validatedFields.error): ", validatedFields);
+    // console.log("server values: ", values)
+    // console.log("console.log(validatedFields.error): ", validatedFields);
     
     try {
         if (!validatedFields.success) {

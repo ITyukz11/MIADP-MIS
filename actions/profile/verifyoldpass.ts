@@ -8,8 +8,6 @@ interface RegisterResponse {
 }
 
 export const verifyoldpass = async (values:any): Promise<RegisterResponse> => {
-    console.log("values: ",values)
-
     try {
             const response = await axios.post('/api/verify-password', {
                 email:values.email,

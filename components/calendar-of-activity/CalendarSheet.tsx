@@ -148,7 +148,6 @@ ${formattedPreparatoryList}`;
       return false;
     }
   };
-  console.log("activityData: ",activityData)
   const formatProperDateTime = (timestamp: string): string => {
     const date = new Date(timestamp);
 

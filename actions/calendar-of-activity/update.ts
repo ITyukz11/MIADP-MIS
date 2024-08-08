@@ -13,7 +13,7 @@ export const updateCalendarOfActivity = async (activityId:string, activity: any)
     });
 
     if (response.status === 200) {
-      console.log('Activity updated successfully');
+      // console.log('Activity updated successfully');
       return { success: 'Activity updated successfully' };
     } else {
       console.error('Error updating calendar activity. Status:', response.status);

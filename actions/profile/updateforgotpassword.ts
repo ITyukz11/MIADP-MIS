@@ -8,7 +8,6 @@ interface RegisterResponse {
 }
 
 export const updateforgotpass = async (values:any): Promise<RegisterResponse> => {
-    console.log("values: ",values)
 
     try {
             const response = await axios.post('/api/update-forgot-password', {

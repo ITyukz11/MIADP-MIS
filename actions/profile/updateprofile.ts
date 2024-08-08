@@ -8,7 +8,6 @@ interface RegisterResponse {
 }
 
 export const updateprofile = async (values:z.infer<typeof UserSchema>, logs:any): Promise<RegisterResponse> => {
-    console.log("values: ",values)
     const validatedFields = UserSchema.safeParse(values);
     if (!validatedFields.success) {
       return { error: "Invalid fields!" };

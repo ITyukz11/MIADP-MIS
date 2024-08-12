@@ -13,7 +13,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion"
 
-import { CalendarFold, Clock, Component, FlagTriangleRight, Info, Map, NotebookPen, TargetIcon, UserCircle, Users } from "lucide-react"
+import { CalendarFold, Clock, Component, FlagTriangleRight, Info, Map, NotebookPen, Pencil, PencilIcon, TargetIcon, Trash, Trash2, UserCircle, Users } from "lucide-react"
 import { formatDate, formatTime, getStatusColor } from "../table/data/activities/coa-columns"
 import { Badge } from "../ui/badge"
 import Image from "next/image"
@@ -28,6 +28,19 @@ import { useDispatch, useSelector } from "@/app/store/store"
 import { fetchUsersData } from "@/app/store/userAction"
 import { TooltipComponent } from "../Tooltip"
 import { RiAttachmentLine } from "react-icons/ri"
+import DisplayHTMLDialog from "../dialog/display-html-dialog"
+import { capitalizeEachWord } from "@/utils/capitalizeEachWord"
+import { Button } from "../ui/button"
+import { IoPencilOutline, IoTrashOutline } from "react-icons/io5"
+import { PiNotePencilBold } from "react-icons/pi"
+import UpdateActivityDialog from "../dialog/update-dialog"
+import ConfirmDeleteDialog from "../dialog/delete-dialog"
+import { ToastAction } from "../ui/toast"
+import { toast } from "../ui/use-toast"
+import { deleteCalendarOfActivity } from "@/actions/calendar-of-activity/delete"
+import { fetchActivitiesData } from "@/app/store/activityAction"
+import { getCurrentUser } from "@/lib/session"
+import { useCurrentUser } from "../context/CurrentUserContext"
 
 interface CalendarSheetProps {
   activityData: any[]
@@ -35,10 +48,14 @@ interface CalendarSheetProps {
   closeCalendarSheet: () => void
 }
 export function CalendarSheet({ activityData, openSheet, closeCalendarSheet }: CalendarSheetProps) {
+  const [openUpdateDialog, setOpenUpdateDialog] = useState(false);
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false)
+
+  const [loadingDelete, setLoadingDelete] = useState(false);
 
   const dispatch = useDispatch();
   const { usersData, loadingUser, errorUser } = useSelector((state) => state.users)
-
+  const { currentUser } = useCurrentUser()
   useEffect(() => {
     if (usersData.length === 0) {
       dispatch(fetchUsersData());
@@ -47,7 +64,9 @@ export function CalendarSheet({ activityData, openSheet, closeCalendarSheet }: C
 
   const [qrCode, setQrCode] = useState<string | null>(null);
   const [openProfile, setOpenProfile] = useState(false)
+  const [openHTMLDialog, setOpenHTMLDialog] = useState(false)
 
+  const { activityLoading } = useSelector((state) => state.activity)
   useEffect(() => {
     // Ensure activityData is defined and has at least one element
     if (!activityData || activityData.length === 0) {
@@ -119,6 +138,7 @@ ${formattedPreparatoryList}`;
 
   const {
     user,
+    id,
     activityTitle,
     userName,
     dateFrom,
@@ -152,12 +172,12 @@ ${formattedPreparatoryList}`;
     const date = new Date(timestamp);
 
     const options: Intl.DateTimeFormatOptions = {
-        month: 'short', // 'Aug'
-        day: 'numeric', // '6'
-        year: 'numeric', // '2024'
-        hour: '2-digit', // 'hh'
-        minute: '2-digit', // 'mm'
-        hour12: true // am/pm
+      month: 'short', // 'Aug'
+      day: 'numeric', // '6'
+      year: 'numeric', // '2024'
+      hour: '2-digit', // 'hh'
+      minute: '2-digit', // 'mm'
+      hour12: true // am/pm
     };
 
     // Format date and time
@@ -165,20 +185,69 @@ ${formattedPreparatoryList}`;
 
     // Format output as 'Aug 6, 2024 - hh:mm am/pm'
     return `${formattedDate.replace(/,/, ' -')}`;
-};
+  };
+
+  const handleCancelUpdate = () => {
+    setOpenUpdateDialog(false);
+  };
+
+
+  const handleCancelDelete = () => {
+    // Handle cancel action here
+    setOpenDeleteDialog(false)
+  };
+
+  const handleConfirmDelete = async () => {
+    setLoadingDelete(true);
+    const response = await deleteCalendarOfActivity([id]);
+    setLoadingDelete(false);
+
+    if (response.success) {
+      toast({
+        title: "Success",
+        description: "The calendar of activity you selected has been deleted successfully.",
+        duration: 5000,
+        action: (
+          <ToastAction altText="Ok">Ok</ToastAction>
+        ),
+      });
+
+      dispatch(fetchActivitiesData())
+    } else {
+      toast({
+        title: "Error",
+        variant: 'destructive',
+        description: response.error ?? 'An unexpected error occurred.',
+        duration: 5000,
+        action: (
+          <ToastAction altText="Ok">Ok</ToastAction>
+        ),
+      });
+    }
+    if (!activityLoading && !loadingDelete) {
+      setOpenDeleteDialog(false);
+      closeCalendarSheet()
+    }
+  };
 
   return (
     <>
       <Sheet open={openSheet} onOpenChange={closeCalendarSheet}>
         <SheetContent className="overflow-y-auto scrollbar-thin sm:min-w-[600px] h-full">
           <SheetHeader>
-            <SheetTitle className="flex flex-row gap-2 items-center">
+            <SheetTitle className="flex flex-row gap-2 items-center pr-4">
               <div
                 style={{ backgroundColor: user.color }}
                 className="border rounded-full w-5 h-5 flex-shrink-0"
               ></div>
               {activityTitle}
             </SheetTitle>
+            {user.id == currentUser?.id &&
+              <div className="flex flex-col gap-2 absolute top-8 right-4">
+                <PiNotePencilBold size={20} className="cursor-pointer" onClick={() => setOpenUpdateDialog(true)} />
+                <IoTrashOutline size={20} className="cursor-pointer" onClick={() => setOpenDeleteDialog(true)} />
+              </div>
+            }
           </SheetHeader>
           <div className="mt-4 gap-5 grid grid-cols-1 md:grid-cols-2 auto-rows-min">
             <div className="flex flex-col space-y-2 gap-5">
@@ -206,7 +275,7 @@ ${formattedPreparatoryList}`;
                         height={30}
                       />
                       <div className="flex flex-col w-full items-center pr-1 cursor-pointer">
-                        <Label className="text-sm font-medium  cursor-pointer">{userName}</Label>
+                        <Label className="text-sm font-medium text-center cursor-pointer">{capitalizeEachWord(userName)}</Label>
                         <Label className="text-xs font-light  cursor-pointer">{user.position}</Label>
                       </div>
                     </Label>
@@ -325,7 +394,7 @@ ${formattedPreparatoryList}`;
                 </div>
               )}
               {remarks && (
-                <div className="flex items-center space-x-2 mt-2">
+                <div className="flex items-center space-x-2 mt-2 pr-2">
                   <TooltipComponent
                     trigger={<div className='flex items-center cursor-help'><TbNotes className="h-5 w-5 shrink-0" /></div>}
                     description="Activity Remarks"
@@ -358,7 +427,7 @@ ${formattedPreparatoryList}`;
                                     style={{ backgroundColor: user.color }}>
                                     <Label className="text-xs font-normal">{user.name.split(' ').map((n: string) => n[0]).join('')}</Label>
                                   </div>
-                                  <Label className="text-xs font-normal text-black dark:text-white">{user.name}</Label>
+                                  <Label className="text-xs font-normal text-black dark:text-white">{capitalizeEachWord(user.name)}</Label>
                                 </div>
                               </>
                             ) : (
@@ -386,7 +455,7 @@ ${formattedPreparatoryList}`;
                       </div>
                     </AccordionTrigger>
                     <AccordionContent>
-                      <div className="flex flex-col space-y-2 p-2 border rounded-lg shadow-md" dangerouslySetInnerHTML={{ __html: preparatoryContent }} />
+                      <div className="flex flex-col space-y-2 p-2 border rounded-lg shadow-md cursor-pointer" onClick={() => setOpenHTMLDialog(!openHTMLDialog)} dangerouslySetInnerHTML={{ __html: preparatoryContent }} />
                     </AccordionContent>
                   </AccordionItem>
                 </Accordion> :
@@ -422,7 +491,7 @@ ${formattedPreparatoryList}`;
                   ))}
                 </Accordion>
               }
-              {calendarOfActivityAttachment && (
+              {calendarOfActivityAttachment && calendarOfActivityAttachment.length > 0 && calendarOfActivityAttachment[0].details && (
                 <Accordion type="single" collapsible>
                   {calendarOfActivityAttachment.map((attachment: any, index: number) => (
                     <AccordionItem key={attachment.id} value={attachment.id}>
@@ -460,6 +529,7 @@ ${formattedPreparatoryList}`;
                   ))}
                 </Accordion>
               )}
+
               {qrCode && (
                 <div className="flex flex-col">
                   <div className="flex flex-row gap-2 mb-2">
@@ -489,6 +559,27 @@ ${formattedPreparatoryList}`;
         openProfileDialog={openProfile}
         setProfileDialogClose={() => setOpenProfile(!openProfile)}
         profileUserName={userName} />
+      <DisplayHTMLDialog
+        html={preparatoryContent}
+        openDeleteDialog={openHTMLDialog}
+        setDeleteDialogClose={() => setOpenHTMLDialog(!openHTMLDialog)} />
+      <UpdateActivityDialog
+        activityId={[id]}
+        onCancel={handleCancelUpdate}
+        openUpdateDialog={openUpdateDialog}
+        setUpdateDialogClose={setOpenUpdateDialog}
+        loadingUpdate={activityLoading}
+      />
+      <ConfirmDeleteDialog
+        items={[id]}
+        onCancel={handleCancelDelete}
+        onConfirm={handleConfirmDelete}
+        openDeleteDialog={openDeleteDialog}
+        setDeleteDialogClose={() => setOpenDeleteDialog(!openDeleteDialog)}
+        loading={loadingDelete} />
     </>
   )
 }
+
+
+

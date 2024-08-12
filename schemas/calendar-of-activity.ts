@@ -25,7 +25,7 @@ export const CalendarOfActivitySchema = z.object({
       userId: z.string().min(1, "is required *"),
     })
   ).min(1, "At least one participant is required *").optional(),
-  listMode: z.boolean(),
+  listMode: z.boolean().optional(),
   preparatoryList: z.array(
     z.object({
       description: z.string().optional(),

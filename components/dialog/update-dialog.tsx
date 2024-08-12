@@ -87,6 +87,8 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
 
     const [selectedData, setSelectedData] = useState<Framework[]>([])
 
+    const [listMode, setListMode] = useState<boolean>(false)
+
     const [WFPYear, setWFPYear] = useState(new Date().getFullYear().toString());
     const WFPYears = ['2023', '2024', '2025', '2026', '2027', '2028']
 
@@ -108,7 +110,6 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
             color: '',
             status: '',
             participants: [{ userId: '' }],
-            listMode: false,
             preparatoryContent: '',
             preparatoryList: [{ description: '', status: '', remarks: '' }],
             calendarOfActivityAttachment: [{ details: '', link: '' }],
@@ -186,12 +187,12 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
                     color: activityData.color || '',
                     status: activityData.status,
                     participants: activityData.participants.length > 0 ? activityData.participants : [{ userId: '' }],
-                    listMode: activityData.preparatoryContent ? false : true,
                     preparatoryContent: activityData.preparatoryContent,
                     preparatoryList: activityData.preparatoryList.length > 0 ? activityData.preparatoryList : [{ description: '', status: '', remarks: '' }],
                     calendarOfActivityAttachment: activityData.calendarOfActivityAttachment && activityData.calendarOfActivityAttachment.length > 0 ? activityData.calendarOfActivityAttachment : [{ details: '', link: '' }],
                     remarks: activityData.remarks,
                 });
+                setListMode(activityData.preparatoryContent ? false : true)
                 setAllDayChecked(activityData.dateFrom != activityData.dateTo);
             }
             setLoadingForm(false);
@@ -777,23 +778,21 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
                                                     <label
                                                         className='font-bold md:text-xl'
                                                     >
-                                                        Preparatory {form.watch('listMode') ? 'List' : 'Content'}
+                                                        Preparatory {listMode ? 'List' : 'Content'}
                                                     </label>
                                                     <TooltipComponent
                                                         trigger={<button type='button' className='flex items-center'><IoInformationCircleOutline size={24} /></button>}
                                                         description="Please enter your preparatory list below. For clarity, consider using bullet points or numbering."
                                                     />
-                                                    <FormField control={form.control}
-                                                        name="listMode"
-                                                        render={({ field }) => (
+                                                 
                                                             <div className="flex items-center space-x-2">
-                                                                <Switch id="list-mode" checked={field.value} onCheckedChange={(value) => { field.onChange(value); handleListChange() }} disabled={loadingForm} />
+                                                                <Switch id="list-mode" checked={listMode} onCheckedChange={(value) => { setListMode(value); handleListChange() }} disabled={loadingForm} />
                                                                 <Label htmlFor="list-mode" className='text-xs sm:text-sm'>List mode</Label>
                                                             </div>
-                                                        )} />
+                                                 
 
                                                 </div>
-                                                {form.watch('listMode') &&
+                                                {listMode &&
                                                     <div className='flex flex-row gap-2 justify-end items-center'>
                                                         <Badge variant='secondary' className='h-fit'>{preparatoryListFields.length}</Badge>
                                                         <Button type='button' size={'sm'} disabled={loadingForm} onClick={() => appendPreparatoryList({ description: '', status: '', remarks: '' })}>
@@ -804,7 +803,7 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
 
                                                 <FormMessage />
                                             </FormLabel>
-                                            {!form.watch('listMode') ? <>
+                                            {!listMode ? <>
                                                 <FormField
                                                     control={form.control}
                                                     name="preparatoryContent"

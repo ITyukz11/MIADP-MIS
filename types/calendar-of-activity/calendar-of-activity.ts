@@ -42,6 +42,7 @@ export interface User {
     activityTitle: string;
     activityDescription: string;
     type: string;
+    otherType:string;
     targetParticipant: string;
     participants: Participants[];
     location: string;

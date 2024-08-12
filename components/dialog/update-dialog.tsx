@@ -39,6 +39,7 @@ import { HiUser, HiUserGroup } from 'react-icons/hi2';
 import { TooltipComponent } from '../Tooltip';
 import { IoInformationCircleOutline } from 'react-icons/io5';
 import { Switch } from '../ui/switch';
+import { FaX } from 'react-icons/fa6';
 
 
 interface UpdateActivityDialogProps {
@@ -102,6 +103,7 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
             targetParticipant: '',
             location: '',
             type: '',
+            otherType: '',
             dateFrom: '',
             dateTo: '',
             timeStart: '',
@@ -167,6 +169,7 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
     // console.log("form.participants", form.watch('participants'))
     // console.log("selectedData: ", selectedData)
 
+    console.log(form.formState.errors)
     useEffect(() => {
         if (activityId.length > 0 && currentIndex < activityId.length) {
             setLoadingForm(true);
@@ -179,6 +182,7 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
                     targetParticipant: activityData.targetParticipant,
                     location: activityData.location,
                     type: activityData.type,
+                    otherType: activityData.otherType,
                     dateFrom: activityData.dateFrom,
                     dateTo: activityData.dateTo,
                     timeStart: activityData.timeStart,
@@ -539,33 +543,68 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
                                     />
 
                                     <div className='flex flex-row flex-wrap sm:grid grid-cols-3 gap-2'>
-                                        <FormField
-                                            control={form.control}
-                                            name='type'
-                                            render={({ field }) => (
-                                                <FormItem className='mt-auto w-full'>
-                                                    <FormLabel className='flex flex-row gap-1 text-xs sm:text-sm'>Type<FormMessage /></FormLabel>
-                                                    <FormControl>
-                                                        <Select onValueChange={field.onChange} defaultValue={field.value} disabled={loadingForm}>
-                                                            <FormControl
-                                                                className="text-xs sm:text-sm">
-                                                                <SelectTrigger>
-                                                                    <SelectValue placeholder="Select a type" />
-                                                                </SelectTrigger>
-                                                            </FormControl>
-                                                            <SelectContent>
-                                                                {TypeData.map((option, index) => (
-                                                                    <SelectItem key={index}
-                                                                        value={option.value || 'default_value'}
-                                                                        disabled={loadingForm}
-                                                                        className="text-xs sm:text-sm">{option.label}</SelectItem>
-                                                                ))}
-                                                            </SelectContent>
-                                                        </Select>
-                                                    </FormControl>
-                                                </FormItem>
-                                            )}
-                                        />
+                                        {form.watch('type') === "Other" ?
+                                            <FormField
+                                                control={form.control}
+                                                name={'otherType'}
+                                                render={({ field }) => (
+                                                    <FormItem className='mt-auto w-full'>
+                                                        <FormLabel className='flex flex-row justify-between gap-1 text-xs sm:text-sm'>
+                                                            <div className='flex flex-row gap-1'>
+                                                                Type<FormMessage />
+                                                            </div>
+                                                            <div>
+                                                                <Label className='text-xs sm:text-sm font-light flex flex-row gap-1 items-center'>
+                                                                    (Other)
+                                                                    <FaX size={10} className='cursor-pointer' onClick={() => {
+                                                                        form.resetField('otherType');
+                                                                        form.resetField('type')
+                                                                    }} />
+                                                                </Label>
+                                                            </div>
+                                                        </FormLabel>
+                                                        <FormControl>
+                                                            <Input {...field} disabled={loadingForm} value={form.watch('otherType')} className='text-xs sm:text-sm' placeholder="Please specify..." />
+                                                        </FormControl>
+                                                    </FormItem>
+                                                )}
+                                            /> :
+                                            <FormField
+                                                control={form.control}
+                                                name={'type'}
+                                                render={({ field }) => (
+                                                    <FormItem className='mt-auto w-full'>
+                                                        <FormLabel className='flex flex-row justify-between gap-1 text-xs sm:text-sm'>
+                                                            <div className='flex flex-row gap-1'>
+                                                                Type<FormMessage />
+                                                            </div>
+                                                        </FormLabel>
+                                                        <FormControl>
+                                                            <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value} disabled={loadingForm}>
+                                                                <FormControl className="text-xs sm:text-sm">
+                                                                    <SelectTrigger>
+                                                                        <SelectValue placeholder="Select a type" />
+                                                                    </SelectTrigger>
+                                                                </FormControl>
+                                                                <SelectContent>
+                                                                    {TypeData.map((option, index) => (
+                                                                        <SelectItem
+                                                                            key={index}
+                                                                            value={option.value || 'default_value'}
+                                                                            disabled={loadingForm}
+                                                                            className="text-xs sm:text-sm"
+                                                                        >
+                                                                            {option.label}
+                                                                        </SelectItem>
+                                                                    ))}
+                                                                </SelectContent>
+                                                            </Select>
+                                                        </FormControl>
+                                                    </FormItem>
+                                                )}
+                                            />
+                                        }
+
                                         <FormField
                                             control={form.control}
                                             name="targetParticipant"
@@ -784,12 +823,12 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
                                                         trigger={<button type='button' className='flex items-center'><IoInformationCircleOutline size={24} /></button>}
                                                         description="Please enter your preparatory list below. For clarity, consider using bullet points or numbering."
                                                     />
-                                                 
-                                                            <div className="flex items-center space-x-2">
-                                                                <Switch id="list-mode" checked={listMode} onCheckedChange={(value) => { setListMode(value); handleListChange() }} disabled={loadingForm} />
-                                                                <Label htmlFor="list-mode" className='text-xs sm:text-sm'>List mode</Label>
-                                                            </div>
-                                                 
+
+                                                    <div className="flex items-center space-x-2">
+                                                        <Switch id="list-mode" checked={listMode} onCheckedChange={(value) => { setListMode(value); handleListChange() }} disabled={loadingForm} />
+                                                        <Label htmlFor="list-mode" className='text-xs sm:text-sm'>List mode</Label>
+                                                    </div>
+
 
                                                 </div>
                                                 {listMode &&

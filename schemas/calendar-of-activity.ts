@@ -12,7 +12,7 @@ export const CalendarOfActivitySchema = z.object({
   activityTitle: z.string().min(1, "is required *"),
   activityDescription: z.string().min(1, "is required *"),
   type: z.string().min(1, "is required *"),
-  otherType: z.string().optional(),
+  otherType: z.string().nullable().optional(),
   targetParticipant: z.string().min(1, "is required *"),
   location: z.string().min(1, "is required *"),
   dateFrom: z.string(),

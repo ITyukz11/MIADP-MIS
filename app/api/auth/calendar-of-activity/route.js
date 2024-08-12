@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/session';
 import { hash } from 'bcrypt';
-import { PrismaClient } from '@prisma/client'
+import { Prisma, PrismaClient } from '@prisma/client'
 import { withAccelerate } from '@prisma/extension-accelerate'
 
 const prisma = new PrismaClient().$extends(withAccelerate())
@@ -158,22 +158,51 @@ export async function DELETE(request) {
 export async function PUT(request) {
   try {
     const { id, newData } = await request.json();
+    
+    // Log incoming request data
+    console.log("Received request data:");
+    console.log("ID:", id);
+    console.log("New Data:", newData);
 
     if (!id) {
+      console.log("Error: ID is missing.");
       return NextResponse.json({ error: 'ID is required.' }, { status: 400 });
     }
 
+    // Check if the record exists
+    const existingActivity = await prisma.calendarOfActivity.findUnique({
+      where: { id: id }
+    });
+
+    console.log('Existing activity before update:', existingActivity);
+
+    if (!existingActivity) {
+      console.log("Error: Record not found.");
+      return NextResponse.json({ error: 'Record not found.' }, { status: 404 });
+    }
+
+    // Log new data to be updated
+    console.log("Attempting to update activity with data:", newData);
+
+    // Perform the update operation
     const updatedActivity = await prisma.calendarOfActivity.update({
       where: { id: id },
       data: newData
     });
 
-    return NextResponse.json({ updatedActivity },{ status: 200 });
+    console.log('Activity successfully updated:', updatedActivity);
+
+    return NextResponse.json({ updatedActivity }, { status: 200 });
   } catch (error) {
-    console.error('Error updating activity:', error);
+    console.error('Error during update operation:', error);
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      console.error('Prisma error code:', error.code);
+    }
     return NextResponse.json({ error: 'Internal server error.' }, { status: 500 });
   }
 }
+
+
 
 
 export async function GET(request) {

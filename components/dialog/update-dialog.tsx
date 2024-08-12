@@ -92,7 +92,7 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
 
     const [WFPYear, setWFPYear] = useState(new Date().getFullYear().toString());
     const WFPYears = ['2023', '2024', '2025', '2026', '2027', '2028']
-
+    console.log("activityId: ", activityId)
     const form = useForm<z.infer<typeof CalendarOfActivitySchema>>({
         resolver: zodResolver(CalendarOfActivitySchema),
         defaultValues: {
@@ -169,7 +169,7 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
     // console.log("form.participants", form.watch('participants'))
     // console.log("selectedData: ", selectedData)
 
-    console.log(form.formState.errors)
+    console.log("form state: ",form.formState.errors)
     useEffect(() => {
         if (activityId.length > 0 && currentIndex < activityId.length) {
             setLoadingForm(true);
@@ -237,6 +237,7 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
         console.log("updatedvalues: ", values)
         setError('');
         setSuccess('');
+        console.log("updatedvalues activityId: ", activityId)
 
         const individualActivity = watch('individualActivity');
         // Transform participants to match Prisma's expected structure
@@ -269,7 +270,6 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
         }
         // Check for id presence in preparatoryList items
         const formattedPreparatoryList = values.preparatoryList?.map((item: { id?: any; description?: string; status?: string; remarks?: string }) => ({
-            id: item.id || '', // Handle cases where id might be missing
             description: item.description,
             status: item.status,
             remarks: item.remarks,
@@ -277,7 +277,6 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
 
         // Check for id presence in calendarOfActivityAttachment items
         const formattedAttachments = values.calendarOfActivityAttachment?.map((item: { id?: any; details?: string; link?: string }) => ({
-            id: item.id || '', // Handle cases where id might be missing
             details: item.details,
             link: item.link,
         })) || [];
@@ -564,7 +563,7 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
                                                             </div>
                                                         </FormLabel>
                                                         <FormControl>
-                                                            <Input {...field} disabled={loadingForm} value={form.watch('otherType')} className='text-xs sm:text-sm' placeholder="Please specify..." />
+                                                            <Input {...field} disabled={loadingForm} value={form.watch('otherType')||''} className='text-xs sm:text-sm' placeholder="Please specify..." />
                                                         </FormControl>
                                                     </FormItem>
                                                 )}

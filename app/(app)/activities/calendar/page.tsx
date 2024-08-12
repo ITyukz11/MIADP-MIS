@@ -44,6 +44,7 @@ import dayjs from 'dayjs';
 import { useDispatch, useSelector } from '@/app/store/store';
 import { fetchActivitiesData } from '@/app/store/activityAction';
 import MajorOrIndividualDialog from '../major-or-individual-dialog';
+import { useCalendarOfActivityFilter } from '@/components/context/FilterRegionContext';
 
 interface Event {
     id: string;
@@ -70,13 +71,20 @@ const page = () => {
     const { activitiesData, activityLoading, activityError } = useSelector((state) => state.activity);
     const { currentUser } = useCurrentUser();
 
-    const [selectedFilter, setSelectedFilter] = useState(currentUser?.region);
+    const { currentFilter, setCurrentFilter } = useCalendarOfActivityFilter();
+    const [selectedFilter, setSelectedFilter] = useState<string | undefined>(currentFilter?.filter);
+
     const [filteredData, setFilteredData] = useState<Event[]>([]);
 
     const [fullScreenCalendar, setFullScreenCalendar] = useState(false)
 
     const [individualActivity, setIndividualActivity] = useState(false)
     const [planningActivityOpen, setPlanningActivityOpen] = useState(false)
+
+    const handleValueChange = (value: string) => {
+        setSelectedFilter(value);
+        setCurrentFilter({ filter: value });
+      };
 
     const handleSetIndividualActivity = (isIndividual: boolean) => {
         // Logic to handle setting individual activity state or any other actions
@@ -386,8 +394,6 @@ const page = () => {
         return dayjs(dateString).subtract(1, 'day').format('YYYY-MM-DD');
     };
 
-    console.log("filteredData: ", filteredData)
-
     return (
         <div className='w-full flex justify-center'>
             <div className="flex flex-col py-2 md:flex-row gap-5 flex-wrap md:flex-nowrap overflow-hidden w-full max-w-[1800px]"
@@ -396,16 +402,7 @@ const page = () => {
                 }}>
                 {!fullScreenCalendar &&
                     (<div className='flex flex-col w-full md:w-1/4 gap-4 justify-start items-center'>
-                        {/* <Card className='w-full'>
-                            <CardHeader>
-                                <Button
-                                    variant="default"
-                                    className='flex flex-row items-center gap-1 justify-center text-xs lg:text-sm'
-                                    onClick={() => setPlanningActivityOpen(true)}><FaPlusCircle className='shrink-0' /> Create new activity</Button>
-                                <ViewMySchedDialog />
-                                <ViewMyParticipatedSchedDialog />
-                            </CardHeader>
-                        </Card> */}
+                        
                         <Card className='overflow-y-auto w-full md:max-h-[400px] rounded-xl scrollbar-thin scrollbar-track-rounded-full'>
                             <CardHeader className="font-bold gap-2 sticky top-0 p-3 z-10 border-b bg-white dark:bg-gray-800">
                                 <CardTitle className="flex flex-row items-center justify-start gap-10">
@@ -539,7 +536,7 @@ const page = () => {
                     className="h-fit w-full min-h-[700px] mb-2 md:w-3/4 overflow-x-auto scrollbar-thin scrollbar-track-rounded-full"
                     style={fullScreenCalendar ? { width: '100%', height: '100%' } : undefined}>
                     <div ref={cardRef} className='flex justify-between flex-row gap-2 p-1 px-5 pt-2'>
-                        <Select onValueChange={(value) => setSelectedFilter(value)} disabled={activityLoading}>
+                          <Select onValueChange={handleValueChange} value={selectedFilter} disabled={activityLoading}>
                             <SelectTrigger className="w-fit">
                                 <SelectValue placeholder={currentUser?.region ? currentUser?.region : "Filter"} />
                             </SelectTrigger>

@@ -9,6 +9,7 @@ import { getServerSession } from "next-auth"
 import FloatingAIChat from "@/components/FloatingAIChat"
 import { CurrentUserProvider } from "@/components/context/CurrentUserContext"
 import ReduxProvider from "@/components/ReduxProvider"
+import { CalendarOfActivityFilterProvider } from "@/components/context/FilterRegionContext"
 
 interface AppLayoutProps {
     children: React.ReactNode
@@ -24,6 +25,7 @@ export default async function AppLayout({ children }: AppLayoutProps) {
     return (
         <ReduxProvider>
             <CurrentUserProvider initialUser={session.user as any}>
+                <CalendarOfActivityFilterProvider initialFilter={session.user.region as any}>
                 <div className="flex flex-col min-w-[320px] items-center">
                     <ErrorBoundary errorComponent={GlobalError}>
                         <SiteHeader />
@@ -32,6 +34,7 @@ export default async function AppLayout({ children }: AppLayoutProps) {
                         <SiteFooter />
                     </ErrorBoundary>
                 </div>
+                </CalendarOfActivityFilterProvider>
             </CurrentUserProvider>
         </ReduxProvider>
     )

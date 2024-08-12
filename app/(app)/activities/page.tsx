@@ -17,6 +17,7 @@ import { CalendarSheet } from '@/components/calendar-of-activity/CalendarSheet';
 import { useCurrentUser } from '@/components/context/CurrentUserContext';
 import { useDispatch, useSelector } from '@/app/store/store';
 import { fetchActivitiesData } from '@/app/store/activityAction';
+import { useCalendarOfActivityFilter } from '@/components/context/FilterRegionContext';
 
 type Props = {}
 
@@ -25,7 +26,8 @@ const Page = (props: Props) => {
   const [filteredData, setFilteredData] = useState<any[]>([]);
 
   const {currentUser} = useCurrentUser();
-  const [selectedFilter, setSelectedFilter] = useState(currentUser?.region);
+  const { currentFilter, setCurrentFilter } = useCalendarOfActivityFilter();
+  const [selectedFilter, setSelectedFilter] = useState<string | undefined>(currentFilter?.filter);
 
   const [viewCalendarData, setViewCalendarData] = useState<any[]>([]);
   const [viewCalendar, setViewCalendar] = useState(false)
@@ -99,11 +101,18 @@ const Page = (props: Props) => {
     'userName'
   ]; // Columns to hide
 
+
+
+  const handleValueChange = (value: string) => {
+    setSelectedFilter(value);
+    setCurrentFilter({ filter: value });
+  };
+  
   return (
     <div>
       <div className='flex flex-col flex-wrap w-full'>
         <div className='flex flex-row gap-2 overflow-x-auto w-full scrollbar-thin p-1'>
-          <Select onValueChange={(value) => setSelectedFilter(value)}>
+          <Select onValueChange={handleValueChange} value={selectedFilter} disabled={activityLoading}>
             <SelectTrigger className="w-fit">
               <SelectValue placeholder={currentUser?.region? currentUser?.region:"Filter"} />
             </SelectTrigger>

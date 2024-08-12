@@ -516,7 +516,7 @@ const CalendarForm = ({ setDialogClose, individualActivity_ }: Props) => {
                                             </div>
                                         </FormLabel>
                                         <FormControl>
-                                            <Input {...field} disabled={loadingForm} value={form.watch('otherType')} className='text-xs sm:text-sm' placeholder="Please specify..." />
+                                            <Input {...field} disabled={loadingForm} value={form.watch('otherType') || ''} className='text-xs sm:text-sm' placeholder="Please specify..." />
                                         </FormControl>
                                     </FormItem>
                                 )}

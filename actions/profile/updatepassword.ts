@@ -1,6 +1,5 @@
 import * as z from "zod";
 import axios, { AxiosError } from "axios";
-import { UserSchema } from "@/schemas/user";
 
 interface RegisterResponse {
     success?: string;

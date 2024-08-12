@@ -11,24 +11,11 @@ import {
     DialogTitle,
 } from "@/components/ui/dialog";
 
-import {
-    Select,
-    SelectContent,
-    SelectGroup,
-    SelectItem,
-    SelectLabel,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
-
-import { Input } from "@/components/ui/input";
-import { UserSchema } from "@/schemas/user";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { componentOptions, correspondencePurposeOptions, unitOptions } from "@/lib/data/filter";
 import { Badge } from "@/components/ui/badge";
 import { Send, Upload } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";

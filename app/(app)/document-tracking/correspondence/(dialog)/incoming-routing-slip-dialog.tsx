@@ -22,7 +22,6 @@ import {
 } from "@/components/ui/select";
 
 import { Input } from "@/components/ui/input";
-import { UserSchema } from "@/schemas/user";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";

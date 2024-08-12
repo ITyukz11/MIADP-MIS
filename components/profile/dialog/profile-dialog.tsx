@@ -17,14 +17,15 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { EnterPasswordDialog } from "@/components/dialog/enter-password";
 import { useEffect, useState } from "react";
-import { updateprofile } from "@/actions/profile/updateprofile";
-import { error } from "console";
-import { toast } from "@/components/ui/use-toast";
-import { ToastAction } from "@/components/ui/toast";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { componentOptions, regionOptions, unitOptions } from "@/lib/data/filter";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
+import { updateprofile } from "@/actions/profile/updateprofile";
+import { toast } from "@/components/ui/use-toast";
+import { ToastAction } from "@/components/ui/toast";
+import { useDispatch } from "@/app/store/store";
+import { fetchActivitiesData } from "@/app/store/activityAction";
 
 interface ProfileDialogProps {
     open: boolean;
@@ -39,6 +40,8 @@ export function ProfileDialog({ open, setClose }: ProfileDialogProps) {
     const [error, setError] = useState<string | null>(null);
     const [component4, setComponent4] = useState<boolean>(!currentUser?.component)
 
+    const dispatch = useDispatch()
+    
     const form = useForm<z.infer<typeof UserSchema>>({
         resolver: zodResolver(UserSchema),
         defaultValues: {
@@ -48,9 +51,43 @@ export function ProfileDialog({ open, setClose }: ProfileDialogProps) {
             position: currentUser?.position || '',
             unit: currentUser?.unit || '',
             component: currentUser?.component || '',
-            region: currentUser?.region || ''
+            region: currentUser?.region || '',
+            color: currentUser?.color || ''
         },
     });
+
+    
+    useEffect(() => {
+        if (!open) {
+            // Reset the form to default values when dialog is closed
+            form.reset({
+                id: '',
+                name: currentUser?.name || '',
+                email: currentUser?.email || '',
+                position: currentUser?.position || '',
+                unit: currentUser?.unit || '',
+                component: currentUser?.component || '',
+                region: currentUser?.region || '',
+                color: currentUser?.color || ''
+            });
+            // Reset editProfile state
+            setEditProfile(true);
+        }
+    }, [open, currentUser, form]);
+
+    type ColorMapping = {
+        [key: string]: string;
+      };
+      const regionColors: ColorMapping ={
+        'PSO':'#C80000',
+        'RPCO 9':'#ffc124',
+        'RPCO 10':'#9117c2',
+        'RPCO 11':'#0173bc',
+        'RPCO 12':'#ff6f00',
+        'RPCO 13':'#ff0090',
+        'BARMM':'#3cb54b'
+      }
+      
 
     const onSubmit = async (values: z.infer<typeof UserSchema>) => {
         setLoading(true)
@@ -89,6 +126,11 @@ export function ProfileDialog({ open, setClose }: ProfileDialogProps) {
         } else {
             logs.remarks = "No changes made";
         }
+
+        if (values?.region && regionColors[values.region]) {
+            values.color = regionColors[values.region];
+        }
+        
         try {
             await updateprofile(values, logs)
                 .then((data) => {
@@ -105,6 +147,7 @@ export function ProfileDialog({ open, setClose }: ProfileDialogProps) {
                             ),
                         })
                         // Update currentUser context
+                        dispatch(fetchActivitiesData())
                         setCurrentUser(values);
                         setClose()
                     }
@@ -168,7 +211,7 @@ export function ProfileDialog({ open, setClose }: ProfileDialogProps) {
                                     name="name"
                                     render={({ field }) => (
                                         <FormItem className="grid grid-cols-4 items-center gap-4">
-                                            <FormLabel className="text-xs sm:text-sm text-right">Name</FormLabel>
+                                            <FormLabel className="text-xs sm:text-sm text-right flex justify-end">Name<FormMessage /></FormLabel>
                                             <FormControl>
                                                 <Input
                                                     id="name"
@@ -177,7 +220,6 @@ export function ProfileDialog({ open, setClose }: ProfileDialogProps) {
                                                     disabled={editProfile || loading}
                                                 />
                                             </FormControl>
-                                            <FormMessage />
                                         </FormItem>
                                     )}
                                 />
@@ -186,7 +228,7 @@ export function ProfileDialog({ open, setClose }: ProfileDialogProps) {
                                     name="email"
                                     render={({ field }) => (
                                         <FormItem className="grid grid-cols-4 items-center gap-4">
-                                            <FormLabel className="text-xs sm:text-sm text-right">Email</FormLabel>
+                                            <FormLabel className="text-xs sm:text-sm text-right flex justify-end">Email<FormMessage /></FormLabel>
                                             <FormControl>
                                                 <Input
                                                     id="email"
@@ -195,7 +237,6 @@ export function ProfileDialog({ open, setClose }: ProfileDialogProps) {
                                                     disabled={true}
                                                 />
                                             </FormControl>
-                                            <FormMessage />
                                         </FormItem>
                                     )}
                                 />
@@ -204,7 +245,7 @@ export function ProfileDialog({ open, setClose }: ProfileDialogProps) {
                                     name="position"
                                     render={({ field }) => (
                                         <FormItem className="grid grid-cols-4 items-center gap-4">
-                                            <FormLabel className="text-xs sm:text-sm text-right">Position</FormLabel>
+                                            <FormLabel className="text-xs sm:text-sm text-right flex justify-end">Position<FormMessage /></FormLabel>
                                             <FormControl>
                                                 <Input
                                                     id="position"
@@ -213,17 +254,16 @@ export function ProfileDialog({ open, setClose }: ProfileDialogProps) {
                                                     disabled={editProfile || loading}
                                                 />
                                             </FormControl>
-                                            <FormMessage />
                                         </FormItem>
                                     )}
                                 />
-                                {currentUser?.unit || form.watch("component") == 'Component 4' && (
+                                {form.watch("component") == 'Component 4' && (
                                     <FormField
                                         name='unit'
                                         control={form.control}
                                         render={({ field }) => (
                                             <FormItem className="grid grid-cols-4 items-center gap-4">
-                                                <FormLabel className="text-xs sm:text-sm text-right">Unit<FormMessage /></FormLabel>
+                                                <FormLabel className="text-xs sm:text-sm text-right flex justify-end">Unit<FormMessage /></FormLabel>
                                                 <Select
                                                     onValueChange={field.onChange}
                                                     defaultValue={field.value}
@@ -250,7 +290,7 @@ export function ProfileDialog({ open, setClose }: ProfileDialogProps) {
                                     control={form.control}
                                     render={({ field }) => (
                                         <FormItem className="grid grid-cols-4 items-center gap-4">
-                                            <FormLabel className="text-xs sm:text-sm text-right">Component<FormMessage /></FormLabel>
+                                            <FormLabel className="text-xs sm:text-sm text-right flex justify-end">Component<FormMessage /></FormLabel>
                                             <Select
                                                 onValueChange={(newValue) => {
                                                     field.onChange(newValue)

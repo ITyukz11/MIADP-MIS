@@ -12,6 +12,7 @@ export interface User {
   component?: string;
   unit?: string;
   id?: string;
+  color?:string;
   // Add other user properties if needed
 }
 

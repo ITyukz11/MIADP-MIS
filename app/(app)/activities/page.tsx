@@ -18,6 +18,7 @@ import { useCurrentUser } from '@/components/context/CurrentUserContext';
 import { useDispatch, useSelector } from '@/app/store/store';
 import { fetchActivitiesData } from '@/app/store/activityAction';
 import { useCalendarOfActivityFilter } from '@/components/context/FilterRegionContext';
+import { Label } from '@/components/ui/label';
 
 type Props = {}
 
@@ -27,11 +28,14 @@ const Page = (props: Props) => {
 
   const {currentUser} = useCurrentUser();
   const { currentFilter, setCurrentFilter } = useCalendarOfActivityFilter();
-  const [selectedFilter, setSelectedFilter] = useState<string | undefined>(currentFilter?.filter);
 
   const [viewCalendarData, setViewCalendarData] = useState<any[]>([]);
   const [viewCalendar, setViewCalendar] = useState(false)
   const [selectedRowId, setSelectedRowId] = useState('');
+
+  // console.log("selectedFilter: " , selectedFilter)
+  console.log("currentFilter: " , currentFilter)
+  console.log("currentFilter.filter: " , currentFilter?.filter)
 
 
   const handleViewRowIdPressed = (viewId: string) => {
@@ -77,17 +81,17 @@ const Page = (props: Props) => {
   
 
   useEffect(() => {
-    if (selectedFilter === 'All') {
+    if (currentFilter?.filter === 'All') {
       setFilteredData(coaData);
     } else {
       const filtered = coaData.filter(item =>
-        item.user?.region === selectedFilter ||
-        item.user?.component === selectedFilter ||
-        item.user?.unit === selectedFilter
+        item.user?.region === currentFilter?.filter ||
+        item.user?.component === currentFilter?.filter || 
+        item.user?.unit === currentFilter?.filter
       );
       setFilteredData(filtered);
     }
-  }, [selectedFilter, coaData]);
+  }, [currentFilter ,coaData]);
 
   const hiddenColumns = [
     'id',
@@ -104,7 +108,6 @@ const Page = (props: Props) => {
 
 
   const handleValueChange = (value: string) => {
-    setSelectedFilter(value);
     setCurrentFilter({ filter: value });
   };
   
@@ -112,7 +115,7 @@ const Page = (props: Props) => {
     <div>
       <div className='flex flex-col flex-wrap w-full'>
         <div className='flex flex-row gap-2 overflow-x-auto w-full scrollbar-thin p-1'>
-          <Select onValueChange={handleValueChange} value={selectedFilter} disabled={activityLoading}>
+          <Select onValueChange={handleValueChange} value={currentFilter?.filter} disabled={activityLoading}>
             <SelectTrigger className="w-fit">
               <SelectValue placeholder={currentUser?.region? currentUser?.region:"Filter"} />
             </SelectTrigger>
@@ -158,6 +161,7 @@ const Page = (props: Props) => {
             <Skeleton className="h-[250px] w-full rounded-xl" />
           </div>
         )}
+        {activityError && <Label className=' text-destructive'>{activityError}</Label>}
 
       </div>
       <CalendarSheet activityData={viewCalendarData} openSheet={viewCalendar} closeCalendarSheet={() => setViewCalendar(!viewCalendar)} />

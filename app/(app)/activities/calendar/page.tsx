@@ -72,7 +72,7 @@ const page = () => {
     const { currentUser } = useCurrentUser();
 
     const { currentFilter, setCurrentFilter } = useCalendarOfActivityFilter();
-    const [selectedFilter, setSelectedFilter] = useState<string | undefined>(currentFilter?.filter);
+
 
     const [filteredData, setFilteredData] = useState<Event[]>([]);
 
@@ -82,7 +82,6 @@ const page = () => {
     const [planningActivityOpen, setPlanningActivityOpen] = useState(false)
 
     const handleValueChange = (value: string) => {
-        setSelectedFilter(value);
         setCurrentFilter({ filter: value });
       };
 
@@ -219,7 +218,7 @@ const page = () => {
 
 
     useEffect(() => {
-        if (selectedFilter === 'All') {
+        if (currentFilter?.filter === 'All') {
             setFilteredData(filteredCoaData);
 
             const filteredUpcomingData = filteredCoaData
@@ -234,9 +233,9 @@ const page = () => {
             setFilteredOnGoingEvents(filteredOnGoingEvents)
         } else {
             const filtered = activitiesData.filter(item =>
-                item.user?.region === selectedFilter ||
-                item.user?.component === selectedFilter ||
-                item.user?.unit === selectedFilter
+                item.user?.region === currentFilter?.filter ||
+                item.user?.component === currentFilter?.filter ||
+                item.user?.unit === currentFilter?.filter
             );
 
             const formattedData = filtered.map((event: any) => {
@@ -272,7 +271,7 @@ const page = () => {
             setFilteredOnGoingEvents(filteredOnGoingEvents)
 
         }
-    }, [selectedFilter, filteredCoaData]);
+    }, [currentFilter, filteredCoaData]);
 
     const events = [
         // Replace this with your actual list of events
@@ -536,7 +535,7 @@ const page = () => {
                     className="h-fit w-full min-h-[700px] mb-2 md:w-3/4 overflow-x-auto scrollbar-thin scrollbar-track-rounded-full"
                     style={fullScreenCalendar ? { width: '100%', height: '100%' } : undefined}>
                     <div ref={cardRef} className='flex justify-between flex-row gap-2 p-1 px-5 pt-2'>
-                          <Select onValueChange={handleValueChange} value={selectedFilter} disabled={activityLoading}>
+                          <Select onValueChange={handleValueChange} value={currentFilter?.filter} disabled={activityLoading}>
                             <SelectTrigger className="w-fit">
                                 <SelectValue placeholder={currentUser?.region ? currentUser?.region : "Filter"} />
                             </SelectTrigger>

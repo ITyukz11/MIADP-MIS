@@ -25,7 +25,7 @@ export default async function AppLayout({ children }: AppLayoutProps) {
     return (
         <ReduxProvider>
             <CurrentUserProvider initialUser={session.user as any}>
-                <CalendarOfActivityFilterProvider initialFilter={session.user.region as any}>
+                <CalendarOfActivityFilterProvider initialFilter={{ filter: session.user.region as string }}>
                 <div className="flex flex-col min-w-[320px] items-center">
                     <ErrorBoundary errorComponent={GlobalError}>
                         <SiteHeader />

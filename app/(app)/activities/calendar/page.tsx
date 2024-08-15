@@ -45,6 +45,8 @@ import { useDispatch, useSelector } from '@/app/store/store';
 import { fetchActivitiesData } from '@/app/store/activityAction';
 import MajorOrIndividualDialog from '../major-or-individual-dialog';
 import { useCalendarOfActivityFilter } from '@/components/context/FilterRegionContext';
+import SelectTypeOfActivity from '../components/SelectTypeOfActivity';
+import SelectFilterRegUniCom from '../components/SelectFilterRegUniCom';
 
 interface Event {
     id: string;
@@ -80,10 +82,6 @@ const page = () => {
 
     const [individualActivity, setIndividualActivity] = useState(false)
     const [planningActivityOpen, setPlanningActivityOpen] = useState(false)
-
-    const handleValueChange = (value: string) => {
-        setCurrentFilter({ filter: value });
-      };
 
     const handleSetIndividualActivity = (isIndividual: boolean) => {
         // Logic to handle setting individual activity state or any other actions
@@ -166,21 +164,28 @@ const page = () => {
         return 'T' + isoString.split('T')[1];
     };
 
-    const timeStartFormat = (time:string | null | undefined)=>{
+    const timeStartFormat = (time: string | null | undefined) => {
         if (!time) {
             return ""; // Return an empty string if isoString is null or undefined
-        }else{
-            return "T"+time;
+        } else {
+            return "T" + time;
         }
     }
     useEffect(() => {
         const fetchData = () => {
             try {
-
-                const formattedData = activitiesData.map((event: any) => {
+                const filteredActivities = activitiesData.filter((activity: any) => {
+                    if (currentFilter?.typeOfActivity === 'WFP Activities') {
+                        return !activity.individualActivity; // Only WFP Activities
+                    } else if (currentFilter?.typeOfActivity === 'Individual Activities') {
+                        return activity.individualActivity; // Only Individual Activities
+                    }
+                    return true; // If no specific type is selected, include all activities
+                });
+                const formattedData = filteredActivities.map((event: any) => {
                     // const startDate = new Date(event.dateFrom);
                     // const endDate = new Date(event.dateTo);
-                     const startDate =event.dateFrom
+                    const startDate = event.dateFrom
                     const endDate = event.dateTo
 
                     return {
@@ -188,8 +193,8 @@ const page = () => {
                         title: event.activityTitle,
                         // start: formatStartDateToISOWithoutTimezone(startDate) + addingTimeEvent(event.timeStart), // Format date without timezone
                         // end: formatEndDateToISOWithoutTimezone(endDate, startDate) + addingTimeEvent(event.timeEnd),
-                        start:startDate+timeStartFormat(event.timeStart),
-                        end:formatEndDateToISOWithoutTimezone(endDate,startDate),
+                        start: startDate + timeStartFormat(event.timeStart),
+                        end: formatEndDateToISOWithoutTimezone(endDate, startDate),
                         timeStart: event.timeStart,
                         timeEnd: event.timeEnd,
                         color: event.user.color, // Use user color
@@ -214,7 +219,7 @@ const page = () => {
             }
         };
         fetchData()
-    }, [activitiesData, activityLoading])
+    }, [activitiesData, activityLoading, currentFilter])
 
 
     useEffect(() => {
@@ -232,7 +237,16 @@ const page = () => {
             setFilteredUpcomingEvents(filteredUpcomingData)
             setFilteredOnGoingEvents(filteredOnGoingEvents)
         } else {
-            const filtered = activitiesData.filter(item =>
+            const filteredActivities = activitiesData.filter((activity: any) => {
+                if (currentFilter?.typeOfActivity === 'WFP Activities') {
+                    return !activity.individualActivity; // Only WFP Activities
+                } else if (currentFilter?.typeOfActivity === 'Individual Activities') {
+                    return activity.individualActivity; // Only Individual Activities
+                }
+                return true; // If no specific type is selected, include all activities
+            });
+
+            const filtered = filteredActivities.filter(item =>
                 item.user?.region === currentFilter?.filter ||
                 item.user?.component === currentFilter?.filter ||
                 item.user?.unit === currentFilter?.filter
@@ -241,7 +255,7 @@ const page = () => {
             const formattedData = filtered.map((event: any) => {
                 // const startDate = new Date(event.dateFrom);
                 // const endDate = new Date(event.dateTo);
-                 const startDate =event.dateFrom
+                const startDate = event.dateFrom
                 const endDate = event.dateTo
 
                 return {
@@ -249,8 +263,8 @@ const page = () => {
                     title: event.activityTitle,
                     // start: formatStartDateToISOWithoutTimezone(startDate) + addingTimeEvent(event.timeStart), // Format date without timezone
                     // end: formatEndDateToISOWithoutTimezone(endDate, startDate) + addingTimeEvent(event.timeEnd),
-                    start:startDate+timeStartFormat(event.timeStart),
-                    end:formatEndDateToISOWithoutTimezone(endDate,startDate),
+                    start: startDate + timeStartFormat(event.timeStart),
+                    end: formatEndDateToISOWithoutTimezone(endDate, startDate),
                     timeStart: event.timeStart,
                     timeEnd: event.timeEnd,
                     color: event.user.color, // Use user color
@@ -275,17 +289,19 @@ const page = () => {
 
     const events = [
         // Replace this with your actual list of events
-        {   id: '1', 
-            title: 'Orientation cum Meeting with NCIP and MIADP Staff', 
-            start: '2024-07-01T13:00', 
-            end: '2024-07-01', 
-            color: '#ff0000'    
+        {
+            id: '1',
+            title: 'Orientation cum Meeting with NCIP and MIADP Staff',
+            start: '2024-07-01T13:00',
+            end: '2024-07-01',
+            color: '#ff0000'
         },
-        {   id: '2', 
-            title: 'PSO-RPCO 1st Quarter Assessment, Davao City', 
-            start: '2024-07-05', 
-            end: '2024-07-07', 
-            color: '#013220' 
+        {
+            id: '2',
+            title: 'PSO-RPCO 1st Quarter Assessment, Davao City',
+            start: '2024-07-05',
+            end: '2024-07-07',
+            color: '#013220'
         },
         {
             id: '3',
@@ -294,29 +310,33 @@ const page = () => {
             end: '2024-07-02',   // Include time in ISO 8601 format
             color: '#0000ff'
         },
-        {   id: '4', 
-            title: 'Event 1', 
-            start: '2024-07-20', 
-            end: '2024-07-25', 
-            color: '#ff0000' 
+        {
+            id: '4',
+            title: 'Event 1',
+            start: '2024-07-20',
+            end: '2024-07-25',
+            color: '#ff0000'
         },
-        {   id: '5', 
-            title: 'Event 2', 
-            start: '2024-07-21', 
-            end: '2024-07-07', 
-            color: '#013220' 
+        {
+            id: '5',
+            title: 'Event 2',
+            start: '2024-07-21',
+            end: '2024-07-07',
+            color: '#013220'
         },
-        {   id: '6', 
-            title: 'Event 3', 
-            start: '2024-07-26', 
-            end: '2024-07-12', 
-            color: '#0000ff' 
+        {
+            id: '6',
+            title: 'Event 3',
+            start: '2024-07-26',
+            end: '2024-07-12',
+            color: '#0000ff'
         },
-        {   id: '7', 
-            title: 'Event 1', 
-            start: '2024-07-30', 
-            end: '2024-07-20', 
-            color: '#ff0000' 
+        {
+            id: '7',
+            title: 'Event 1',
+            start: '2024-07-30',
+            end: '2024-07-20',
+            color: '#ff0000'
         },
         { id: '8', title: 'SDS Orientation', start: '2024-07-05', end: '2024-07-07', color: '#013220' },
         { id: '9', title: 'Training of Trainers (TOT) - Business Plan Preparation (Modules 1 and 2) (RPCO-LGU-NCIP)', start: '2024-07-07', end: '2024-07-12', color: '#0000ff' },
@@ -401,7 +421,7 @@ const page = () => {
                 }}>
                 {!fullScreenCalendar &&
                     (<div className='flex flex-col w-full md:w-1/4 gap-4 justify-start items-center'>
-                        
+
                         <Card className='overflow-y-auto w-full md:max-h-[400px] rounded-xl scrollbar-thin scrollbar-track-rounded-full'>
                             <CardHeader className="font-bold gap-2 sticky top-0 p-3 z-10 border-b bg-white dark:bg-gray-800">
                                 <CardTitle className="flex flex-row items-center justify-start gap-10">
@@ -449,7 +469,7 @@ const page = () => {
                                                             <div className='flex gap-3 flex-row flex-wrap'>
                                                                 {/* <Label className="font-extralight">{`${startDateString}-${endDateString}`}</Label> */}
                                                                 <Label className="font-extralight text-xs sm:text-sm">
-                                                                    {startDate === endDate || startTimeString? startDate : `${startDate} - ${endDate}`}
+                                                                    {startDate === endDate || startTimeString ? startDate : `${startDate} - ${endDate}`}
                                                                 </Label>
                                                                 <Label className="font-extralight text-xs sm:text-sm">{startTimeString ? `${startTimeString} - ${endTimeString}` : 'All Day'}</Label>
                                                             </div>
@@ -512,7 +532,7 @@ const page = () => {
                                                             {/** - ${endDateString} ${endTimeString} */}
                                                             <div className='flex gap-3 flex-row flex-wrap'>
                                                                 <Label className="font-extralight text-xs sm:text-sm">
-                                                                    {startDate === endDate || startTimeString? startDate : `${startDate} - ${endDate}`}
+                                                                    {startDate === endDate || startTimeString ? startDate : `${startDate} - ${endDate}`}
                                                                 </Label>
                                                                 <Label className="font-extralight text-xs sm:text-sm">{startTimeString ? `${startTimeString} - ${endTimeString}` : 'All Day'}</Label>
                                                             </div>
@@ -535,32 +555,11 @@ const page = () => {
                     className="h-fit w-full min-h-[700px] mb-2 md:w-3/4 overflow-x-auto scrollbar-thin scrollbar-track-rounded-full"
                     style={fullScreenCalendar ? { width: '100%', height: '100%' } : undefined}>
                     <div ref={cardRef} className='flex justify-between flex-row gap-2 p-1 px-5 pt-2'>
-                          <Select onValueChange={handleValueChange} value={currentFilter?.filter} disabled={activityLoading}>
-                            <SelectTrigger className="w-fit">
-                                <SelectValue placeholder={currentUser?.region ? currentUser?.region : "Filter"} />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value='All'>All</SelectItem>
-                                <SelectGroup>
-                                    <SelectLabel>Regions</SelectLabel>
-                                    {regionOptions.map((option, index) => (
-                                        <SelectItem key={index} value={option}>{option}</SelectItem>
-                                    ))}
-                                </SelectGroup>
-                                <SelectGroup>
-                                    <SelectLabel>Components</SelectLabel>
-                                    {componentOptions.map((option, index) => (
-                                        <SelectItem key={index} value={option}>{option}</SelectItem>
-                                    ))}
-                                </SelectGroup>
-                                <SelectGroup>
-                                    <SelectLabel>Units</SelectLabel>
-                                    {unitOptions.map((option, index) => (
-                                        <SelectItem key={index} value={option.value}>{option.label}</SelectItem>
-                                    ))}
-                                </SelectGroup>
-                            </SelectContent>
-                        </Select>
+                        <div className='flex flex-row gap-1 justify-start'>
+                            <SelectFilterRegUniCom />
+                            <SelectTypeOfActivity />
+                        </div>
+
                         <Button
                             disabled={activityLoading}
                             onClick={toggleFullScreen}
@@ -589,7 +588,7 @@ const page = () => {
                             // windowResize={handleWindowResize}
                             eventDisplay="block cursor-pointer"
                             plugins={[multiMonthPlugin, dayGridPlugin, timeGridPlugin, listPlugin]}
-                            initialView="dayGridMonth"
+                            initialView="multiMonthYear"
                             events={filteredData}
                             eventClick={handleEventClick}
                             eventClassNames={'cursor-pointer'}

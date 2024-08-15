@@ -3,6 +3,7 @@ import React, { createContext, useState, useContext, ReactNode, FC, useEffect } 
 
 export interface CalendarOfActivityFilter {
   filter: string;
+  typeOfActivity: string;
   // Add other filter properties if needed
 }
 
@@ -22,13 +23,11 @@ interface CalendarOfActivityFilterProviderProps {
 }
 
 export const CalendarOfActivityFilterProvider: FC<CalendarOfActivityFilterProviderProps> = ({ children, initialFilter }) => {
-  // Initialize state from localStorage
   const [currentFilter, setCurrentFilterState] = useState<CalendarOfActivityFilter | null>(() => {
     const storedFilter = localStorage.getItem('calendarOfActivityFilter');
     return storedFilter ? JSON.parse(storedFilter) : initialFilter;
   });
 
-  // Update localStorage when filter changes
   useEffect(() => {
     if (currentFilter) {
       localStorage.setItem('calendarOfActivityFilter', JSON.stringify(currentFilter));
@@ -47,6 +46,7 @@ export const CalendarOfActivityFilterProvider: FC<CalendarOfActivityFilterProvid
     </CalendarOfActivityFilterContext.Provider>
   );
 };
+
 
 export const useCalendarOfActivityFilter = (): CalendarOfActivityFilterValue => {
   const context = useContext(CalendarOfActivityFilterContext);

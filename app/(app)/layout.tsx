@@ -22,18 +22,24 @@ export default async function AppLayout({ children }: AppLayoutProps) {
         redirect(authOptions?.pages?.signIn || "/auth/login")
     }
 
+    // Default value for typeOfActivity
+    const initialFilter = {
+        filter: session.user.region as string,
+        typeOfActivity: 'WFP Activities' // Default value or set as needed
+    };
+
     return (
         <ReduxProvider>
             <CurrentUserProvider initialUser={session.user as any}>
-                <CalendarOfActivityFilterProvider initialFilter={{ filter: session.user.region as string }}>
-                <div className="flex flex-col min-w-[320px] items-center">
-                    <ErrorBoundary errorComponent={GlobalError}>
-                        <SiteHeader />
-                        <main className="flex-1 mt-4 mb-auto h-full min-w-[320px] max-w-[2560px] w-[98vw] px-2 sm:px-8 relative">{children}</main>
-                        <FloatingAIChat />
-                        <SiteFooter />
-                    </ErrorBoundary>
-                </div>
+                <CalendarOfActivityFilterProvider initialFilter={initialFilter}>
+                    <div className="flex flex-col min-w-[320px] items-center">
+                        <ErrorBoundary errorComponent={GlobalError}>
+                            <SiteHeader />
+                            <main className="flex-1 mt-4 mb-auto h-full min-w-[320px] max-w-[2560px] w-[98vw] px-2 sm:px-8 relative">{children}</main>
+                            <FloatingAIChat />
+                            <SiteFooter />
+                        </ErrorBoundary>
+                    </div>
                 </CalendarOfActivityFilterProvider>
             </CurrentUserProvider>
         </ReduxProvider>

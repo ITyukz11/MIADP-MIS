@@ -3,22 +3,13 @@ import React, { useEffect, useState } from 'react';
 import { DataTable } from '@/components/table/data-table';
 import { columns } from '@/components/table/data/activities/coa-columns';
 import { Skeleton } from '@/components/ui/skeleton';
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { componentOptions, regionOptions, unitOptions } from '@/lib/data/filter';
 import { CalendarSheet } from '@/components/calendar-of-activity/CalendarSheet';
-import { useCurrentUser } from '@/components/context/CurrentUserContext';
 import { useDispatch, useSelector } from '@/app/store/store';
 import { fetchActivitiesData } from '@/app/store/activityAction';
 import { useCalendarOfActivityFilter } from '@/components/context/FilterRegionContext';
 import { Label } from '@/components/ui/label';
+import SelectTypeOfActivity from './components/SelectTypeOfActivity';
+import SelectFilterRegUniCom from './components/SelectFilterRegUniCom';
 
 type Props = {}
 
@@ -26,17 +17,11 @@ const Page = (props: Props) => {
   const [coaData, setCoaData] = useState<any[]>([]);
   const [filteredData, setFilteredData] = useState<any[]>([]);
 
-  const {currentUser} = useCurrentUser();
-  const { currentFilter, setCurrentFilter } = useCalendarOfActivityFilter();
+  const { currentFilter } = useCalendarOfActivityFilter();
 
   const [viewCalendarData, setViewCalendarData] = useState<any[]>([]);
   const [viewCalendar, setViewCalendar] = useState(false)
   const [selectedRowId, setSelectedRowId] = useState('');
-
-  // console.log("selectedFilter: " , selectedFilter)
-  console.log("currentFilter: " , currentFilter)
-  console.log("currentFilter.filter: " , currentFilter?.filter)
-
 
   const handleViewRowIdPressed = (viewId: string) => {
     setSelectedRowId(viewId);
@@ -56,12 +41,19 @@ const Page = (props: Props) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Filter out activities where 'individualActivity' is false
-        const filteredActivities = activitiesData.filter((activity: any) => !activity.individualActivity);
-        
+        // Filter activities based on typeOfActivity
+        const filteredActivities = activitiesData.filter((activity: any) => {
+          if (currentFilter?.typeOfActivity === 'WFP Activities') {
+            return !activity.individualActivity; // Only WFP Activities
+          } else if (currentFilter?.typeOfActivity === 'Individual Activities') {
+            return activity.individualActivity; // Only Individual Activities
+          }
+          return true; // If no specific type is selected, include all activities
+        });
+
         // Sort activities based on 'createdAt' in descending order
         const sortedActivities = filteredActivities.sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-        
+
         setCoaData(sortedActivities);
         setFilteredData(sortedActivities); // Initialize filteredData with all activities sorted
       } catch (error) {
@@ -69,16 +61,15 @@ const Page = (props: Props) => {
       }
     };
     fetchData();
-  }, [activitiesData]);
-  
-  
+  }, [activitiesData, currentFilter]);
+
   useEffect(() => {
     const viewCalendarDataFiltered = filteredData.filter(activity =>
       activity.id == selectedRowId
     );
     setViewCalendarData(viewCalendarDataFiltered);
   }, [activitiesData, filteredData, selectedRowId])
-  
+
 
   useEffect(() => {
     if (currentFilter?.filter === 'All') {
@@ -86,12 +77,12 @@ const Page = (props: Props) => {
     } else {
       const filtered = coaData.filter(item =>
         item.user?.region === currentFilter?.filter ||
-        item.user?.component === currentFilter?.filter || 
+        item.user?.component === currentFilter?.filter ||
         item.user?.unit === currentFilter?.filter
       );
       setFilteredData(filtered);
     }
-  }, [currentFilter ,coaData]);
+  }, [currentFilter, coaData]);
 
   const hiddenColumns = [
     'id',
@@ -105,56 +96,26 @@ const Page = (props: Props) => {
     'userName'
   ]; // Columns to hide
 
-
-
-  const handleValueChange = (value: string) => {
-    setCurrentFilter({ filter: value });
-  };
-  
   return (
     <div>
       <div className='flex flex-col flex-wrap w-full'>
         <div className='flex flex-row gap-2 overflow-x-auto w-full scrollbar-thin p-1'>
-          <Select onValueChange={handleValueChange} value={currentFilter?.filter} disabled={activityLoading}>
-            <SelectTrigger className="w-fit">
-              <SelectValue placeholder={currentUser?.region? currentUser?.region:"Filter"} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value='All'>All</SelectItem>
-              <SelectGroup>
-                <SelectLabel>Regions</SelectLabel>
-                {regionOptions.map((option, index) => (
-                  <SelectItem key={index} value={option}>{option}</SelectItem>
-                ))}
-              </SelectGroup>
-              <SelectGroup>
-                <SelectLabel>Components</SelectLabel>
-                {componentOptions.map((option, index) => (
-                  <SelectItem key={index} value={option}>{option}</SelectItem>
-                ))}
-              </SelectGroup>
-              <SelectGroup>
-                <SelectLabel>Units</SelectLabel>
-                {unitOptions.map((option, index) => (
-                  <SelectItem key={index} value={option.value}>{option.label}</SelectItem>
-                ))}
-              </SelectGroup>
-            </SelectContent>
-          </Select>
-        </div>  
+          <SelectFilterRegUniCom/>
+          <SelectTypeOfActivity/>
+        </div>
 
-        {filteredData.length > 0 ? (
+        {!activityLoading ? (
           <div className='w-full overflow-x-auto scrollbar-thin p-1'>
-            <DataTable 
-              data={filteredData} 
-              columns={columns} 
-              hiddenColumns={hiddenColumns} 
+            <DataTable
+              data={filteredData}
+              columns={columns}
+              hiddenColumns={hiddenColumns}
               allowSelectRow={false}
               allowViewCalendar={true}
               onViewRowId={handleViewRowIdPressed}
-              setAllowViewCalendar={()=> setViewCalendar(!viewCalendar)}
+              setAllowViewCalendar={() => setViewCalendar(!viewCalendar)}
               allowDateRange={true}
-              />
+            />
           </div>
         ) : (
           <div className="flex flex-col space-y-3">
@@ -162,7 +123,6 @@ const Page = (props: Props) => {
           </div>
         )}
         {activityError && <Label className=' text-destructive'>{activityError}</Label>}
-
       </div>
       <CalendarSheet activityData={viewCalendarData} openSheet={viewCalendar} closeCalendarSheet={() => setViewCalendar(!viewCalendar)} />
     </div>

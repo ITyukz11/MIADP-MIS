@@ -10,6 +10,7 @@ import { Separator } from "@/components/ui/separator"
 import CalendarFormDialog from './calendar-form-dialog'
 import { useState } from "react";
 import { HiUser, HiUserGroup } from "react-icons/hi2";
+import { Label } from "@/components/ui/label";
 
 interface MajorOrIndividualDialogProps {
     open: boolean;
@@ -48,7 +49,9 @@ export default function MajorOrIndividualDialog({ open, setClose, setCalendarFor
                             setIndividualActivity(false)
                             setClose()
                         }}>
-                        <HiUserGroup size={70}/> Major Activity
+                        <HiUserGroup size={70}/> 
+                        <Label> Major Activity</Label>
+                        <Label>(WFP)</Label>
                     </Button>
                 </div>
             </DialogContent>

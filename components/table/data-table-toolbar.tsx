@@ -7,9 +7,12 @@ import { DataTableViewOptions } from "./data-table-view-options";
 import { CSVLink } from "react-csv";
 import { DialogApprovePendingUsers } from '../admin/dialog-accounts';
 import { AiOutlineExport, AiOutlinePrinter } from "react-icons/ai";
-import { SearchIcon } from 'lucide-react';
-import { DateRange } from 'react-day-picker';
+import { Calendar, CalendarCheck, SearchIcon } from 'lucide-react';
+import { DateRange, Months } from 'react-day-picker';
 import { CalendarDateRangePicker } from '../dashboard/date-range-picker';
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '../ui/select';
+import * as ExcelJS from 'exceljs';
+import { useCalendarOfActivityFilter } from '../context/FilterRegionContext';
 
 interface DataTableToolbarProps<TData> {
   data: TData[];
@@ -31,20 +34,40 @@ export function DataTableToolbar<TData>({
   const [loading, setLoading] = useState(false);
   const [filterInput, setFilterInput] = useState<string>("");
 
-  
+  const { currentFilter } = useCalendarOfActivityFilter();
+
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
     from: new Date(2024, 0, 1), // January 1, 2024
     to: new Date(2024, 11, 31), // December 31, 2024
   });
 
   const isDateRangeDifferent = dateRange &&
-  (dateRange.from?.getTime() !== new Date(2024, 0, 1).getTime() ||
-    dateRange.to?.getTime() !== new Date(2024, 11, 31).getTime());
+    (dateRange.from?.getTime() !== new Date(2024, 0, 1).getTime() ||
+      dateRange.to?.getTime() !== new Date(2024, 11, 31).getTime());
 
   const filteredData = table.getFilteredRowModel().rows.map((row) => row.original);
 
-  // Transform data to CSVRow type using type assertion
-  const csvData: CSVRow[] = filteredData as CSVRow[];
+  // const ExportToCSVDatas = table.getAllColumns().filter(column => column.getIsVisible())
+
+  const visibleColumns = table.getAllColumns().filter(column => column.getIsVisible());
+
+  // Extract data from visible columns
+  const csvData: CSVRow[] = table.getFilteredRowModel().rows.map(row => {
+    const rowData: CSVRow = {};
+    visibleColumns.forEach(column => {
+      // Ensure type safety by asserting the type of row.original
+      if (typeof row.original === 'object' && row.original !== null) {
+        rowData[column.id] = (row.original as Record<string, any>)[column.id];
+      }
+    });
+    return rowData;
+  });
+
+  // Prepare headers
+  const headers = visibleColumns.map(column => ({
+    label: column.id,
+    key: column.id,
+  }));
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
@@ -74,22 +97,232 @@ export function DataTableToolbar<TData>({
     }
   }, [dateRange, table]);
 
+
+  const [selectedMonth, setSelectedMonth] = useState<string>('');
+
+  // Function to get date ranges for the past 12 months including the current month
+  const getDateRangeOptions = () => {
+    const today = new Date();
+    const options = [];
+
+    // Loop to create options for the current month and the previous 12 months
+    for (let i = 0; i < 13; i++) {
+      const date = new Date(today.getFullYear(), today.getMonth() - i, 1);
+      const month = date.toLocaleString('default', { month: 'long' });
+      const year = date.getFullYear();
+      options.push({
+        value: `${year}-${date.getMonth() + 1}`, // Format: YYYY-M
+        label: i === 0 ? 'This month' : `${month} ${year}`, // Label for the current month
+      });
+    }
+
+    return options;
+  };
+
+  useEffect(() => {
+    if (selectedMonth) {
+      const [year, month] = selectedMonth.split('-').map(Number);
+      const from = new Date(year, month - 1, 1);
+      const to = new Date(year, month, 0);
+      setDateRange({ from, to });
+    }
+  }, [selectedMonth]);
+
+  // Call getDateRangeOptions to get the month options
+  const monthOptions = getDateRangeOptions();
+  const formatDate = (date: Date | undefined): string => {
+    if (!date) return '';
+
+    const formatter = new Intl.DateTimeFormat('en-US', {
+      month: 'long', // Full month name
+      day: 'numeric', // Day of the month
+      year: 'numeric' // Full year
+    });
+
+    return formatter.format(date);
+  };
+
+  const handleExportToExcel = async () => {
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('Calendar of Activity');
+
+    try {
+      // Get visible columns and data
+      const visibleColumns = table.getAllColumns().filter(column => {
+       if(column.id != "#"){
+        return column.getIsVisible()
+       }
+       });
+      const headers = ['#', 'Unit/Component', ...visibleColumns.map(column => column.id)];
+
+      // Define title, date, and filter data
+      const title = 'CALENDAR OF ACTIVITIES';
+      const date = `Date: ${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}`;
+      const filterData = `Type: ${currentFilter?.typeOfActivity} | Filtered by: ${currentFilter?.filter}`
+      const filteredDate = `${formatDate(dateRange?.from)} - ${formatDate(dateRange?.to)}`
+
+      // Add title
+      worksheet.mergeCells('A1:' + String.fromCharCode(65 + headers.length - 1) + '1');
+      const titleCell = worksheet.getCell('A1');
+      titleCell.value = title;
+      titleCell.font = { bold: true, size: 14 };
+      titleCell.alignment = { horizontal: 'center', vertical: 'middle' };
+
+      // Add date
+      worksheet.mergeCells('A2:' + String.fromCharCode(65 + headers.length - 1) + '2');
+      const dateCell = worksheet.getCell('A2');
+      dateCell.value = date;
+      dateCell.font = { size: 12 };
+      dateCell.alignment = { horizontal: 'center', vertical: 'middle' };
+
+      // Add filter data
+      worksheet.mergeCells('A3:' + String.fromCharCode(65 + headers.length - 1) + '3');
+      const filterCell = worksheet.getCell('A3');
+      filterCell.value = filterData;
+      filterCell.font = { size: 12 };
+      filterCell.alignment = { horizontal: 'center', vertical: 'middle' };
+
+      // Add date
+      worksheet.mergeCells('A4:' + String.fromCharCode(65 + headers.length - 1) + '4');
+      const dateRangeCell = worksheet.getCell('A4');
+      dateRangeCell.value = filteredDate
+      dateRangeCell.font = { 
+        size: 12, 
+        bold: true,          // Bold text
+        underline: 'single'  // Underline text
+      };
+      dateRangeCell.alignment = { horizontal: 'center', vertical: 'middle',  };
+
+      // Add a blank row for spacing
+      worksheet.addRow([]);
+
+      // Add headers to the worksheet
+      const headerRow = worksheet.addRow(headers);
+      headerRow.eachCell({ includeEmpty: true }, (cell) => {
+        cell.font = { bold: true }; // Bold text
+        cell.alignment = { horizontal: 'center' }; // Center align
+        cell.value = cell.value?.toString().toUpperCase(); // Capitalize text
+        cell.fill = {
+          type: 'pattern',
+          pattern: 'solid',
+          fgColor: { argb: '538DD5' } // Blue color
+        };
+        cell.border = {
+          top: { style: 'thin', color: { argb: '000000' } },
+          left: { style: 'thin', color: { argb: '000000' } },
+          bottom: { style: 'thin', color: { argb: '000000' } },
+          right: { style: 'thin', color: { argb: '000000' } }
+        };
+      });
+
+      // Add rows using key-value pairs
+      const rows = table.getFilteredRowModel().rows.map(row => {
+        const rowData = visibleColumns.reduce((acc, column) => {
+          acc[column.id] = (row.original as any)[column.id] || '';
+          return acc;
+        }, {} as Record<string, any>);
+
+        // Access 'unit' or 'component' from the 'user' object
+        const user = (row.original as any).user || {};
+        rowData['Unit/Component'] = user.unit || user.component || '';
+
+        return rowData;
+      });
+
+      // Add an incremental number in the first column
+      rows.forEach((data: any, index: number) => {
+        const rowValues = [index + 1, data['Unit/Component'], ...headers.slice(2).map(header => data[header])]; // Ensure correct order
+        const row = worksheet.addRow(rowValues);
+
+        // Add alternate row colors and styles
+      row.eachCell({ includeEmpty: true }, (cell) => {
+          cell.alignment = { wrapText: true, vertical: 'middle' }; // Wrap text and center vertically
+          if (index % 2 === 0) {
+            cell.fill = {
+              type: 'pattern',
+              pattern: 'solid',
+              fgColor: { argb: 'F2F2F2' } // Light gray for even rows
+            };
+          } else {
+            cell.fill = {
+              type: 'pattern',
+              pattern: 'solid',
+              fgColor: { argb: 'DCE6F1' } // Light blue for odd rows
+            };
+          }
+          cell.border = {
+            top: { style: 'thin', color: { argb: '000000' } },
+            left: { style: 'thin', color: { argb: '000000' } },
+            bottom: { style: 'thin', color: { argb: '000000' } },
+            right: { style: 'thin', color: { argb: '000000' } }
+          };
+        });
+      });
+
+      // Set column widths based on header names
+      headers.forEach((header, index) => {
+        const column = worksheet.getColumn(index + 1);
+        switch (header.toUpperCase()) {
+          case '#':
+            column.width = 3;
+            break;
+          case 'ACTIVITYTITLE':
+          case 'LOCATION':
+          case 'ACTIVITYDESCRIPTION':
+            column.width = 35;
+            break;
+          case 'UNIT/COMPONENT':
+            column.width = 17;
+            break;
+          default:
+            column.width = 12;
+            break;
+        }
+      });
+
+      worksheet.pageSetup = {
+        paperSize: 9, // A4 paper size
+        orientation: 'landscape',
+        fitToPage: true,
+        fitToWidth: 1,
+        fitToHeight: 0,
+      };
+
+      // Write file
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'Calendar of Activities.xlsx';
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Error generating Excel file:", error);
+    }
+  };
+
+  // console.log("Filtered rows:", table.getFilteredRowModel().rows);
+
   return (
     <div className="flex items-center justify-between flex-wrap overflow-x-auto">
-      <div className="flex flex-1 items-center gap-2 flex-wrap justify-start">
+      <div className="flex flex-1 items-center gap-2 py-1 flex-wrap justify-start">
         <div className='relative'>
           <Input
             placeholder="Filter..."
             value={filterInput}
             onChange={(event) => setFilterInput(event.target.value)}
-            className="h-8 w-[150px] lg:w-[250px] pr-6"
+            className="h-9 w-[150px] lg:w-[250px] pr-6 z-50"
           />
           <SearchIcon className='absolute right-2 top-2 h-4 w-4' />
         </div>
-
-        <CSVLink data={csvData} filename="filtered_data.csv">
-          <Button variant="outline"><AiOutlineExport className='w-4 h-4 shrink-0' /> Export</Button>
-        </CSVLink>
+        <Button
+          variant="outline"
+          className="flex flex-row gap-1 items-center justify-center"
+          onClick={handleExportToExcel}
+        >
+          <AiOutlineExport className='w-4 h-4 shrink-0' />  Export to Excel
+        </Button>
         <Button variant="outline" disabled className='cursor-not-allowed'>
           <AiOutlinePrinter className='w-5 h-5 shrink-0' /> Print
         </Button>
@@ -98,12 +331,13 @@ export function DataTableToolbar<TData>({
       <div className="flex flex-row gap-2 items-center">
         {allowDateRange && (
           <>
-            {isFiltered && isDateRangeDifferent &&(
+            {isFiltered && isDateRangeDifferent && (
               <Button
                 variant="ghost"
                 onClick={() => {
                   table.resetColumnFilters();
-                  setDateRange({from: new Date(2024, 0, 1),to: new Date(2024, 11, 31)})}}
+                  setDateRange({ from: new Date(2024, 0, 1), to: new Date(2024, 11, 31) })
+                }}
                 className="h-8 px-2 lg:px-3"
               >
                 Reset
@@ -111,12 +345,35 @@ export function DataTableToolbar<TData>({
               </Button>
             )}
             <CalendarDateRangePicker
-              className="mr-2"
               date={dateRange}
               onDateChange={setDateRange}
             />
           </>
         )}
+        <Select onValueChange={setSelectedMonth} value={selectedMonth} disabled={false}>
+          <SelectTrigger className="w-fit">
+            <SelectValue placeholder="Select Month" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectGroup>
+              <SelectLabel>Month</SelectLabel>
+              {monthOptions.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectGroup>
+          </SelectContent>
+        </Select>
+        {/* <Button
+              variant="outline"
+              className="flex flex-row gap-1 items-center justify-center"
+              onClick={() => setDateRange(getCurrentMonthRange())} // Set date range to current month
+            >
+              <CalendarCheck size={15} />
+              This month
+            </Button> */}
+
         <DataTableViewOptions table={table} />
         <DialogApprovePendingUsers
           approvedPendingUsersData={filteredData as Array<

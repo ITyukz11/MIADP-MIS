@@ -27,42 +27,42 @@ export function DataTableViewOptions<TData>({
   //     column.toggleVisibility(false);
   //   }
   // });
-  
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button
           variant="outline"
           size="sm"
-          className="ml-auto h-8 flex"
+          className="ml-auto h-9 flex"
         >
           <MixerHorizontalIcon className="mr-2 h-4 w-4" />
           View
         </Button>
       </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-fit grid grid-cols-2 overflow-y-auto">
-          <DropdownMenuLabel>Toggle columns</DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          {table
-    .getAllColumns()
-    .filter(
-      (column) =>
-        typeof column.accessorFn !== "undefined" && column.getCanHide()
-    )
-    .map((column) => {
-      return (
-        <DropdownMenuCheckboxItem
-          key={column.id}
-          className="capitalize cursor-pointer"
-          checked={column.getIsVisible()}
-          onCheckedChange={(value) => {column.toggleVisibility(value)}}
-        >
-          {column.id == "userName"? "Author": column.id}
-        </DropdownMenuCheckboxItem>
-      );
-      
-    })}
-        </DropdownMenuContent>
+      <DropdownMenuContent align="end" className="w-fit grid grid-cols-2 overflow-y-auto">
+        <DropdownMenuLabel>Toggle columns</DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        {table
+          .getAllColumns()
+          .filter(
+            (column) =>
+              typeof column.accessorFn !== "undefined" && column.getCanHide()
+          )
+          .map((column) => {
+            return (
+              <DropdownMenuCheckboxItem
+                key={column.id}
+                className="capitalize cursor-pointer"
+                checked={column.getIsVisible()}
+                onCheckedChange={(value) => { column.toggleVisibility(value) }}
+              >
+                {column.id == "userName" ? "Author" : column.id}
+              </DropdownMenuCheckboxItem>
+            );
+
+          })}
+      </DropdownMenuContent>
     </DropdownMenu>
   )
 }

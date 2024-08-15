@@ -76,7 +76,7 @@ export function DataTable<TData extends { id: string }, TValue>({
   const [sorting, setSorting] = React.useState<SortingState>([]);
 
   const numberingColumn: ColumnDef<TData, any> = {
-    id: "numbering",
+    id: "#",
     header: "#",
     cell: (info) => info.row.index + 1,
   };

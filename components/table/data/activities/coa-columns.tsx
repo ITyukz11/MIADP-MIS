@@ -103,6 +103,8 @@ export const columns: ColumnDef<Activity>[] = [
     cell: ({ row }) => (
       <div className="flex space-x-2">
         <span className="max-w-[500px] truncate font-medium cursor-default gap-1 flex">
+        <Badge>
+        {row.original.user?.region }</Badge>
         <Badge variant={'outline'}>
           {row.original.user?.unit? row.original.user?.unit: row.original.user?.component}</Badge>
         {row.getValue("activityTitle")}

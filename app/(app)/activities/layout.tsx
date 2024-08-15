@@ -26,15 +26,6 @@ export default function ActivitiesLayout({ children }: ActivitiesLayoutProps) {
   const [calendarFormOpen, setCalendarFormOpen] = useState(false)
   const [individualActivity, setIndividualActivity] = useState(false)
 
-  const [isRotating, setIsRotating] = useState(false);
-
-  const handleRefreshClick = () => {
-    setIsRotating(true);
-    // Perform your refresh logic here
-    // After the refresh logic is done, stop the rotation
-    setTimeout(() => setIsRotating(false), 1000); // Adjust the duration as needed
-  };
-
 
   const handleSetIndividualActivity = (isIndividual: boolean) => {
     // Logic to handle setting individual activity state or any other actions
@@ -49,51 +40,17 @@ export default function ActivitiesLayout({ children }: ActivitiesLayoutProps) {
       dispatch(fetchActivitiesData());
     }
   }, [dispatch, activitiesData.length]);
-  // const dispatch = useDispatch();
-  // const { activitiesData, activityLoading, activityError } = useActivitiesData();
 
-  // useEffect(() => {
-  //   dispatch(setActivityLoading(activityLoading));
-  //   if (activitiesData) {
-  //     dispatch(setActivitiesData(activitiesData));
-  //   }
-  //   if (activityError) {
-  //     dispatch(setActivityError(activityError.message));
-  //   }
-  // }, [activitiesData, activityLoading, activityError, dispatch]);
 
   return (
     <div className="xs:container space-y-2">
-      {/* <PageHeader>
-        <PageHeaderHeading className="hidden md:block">
-          Welcome to the Calendar of Activities
-        </PageHeaderHeading>
-        <PageHeaderHeading className="md:hidden">Activity Calendar</PageHeaderHeading>
-        <div className='hidden sm:block'>
-          <PageHeaderDescription>
-            Explore and manage your scheduled activities with ease. This calendar provides a comprehensive view of all planned activities, allowing you to stay organized and efficient.
-          </PageHeaderDescription>
-        </div>
-
-        <PageActions className='flex flex-wrap gap-2 md:gap-0 flex-col md:flex-row'>
-          <div></div>
-          <Link href="/activities/calendar" className={cn(buttonVariants(), "rounded-[6px] xs:w-[200px] md:w-fit")}>
-            Show Calendar
-          </Link>
-
-          <Button variant='outline' className='xs:w-[200px] md:w-fit' onClick={() => setPlanningActivityOpen(true)}>Start planning activity</Button>
-          <Link href="/activities" className={cn(buttonVariants(), "rounded-[6px] xs:w-[200px] md:w-fit")}>
-            Table
-          </Link>
-
-        </PageActions>
-      </PageHeader> */}
       <div className='flex flex-row flex-wrap justify-center gap-2 md:justify-between'>
         <div className='flex flex-col'>
           <h2 className="text-xl md:text-3xl font-bold tracking-tight">Calendar of Activities</h2>
           <Label className='text-xs sm:text-sm text-muted-foreground'>
             Explore and manage your scheduled activities with ease. This calendar provides a comprehensive view of all planned activities, allowing you to stay organized and efficient.
           </Label>
+          {activityError && <Label className='text-destructive'>{activityError}</Label>}
         </div>
         <Card className='flex flex-row gap-2 w-full shadow-none'>
           <CardContent className='flex items-center justify-center md:justify-between gap-2 w-full p-4 flex-wrap'>

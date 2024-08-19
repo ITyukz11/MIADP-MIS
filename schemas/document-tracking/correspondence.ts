@@ -24,3 +24,15 @@ export const CorrespondenceOutgoingSchema = z.object({
 })
 export type CorrespondenceOutgoingType = z.infer<typeof CorrespondenceOutgoingSchema>
 
+export const DoctrackDocumentSchema = z.object({
+  no:z.string().min(1, "*"),
+  date: z.string().min(1, "*"),
+  encoder: z.string().min(1, "*"),
+  subject: z.string().min(1, "*"),
+  description: z.string().min(1, "*"),
+  link: z.string().optional(),
+  attachment: z.string().optional(),
+  remarks: z.string().optional(),
+})
+export type DoctrackDocumentType = z.infer<typeof DoctrackDocumentSchema>
+

@@ -403,7 +403,8 @@ ${formattedPreparatoryList}`;
                 </div>
               )}
 
-              <Accordion type="single" collapsible>
+              {participants[0] && <>
+                <Accordion type="single" collapsible>
                 <AccordionItem value="participants">
                   <AccordionTrigger className="flex items-center justify-start space-x-2">
                     <div className="flex flex-row flex-start gap-2 items-center">
@@ -442,6 +443,8 @@ ${formattedPreparatoryList}`;
                   </AccordionContent>
                 </AccordionItem>
               </Accordion>
+              </>}
+          
               {preparatoryContent ?
                 <Accordion type="single" collapsible>
                   <AccordionItem value={"2"}>

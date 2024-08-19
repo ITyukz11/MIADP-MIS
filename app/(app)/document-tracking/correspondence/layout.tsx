@@ -2,7 +2,7 @@
 import { Button, buttonVariants } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
-import { Download, DownloadIcon, Eye, Table2Icon } from 'lucide-react'
+import { Download, DownloadIcon, Eye, NotebookText, Route, Table2Icon } from 'lucide-react'
 import React, { useState } from 'react'
 import { FaPlusCircle } from 'react-icons/fa'
 import {
@@ -29,6 +29,9 @@ import Link from 'next/link'
 import { cn } from '@/lib/utils'
 import IncOrOutDialog from './(dialog)/incoming-or-outgoing-dialog'
 import { OutgoingFormDialog } from './(dialog)/outgoing-form-dialog'
+import { AddNewDocsDialog } from './(dialog)/add-new-docs-dialog'
+import { FcDocument } from 'react-icons/fc'
+import { HiDocument } from 'react-icons/hi2'
 
 type Props = {}
 
@@ -40,6 +43,7 @@ export default function CorrespondenceLayout({ children }: CorrespondenceLayoutP
     const [addIncomingRoutingSlipDialog, setAddIncomingRoutingSlipDialog] = useState<boolean>(false)
     const [addOutgoingFormDialog, setAddOutgoingFormDialog] = useState<boolean>(false)
     const [incOrOutDialog, setIncOrOutDialog] = useState<boolean>(false)
+    const [newDocsDialog, setNewDocsDialog] = useState<boolean>(false)
 
     return (    
         <>
@@ -50,9 +54,18 @@ export default function CorrespondenceLayout({ children }: CorrespondenceLayoutP
                             variant="default"
                             className='flex flex-row items-center gap-1 justify-center text-xs lg:text-sm'
                             onClick={() => setIncOrOutDialog(true)}>
-                            <FaPlusCircle size={20} />New</Button>
+                            <Route size={20} />Route</Button>
+                            <Button
+                            variant="default"
+                            className='flex flex-row items-center gap-1 justify-center text-xs lg:text-sm'
+                            onClick={() => setNewDocsDialog(true)}>
+                            <FaPlusCircle size={20} />Add new docs</Button>
+                      
                         <Link href="/document-tracking/correspondence" className={cn(buttonVariants({ variant: 'secondary' }), "rounded-[6px] xs:w-[200px] md:w-fit flex flex-row gap-1 items-center justify-center overflow-hidden text-xs lg:text-sm")}>
                             <Table2Icon size={15} />  Table
+                        </Link>
+                        <Link href="/document-tracking/document" className={cn(buttonVariants({ variant: 'secondary' }), "rounded-[6px] xs:w-[200px] md:w-fit flex flex-row gap-1 items-center justify-center overflow-hidden text-xs lg:text-sm")}>
+                            <NotebookText size={15} />  Documents
                         </Link>
                         <Link href="/document-tracking/correspondence/downloads" className={cn(buttonVariants({ variant: 'secondary' }), "rounded-[6px] xs:w-[200px] md:w-fit flex flex-row gap-1 items-center justify-center overflow-hidden text-xs lg:text-sm")}>
                             <Download size={15} />  Downloadables
@@ -69,6 +82,9 @@ export default function CorrespondenceLayout({ children }: CorrespondenceLayoutP
                 setClose={() => setIncOrOutDialog(!incOrOutDialog)}
                 setIncomingRoutingSlipDialog={() => setAddIncomingRoutingSlipDialog(!addIncomingRoutingSlipDialog)}
                 setOutgoingRoutingSlipDialog={() => setAddOutgoingFormDialog(!addOutgoingFormDialog)} />
+            <AddNewDocsDialog
+              open={newDocsDialog}
+              setClose={() => setNewDocsDialog(!newDocsDialog)}/>
         </>
     )
 }

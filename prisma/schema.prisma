@@ -223,3 +223,15 @@ model CalendarOfActivityAttachments {
   calendarOfActivity CalendarOfActivity @relation(fields: [activity], references: [id])
   createdAt     DateTime @default(now()) @map(name: "created_at")
 }
+
+model DoctrackDocuments {
+  id          String   @id @default(cuid())
+  subject     String
+  description String
+  link        String
+  attachment  String
+  from        String
+  date        String
+  encoder     String
+  createdAt   DateTime @default(now()) @map(name: "created_at")
+}

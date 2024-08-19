@@ -92,7 +92,6 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
 
     const [WFPYear, setWFPYear] = useState(new Date().getFullYear().toString());
     const WFPYears = ['2023', '2024', '2025', '2026', '2027', '2028']
-    console.log("activityId: ", activityId)
     const form = useForm<z.infer<typeof CalendarOfActivitySchema>>({
         resolver: zodResolver(CalendarOfActivitySchema),
         defaultValues: {
@@ -169,7 +168,6 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
     // console.log("form.participants", form.watch('participants'))
     // console.log("selectedData: ", selectedData)
 
-    console.log("form state: ",form.formState.errors)
     useEffect(() => {
         if (activityId.length > 0 && currentIndex < activityId.length) {
             setLoadingForm(true);
@@ -204,7 +202,6 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
     }, [activityId, currentIndex, activitiesData, form]);
 
 
-    console.log("activityData: ", activitiesData)
     const { control, watch } = form;
 
     const {
@@ -237,7 +234,6 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
         console.log("updatedvalues: ", values)
         setError('');
         setSuccess('');
-        console.log("updatedvalues activityId: ", activityId)
 
         const individualActivity = watch('individualActivity');
         // Transform participants to match Prisma's expected structure

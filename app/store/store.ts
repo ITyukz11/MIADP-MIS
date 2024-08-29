@@ -9,16 +9,27 @@ const persistConfig = {
   storage,
 };
 
+//CALENDAR OF ACTIVITY
 const persistedActivityReducer = persistReducer(persistConfig, activityReducer);
 const persistedCountActivityReducer = persistReducer(persistConfig, countActivityReducer);
 const persistedCountByComponentActivityReducer = persistReducer(persistConfig, countComponentActivityReducer);
-  
+const persistedCountActivityParticipantReducer = persistReducer(persistConfig, countActivityParticipantReducer);
+
+//DOCUMENT TRACKING
+const persistedCorrespondenceDocumentReducer = persistReducer(persistConfig, documentReducer);
+const persistedCorrespondenceDocumentIncomingRouteReducer = persistReducer(persistConfig, incomingRouteReducer);
+
 const store = configureStore({
   reducer: {
     activity: persistedActivityReducer,
     users: userReducer,
     countActivity: persistedCountActivityReducer,
-    countByComponentActivity: persistedCountByComponentActivityReducer
+    countByComponentActivity: persistedCountByComponentActivityReducer,
+    countActivityParticipant: persistedCountActivityParticipantReducer,
+
+    correspondenceDocument: persistedCorrespondenceDocumentReducer,
+    correspondenceIncomingRoute: persistedCorrespondenceDocumentIncomingRouteReducer
+
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
@@ -37,7 +48,10 @@ import { TypedUseSelectorHook, useDispatch as useDispatchBase, useSelector as us
 import { configureStore } from '@reduxjs/toolkit';
 import countActivityReducer from './countActivityReducer';
 import countComponentActivityReducer from './countComponentActivityReducer';
-
+import documentReducer from './document-tracking/correspondence/documentReducer';
+import incomingRouteReducer from './document-tracking/correspondence/incomingRouteReducer';
+import countActivityParticipantReducer from './calendar-of-activity/countActivityParticipantReducer';
+ 
 export const useDispatch = () => useDispatchBase<AppDispatch>();
 export const useSelector: TypedUseSelectorHook<RootState> = useSelectorBase;
 

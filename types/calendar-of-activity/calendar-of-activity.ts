@@ -79,4 +79,14 @@ export interface User {
     [region: string]: ComponentCounts;
   }
   
+  export interface UserWithActivityCount {
+    id: string;
+    region: string;
+    name: string;
+    unit: string;
+    component: string;
+    position: string;
+    email: string;
+    totalActivities: number;
+  }
   

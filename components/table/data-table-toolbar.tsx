@@ -19,6 +19,7 @@ interface DataTableToolbarProps<TData> {
   table: TanstackTable<TData>;
   selectedRows: Record<string, boolean>;
   allowDateRange: boolean
+  allowExportToExcel?:boolean
 }
 
 type CSVRow = Record<string, any>;
@@ -27,7 +28,8 @@ export function DataTableToolbar<TData>({
   data,
   table,
   selectedRows,
-  allowDateRange
+  allowDateRange,
+  allowExportToExcel
 }: DataTableToolbarProps<TData>) {
   const isFiltered = table.getState().columnFilters.length > 0;
   const [isPending, startTransition] = useTransition();
@@ -316,13 +318,15 @@ export function DataTableToolbar<TData>({
           />
           <SearchIcon className='absolute right-2 top-2 h-4 w-4' />
         </div>
+        {allowExportToExcel && 
         <Button
-          variant="outline"
-          className="flex flex-row gap-1 items-center justify-center"
-          onClick={handleExportToExcel}
-        >
-          <AiOutlineExport className='w-4 h-4 shrink-0' />  Export to Excel
-        </Button>
+        variant="outline"
+        className="flex flex-row gap-1 items-center justify-center"
+        onClick={handleExportToExcel}
+      >
+        <AiOutlineExport className='w-4 h-4 shrink-0' />  Export to Excel
+      </Button>}
+        
         <Button variant="outline" disabled className='cursor-not-allowed'>
           <AiOutlinePrinter className='w-5 h-5 shrink-0' /> Print
         </Button>
@@ -348,9 +352,7 @@ export function DataTableToolbar<TData>({
               date={dateRange}
               onDateChange={setDateRange}
             />
-          </>
-        )}
-        <Select onValueChange={setSelectedMonth} value={selectedMonth} disabled={false}>
+            <Select onValueChange={setSelectedMonth} value={selectedMonth} disabled={false}>
           <SelectTrigger className="w-fit">
             <SelectValue placeholder="Select Month" />
           </SelectTrigger>
@@ -365,6 +367,9 @@ export function DataTableToolbar<TData>({
             </SelectGroup>
           </SelectContent>
         </Select>
+          </>
+        )}
+        
         {/* <Button
               variant="outline"
               className="flex flex-row gap-1 items-center justify-center"

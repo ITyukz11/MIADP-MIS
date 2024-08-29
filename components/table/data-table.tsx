@@ -36,6 +36,7 @@ interface DataTableProps<TData, TValue> {
   setAllowViewCalendar?: () => void;
   onViewRowId?: (id: string) => void;
   allowDateRange?:boolean;
+  allowExportToExcel?:boolean;
 }
 
 export function DataTable<TData extends { id: string }, TValue>({
@@ -47,7 +48,8 @@ export function DataTable<TData extends { id: string }, TValue>({
   allowViewCalendar,
   setAllowViewCalendar,
   onViewRowId,
-  allowDateRange=false
+  allowDateRange=false,
+  allowExportToExcel=false
 }: DataTableProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = React.useState<Record<string, boolean>>({});
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>(() => {
@@ -158,8 +160,8 @@ export function DataTable<TData extends { id: string }, TValue>({
   }, [rowSelection, table]);
 
   return (
-    <div className="space-y-4 flex-wrap py-1">
-      <DataTableToolbar data={data} table={table} selectedRows={rowSelection} allowDateRange={allowDateRange}/>
+    <div className="space-y-4 flex-wrap py-1 w-full">
+      <DataTableToolbar data={data} table={table} selectedRows={rowSelection} allowDateRange={allowDateRange} allowExportToExcel={allowExportToExcel}/>
       <div className="rounded-md border">
         <Table>
           <TableHeader>

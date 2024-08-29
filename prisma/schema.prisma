@@ -31,6 +31,8 @@ model User {
   userLog                       UserLog[]
   password                      String
   messages                      Message[]
+  doctrackDocuments             DoctrackDocuments[]
+  doctrackDocumentIncomingRoute DoctrackDocumentIncomingRoute[]
   status                        String                          @default("Approved") // Status field to track approval status (e.g., "approved", "disapproved", "pending")
   createdAt                     DateTime                        @default(now()) @map(name: "created_at")
   updatedAt                     DateTime                        @updatedAt @map(name: "updated_at")
@@ -44,7 +46,7 @@ model Message {
   id        Int      @id @default(autoincrement())
   content   String
   createdAt DateTime @default(now())
-  userId    String   // Changed from Int to String
+  userId    String // Changed from Int to String
   user      User     @relation(fields: [userId], references: [id])
 }
 
@@ -125,36 +127,36 @@ model TimeFrameFinancial {
 }
 
 model CalendarOfActivity {
-  id                        String                          @id @default(cuid())
-  authorizeOther            Boolean
-  individualActivity        Boolean                         @default(false) // Adding a default value
-  WFPYear                   String?
-  activityTitle             String
-  activityDescription       String
-  type                      String
-  otherType                 String?
-  targetParticipant         String
-  participants              CalendarOfActivityParticipant[]
-  location                  String
-  dateFrom                  String
-  dateTo                    String
-  timeStart                 String
-  timeEnd                   String
-  allDay                    Boolean
-  preparatoryList           PreparatoryList[]
-  preparatoryContent        String?
-  remarks                   String
-  color                     String?
-  images                    CalendarOfActivitiesImage[]
-  attachments               String?
-  status                    String
-  qrCode                    String?
-  userName                  String
-  user                      User                            @relation(fields: [userName], references: [name])
-  calendarOfActivityHistory CalendarOfActivityHistory[]
+  id                           String                          @id @default(cuid())
+  authorizeOther               Boolean
+  individualActivity           Boolean                         @default(false) // Adding a default value
+  WFPYear                      String?
+  activityTitle                String
+  activityDescription          String
+  type                         String
+  otherType                    String?
+  targetParticipant            String
+  participants                 CalendarOfActivityParticipant[]
+  location                     String
+  dateFrom                     String
+  dateTo                       String
+  timeStart                    String
+  timeEnd                      String
+  allDay                       Boolean
+  preparatoryList              PreparatoryList[]
+  preparatoryContent           String?
+  remarks                      String
+  color                        String?
+  images                       CalendarOfActivitiesImage[]
+  attachments                  String?
+  status                       String
+  qrCode                       String?
+  userName                     String
+  user                         User                            @relation(fields: [userName], references: [name])
+  calendarOfActivityHistory    CalendarOfActivityHistory[]
   calendarOfActivityAttachment CalendarOfActivityAttachments[]
-  createdAt                 DateTime                        @default(now()) @map(name: "created_at")
-  updatedAt                 DateTime                        @updatedAt @map(name: "updated_at")
+  createdAt                    DateTime                        @default(now()) @map(name: "created_at")
+  updatedAt                    DateTime                        @updatedAt @map(name: "updated_at")
 }
 
 model CalendarOfActivityParticipant {
@@ -167,13 +169,13 @@ model CalendarOfActivityParticipant {
 }
 
 model CalendarOfActivitiesImage {
-  id                   String               @id @default(cuid())
+  id                   String              @id @default(cuid())
   url                  String
   description          String?
   calendarOfActivityId String
-  calendarOfActivity   CalendarOfActivity?   @relation(fields: [calendarOfActivityId], references: [id])
-  createdAt            DateTime             @default(now()) @map(name: "created_at")
-  updatedAt            DateTime             @updatedAt @map(name: "updated_at")
+  calendarOfActivity   CalendarOfActivity? @relation(fields: [calendarOfActivityId], references: [id])
+  createdAt            DateTime            @default(now()) @map(name: "created_at")
+  updatedAt            DateTime            @updatedAt @map(name: "updated_at")
 }
 
 model PreparatoryList {
@@ -207,31 +209,98 @@ model Notifications {
 }
 
 model UserLog {
-  id            String   @id @default(cuid())
-  userName      String   
-  user          User     @relation(fields: [userName], references: [name])
-  action        String
-  remarks       String
-  createdAt     DateTime @default(now()) @map(name: "created_at")
+  id        String   @id @default(cuid())
+  userName  String
+  user      User     @relation(fields: [userName], references: [name])
+  action    String
+  remarks   String
+  createdAt DateTime @default(now()) @map(name: "created_at")
 }
 
 model CalendarOfActivityAttachments {
-  id            String   @id @default(cuid())
-  details       String
-  link          String
-  activity      String
+  id                 String             @id @default(cuid())
+  details            String
+  link               String
+  activity           String
   calendarOfActivity CalendarOfActivity @relation(fields: [activity], references: [id])
-  createdAt     DateTime @default(now()) @map(name: "created_at")
+  createdAt          DateTime           @default(now()) @map(name: "created_at")
 }
 
 model DoctrackDocuments {
-  id          String   @id @default(cuid())
-  subject     String
-  description String
-  link        String
-  attachment  String
-  from        String
-  date        String
-  encoder     String
-  createdAt   DateTime @default(now()) @map(name: "created_at")
+  id             String                          @id @default(cuid())
+  userId         String                      
+  user           User       @relation(fields: [userId], references: [id])
+  subject        String
+  description    String
+  link           String
+  attachment     String
+  from           String
+  documentType   String
+  routeType      String
+  date           String
+  remarks        String
+  encoder        String
+  incomingRoutes DoctrackDocumentIncomingRoute[]
+  outgoingRoutes DoctrackDocumentOutgoingRoute[]
+  createdAt      DateTime                        @default(now()) @map(name: "created_at")
+}
+
+model DoctrackDocumentIncomingRoute {
+  id         String     @id @default(cuid())
+  userId     String                      
+  user       User       @relation(fields: [userId], references: [id])
+  subject    String
+  purpose    String
+  remarks    String
+  documentId String
+  document   DoctrackDocuments                     @relation(fields: [documentId], references: [id])
+  doctrackDocumentIncomingRouteTo         DoctrackDocumentIncomingRouteTo[] //Receiver
+  doctrackDocumentIncomingRouteStatus     DoctrackDocumentIncomingRouteStatus[]
+  updatedAt  DateTime                              @updatedAt @map(name: "updated_at")
+  createdAt  DateTime                              @default(now()) @map(name: "created_at")
+}
+
+model DoctrackDocumentIncomingRouteTo {
+  id                              String                        @id @default(cuid())
+  receiver                        String
+  sender                          String
+  doctrackDocumentIncomingRouteId String
+  doctrackDocumentIncomingRoute   DoctrackDocumentIncomingRoute @relation(fields: [doctrackDocumentIncomingRouteId], references: [id])
+  createdAt                       DateTime                      @default(now()) @map(name: "created_at")
+}
+
+model DoctrackDocumentIncomingRouteStatus {
+  id                              String                        @id @default(cuid())
+  status                          String
+  doctrackDocumentIncomingRouteId String                        
+  doctrackDocumentIncomingRoute   DoctrackDocumentIncomingRoute @relation(fields: [doctrackDocumentIncomingRouteId], references: [id])
+  createdAt                       DateTime                      @default(now()) @map(name: "created_at")
+}
+
+model DoctrackDocumentOutgoingRoute {
+  id         String                                @id @default(cuid())
+  documentId String
+  particular String
+  document   DoctrackDocuments                     @relation(fields: [documentId], references: [id])
+  to         DoctrackDocumentOutgoingRouteTo[] //Receiver
+  status     DoctrackDocumentOutgoingRouteStatus[]
+  remarks    String
+  updatedAt  DateTime                              @updatedAt @map(name: "updated_at")
+  createdAt  DateTime                              @default(now()) @map(name: "created_at")
+}
+
+model DoctrackDocumentOutgoingRouteTo {
+  id                              String                        @id @default(cuid())
+  receiver                        String
+  doctrackDocumentOutgoingRouteId String
+  doctrackDocumentOutgoingRoute   DoctrackDocumentOutgoingRoute @relation(fields: [doctrackDocumentOutgoingRouteId], references: [id])
+  createdAt                       DateTime                      @default(now()) @map(name: "created_at")
+}
+
+model DoctrackDocumentOutgoingRouteStatus {
+  id                              String                        @id @default(cuid())
+  status                          String
+  doctrackDocumentOutgoingRouteId String                        
+  doctrackDocumentOutgoingRoute   DoctrackDocumentOutgoingRoute @relation(fields: [doctrackDocumentOutgoingRouteId], references: [id])
+  createdAt                       DateTime                      @default(now()) @map(name: "created_at")
 }

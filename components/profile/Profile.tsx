@@ -10,11 +10,11 @@ import {
 } from "@/components/ui/form"
 import { useForm } from 'react-hook-form';
 import { RegisterSchema } from '@/schemas';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Input } from '../ui/input';
 import { Button } from '../ui/button';
-import { useSelector } from '@/app/store/store';
+import { useDispatch, useSelector } from '@/app/store/store';
+import { fetchCountActivityParticipantsData } from '@/app/store/calendar-of-activity/countActivityParticipantAction';
 
 
 interface ProfileProps {
@@ -29,20 +29,29 @@ const Profile: React.FC<ProfileProps> = ({
 }) => {
 
     const [profileData, setProfileData] = useState<any[]>([])
+    const dispatch = useDispatch();
 
     const { usersData, errorUser, loadingUser } = useSelector((state) => state.users)
     const { activitiesData, activityLoading, activityError } = useSelector((state) => state.activity)
+    const { countParticipantActivitiesData, countParticipantActivityLoading, countParticipantActivityError } = useSelector((state)=> state.countActivityParticipant)
+    
+    useEffect(() => {
+        if (countParticipantActivitiesData.length === 0) {
+            dispatch(fetchCountActivityParticipantsData());
+        }
+    }, [dispatch, countParticipantActivitiesData.length]);
 
-    const [totalActivity, setTotalActivity] = useState(0)
-    const form = useForm<z.infer<typeof RegisterSchema>>({
-        resolver: zodResolver(RegisterSchema),
+    console.log("countParticipantActivitiesData: ", countParticipantActivitiesData)
+    const [totalActivity, setTotalActivity] = useState<number>(0)
+    const form = useForm<z.infer<any>>({
         defaultValues: {
             region: profileData[0]?.region,
             email: profileData[0]?.email,
             component: profileData[0]?.component,
             unit: profileData[0]?.unit,
             position: profileData[0]?.position,
-            fullname: profileData[0]?.name,
+            name: profileData[0]?.name,
+            totalActivity: profileData[0]?.totalActivity,
         }
     })
 
@@ -61,22 +70,15 @@ const Profile: React.FC<ProfileProps> = ({
     };
 
     useEffect(() => {
-        const filteredProfileData = usersData.filter(user => user.name == profileUserName)
+        const filteredProfileData = countParticipantActivitiesData.filter(user => user.name == profileUserName)
         setProfileData(filteredProfileData)
-        // console.log("filteredProfileData: ", filteredProfileData)
-    }, [profileUserName, usersData])
-
+    }, [profileUserName, countParticipantActivitiesData])
+    
     useEffect(() => {
-        const user = usersData.find(user => user.name === profileUserName);
-        if (user) {
-            const userId = user.id;
-            const userActivities = activitiesData.filter(activity =>
-                activity.participants.some(participant => participant.userId === userId)
-            );
-            setTotalActivity(userActivities.length);
-        }
-    }, [activitiesData, usersData, profileUserName]);
-
+        const user = countParticipantActivitiesData.find(user => user.name === profileUserName);
+            setTotalActivity(user?.totalActivities || 0);
+    }, [activitiesData, usersData, profileUserName, countParticipantActivitiesData]);
+    console.log("totalActivity: ",totalActivity)
     return (
         <Dialog open={openProfileDialog} onOpenChange={setProfileDialogClose}>
             <DialogContent
@@ -204,19 +206,18 @@ const Profile: React.FC<ProfileProps> = ({
                                         control={form.control}
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel className="flex flex-row text-black dark:text-white">Total Activities <FormMessage /></FormLabel>
+                                                <FormLabel className="flex flex-row text-black dark:text-white">Total Participated Activities <FormMessage /></FormLabel>
                                                 <FormControl>
                                                     <Input
                                                         className='text-black dark:text-white'
                                                         {...field}
                                                         value={totalActivity}
-                                                        readOnly={true}
-                                                        disabled={activityLoading} />
+                                                        readOnly={true}/>
                                                 </FormControl>
                                             </FormItem>
                                         )}
                                     />
-                                    <Button type='button' className='mt-auto'>More Stats</Button>
+                                    <Button type='button' className='mt-auto' disabled>More Stats</Button>
                                 </div>
                             </div>
                         </form>

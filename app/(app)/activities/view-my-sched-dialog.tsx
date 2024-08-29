@@ -177,6 +177,7 @@ export const ViewMySchedDialog = (props: Props) => {
             onSelectedRowIdsChange={handleSelectedRowIdsChange}
             allowSelectRow={true}
             allowDateRange={true}
+            allowExportToExcel
           />
         </div>
 

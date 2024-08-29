@@ -100,6 +100,7 @@ export const ViewMyParticipatedSchedDialog = (props: Props) => {
               onViewRowId={handleViewRowIdPressed}
               setAllowViewCalendar={() => setViewCalendar(!viewCalendar)}
               allowDateRange={true}
+              allowExportToExcel
             />
           </div>
 

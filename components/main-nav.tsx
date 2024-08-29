@@ -29,8 +29,9 @@ export const MainNav = () => {
             key={index}
             href={link.href}
             className={cn(
-              "transition-colors hover:text-foreground/80",
-              pathname === link.href ? "text-foreground" : "text-foreground/60"
+              "transition-colors hover:text-foreground/80 text-foreground/60", {
+                "text-foreground": pathname?.includes(link.href)
+              }
             )}
           >
             {link.text}

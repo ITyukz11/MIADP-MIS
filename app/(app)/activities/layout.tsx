@@ -16,6 +16,7 @@ import { ViewMyParticipatedSchedDialog } from './view-participated-activity-dial
 import { FaPlusCircle } from 'react-icons/fa'
 import { TbReportAnalytics } from 'react-icons/tb'
 import { fetchActivitiesData } from '@/app/store/activityAction'
+import { usePathname } from 'next/navigation'
 
 interface ActivitiesLayoutProps {
   children: React.ReactNode
@@ -26,6 +27,7 @@ export default function ActivitiesLayout({ children }: ActivitiesLayoutProps) {
   const [calendarFormOpen, setCalendarFormOpen] = useState(false)
   const [individualActivity, setIndividualActivity] = useState(false)
 
+  const pathname = usePathname()
 
   const handleSetIndividualActivity = (isIndividual: boolean) => {
     // Logic to handle setting individual activity state or any other actions
@@ -63,14 +65,25 @@ export default function ActivitiesLayout({ children }: ActivitiesLayoutProps) {
               <ViewMyParticipatedSchedDialog />
             </div>
             <div className='flex sm:flex-row gap-2 flex-wrap justify-center sm:justify-end'>
-              <Link href="/activities" className={cn(buttonVariants({ variant: 'secondary' }), "rounded-[6px] xs:w-[200px] md:w-fit flex flex-row gap-1 items-center justify-center overflow-hidden text-xs lg:text-sm")}>
+              <Link href="/activities" 
+              className={cn(buttonVariants({ variant: 'secondary' }),
+              "hover:bg-blue-100 dark:hover:bg-blue-700 rounded-[6px] xs:w-[200px] md:w-fit flex flex-row gap-1 items-center justify-center overflow-hidden text-xs lg:text-sm", {
+                  'font-bold hover:bg-blue-100 dark:hover:bg-blue-700 bg-blue-100 dark:bg-blue-700': pathname ==='/activities'
+              })}>
                 <TableIcon size={22} /> Table
               </Link>
               <Link href="/activities/calendar"
-                className={cn(buttonVariants({ variant: 'secondary' }), "rounded-[6px] xs:w-[200px] md:w-fit flex flex-row gap-1 items-center justify-center overflow-hidden text-xs lg:text-sm")}>
+              className={cn(buttonVariants({ variant: 'secondary' }),
+              "hover:bg-blue-100 dark:hover:bg-blue-700 rounded-[6px] xs:w-[200px] md:w-fit flex flex-row gap-1 items-center justify-center overflow-hidden text-xs lg:text-sm", {
+                  'font-bold hover:bg-blue-100 dark:hover:bg-blue-700 bg-blue-100 dark:bg-blue-700': pathname === '/activities/calendar' 
+              })}>
                 <Calendar size={22} /> Calendar
               </Link>
-              <Link href="/activities/report" className={cn(buttonVariants({ variant: 'secondary' }), "rounded-[6px] xs:w-[200px] md:w-fit flex flex-row gap-1 items-center justify-center overflow-hidden text-xs lg:text-sm")}>
+              <Link href="/activities/report" 
+               className={cn(buttonVariants({ variant: 'secondary' }),
+               "hover:bg-blue-100 dark:hover:bg-blue-700 rounded-[6px] xs:w-[200px] md:w-fit flex flex-row gap-1 items-center justify-center overflow-hidden text-xs lg:text-sm", {
+                   'font-bold hover:bg-blue-100 dark:hover:bg-blue-700 bg-blue-100 dark:bg-blue-700': pathname === '/activities/report'
+               })}>
                 <TbReportAnalytics size={25} />  Report
               </Link>
               <Button

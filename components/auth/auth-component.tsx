@@ -51,8 +51,8 @@ export default function AuthenticationPage() {
         alt: 'miadp-region-xiii logo'
     },
     {
-        src: '/miadp-pso.jpg',
-        alt: 'miadp-pso logo'
+        src: '/miadp-barmm.jpg',
+        alt: 'miadp-barmm logo'
     },
     ]
 

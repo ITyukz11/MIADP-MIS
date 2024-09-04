@@ -65,6 +65,7 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
     // const { activities, loading, fetchActivitiesData } = useCalendarOfActivityContext();
     const { activitiesData, activityError, activityLoading } = useSelector((state) => state.activity)
 
+    console.log("UPDATE activityId: ", activityId)
     const dispatch = useDispatch()
 
     const [allDayChecked, setAllDayChecked] = useState(false);
@@ -483,6 +484,8 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
                     )}
 
                 </DialogTitle>
+                {activityLoading && <LoadingSpinner/>}
+                {activityError && <Label className='text-destructive'>{activityError}</Label>}
                 {activityId.length ? (
                     <>
                         <DialogDescription>

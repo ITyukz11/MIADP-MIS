@@ -81,19 +81,19 @@ export const columns: ColumnDef<Activity>[] = [
   //   enableSorting: false,
   //   enableHiding: false,
   // },
-  // {
-  //   accessorKey: "id",
-  //   header: ({ column }) => (
-  //     <DataTableColumnHeader column={column} title="COA ID" />
-  //   ),
-  //   cell: ({ row }) => (
-  //     <div className="flex space-x-2">
-  //       <span className="max-w-[500px] truncate font-medium cursor-default">
-  //         {row.getValue("id")}
-  //       </span>
-  //     </div>
-  //   ),
-  // },
+  {
+    accessorKey: "id",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="COA ID" />
+    ),
+    cell: ({ row }) => (
+      <div className="flex space-x-2">
+        <span className="max-w-[500px] truncate font-medium cursor-default">
+          {row.getValue("id")}
+        </span>
+      </div>
+    ),
+  },
   {
     accessorKey: "activityTitle",
    // enableHiding: false,

@@ -42,6 +42,7 @@ import 'react-quill/dist/quill.snow.css'; // Import Quill styles
 import { Switch } from '@/components/ui/switch'
 import { FaX } from 'react-icons/fa6'
 import { userAgent } from 'next/server'
+import FormFieldWrapper from '@/components/FormFieldWrapper'
 
 
 export const QuillEditor = dynamic(() => import('react-quill'), { ssr: false });
@@ -100,8 +101,6 @@ const CalendarForm = ({ setDialogClose, individualActivity_ }: Props) => {
     const [success, setSuccess] = useState<string | undefined>("");
 
     const [allDayChecked, setAllDayChecked] = useState(false)
-    const [individualActivity, setIndividualActivity] = useState<boolean>(individualActivity_)
-
     const { RangePicker } = DatePicker;
 
     // const { loading, fetchActivitiesData } = useCalendarOfActivityContext();
@@ -154,6 +153,7 @@ const CalendarForm = ({ setDialogClose, individualActivity_ }: Props) => {
     };
     const { control, watch, formState: { errors } } = form;
 
+    console.log("individualActivity: ", watch('individualActivity'))
     const {
         fields: participantFields,
         append: appendParticipant,
@@ -332,6 +332,7 @@ const CalendarForm = ({ setDialogClose, individualActivity_ }: Props) => {
         })
 
     }
+    console.log("form error: ", form.formState.errors)
 
     // Function to send a push notification
     const sendPushNotificationToMobileUser = async (expoPushToken: any, title: string, body: string, data?: string) => {
@@ -434,10 +435,6 @@ const CalendarForm = ({ setDialogClose, individualActivity_ }: Props) => {
         setScheduleError(false)
     }
 
-    const handleIndividualActivityChecked = () => {
-        setIndividualActivity(!individualActivity)
-        form.setValue('individualActivity', allDayChecked)
-    }
     const WFPYears = ['2023', '2024', '2025', '2026', '2027', '2028']
 
     const handleListChange = () => {
@@ -449,18 +446,13 @@ const CalendarForm = ({ setDialogClose, individualActivity_ }: Props) => {
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 w-full" autoComplete="off">
                 <div className="space-y-4 w-full flex flex-col flex-wrap">
                     <div className='flex flex-row gap-2 w-full'>
-                        <FormField
+                        <FormFieldWrapper
                             control={form.control}
-                            name="activityTitle"
-                            render={({ field }) => (
-                                <FormItem className='w-full'>
-                                    <FormLabel className='flex flex-row gap-1 text-xs sm:text-sm'>Activity Title<FormMessage /></FormLabel>
-                                    <FormControl>
-                                        <Input {...field} disabled={loadingForm} className='text-xs sm:text-sm' placeholder="Type your activity title here."
-                                            tabIndex={0} />
-                                    </FormControl>
-                                </FormItem>
-                            )}
+                            name='activityTitle'
+                            label='Activity Title'
+                            placeholder='Type your activity title here.'
+                            tabIndex={0}
+                            isDisabled={loadingForm}
                         />
                         <div className='mt-auto'>
                             <Select onValueChange={(value) => setWFPYear(value)} defaultValue={WFPYear} disabled={loadingForm}>
@@ -482,17 +474,13 @@ const CalendarForm = ({ setDialogClose, individualActivity_ }: Props) => {
                             </Select>
                         </div>
                     </div>
-                    <FormField
+                    <FormFieldWrapper
                         control={form.control}
-                        name="activityDescription"
-                        render={({ field }) => (
-                            <FormItem className='w-full'>
-                                <FormLabel className='flex flex-row gap-1 text-xs sm:text-sm'>Activity Description<FormMessage /></FormLabel>
-                                <FormControl>
-                                    <Textarea {...field} disabled={loadingForm} className='text-xs sm:text-sm' placeholder="Type your description here." />
-                                </FormControl>
-                            </FormItem>
-                        )}
+                        name='activityDescription'
+                        label='Activity Description'
+                        placeholder='Type your description here.'
+                        isDisabled={loadingForm}
+                        isTextarea
                     />
                     <div className='flex flex-row flex-wrap sm:grid grid-cols-3 gap-2'>
                         {form.watch('type') === "Other" ?
@@ -556,7 +544,6 @@ const CalendarForm = ({ setDialogClose, individualActivity_ }: Props) => {
                                 )}
                             />
                         }
-
                         <FormField
                             control={form.control}
                             name="targetParticipant"
@@ -965,18 +952,18 @@ const CalendarForm = ({ setDialogClose, individualActivity_ }: Props) => {
                     </div> */}
                     <FormLabel className='flex items-center justify-between -pb-10'>
                         <div className='flex flex-row items-center gap-1'>
-                        <label
+                            <label
                                 className='font-bold md:text-xl'
-                      
+
                             >
-                                Attachments 
+                                Attachments
                             </label>
                             <TooltipComponent
-                                    trigger={<button type='button' className='flex items-center'><IoInformationCircleOutline size={24} /></button>}
-                                    description="If you add any attachment here, the attachment fields will be required."
-                                />
+                                trigger={<button type='button' className='flex items-center'><IoInformationCircleOutline size={24} /></button>}
+                                description="If you add any attachment here, the attachment fields will be required."
+                            />
                             <Label className=' font-extralight text-xs sm:text-sm'>
-                             (Optional)
+                                (Optional)
                             </Label>
                         </div>
                         <Button type='button' size={'sm'} disabled={loadingForm} onClick={() => appendAttachments({ details: '', link: '' })}>

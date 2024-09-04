@@ -24,7 +24,7 @@ export const CalendarOfActivitySchema = z.object({
     z.object({
       userId: z.string().min(1, "is required *"),
     })
-  ).min(1, "At least one participant is required *").optional(),
+  ).optional(),
   listMode: z.boolean().optional(),
   preparatoryList: z.array(
     z.object({
@@ -91,7 +91,7 @@ export const CalendarOfActivitySchema = z.object({
     });
   }
 
-  if (!data.participants || data.participants.length === 0) {
+  if (!data.participants || data.participants.length === 0 && !data.individualActivity) {
     errors.push({
       message: "At least one participant is required *",
       path: ["participants"],

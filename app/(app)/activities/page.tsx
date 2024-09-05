@@ -10,6 +10,7 @@ import { useCalendarOfActivityFilter } from '@/components/context/FilterRegionCo
 import { Label } from '@/components/ui/label';
 import SelectTypeOfActivity from './components/SelectTypeOfActivity';
 import SelectFilterRegUniCom from './components/SelectFilterRegUniCom';
+import SelectFilterUnit from './components/SelectFilterUnit';
 
 type Props = {}
 
@@ -72,17 +73,47 @@ const Page = (props: Props) => {
 
 
   useEffect(() => {
-    if (currentFilter?.filter === 'All') {
-      setFilteredData(coaData);
-    } else {
+    if (currentFilter?.filter === 'All' && currentFilter?.unit === 'All') {
+      console.log("1");
+      console.log("region: ", currentFilter?.filter);
+      console.log("unit/component: ", currentFilter?.unit);
+      setFilteredData(coaData);  // Return all data
+    } 
+    else if (currentFilter?.filter !== 'All' && currentFilter?.unit === 'All') {
+      console.log("2");
+      console.log("region: ", currentFilter?.filter);
+      console.log("unit/component: ", currentFilter?.unit);
       const filtered = coaData.filter(item =>
-        item.user?.region === currentFilter?.filter ||
-        item.user?.component === currentFilter?.filter ||
-        item.user?.unit === currentFilter?.filter
+        item.user?.region === currentFilter?.filter
       );
-      setFilteredData(filtered);
+      setFilteredData(filtered);  // Filter by region only
+    }
+    else if (currentFilter?.filter === 'All' && currentFilter?.unit !== 'All') {
+      console.log("3");
+      console.log("region: ", currentFilter?.filter);
+      console.log("unit/component: ", currentFilter?.unit);
+      const filtered = coaData.filter(item =>
+        item.user?.unit === currentFilter?.unit || 
+        item.user?.component === currentFilter?.unit
+      );
+      setFilteredData(filtered);  // Filter by unit/component only
+    }
+    else if (currentFilter?.filter !== 'All' && currentFilter?.unit !== 'All') {
+      console.log("4");
+      console.log("region: ", currentFilter?.filter);
+      console.log("unit/component: ", currentFilter?.unit);
+      const filtered = coaData.filter(item =>
+        item.user?.region === currentFilter?.filter &&
+        (
+          item.user?.unit === currentFilter?.unit || 
+          item.user?.component === currentFilter?.unit
+        )
+      );
+      setFilteredData(filtered);  // Filter by both region and unit/component
     }
   }, [currentFilter, coaData]);
+  
+  
 
   const hiddenColumns = [
     'id',
@@ -101,6 +132,7 @@ const Page = (props: Props) => {
       <div className='flex flex-col flex-wrap w-full'>
         <div className='flex flex-row gap-2 overflow-x-auto w-full scrollbar-thin p-1'>
           <SelectFilterRegUniCom/>
+          <SelectFilterUnit/>
           <SelectTypeOfActivity/>
         </div>
 

@@ -25,7 +25,8 @@ export default async function AppLayout({ children }: AppLayoutProps) {
     // Default value for typeOfActivity
     const initialFilter = {
         filter: session.user.region as string,
-        typeOfActivity: 'WFP Activities' // Default value or set as needed
+        typeOfActivity: 'WFP Activities', // Default value or set as needed
+        unit: 'All'
     };
 
     return (

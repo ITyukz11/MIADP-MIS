@@ -9,7 +9,11 @@ function SelectTypeOfActivity({}: Props) {
     const { activityLoading } = useSelector((state) => state.activity);
     const { currentFilter, setCurrentFilter } = useCalendarOfActivityFilter();
     const handleTypeOfActivtyChange = (value: string) => {
-        setCurrentFilter({ filter: currentFilter?.filter || '', typeOfActivity: value });
+        setCurrentFilter({ 
+            filter: currentFilter?.filter || '', 
+            unit: currentFilter?.unit || '',
+            typeOfActivity: value 
+        });
       };
 
   return (

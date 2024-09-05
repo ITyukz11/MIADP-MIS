@@ -13,7 +13,10 @@ function SelectFilterRegUniCom({}: Props) {
     const { currentFilter, setCurrentFilter } = useCalendarOfActivityFilter();
 
     const handleValueChange = (value: string) => {
-        setCurrentFilter({ filter: value, typeOfActivity:currentFilter?.typeOfActivity || '' });
+        setCurrentFilter({ 
+          filter: value, 
+          typeOfActivity:currentFilter?.typeOfActivity || '', 
+          unit:currentFilter?.unit || ''});
       };
 
   return (
@@ -27,18 +30,6 @@ function SelectFilterRegUniCom({}: Props) {
                 <SelectLabel>Regions</SelectLabel>
                 {regionOptions.map((option, index) => (
                   <SelectItem key={index} value={option}>{option}</SelectItem>
-                ))}
-              </SelectGroup>
-              <SelectGroup>
-                <SelectLabel>Components</SelectLabel>
-                {componentOptions.map((option, index) => (
-                  <SelectItem key={index} value={option}>{option}</SelectItem>
-                ))}
-              </SelectGroup>
-              <SelectGroup>
-                <SelectLabel>Units</SelectLabel>
-                {unitOptions.map((option, index) => (
-                  <SelectItem key={index} value={option.value}>{option.label}</SelectItem>
                 ))}
               </SelectGroup>
             </SelectContent>

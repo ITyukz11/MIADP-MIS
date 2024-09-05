@@ -28,7 +28,7 @@ import { useDispatch, useSelector } from "@/app/store/store"
 import { fetchUsersData } from "@/app/store/userAction"
 import { TooltipComponent } from "../Tooltip"
 import { RiAttachmentLine } from "react-icons/ri"
-import DisplayHTMLDialog from "../dialog/display-html-dialog"
+import DisplayHTMLDialog from "../dialog/display-content-dialog"
 import { capitalizeEachWord } from "@/utils/capitalizeEachWord"
 import { Button } from "../ui/button"
 import { IoPencilOutline, IoTrashOutline } from "react-icons/io5"
@@ -41,6 +41,8 @@ import { deleteCalendarOfActivity } from "@/actions/calendar-of-activity/delete"
 import { fetchActivitiesData } from "@/app/store/activityAction"
 import { getCurrentUser } from "@/lib/session"
 import { useCurrentUser } from "../context/CurrentUserContext"
+import DisplayContentDialog from "../dialog/display-content-dialog"
+import { LoadingSpinner } from "../LoadingSpinner"
 
 interface CalendarSheetProps {
   activityData: any[]
@@ -53,6 +55,10 @@ export function CalendarSheet({ activityData, openSheet, closeCalendarSheet }: C
 
   const [loadingDelete, setLoadingDelete] = useState(false);
 
+  const [contentHTMLData, setContentHTMLData] = useState<string>('')
+  const [contentDialogTitle, setContentDialogTitle] = useState<string>('')
+  const [contentData, setContentData] = useState<string>('')
+
   const dispatch = useDispatch();
   const { usersData, loadingUser, errorUser } = useSelector((state) => state.users)
   const { currentUser } = useCurrentUser()
@@ -64,7 +70,7 @@ export function CalendarSheet({ activityData, openSheet, closeCalendarSheet }: C
 
   const [qrCode, setQrCode] = useState<string | null>(null);
   const [openProfile, setOpenProfile] = useState(false)
-  const [openHTMLDialog, setOpenHTMLDialog] = useState(false)
+  const [openContentDialog, setOpenContentDialog] = useState(false)
 
   const { activityLoading } = useSelector((state) => state.activity)
   useEffect(() => {
@@ -230,6 +236,12 @@ ${formattedPreparatoryList}`;
     }
   };
 
+  const handleOpenContentDialog = (title:string, content: string, html: string) =>{
+    setContentHTMLData(html)
+    setContentData(content)
+    setContentDialogTitle(title)
+    setOpenContentDialog(!openContentDialog)
+  }
   return (
     <>
       <Sheet open={openSheet} onOpenChange={closeCalendarSheet}>
@@ -369,7 +381,10 @@ ${formattedPreparatoryList}`;
                   trigger={<div className='flex items-center cursor-help'><Info className="h-5 w-5 shrink-0" /></div>}
                   description="Activity Description"
                 />
-                <Badge variant={'outline'} className=" shadow-sm">
+                <Badge 
+                  variant={'outline'} 
+                  className="cursor-pointer shadow-sm" 
+                  onClick={()=> handleOpenContentDialog("Activity Description", activityDescription, "")}>
                   <p className="text-xs">{activityDescription}</p>
                 </Badge>
               </div>
@@ -399,7 +414,13 @@ ${formattedPreparatoryList}`;
                     trigger={<div className='flex items-center cursor-help'><TbNotes className="h-5 w-5 shrink-0" /></div>}
                     description="Activity Remarks"
                   />
-                  <Label>{remarks}</Label>
+                     <Badge 
+                  variant={'outline'} 
+                  className="cursor-pointer shadow-sm" 
+                  onClick={()=> handleOpenContentDialog("Remarks", remarks, "")}>
+                  {remarks}
+                </Badge>
+                
                 </div>
               )}
 
@@ -436,6 +457,8 @@ ${formattedPreparatoryList}`;
                                 <Label>User details not found.</Label>
                               </Badge>
                             )}
+                            {loadingUser && <LoadingSpinner/>}
+                            {errorUser && <Label className="text-destructive">{errorUser}</Label>}
                           </div>
                         );
                       })}
@@ -458,7 +481,7 @@ ${formattedPreparatoryList}`;
                       </div>
                     </AccordionTrigger>
                     <AccordionContent>
-                      <div className="flex flex-col space-y-2 p-2 border rounded-lg shadow-md cursor-pointer" onClick={() => setOpenHTMLDialog(!openHTMLDialog)} dangerouslySetInnerHTML={{ __html: preparatoryContent }} />
+                      <div className="flex text-sm flex-col space-y-2 p-2 border rounded-lg shadow-md cursor-pointer" onClick={() => handleOpenContentDialog("Preparatory Content","",preparatoryContent)} dangerouslySetInnerHTML={{ __html: preparatoryContent }} />
                     </AccordionContent>
                   </AccordionItem>
                 </Accordion> :
@@ -517,7 +540,7 @@ ${formattedPreparatoryList}`;
                             {isValidUrl(attachment.link) ? (
                               <Link href={attachment.link} passHref target="_blank" rel="noopener noreferrer"
                                 className=" text-blue-500 hover:text-blue-400 cursor-pointer break-words">
-                                <Label>{attachment.link}</Label>
+                                <Label className="cursor-pointer">{attachment.link}</Label>
                               </Link>
                             ) : (
                               <Label>(Not a link) {attachment.link}</Label>
@@ -562,10 +585,12 @@ ${formattedPreparatoryList}`;
         openProfileDialog={openProfile}
         setProfileDialogClose={() => setOpenProfile(!openProfile)}
         profileUserName={userName} />
-      <DisplayHTMLDialog
-        html={preparatoryContent}
-        openDeleteDialog={openHTMLDialog}
-        setDeleteDialogClose={() => setOpenHTMLDialog(!openHTMLDialog)} />
+      <DisplayContentDialog
+        html={contentHTMLData}
+        title={contentDialogTitle}
+        content={contentData}
+        openDeleteDialog={openContentDialog}
+        setDeleteDialogClose={() => setOpenContentDialog(!openContentDialog)} />
       <UpdateActivityDialog
         activityId={[id]}
         onCancel={handleCancelUpdate}

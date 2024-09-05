@@ -3,13 +3,15 @@ import { Button } from '../ui/button';
 import { LoadingSpinner } from '../LoadingSpinner';
 import { Separator } from '../ui/separator';
 
-interface DisplayHTMLDialogProps {
-    html: string
+interface DisplayContentDialogProps {
+    html?: string
+    title:string
+    content?:string
     openDeleteDialog: boolean
     setDeleteDialogClose: () => void;
 }
 
-const DisplayHTMLDialog: React.FC<DisplayHTMLDialogProps> = ({ html, openDeleteDialog, setDeleteDialogClose }) => {
+const DisplayContentDialog: React.FC<DisplayContentDialogProps> = ({ html, title, content, openDeleteDialog, setDeleteDialogClose }) => {
     const avoidDefaultDomBehavior = (e: Event) => {
         e.preventDefault();
     };
@@ -27,12 +29,13 @@ const DisplayHTMLDialog: React.FC<DisplayHTMLDialogProps> = ({ html, openDeleteD
                 onInteractOutside={avoidDefaultDomBehavior}
                 onKeyDown={handleKeyDown}
             >
-                <DialogTitle>Preparatory Content</DialogTitle>
+                <DialogTitle>{title}</DialogTitle>
                 <DialogDescription>
                     This section provides an overview of the content in an expandable format.
                 </DialogDescription>
                 <Separator />
-                <div dangerouslySetInnerHTML={{ __html: html }} />
+                {html &&  <div dangerouslySetInnerHTML={{ __html: html }} />}
+                {content && <div>{content}</div>}
                 <Separator />
                 <DialogFooter>
                     <Button onClick={setDeleteDialogClose}>
@@ -45,4 +48,4 @@ const DisplayHTMLDialog: React.FC<DisplayHTMLDialogProps> = ({ html, openDeleteD
     );
 };
 
-export default DisplayHTMLDialog;
+export default DisplayContentDialog;

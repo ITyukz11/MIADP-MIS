@@ -173,6 +173,9 @@ export const columns: ColumnDef<Activity>[] = [
             }`}
           >
             {status}
+            {status === "Ongoing" && (
+                    <div className="h-3 w-3 rounded-full bg-white animate-pulse ml-1"></div>
+                  )}
           </Badge>
         </span>
       </div>

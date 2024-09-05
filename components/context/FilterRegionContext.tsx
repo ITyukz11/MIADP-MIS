@@ -4,6 +4,7 @@ import React, { createContext, useState, useContext, ReactNode, FC, useEffect } 
 export interface CalendarOfActivityFilter {
   filter: string;
   typeOfActivity: string;
+  unit: string;
   // Add other filter properties if needed
 }
 

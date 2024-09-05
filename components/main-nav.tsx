@@ -30,8 +30,10 @@ export const MainNav = () => {
             href={link.href}
             className={cn(
               "transition-colors hover:text-foreground/80 text-foreground/60", {
-                "text-foreground": pathname?.includes(link.href)
-              }
+              "text-foreground":
+                (pathname === '/' && link.href === '/') ||
+                (pathname !== '/' && pathname === link.href),
+            }
             )}
           >
             {link.text}

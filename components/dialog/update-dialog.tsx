@@ -89,7 +89,7 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
 
     const [selectedData, setSelectedData] = useState<Framework[]>([])
 
-    const [listMode, setListMode] = useState<boolean>(false)
+    // const [listMode, setListMode] = useState<boolean>(false)
 
     const [WFPYear, setWFPYear] = useState(new Date().getFullYear().toString());
     const WFPYears = ['2023', '2024', '2025', '2026', '2027', '2028']
@@ -108,6 +108,7 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
             dateTo: '',
             timeStart: '',
             timeEnd: '',
+            listMode:false,
             allDay: false,
             color: '',
             status: '',
@@ -188,6 +189,7 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
                     timeEnd: activityData.timeEnd,
                     allDay: activityData.allDay,
                     color: activityData.color || '',
+                    listMode:activityData.preparatoryContent ? false : true,
                     status: activityData.status,
                     participants: activityData.participants.length > 0 ? activityData.participants : [{ userId: '' }],
                     preparatoryContent: activityData.preparatoryContent,
@@ -195,7 +197,7 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
                     calendarOfActivityAttachment: activityData.calendarOfActivityAttachment && activityData.calendarOfActivityAttachment.length > 0 ? activityData.calendarOfActivityAttachment : [{ details: '', link: '' }],
                     remarks: activityData.remarks,
                 });
-                setListMode(activityData.preparatoryContent ? false : true)
+                // setListMode(activityData.preparatoryContent ? false : true)
                 setAllDayChecked(activityData.dateFrom != activityData.dateTo);
             }
             setLoadingForm(false);
@@ -297,6 +299,7 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
         };
 
 
+       
 
         if (formattedParticipants.length > 0) {
             formattedValues.participants = {
@@ -321,6 +324,9 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
             setLoadingForm(true);
 
             try {
+        delete formattedValues.listMode
+
+                console.log("formattedValues: ", formattedValues)
 
                 const result = await updateCalendarOfActivity(activityId[currentIndex], formattedValues);
 
@@ -456,6 +462,7 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
     const handleListChange = () => {
         form.setValue("preparatoryList", [{ description: '', status: '', remarks: '' }])
         form.setValue("preparatoryContent", "")
+        form.setValue("listMode",!form.watch("listMode"))
     }
 
     return (
@@ -815,7 +822,7 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
                                                     <label
                                                         className='font-bold md:text-xl'
                                                     >
-                                                        Preparatory {listMode ? 'List' : 'Content'}
+                                                        Preparatory {form.watch("listMode") ? 'List' : 'Content'}
                                                     </label>
                                                     <TooltipComponent
                                                         trigger={<button type='button' className='flex items-center'><IoInformationCircleOutline size={24} /></button>}
@@ -823,13 +830,13 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
                                                     />
 
                                                     <div className="flex items-center space-x-2">
-                                                        <Switch id="list-mode" checked={listMode} onCheckedChange={(value) => { setListMode(value); handleListChange() }} disabled={loadingForm} />
+                                                        <Switch id="list-mode" checked={form.watch("listMode")} onCheckedChange={(value) => handleListChange()} disabled={loadingForm} />
                                                         <Label htmlFor="list-mode" className='text-xs sm:text-sm'>List mode</Label>
                                                     </div>
 
 
                                                 </div>
-                                                {listMode &&
+                                                {form.watch("listMode") &&
                                                     <div className='flex flex-row gap-2 justify-end items-center'>
                                                         <Badge variant='secondary' className='h-fit'>{preparatoryListFields.length}</Badge>
                                                         <Button type='button' size={'sm'} disabled={loadingForm} onClick={() => appendPreparatoryList({ description: '', status: '', remarks: '' })}>
@@ -840,7 +847,7 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
 
                                                 <FormMessage />
                                             </FormLabel>
-                                            {!listMode ? <>
+                                            {!form.watch("listMode") ? <>
                                                 <FormField
                                                     control={form.control}
                                                     name="preparatoryContent"

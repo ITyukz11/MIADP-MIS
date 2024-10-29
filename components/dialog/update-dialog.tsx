@@ -191,7 +191,7 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
                     color: activityData.color || '',
                     listMode:activityData.preparatoryContent ? false : true,
                     status: activityData.status,
-                    participants: activityData.participants.length > 0 ? activityData.participants : [{ userId: '' }],
+                    participants: activityData.participants.length > 0 ? activityData.participants : activityData.individualActivity? [{ userId: currentUser?.id }]:[{ userId: '' }],
                     preparatoryContent: activityData.preparatoryContent,
                     preparatoryList: activityData.preparatoryList.length > 0 ? activityData.preparatoryList : [{ description: '', status: '', remarks: '' }],
                     calendarOfActivityAttachment: activityData.calendarOfActivityAttachment && activityData.calendarOfActivityAttachment.length > 0 ? activityData.calendarOfActivityAttachment : [{ details: '', link: '' }],
@@ -202,7 +202,7 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
             }
             setLoadingForm(false);
         }
-    }, [activityId, currentIndex, activitiesData, form]);
+    }, [activityId, currentIndex, activitiesData, form, currentUser?.id]);
 
 
     const { control, watch } = form;
@@ -464,6 +464,8 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
         form.setValue("preparatoryContent", "")
         form.setValue("listMode",!form.watch("listMode"))
     }
+
+    console.log(form.formState.errors)
 
     return (
         <Dialog open={openUpdateDialog} onOpenChange={setUpdateDialogClose}>

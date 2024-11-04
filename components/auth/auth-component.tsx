@@ -15,6 +15,7 @@ import {
 import { RegisterForm } from "./register-form"
 import { useState } from "react"
 import { motion } from "framer-motion"
+import { ModeToggle } from "../mode-toggle"
 
 export const metadata: Metadata = {
     title: "Authentication",
@@ -114,6 +115,9 @@ export default function AuthenticationPage() {
                     </div>
                 </div>
                 <div className="pt-2 pb-2 sm:p-6 w-full h-full">
+                <div className='absolute flex flex-row right-5 top-5'>
+                        <ModeToggle />
+                        </div>
                     <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px] h-full">
                         <div className="flex flex-row w-full justify-center items-center h-full">
 

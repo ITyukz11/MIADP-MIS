@@ -21,13 +21,15 @@ import { CalendarSheet } from '@/components/calendar-of-activity/CalendarSheet';
 import { useSelector } from '@/app/store/store';
 import { IoPeopleCircle } from 'react-icons/io5';
 import { MdPeople } from 'react-icons/md';
+import { useActivitiesData } from '@/lib/calendar-of-activity/useActivitiesDataHook';
 
 
 type Props = {};
 
 export const ViewMyParticipatedSchedDialog = (props: Props) => {
   // const { activities, loading, error, fetchActivitiesData } = useCalendarOfActivityContext();
-  const { activitiesData, activityLoading, activityError } = useSelector((state)=> state.activity)
+  // const { activitiesData, activityLoading, activityError } = useSelector((state)=> state.activity)
+  const { activitiesData, activityError, activityLoading } = useActivitiesData()
   const { currentUser } = useCurrentUser();
   const [filteredData, setFilteredData] = useState<any[]>([]);
   const [viewCalendarData, setViewCalendarData] = useState<any[]>([]);
@@ -43,8 +45,8 @@ export const ViewMyParticipatedSchedDialog = (props: Props) => {
   useEffect(() => {
     // console.log("currentUser.id: ", currentUser?.id)
     if (currentUser && currentUser.name) {
-      const filtered = activitiesData.filter(activity =>
-        activity.participants.some(participant => participant.userId === currentUser?.id)
+      const filtered = activitiesData.filter((activity:any) =>
+        activity.participants.some((participant:any) => participant.userId === currentUser?.id)
       );
       setFilteredData(filtered);
     }

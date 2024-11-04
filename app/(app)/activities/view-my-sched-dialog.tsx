@@ -26,12 +26,14 @@ import { toast } from '@/components/ui/use-toast';
 import { ToastAction } from '@/components/ui/toast';
 import { useDispatch, useSelector } from '@/app/store/store';
 import { fetchActivitiesData } from '@/app/store/activityAction';
+import { useActivitiesData } from '@/lib/calendar-of-activity/useActivitiesDataHook';
 
 type Props = {};
 
 export const ViewMySchedDialog = (props: Props) => {
   // const { activities, loading, error, fetchActivitiesData } = useCalendarOfActivityContext();
-  const {activitiesData, activityLoading, activityError} =useSelector((state)=> state.activity)
+  // const {activitiesData, activityLoading, activityError} =useSelector((state)=> state.activity)
+  const { activitiesData, activityError, activityLoading } = useActivitiesData()
   const { currentUser } = useCurrentUser();
 
   const [filteredData, setFilteredData] = useState<any[]>([]);
@@ -45,6 +47,9 @@ export const ViewMySchedDialog = (props: Props) => {
 
   const [loadingDelete, setLoadingDelete] = useState(false);
   const [alert, setAlert] = useState<{ type: 'success' | 'error', message: string } | null>(null);
+
+  console.log("currentUser: ", currentUser)
+  console.log("filteredData: ", filteredData)
 
   const dispatch = useDispatch()
 
@@ -97,8 +102,8 @@ export const ViewMySchedDialog = (props: Props) => {
   };
 
   useEffect(() => {
-    if (currentUser && currentUser.name) {
-      const filtered = activitiesData.filter(activity => activity.user?.id=== currentUser.id);
+    if (currentUser && currentUser.id) {
+      const filtered = activitiesData.filter((activity:any) => activity.user?.id=== currentUser.id);
       setFilteredData(filtered);
     }
   }, [currentUser, activitiesData]);

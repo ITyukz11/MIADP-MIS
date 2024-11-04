@@ -40,6 +40,7 @@ import { TooltipComponent } from '../Tooltip';
 import { IoInformationCircleOutline } from 'react-icons/io5';
 import { Switch } from '../ui/switch';
 import { FaX } from 'react-icons/fa6';
+import { useActivitiesData } from '@/lib/calendar-of-activity/useActivitiesDataHook';
 
 
 interface UpdateActivityDialogProps {
@@ -63,7 +64,8 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
     const [currentIndex, setCurrentIndex] = useState(0);
 
     // const { activities, loading, fetchActivitiesData } = useCalendarOfActivityContext();
-    const { activitiesData, activityError, activityLoading } = useSelector((state) => state.activity)
+    // const { activitiesData, activityError, activityLoading } = useSelector((state) => state.activity)
+    const { activitiesData, activityError, activityLoading } = useActivitiesData()
 
     console.log("UPDATE activityId: ", activityId)
     const dispatch = useDispatch()

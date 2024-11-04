@@ -44,7 +44,7 @@ export const ViewMyParticipatedSchedDialog = (props: Props) => {
 
   useEffect(() => {
     // console.log("currentUser.id: ", currentUser?.id)
-    if (currentUser && currentUser.name) {
+    if (currentUser && currentUser.name && activitiesData) {
       const filtered = activitiesData.filter((activity:any) =>
         activity.participants.some((participant:any) => participant.userId === currentUser?.id)
       );

@@ -102,7 +102,7 @@ export const ViewMySchedDialog = (props: Props) => {
   };
 
   useEffect(() => {
-    if (currentUser && currentUser.id) {
+    if (currentUser && currentUser.id && activitiesData) {
       const filtered = activitiesData.filter((activity:any) => activity.user?.id=== currentUser.id);
       setFilteredData(filtered);
     }

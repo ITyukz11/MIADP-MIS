@@ -155,7 +155,7 @@ export function DataTableToolbar<TData>({
         return column.getIsVisible()
        }
        });
-      const headers = ['#', 'Unit/Component', ...visibleColumns.map(column => column.id)];
+      const headers = ['#', 'Region','Unit/Component', ...visibleColumns.map(column => column.id)];
 
       // Define title, date, and filter data
       const title = 'CALENDAR OF ACTIVITIES';
@@ -207,7 +207,7 @@ export function DataTableToolbar<TData>({
         cell.fill = {
           type: 'pattern',
           pattern: 'solid',
-          fgColor: { argb: '538DD5' } // Blue color
+          fgColor: { argb: '8DB4E2' } // Blue color
         };
         cell.border = {
           top: { style: 'thin', color: { argb: '000000' } },
@@ -226,6 +226,7 @@ export function DataTableToolbar<TData>({
 
         // Access 'unit' or 'component' from the 'user' object
         const user = (row.original as any).user || {};
+        rowData['Region'] = user.region
         rowData['Unit/Component'] = user.unit || user.component || '';
 
         return rowData;
@@ -233,7 +234,7 @@ export function DataTableToolbar<TData>({
 
       // Add an incremental number in the first column
       rows.forEach((data: any, index: number) => {
-        const rowValues = [index + 1, data['Unit/Component'], ...headers.slice(2).map(header => data[header])]; // Ensure correct order
+        const rowValues = [index + 1, data['Region'],data['Unit/Component'], ...headers.slice(3).map(header => data[header])]; // Ensure correct order
         const row = worksheet.addRow(rowValues);
 
         // Add alternate row colors and styles

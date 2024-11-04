@@ -10,6 +10,7 @@ import FloatingAIChat from "@/components/FloatingAIChat"
 import { CurrentUserProvider } from "@/components/context/CurrentUserContext"
 import ReduxProvider from "@/components/ReduxProvider"
 import { CalendarOfActivityFilterProvider } from "@/components/context/FilterRegionContext"
+import { SecurityQuestionDialog } from "@/components/dialog/security-question-dialog"
 
 interface AppLayoutProps {
     children: React.ReactNode
@@ -28,7 +29,7 @@ export default async function AppLayout({ children }: AppLayoutProps) {
         typeOfActivity: 'WFP Activities', // Default value or set as needed
         unit: 'All'
     };
-
+    console.log("session.user:", session.user.verificationAnswer)
     return (
         <ReduxProvider>
             <CurrentUserProvider initialUser={session.user as any}>
@@ -39,6 +40,10 @@ export default async function AppLayout({ children }: AppLayoutProps) {
                             <main className="flex-1 mt-4 mb-auto h-full min-w-[320px] max-w-[2560px] w-[98vw] px-2 sm:px-8 relative">{children}</main>
                             <FloatingAIChat />
                             <SiteFooter />
+                            {!session.user.verificationAnswer &&
+                                <>
+                                {/* <SecurityQuestionDialog open={!session.user.verificationAnswer}/> */}
+                                </>}
                         </ErrorBoundary>
                     </div>
                 </CalendarOfActivityFilterProvider>

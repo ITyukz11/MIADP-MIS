@@ -12,6 +12,8 @@ declare module 'next-auth' {
             component:string
             unit:string
             position:string
+            verificationQuestion?:string
+            verificationAnswer?: string
         } & DefaultSession
     }
 
@@ -22,6 +24,8 @@ declare module 'next-auth' {
         component:string
         unit:string
         position:string
+        verificationQuestion?:string
+        verificationAnswer?: string
     }
 }
 
@@ -33,5 +37,7 @@ declare module 'next-auth/jwt'{
        component:string
        unit:string
        position:string
+       verificationQuestion?:string
+       verificationAnswer?: string
     }
 }

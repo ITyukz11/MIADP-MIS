@@ -31,30 +31,64 @@ export async function POST(request) {
 
 export async function GET(request) {
   try {
-    const users = await prisma.user.findMany({
-      select: {
-        id: true,
-        region: true,
-        name: true,
-        unit: true,
-        component: true,
-        position: true,
-        email: true,
-        color: true,
-        expoPushToken: true,
-        notification: true,
-        status: true,
-        createdAt: true,
-        updatedAt: true,
-        role: true,
-        CalendarOfActivityParticipant: true,
-      },
-      cacheStrategy: { ttl: 3600, swr: 300 }
-    });
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get('id');
 
-    return new Response(JSON.stringify(users), { status: 200, headers: { 'Content-Type': 'application/json' } });
+    if (id) {
+      // Fetch a specific user by ID
+      const user = await prisma.user.findUnique({
+        where: { id: id }, // Make sure to convert id to a number
+        select: {
+          id: true,
+          region: true,
+          name: true,
+          unit: true,
+          component: true,
+          position: true,
+          email: true,
+          color: true,
+          expoPushToken: true,
+          notification: true,
+          status: true,
+          createdAt: true,
+          updatedAt: true,
+          role: true,
+          CalendarOfActivityParticipant: true,
+        },
+      });
+
+      if (!user) {
+        return NextResponse.json({ error: 'User not found' }, { status: 404 });
+      }
+
+      return NextResponse.json(user, { status: 200 });
+    } else {
+      // Fetch all users if no ID is provided
+      const users = await prisma.user.findMany({
+        select: {
+          id: true,
+          region: true,
+          name: true,
+          unit: true,
+          component: true,
+          position: true,
+          email: true,
+          color: true,
+          expoPushToken: true,
+          notification: true,
+          status: true,
+          createdAt: true,
+          updatedAt: true,
+          role: true,
+          CalendarOfActivityParticipant: true,
+        },
+        cacheStrategy: { ttl: 3600, swr: 300 },
+      });
+
+      return NextResponse.json(users, { status: 200 });
+    }
   } catch (error) {
     console.error('Error fetching users:', error);
-    return new Response(JSON.stringify({ error: 'Internal Server Error' }), { status: 500, headers: { 'Content-Type': 'application/json' } });
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }

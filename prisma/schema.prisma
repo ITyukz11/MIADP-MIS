@@ -30,6 +30,8 @@ model User {
   calendarOfActivities          CalendarOfActivity[]
   userLog                       UserLog[]
   password                      String
+  verificationQuestion          String?
+  verificationAnswer            String?
   messages                      Message[]
   doctrackDocuments             DoctrackDocuments[]
   doctrackDocumentIncomingRoute DoctrackDocumentIncomingRoute[]

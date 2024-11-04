@@ -44,7 +44,7 @@ export default function DocumentTrackingLayout({ children }: DoctrackLayoutProps
 
     return (
         <div className="xs:container space-y-4">
-            <div className='flex flex-row flex-wrap justify-center gap-2 md:justify-between'>
+            {/* <div className='flex flex-row flex-wrap justify-center gap-2 md:justify-between'>
                 <div className='flex flex-col'>
                     <h2 className="text-xl md:text-3xl font-bold tracking-tight">Document Tracking</h2>
                     <Label className='text-xs sm:text-sm text-muted-foreground'>
@@ -84,14 +84,9 @@ export default function DocumentTrackingLayout({ children }: DoctrackLayoutProps
                                 <FaMoneyBills size={20} />  Disbursement
                             </Link>
                         </div>
-                        {/* <div>
-                            <Link href="/document-tracking/correspondence" className={cn(buttonVariants({ variant: 'secondary' }), "rounded-[6px] xs:w-[200px] md:w-fit flex flex-row gap-1 items-center justify-center overflow-hidden text-xs lg:text-sm")}>
-                                <FaThreads size={20} /> Thread
-                            </Link>
-                        </div> */}
                     </CardContent>
                 </Card>
-            </div>
+            </div> */}
             <div className="w-full flex flex-col gap-2">
                 {children}
 

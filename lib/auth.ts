@@ -91,6 +91,8 @@ export const authOptions: NextAuthOptions = {
           token.component = user.component; 
           token.unit = user.unit; 
           token.position = user.position; 
+          token.verificationQuestion = user.verificationQuestion; 
+          token.verificationAnswer = user.verificationAnswer; 
         }
         return token;
       },
@@ -104,6 +106,8 @@ export const authOptions: NextAuthOptions = {
             session.user.component = token.component
             session.user.unit = token.unit
             session.user.position = token.position; 
+            session.user.verificationQuestion = token.verificationQuestion; 
+            session.user.verificationAnswer = token.verificationAnswer; 
           }
         return session;
       },

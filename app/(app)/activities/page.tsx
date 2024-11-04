@@ -11,6 +11,7 @@ import { Label } from '@/components/ui/label';
 import SelectTypeOfActivity from './components/SelectTypeOfActivity';
 import SelectFilterRegUniCom from './components/SelectFilterRegUniCom';
 import SelectFilterUnit from './components/SelectFilterUnit';
+import { useActivitiesData } from '@/lib/calendar-of-activity/useActivitiesDataHook';
 
 type Props = {}
 
@@ -29,14 +30,15 @@ const Page = (props: Props) => {
     // console.log("viewId ZZ: ", viewId)
   };
   // const { activities, loading, error } = useCalendarOfActivityContext();
-  const dispatch = useDispatch();
-  const { activitiesData, activityLoading, activityError } = useSelector((state) => state.activity);
 
-  useEffect(() => {
-    if (activitiesData.length === 0) {
-      dispatch(fetchActivitiesData());
-    }
-  }, [dispatch, activitiesData.length]);
+  // const dispatch = useDispatch();
+  // const { activitiesData, activityLoading, activityError } = useSelector((state) => state.activity);
+  const { activitiesData, activityError, activityLoading } = useActivitiesData()
+  // useEffect(() => {
+  //   if (activitiesData.length === 0) {
+  //     dispatch(fetchActivitiesData());
+  //   }
+  // }, [dispatch, activitiesData.length]);
 
 
   useEffect(() => {

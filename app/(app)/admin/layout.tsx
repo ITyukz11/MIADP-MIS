@@ -9,21 +9,13 @@ const sidebarNavItems = [
       },
   {
     title: "Datas",
-    href: "/admin",
+    href: "/admin/datas",
+  },
+  {
+    title: "Generate Code",
+    href: "/admin/generate-code",
   },
 
-//   {
-//     title: "Appearance",
-//     href: "/examples/forms/appearance",
-//   },
-//   {
-//     title: "Notifications",
-//     href: "/examples/forms/notifications",
-//   },
-//   {
-//     title: "Display",
-//     href: "/examples/forms/display",
-//   },
 ]
 
 interface SettingsLayoutProps {

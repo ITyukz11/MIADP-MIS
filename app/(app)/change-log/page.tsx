@@ -3,6 +3,10 @@
 import React from 'react';
 import Changelog from '../../../components/change-log/Changelog'
 import { PageHeader, PageHeaderDescription, PageHeaderHeading } from '@/components/page-header';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { FaTools } from "react-icons/fa"
+import Image from "next/image"
 
 const changelogItems = [
   {
@@ -121,16 +125,46 @@ const changelogItems = [
 ];
 const sortedChangelogItems = [...changelogItems].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 const ChangelogPage: React.FC = () => {
+  const imageNumber = Math.floor(Math.random() * 6) + 1;
+  const imagePath = `/under-development/${imageNumber}.png`;
+
   return (
-    <div className="mx-auto flex justify-center relative md:px-56 flex-col">
-    <PageHeader>
-      <PageHeaderHeading>MIADP MIS System Updates</PageHeaderHeading>
-      <PageHeaderDescription>
-        Stay updated with the latest changes and improvements to our system.
-      </PageHeaderDescription>
-    </PageHeader>
-    <Changelog items={sortedChangelogItems} />
-  </div>
+    <div className="flex items-center justify-center">
+      <Card className="w-full max-w-md">
+        <CardHeader>
+          <CardTitle>Changelogs</CardTitle>
+          <CardDescription>This section is currently under development.</CardDescription>
+        </CardHeader>
+        <CardContent className="flex flex-col items-center">
+          <Image 
+            src={imagePath} 
+            alt="Under Development" 
+            width={300} 
+            height={200} 
+            className="rounded-md mb-4"
+          />
+          <Alert className="flex items-center space-x-2">
+            <FaTools className="h-5 w-5 text-yellow-500" />
+            <div>
+              <AlertTitle>Under Development</AlertTitle>
+              <AlertDescription>
+                Features and data are being implemented. Please check back soon!
+              </AlertDescription>
+            </div>
+          </Alert>
+        </CardContent>
+      </Card>
+    </div>
+
+  //   <div className="mx-auto flex justify-center relative md:px-56 flex-col">
+  //   <PageHeader>
+  //     <PageHeaderHeading>MIADP MIS System Updates</PageHeaderHeading>
+  //     <PageHeaderDescription>
+  //       Stay updated with the latest changes and improvements to our system.
+  //     </PageHeaderDescription>
+  //   </PageHeader>
+  //   <Changelog items={sortedChangelogItems} />
+  // </div>
   );
 };
 

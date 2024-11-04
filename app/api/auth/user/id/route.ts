@@ -10,6 +10,9 @@ const AUTH_USERNAME = process.env.BASIC_AUTH_USERNAME;
 const AUTH_PASSWORD = process.env.BASIC_AUTH_PASSWORD;
 
 export async function GET(request: NextRequest) {
+  const url = new URL(request.url);
+  const userId = url.searchParams.get('id'); // Retrieve the user ID from the query parameters
+
   const credentials = basicAuth(request);
 
   if (!credentials || credentials.username !== AUTH_USERNAME || credentials.password !== AUTH_PASSWORD) {
@@ -19,15 +22,13 @@ export async function GET(request: NextRequest) {
     );
   }
 
+  if (!userId) {
+    return NextResponse.json({ error: 'User ID is required' }, { status: 400 });
+  }
+
   try {
-    const data = await request.json();
-
-    if (!data.userId) {
-      return NextResponse.json({ error: 'User ID is required' }, { status: 400 });
-    }
-
     const user = await prisma.user.findFirst({
-      where: { id: data.userId },
+      where: { id: userId },
       select: {
         id: true,
         region: true,
@@ -58,3 +59,4 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
+

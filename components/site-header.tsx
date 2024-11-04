@@ -5,10 +5,10 @@ import { ModeToggle } from "./mode-toggle";
 import { DropDownMenuComponent } from "./drop-down-menu";
 import { MdNotifications } from "react-icons/md";
 import { useCurrentUser } from "./context/CurrentUserContext";
-import NotificationLottieAnimation from "./lottie-icon-animations/Notification";
 import { Label } from "./ui/label";
 import { useEffect } from "react";
 import { io } from "socket.io-client";
+import { NotificationDropdown } from "./notification-dropdown";
 
 export const SiteHeader = () => {
     const { currentUser } = useCurrentUser();
@@ -31,15 +31,15 @@ export const SiteHeader = () => {
                 <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
                     <div className="w-full flex-1 md:w-auto md:flex-none">
                     </div>
-                    <nav className="flex items-center gap-2 ml-auto">
-                        {/* <MdNotifications size={25}/> */}
-                        <NotificationLottieAnimation
+                    <nav className="flex items-center gap-5 ml-auto">
+                        <NotificationDropdown />
+                        {/* <NotificationLottieAnimation
                             width={25}
                             height={25}
                             loop={false}
                             autoplay={false}
-                        />
-                       <Label> Welcome back {currentUser?.name?.split(' ')[0]}</Label>
+                        /> */}
+                        <Label> Welcome back {currentUser?.name?.split(' ')[0]}</Label>
                         <DropDownMenuComponent />
                         <ModeToggle />
                     </nav>

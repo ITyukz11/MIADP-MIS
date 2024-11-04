@@ -19,7 +19,7 @@ import { EnterPasswordDialog } from "@/components/dialog/enter-password";
 import { useEffect, useState } from "react";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { componentOptions, regionOptions, unitOptions } from "@/lib/data/filter";
+import { componentOptions, positionOptions, regionOptions, unitOptions } from "@/lib/data/filter";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { updateprofile } from "@/actions/profile/updateprofile";
 import { toast } from "@/components/ui/use-toast";
@@ -240,7 +240,33 @@ export function ProfileDialog({ open, setClose }: ProfileDialogProps) {
                                         </FormItem>
                                     )}
                                 />
-                                <FormField
+                                  <FormField
+                                name='position'
+                                control={form.control}
+                                render={({ field }) => (
+                                    <FormItem className="grid grid-cols-4 items-center gap-4">
+                                        <FormLabel className="text-xs sm:text-sm text-right flex justify-end">Position<FormMessage /></FormLabel>
+                                        <Select
+                                            onValueChange={field.onChange}
+                                            defaultValue={field.value}
+                                            disabled={loading}
+                                            value={field.value}
+                                        >
+                                            <FormControl className="col-span-3">
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Select a position" />
+                                                </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent>
+                                                {positionOptions.map((option, index) => (
+                                                    <SelectItem key={index} value={option}>{option}</SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                    </FormItem>
+                                )}
+                            />
+                                {/* <FormField
                                     control={form.control}
                                     name="position"
                                     render={({ field }) => (
@@ -256,7 +282,7 @@ export function ProfileDialog({ open, setClose }: ProfileDialogProps) {
                                             </FormControl>
                                         </FormItem>
                                     )}
-                                />
+                                /> */}
                                 {form.watch("component") == 'Component 4' && (
                                     <FormField
                                         name='unit'

@@ -304,7 +304,7 @@ const CalendarForm = ({ setDialogClose, individualActivity_ }: Props) => {
                                     ),
                                 })
 
-                                dispatch(fetchActivitiesData())
+                                // dispatch(fetchActivitiesData())
                             } catch (error) {
                                 console.error("Error submitting calendar activity:", error);
 
@@ -481,6 +481,7 @@ const CalendarForm = ({ setDialogClose, individualActivity_ }: Props) => {
                         placeholder='Type your description here.'
                         isDisabled={loadingForm}
                         isTextarea
+                        tabIndex={0}
                     />
                     <div className='flex flex-row flex-wrap sm:grid grid-cols-3 gap-2'>
                         {form.watch('type') === "Other" ?

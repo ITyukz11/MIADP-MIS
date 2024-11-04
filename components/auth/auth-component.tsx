@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button"
 import { LoginForm } from "./login-form"
 import Autoplay from "embla-carousel-autoplay"
 
-
 import {
     Carousel,
     CarouselContent,
@@ -15,7 +14,7 @@ import {
 } from "@/components/ui/carousel"
 import { RegisterForm } from "./register-form"
 import { useState } from "react"
-import {motion } from "framer-motion"
+import { motion } from "framer-motion"
 
 export const metadata: Metadata = {
     title: "Authentication",
@@ -26,34 +25,34 @@ export default function AuthenticationPage() {
     const [userLogginIn, setUserLogginIn] = useState(true)
 
     const images = [
-    {
-        src: '/miadp-pso.jpg',
-        alt: 'miadp-pso logo'
-    },
-    {
-        src: '/miadp-region-ix.jpg',
-        alt: 'miadp-region-ix logo'
-    },
-    {
-        src: '/miadp-region-x.jpg',
-        alt: 'miadp-region-x logo'
-    },
-    {
-        src: '/miadp-region-xi.jpg',
-        alt: 'miadp-region-xi logo'
-    },
-    {
-        src: '/miadp-region-xii.jpg',
-        alt: 'miadp-region-xii logo'
-    },
-    {
-        src: '/miadp-region-xiii.jpg',
-        alt: 'miadp-region-xiii logo'
-    },
-    {
-        src: '/miadp-barmm.jpg',
-        alt: 'miadp-barmm logo'
-    },
+        {
+            src: '/miadp-pso.jpg',
+            alt: 'miadp-pso logo'
+        },
+        {
+            src: '/miadp-region-ix.jpg',
+            alt: 'miadp-region-ix logo'
+        },
+        {
+            src: '/miadp-region-x.jpg',
+            alt: 'miadp-region-x logo'
+        },
+        {
+            src: '/miadp-region-xi.jpg',
+            alt: 'miadp-region-xi logo'
+        },
+        {
+            src: '/miadp-region-xii.jpg',
+            alt: 'miadp-region-xii logo'
+        },
+        {
+            src: '/miadp-region-xiii.jpg',
+            alt: 'miadp-region-xiii logo'
+        },
+        {
+            src: '/miadp-barmm.jpg',
+            alt: 'miadp-barmm logo'
+        },
     ]
 
 
@@ -105,10 +104,10 @@ export default function AuthenticationPage() {
 
                     </div>
 
-                    <div className="relative z-20">
+                    <div className="relative z-20 " >
                         <blockquote className="space-y-2">
                             <p className="text-base">
-                            Welcome to the MIADP Management Information System! Our system tracks encoded documents, streamlines management, features a calendar to track events, and an activity feed.
+                                Welcome to the MIADP Management Information System! Our system tracks encoded documents, streamlines management, features a calendar to track events, and an activity feed.
                             </p>
                             <footer className="text-sm">Binyang Maria</footer>
                         </blockquote>
@@ -118,39 +117,39 @@ export default function AuthenticationPage() {
                     <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px] h-full">
                         <div className="flex flex-row w-full justify-center items-center h-full">
 
-                        {userLogginIn?
-                  
-                        <motion.div
-                            className="w-full"
-                            key="login"
-                            initial={{ x: '-100%', opacity: 0 }}
-                            animate={{ x: 0, opacity: 1 }}
-                            exit={{ x: '-100%', opacity: 0 }}
-                        >
-                            <LoginForm />
-                        </motion.div>
-                    :
-                            <motion.div
-                            className="w-full h-full"  
-                                key="register"
-                                initial={{ x: '60%', opacity: 0 }}
-                                animate={{ x: 0, opacity: 1 }}
-                                exit={{ x: '100%', opacity: 0 }}
-                            >
-                                <RegisterForm backToLogin={()=> setUserLogginIn(true)}/>
-                            </motion.div>
-                      }
+                            {userLogginIn ?
+
+                                <motion.div
+                                    className="w-full"
+                                    key="login"
+                                    initial={{ x: '-100%', opacity: 0 }}
+                                    animate={{ x: 0, opacity: 1 }}
+                                    exit={{ x: '-100%', opacity: 0 }}
+                                >
+                                    <LoginForm />
+                                </motion.div>
+                                :
+                                <motion.div
+                                    className="w-full h-full"
+                                    key="register"
+                                    initial={{ x: '60%', opacity: 0 }}
+                                    animate={{ x: 0, opacity: 1 }}
+                                    exit={{ x: '100%', opacity: 0 }}
+                                >
+                                    <RegisterForm backToLogin={() => setUserLogginIn(true)} />
+                                </motion.div>
+                            }
                         </div>
-                  
-                        
-                        
+
+
+
                         <Button
-                    variant={'link'}
-                    onClick={() => setUserLogginIn(!userLogginIn)}
-                >
-                    {userLogginIn ? "Don't have an account?" : "Already have an account?"}
-                </Button>
-                {/* <p className="px-8 text-center text-sm text-muted-foreground">
+                            variant={'link'}
+                            onClick={() => setUserLogginIn(!userLogginIn)}
+                        >
+                            {userLogginIn ? "Don't have an account?" : "Already have an account?"}
+                        </Button>
+                        {/* <p className="px-8 text-center text-sm text-muted-foreground">
 
 
                             By clicking continue, you agree to our{" "}
@@ -172,6 +171,7 @@ export default function AuthenticationPage() {
                     </div>
                 </div>
             </div>
+
         </div>
     )
 }

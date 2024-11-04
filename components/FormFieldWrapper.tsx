@@ -22,7 +22,9 @@ type FormFieldWrapperProps<T extends FieldValues> = {
     onTogglePasswordVisibility?: () => void;
     tabIndex?: number;
     isFocus?: boolean;
+    note?:string;
     className?:string
+
 };
 
 const FormFieldWrapper = <T extends FieldValues>({
@@ -39,6 +41,7 @@ const FormFieldWrapper = <T extends FieldValues>({
     onTogglePasswordVisibility,
     tabIndex = -1,
     isFocus = false,
+    note,
     className
 }: FormFieldWrapperProps<T>) => {
     const inputRef = useRef<HTMLInputElement>(null);
@@ -62,6 +65,7 @@ const FormFieldWrapper = <T extends FieldValues>({
                 <FormItem className="w-full">
                     <FormLabel className="flex flex-row gap-1">
                         {label} {isOptional && <Label className="text-xs font-light">(Optional)</Label>}
+                        {note && <Label className="text-xs font-light">{note}</Label>}
                         <FormMessage />
                     </FormLabel>
                     <FormControl className='overflow-hidden'>

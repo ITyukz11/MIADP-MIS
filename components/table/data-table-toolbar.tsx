@@ -13,13 +13,15 @@ import { CalendarDateRangePicker } from '../dashboard/date-range-picker';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '../ui/select';
 import * as ExcelJS from 'exceljs';
 import { useCalendarOfActivityFilter } from '../context/FilterRegionContext';
+import { useSelector } from '@/app/store/store';
+import { capitalizeEachWord } from '@/utils/capitalizeEachWord';
 
 interface DataTableToolbarProps<TData> {
   data: TData[];
   table: TanstackTable<TData>;
   selectedRows: Record<string, boolean>;
   allowDateRange: boolean
-  allowExportToExcel?:boolean
+  allowExportToExcel?: boolean
 }
 
 type CSVRow = Record<string, any>;
@@ -37,7 +39,7 @@ export function DataTableToolbar<TData>({
   const [filterInput, setFilterInput] = useState<string>("");
 
   const { currentFilter } = useCalendarOfActivityFilter();
-
+  const { usersData, loadingUser, errorUser } = useSelector((state) => state.users)
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
     from: new Date(2024, 0, 1), // January 1, 2024
     to: new Date(2024, 11, 31), // December 31, 2024
@@ -151,11 +153,12 @@ export function DataTableToolbar<TData>({
     try {
       // Get visible columns and data
       const visibleColumns = table.getAllColumns().filter(column => {
-       if(column.id != "#"){
-        return column.getIsVisible()
-       }
-       });
-      const headers = ['#', 'Region','Unit/Component', ...visibleColumns.map(column => column.id)];
+        if (column.id != "#") {
+          return column.getIsVisible()
+        }
+      });
+
+      const headers = ['#', 'Region', 'Unit/Component', ...visibleColumns.map(column => column.id), 'Participants'];
 
       // Define title, date, and filter data
       const title = 'CALENDAR OF ACTIVITIES';
@@ -188,12 +191,12 @@ export function DataTableToolbar<TData>({
       worksheet.mergeCells('A4:' + String.fromCharCode(65 + headers.length - 1) + '4');
       const dateRangeCell = worksheet.getCell('A4');
       dateRangeCell.value = filteredDate
-      dateRangeCell.font = { 
-        size: 12, 
+      dateRangeCell.font = {
+        size: 12,
         bold: true,          // Bold text
         underline: 'single'  // Underline text
       };
-      dateRangeCell.alignment = { horizontal: 'center', vertical: 'middle',  };
+      dateRangeCell.alignment = { horizontal: 'center', vertical: 'middle', };
 
       // Add a blank row for spacing
       worksheet.addRow([]);
@@ -218,7 +221,7 @@ export function DataTableToolbar<TData>({
       });
 
       // Add rows using key-value pairs
-      const rows = table.getFilteredRowModel().rows.map(row => {
+      let rows = table.getFilteredRowModel().rows.map(row => {
         const rowData = visibleColumns.reduce((acc, column) => {
           acc[column.id] = (row.original as any)[column.id] || '';
           return acc;
@@ -229,29 +232,101 @@ export function DataTableToolbar<TData>({
         rowData['Region'] = user.region
         rowData['Unit/Component'] = user.unit || user.component || '';
 
+        const participantsData = (row.original as any).participants || {}
+        console.log("data: ", participantsData)
+
+        const participants: (string | undefined)[] = []
+
+        {
+          participantsData.map((participant: any, index: number) => {
+            const user = usersData.find(user => user.id === participant.userId);
+            // console.log("participan user: ", user?.name)
+            participants.push(capitalizeEachWord(user?.name || ''))
+          })
+        }
+        // console.log(participants.toLocaleString())
+        rowData['Participants'] = participants.toLocaleString()
         return rowData;
+      });
+
+      // Sort rows by DATEFROM column in ascending alphabetical order
+      rows.sort((a: any, b: any) => {
+        const dateA: any = new Date(a.dateFrom);
+        const dateB: any = new Date(b.dateFrom);
+        return dateA - dateB;
       });
 
       // Add an incremental number in the first column
       rows.forEach((data: any, index: number) => {
-        const rowValues = [index + 1, data['Region'],data['Unit/Component'], ...headers.slice(3).map(header => data[header])]; // Ensure correct order
+
+        const rowValues = [index + 1, data['Region'], data['Unit/Component'], ...headers.slice(3).map(header => data[header])]; // Ensure correct order
         const row = worksheet.addRow(rowValues);
 
         // Add alternate row colors and styles
-      row.eachCell({ includeEmpty: true }, (cell) => {
+        row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
           cell.alignment = { wrapText: true, vertical: 'middle' }; // Wrap text and center vertically
-          if (index % 2 === 0) {
-            cell.fill = {
-              type: 'pattern',
-              pattern: 'solid',
-              fgColor: { argb: 'F2F2F2' } // Light gray for even rows
-            };
+
+          // Check if the cell is in the 'Status' column
+          if (headers[colNumber - 1] === 'status') {
+            switch (cell.value) {
+              case 'Ongoing':
+                cell.fill = {
+                  type: 'pattern',
+                  pattern: 'solid',
+                  fgColor: { argb: '00a354' } // Green
+                };
+                break;
+              case 'Upcoming':
+                cell.fill = {
+                  type: 'pattern',
+                  pattern: 'solid',
+                  fgColor: { argb: 'f2c018' } // Yellow
+                };
+                break;
+              case 'Completed':
+                cell.fill = {
+                  type: 'pattern',
+                  pattern: 'solid',
+                  fgColor: { argb: '4682B4' } // Blue
+                };
+                break;
+              case 'Cancelled':
+                cell.fill = {
+                  type: 'pattern',
+                  pattern: 'solid',
+                  fgColor: { argb: 'b03620' } // Red
+                };
+                break;
+              case 'Postponed':
+                cell.fill = {
+                  type: 'pattern',
+                  pattern: 'solid',
+                  fgColor: { argb: 'e38812' } // Orange
+                };
+                break;
+              default:
+                cell.fill = {
+                  type: 'pattern',
+                  pattern: 'solid',
+                  fgColor: { argb: 'FFFFFF' } // Default white color
+                };
+                break;
+            }
           } else {
-            cell.fill = {
-              type: 'pattern',
-              pattern: 'solid',
-              fgColor: { argb: 'DCE6F1' } // Light blue for odd rows
-            };
+            // Apply alternate row coloring for non-status cells
+            if (index % 2 === 0) {
+              cell.fill = {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: { argb: 'F2F2F2' } // Light gray for even rows
+              };
+            } else {
+              cell.fill = {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: { argb: 'DCE6F1' } // Light blue for odd rows
+              };
+            }
           }
           cell.border = {
             top: { style: 'thin', color: { argb: '000000' } },
@@ -262,6 +337,7 @@ export function DataTableToolbar<TData>({
         });
       });
 
+
       // Set column widths based on header names
       headers.forEach((header, index) => {
         const column = worksheet.getColumn(index + 1);
@@ -270,12 +346,19 @@ export function DataTableToolbar<TData>({
             column.width = 3;
             break;
           case 'ACTIVITYTITLE':
+            column.width = 40;
+            break;
           case 'LOCATION':
+            column.width = 15;
+            break;
           case 'ACTIVITYDESCRIPTION':
             column.width = 35;
             break;
           case 'UNIT/COMPONENT':
             column.width = 17;
+            break;
+          case 'PARTICIPANTS':
+            column.width = 30;
             break;
           default:
             column.width = 12;
@@ -319,15 +402,15 @@ export function DataTableToolbar<TData>({
           />
           <SearchIcon className='absolute right-2 top-2 h-4 w-4' />
         </div>
-        {allowExportToExcel && 
-        <Button
-        variant="outline"
-        className="flex flex-row gap-1 items-center justify-center"
-        onClick={handleExportToExcel}
-      >
-        <AiOutlineExport className='w-4 h-4 shrink-0' />  Export to Excel
-      </Button>}
-        
+        {allowExportToExcel &&
+          <Button
+            variant="outline"
+            className="flex flex-row gap-1 items-center justify-center"
+            onClick={handleExportToExcel}
+          >
+            <AiOutlineExport className='w-4 h-4 shrink-0' />  Export to Excel
+          </Button>}
+
         <Button variant="outline" disabled className='cursor-not-allowed'>
           <AiOutlinePrinter className='w-5 h-5 shrink-0' /> Print
         </Button>
@@ -354,23 +437,23 @@ export function DataTableToolbar<TData>({
               onDateChange={setDateRange}
             />
             <Select onValueChange={setSelectedMonth} value={selectedMonth} disabled={false}>
-          <SelectTrigger className="w-fit">
-            <SelectValue placeholder="Select Month" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectGroup>
-              <SelectLabel>Month</SelectLabel>
-              {monthOptions.map((option) => (
-                <SelectItem key={option.value} value={option.value}>
-                  {option.label}
-                </SelectItem>
-              ))}
-            </SelectGroup>
-          </SelectContent>
-        </Select>
+              <SelectTrigger className="w-fit">
+                <SelectValue placeholder="Select Month" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectLabel>Month</SelectLabel>
+                  {monthOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
           </>
         )}
-        
+
         {/* <Button
               variant="outline"
               className="flex flex-row gap-1 items-center justify-center"

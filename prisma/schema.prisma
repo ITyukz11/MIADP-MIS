@@ -35,6 +35,8 @@ model User {
   messages                      Message[]
   doctrackDocuments             DoctrackDocuments[]
   doctrackDocumentIncomingRoute DoctrackDocumentIncomingRoute[]
+  subProjectCode                SubProjectCode[]
+  subProjectPhoto               SubProjectPhoto[]
   status                        String                          @default("Approved") // Status field to track approval status (e.g., "approved", "disapproved", "pending")
   createdAt                     DateTime                        @default(now()) @map(name: "created_at")
   updatedAt                     DateTime                        @updatedAt @map(name: "updated_at")
@@ -230,8 +232,8 @@ model CalendarOfActivityAttachments {
 
 model DoctrackDocuments {
   id             String                          @id @default(cuid())
-  userId         String                      
-  user           User       @relation(fields: [userId], references: [id])
+  userId         String
+  user           User                            @relation(fields: [userId], references: [id])
   subject        String
   description    String
   link           String
@@ -248,18 +250,18 @@ model DoctrackDocuments {
 }
 
 model DoctrackDocumentIncomingRoute {
-  id         String     @id @default(cuid())
-  userId     String                      
-  user       User       @relation(fields: [userId], references: [id])
-  subject    String
-  purpose    String
-  remarks    String
-  documentId String
-  document   DoctrackDocuments                     @relation(fields: [documentId], references: [id])
-  doctrackDocumentIncomingRouteTo         DoctrackDocumentIncomingRouteTo[] //Receiver
-  doctrackDocumentIncomingRouteStatus     DoctrackDocumentIncomingRouteStatus[]
-  updatedAt  DateTime                              @updatedAt @map(name: "updated_at")
-  createdAt  DateTime                              @default(now()) @map(name: "created_at")
+  id                                  String                                @id @default(cuid())
+  userId                              String
+  user                                User                                  @relation(fields: [userId], references: [id])
+  subject                             String
+  purpose                             String
+  remarks                             String
+  documentId                          String
+  document                            DoctrackDocuments                     @relation(fields: [documentId], references: [id])
+  doctrackDocumentIncomingRouteTo     DoctrackDocumentIncomingRouteTo[] //Receiver
+  doctrackDocumentIncomingRouteStatus DoctrackDocumentIncomingRouteStatus[]
+  updatedAt                           DateTime                              @updatedAt @map(name: "updated_at")
+  createdAt                           DateTime                              @default(now()) @map(name: "created_at")
 }
 
 model DoctrackDocumentIncomingRouteTo {
@@ -274,7 +276,7 @@ model DoctrackDocumentIncomingRouteTo {
 model DoctrackDocumentIncomingRouteStatus {
   id                              String                        @id @default(cuid())
   status                          String
-  doctrackDocumentIncomingRouteId String                        
+  doctrackDocumentIncomingRouteId String
   doctrackDocumentIncomingRoute   DoctrackDocumentIncomingRoute @relation(fields: [doctrackDocumentIncomingRouteId], references: [id])
   createdAt                       DateTime                      @default(now()) @map(name: "created_at")
 }
@@ -302,7 +304,45 @@ model DoctrackDocumentOutgoingRouteTo {
 model DoctrackDocumentOutgoingRouteStatus {
   id                              String                        @id @default(cuid())
   status                          String
-  doctrackDocumentOutgoingRouteId String                        
+  doctrackDocumentOutgoingRouteId String
   doctrackDocumentOutgoingRoute   DoctrackDocumentOutgoingRoute @relation(fields: [doctrackDocumentOutgoingRouteId], references: [id])
   createdAt                       DateTime                      @default(now()) @map(name: "created_at")
+}
+
+model SubProjectCode {
+  id                     String            @id @default(cuid())
+  briefDescription       String?
+  sequentialNum          String           
+  subprojectTitle        String
+  component              String
+  sharedFundingWithInfra Boolean?
+  region                 String
+  province               String
+  municipality           String
+  ancestralDomainLoc     String
+  type                   String
+  coordinate             String
+  measurement            String?
+  physicalIndicator      String?
+  tepc                   String
+  subProjectPhoto        SubProjectPhoto[] // Corrected type to reference the SubProjectPhoto array
+  code                   String            @unique
+  userId                 String
+  user                   User              @relation(fields: [userId], references: [id])
+  updatedAt              DateTime          @updatedAt @map(name: "updated_at")
+  createdAt              DateTime          @default(now()) @map(name: "created_at")
+}
+
+model SubProjectPhoto {
+  id               String         @id @default(cuid())
+  fileName         String
+  briefDescription String?
+  publicId         String         @unique
+  format           String
+  version          String
+  subProjectCodeId String
+  subProjectCode   SubProjectCode @relation(fields: [subProjectCodeId], references: [id])
+  userId           String
+  user             User           @relation(fields: [userId], references: [id])
+  createdAt        DateTime       @default(now()) @map(name: "created_at")
 }

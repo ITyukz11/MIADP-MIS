@@ -10,13 +10,14 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Label } from "./ui/label"
 import { TbCloudDataConnection } from "react-icons/tb"
-import { navLinks } from "@/config/nav-links"
+import { navLinks } from "@/app/(app)/_components/site-header/nav-links"
 import { Badge } from "./ui/badge"
 import { useCurrentUser } from "./context/CurrentUserContext"
 
 export function MobileNav() {
     const [open, setOpen] = React.useState(false)
     const pathname = usePathname()
+    
     const router = useRouter()
     const { currentUser } = useCurrentUser()
     

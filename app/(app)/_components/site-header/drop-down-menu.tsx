@@ -14,17 +14,17 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { FaBook, FaUser, FaWpforms } from "react-icons/fa";
 import { MdLiveHelp, MdLogout } from "react-icons/md";
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "../../../../components/ui/avatar";
 import { signOut } from "next-auth/react";
 import { TbNumber123, TbPlugConnectedX } from "react-icons/tb";
 import { useState } from "react";
-import { ProfileDialog } from "./profile/dialog/profile-dialog";
-import { useCurrentUser } from "./context/CurrentUserContext";
+import { ProfileDialog } from "../../../../components/profile/dialog/profile-dialog";
+import { useCurrentUser } from "../../../../components/context/CurrentUserContext";
 import { useRouter } from "next/navigation";
 import { IoAirplane } from "react-icons/io5";
-import RequestFormPalTicket from "./dialog/form-pal-ticket";
-import RequestFormPalTicketTest from "./dialog/form-pal-ticket-test";
-import GenerateCodeDialog from "./dialog/generate-code-dialog";
+import RequestFormPalTicket from "../../../../components/dialog/form-pal-ticket";
+import RequestFormPalTicketTest from "../../../../components/dialog/form-pal-ticket-test";
+import GenerateCodeDialog from "../../../../components/dialog/generate-code-dialog";
 
 interface DropDownMenuComponentProps {
 
@@ -68,8 +68,8 @@ export const DropDownMenuComponent = ({ }: DropDownMenuComponentProps) => {
             <DropdownMenuSubTrigger><FaWpforms className="mr-2"/>Forms</DropdownMenuSubTrigger>
             <DropdownMenuPortal>
               <DropdownMenuSubContent>
-              <DropdownMenuItem onClick={()=> setGenerateDialog(!openGenerateDialog)}><TbNumber123/>Request Subproject Code</DropdownMenuItem>
-                <DropdownMenuItem onClick={()=> setPalTicketDialog(true)}><IoAirplane/>Request Form for PAL Ticket</DropdownMenuItem>
+                <DropdownMenuItem disabled onClick={()=> setGenerateDialog(!openGenerateDialog)}><TbNumber123/>Request Subproject Code</DropdownMenuItem>
+                <DropdownMenuItem disabled onClick={()=> setPalTicketDialog(true)}><IoAirplane/>Request Form for PAL Ticket</DropdownMenuItem>
               </DropdownMenuSubContent>
             </DropdownMenuPortal>
           </DropdownMenuSub>
@@ -85,8 +85,8 @@ export const DropDownMenuComponent = ({ }: DropDownMenuComponentProps) => {
       </DropdownMenu>
 
       <ProfileDialog open={profileDialog} setClose={()=> setProfileDialog(!profileDialog)}/>
-      <RequestFormPalTicketTest open={palTicketDialog} close={()=> setPalTicketDialog(!palTicketDialog)}/>
-      <GenerateCodeDialog open={openGenerateDialog} close={()=> setGenerateDialog(!openGenerateDialog)}/>
+      {/* <RequestFormPalTicketTest open={palTicketDialog} close={()=> setPalTicketDialog(!palTicketDialog)}/>
+      <GenerateCodeDialog open={openGenerateDialog} close={()=> setGenerateDialog(!openGenerateDialog)}/> */}
     </>
   )
 }

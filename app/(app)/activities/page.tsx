@@ -12,6 +12,7 @@ import SelectTypeOfActivity from './components/SelectTypeOfActivity';
 import SelectFilterRegUniCom from './components/SelectFilterRegUniCom';
 import SelectFilterUnit from './components/SelectFilterUnit';
 import { useActivitiesData } from '@/lib/calendar-of-activity/useActivitiesDataHook';
+import { Card, CardContent } from '@/components/ui/card';
 
 type Props = {}
 
@@ -27,18 +28,10 @@ const Page = (props: Props) => {
 
   const handleViewRowIdPressed = (viewId: string) => {
     setSelectedRowId(viewId);
-    // console.log("viewId ZZ: ", viewId)
   };
-  // const { activities, loading, error } = useCalendarOfActivityContext();
-
-  // const dispatch = useDispatch();
-  // const { activitiesData, activityLoading, activityError } = useSelector((state) => state.activity);
+ 
   const { activitiesData, activityError, activityLoading } = useActivitiesData()
-  // useEffect(() => {
-  //   if (activitiesData.length === 0) {
-  //     dispatch(fetchActivitiesData());
-  //   }
-  // }, [dispatch, activitiesData.length]);
+
 
 
   useEffect(() => {
@@ -80,7 +73,7 @@ const Page = (props: Props) => {
       console.log("region: ", currentFilter?.filter);
       console.log("unit/component: ", currentFilter?.unit);
       setFilteredData(coaData);  // Return all data
-    } 
+    }
     else if (currentFilter?.filter !== 'All' && currentFilter?.unit === 'All') {
       console.log("2");
       console.log("region: ", currentFilter?.filter);
@@ -95,7 +88,7 @@ const Page = (props: Props) => {
       console.log("region: ", currentFilter?.filter);
       console.log("unit/component: ", currentFilter?.unit);
       const filtered = coaData.filter(item =>
-        item.user?.unit === currentFilter?.unit || 
+        item.user?.unit === currentFilter?.unit ||
         item.user?.component === currentFilter?.unit
       );
       setFilteredData(filtered);  // Filter by unit/component only
@@ -107,15 +100,15 @@ const Page = (props: Props) => {
       const filtered = coaData.filter(item =>
         item.user?.region === currentFilter?.filter &&
         (
-          item.user?.unit === currentFilter?.unit || 
+          item.user?.unit === currentFilter?.unit ||
           item.user?.component === currentFilter?.unit
         )
       );
       setFilteredData(filtered);  // Filter by both region and unit/component
     }
   }, [currentFilter, coaData]);
-  
-  
+
+
 
   const hiddenColumns = [
     'id',
@@ -132,26 +125,28 @@ const Page = (props: Props) => {
   return (
     <div>
       <div className='flex flex-col flex-wrap w-full'>
-        <div className='flex flex-row gap-2 overflow-x-auto w-full scrollbar-thin p-1'>
-          <SelectFilterRegUniCom/>
-          <SelectFilterUnit/>
-          <SelectTypeOfActivity/>
-        </div>
-
         {!activityLoading ? (
-          <div className='w-full overflow-x-auto scrollbar-thin p-1'>
-            <DataTable
-              data={filteredData}
-              columns={columns}
-              hiddenColumns={hiddenColumns}
-              allowSelectRow={false}
-              allowViewCalendar={true}
-              onViewRowId={handleViewRowIdPressed}
-              setAllowViewCalendar={() => setViewCalendar(!viewCalendar)}
-              allowDateRange={true}
-              allowExportToExcel
-            />
-          </div>
+          <Card className='w-full overflow-auto crollbar-thin p-1'>
+            <CardContent className='p-4'>
+              <div className='flex flex-row gap-2 overflow-x-auto w-full scrollbar-thin p-1'>
+                <SelectFilterRegUniCom />
+                <SelectFilterUnit />
+                <SelectTypeOfActivity />
+              </div>
+              <DataTable
+                data={filteredData}
+                columns={columns}
+                hiddenColumns={hiddenColumns}
+                allowSelectRow={false}
+                allowViewCalendar={true}
+                onViewRowId={handleViewRowIdPressed}
+                setAllowViewCalendar={() => setViewCalendar(!viewCalendar)}
+                allowDateRange={true}
+                allowExportToExcel
+              />
+            </CardContent>
+
+          </Card>
         ) : (
           <div className="flex flex-col space-y-3">
             <Skeleton className="h-[250px] w-full rounded-xl" />

@@ -8,7 +8,7 @@ import CalendarFormDialog from './calendar-form-dialog'
 import { useDispatch, useSelector } from '@/app/store/store'
 import { useActivitiesData } from '@/lib/calendar-of-activity/useActivitiesDataHook'
 // import { setActivitiesData, setActivityError, setActivityLoading } from '@/app/store/activityReducer'
-import { Calendar, RefreshCw, TableIcon } from 'lucide-react'
+import { Calendar, List, RefreshCw, TableIcon } from 'lucide-react'
 import { Label } from '@radix-ui/react-label'
 import { Card, CardContent } from '@/components/ui/card'
 import { ViewMySchedDialog } from './view-my-sched-dialog'
@@ -56,7 +56,7 @@ export default function ActivitiesLayout({ children }: ActivitiesLayoutProps) {
   // }, [activitiesData]);
 
   return (
-    <div className="xs:container space-y-2">
+    <div className="xs:container space-y-4">
       <div className='flex flex-row flex-wrap justify-center gap-2 md:justify-between'>
         <div className='flex flex-col'>
           <div className='flex flex-row gap-2 items-center'>
@@ -83,6 +83,13 @@ export default function ActivitiesLayout({ children }: ActivitiesLayoutProps) {
               <ViewMyParticipatedSchedDialog />
             </div>
             <div className='flex sm:flex-row gap-2 flex-wrap justify-center sm:justify-end'>
+              <Link href="/activities/list"
+                className={cn(buttonVariants({ variant: 'secondary' }),
+                  "hover:bg-blue-100 dark:hover:bg-blue-700 rounded-[6px] xs:w-[200px] md:w-fit flex flex-row gap-1 items-center justify-center overflow-hidden text-xs lg:text-sm", {
+                  'font-bold hover:bg-blue-100 dark:hover:bg-blue-700 bg-blue-100 dark:bg-blue-700': pathname === '/activities/list'
+                })}>
+                <List size={22} /> List
+              </Link>
               <Link href="/activities"
                 className={cn(buttonVariants({ variant: 'secondary' }),
                   "hover:bg-blue-100 dark:hover:bg-blue-700 rounded-[6px] xs:w-[200px] md:w-fit flex flex-row gap-1 items-center justify-center overflow-hidden text-xs lg:text-sm", {
@@ -117,8 +124,9 @@ export default function ActivitiesLayout({ children }: ActivitiesLayoutProps) {
           </CardContent>
         </Card>
       </div>
-
-      {children}
+      <div className='flex justify-center'>
+        {children}
+      </div>
       <MajorOrIndividualDialog
         open={planningActivityOpen}
         setClose={() => setPlanningActivityOpen(!planningActivityOpen)}

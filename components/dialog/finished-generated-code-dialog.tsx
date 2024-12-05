@@ -12,58 +12,22 @@ import confetti from 'canvas-confetti';
 import { Label } from '@/components/ui/label';
 import html2canvas from 'html2canvas'; // Import html2canvas
 import { FaDownload, FaPrint } from 'react-icons/fa';
-import { codeComponent, codeProvince, codeRegion, codeType } from '@/app/(app)/admin/generate-code/(datas)/data';
+import { codeAncestralDomain, codeComponent, codeProvince, codeRegion, codeType } from '@/app/(app)/admin/generate-code/(datas)/data';
 import { GenerateQRCodeWithLogo } from '../GenerateQrCodeWithLogo';
 
 
 interface FinishedGeneratedCodeDialogProps {
     open: boolean;
     close: () => void;
-    GeneratedCode: string;
     SubprojectTitle: string;
     SubprojectInformations: any
+    subProjectADLocation?: string
 }
 
-function FinishedGeneratedCode({ open, close, GeneratedCode, SubprojectTitle, SubprojectInformations }: FinishedGeneratedCodeDialogProps) {
-    const [labelSubProjectInformations, setLabelSubProjectInformations] = useState<any>({})
+function FinishedGeneratedCode({ open, close, SubprojectTitle, SubprojectInformations, subProjectADLocation }: FinishedGeneratedCodeDialogProps) {
+
     const [qrCode, setQrCode] = useState<string | null>(null);
-    useEffect(() => {
-        if (open) {
-            // Create a copy of the SubprojectInformations object to store the label mappings
-            let labelMapping: any = {};
-
-            // Loop through each property of SubprojectInformations
-            Object.entries(SubprojectInformations).forEach(([key, value]: [string, any]) => {
-                // Find the corresponding label in codeProvince
-                let component = codeComponent.find((item) => item.value === value);
-                if (component) {
-                    labelMapping[key] = component.label;
-                }
-
-                // Find the corresponding label in codeProvince
-                let province = codeProvince.find((item) => item.value === value);
-                if (province) {
-                    labelMapping[key] = province.label;
-                }
-
-                // Find the corresponding label in codeRegion
-                let region = codeRegion.find((item) => item.value === value);
-                if (region) {
-                    labelMapping[key] = region.label;
-                }
-
-                // Find the corresponding label in codeType
-                let type = codeType.find((item) => item.value === value);
-                if (type) {
-                    labelMapping[key] = type.label;
-                }
-            });
-
-            // Update the state with the mapped labels
-            setLabelSubProjectInformations(labelMapping);
-        }
-    }, [open, SubprojectInformations]);
-
+    console.log("SubprojectInformations: ", SubprojectInformations)
 
     useEffect(() => {
         if (open) {
@@ -167,15 +131,20 @@ function FinishedGeneratedCode({ open, close, GeneratedCode, SubprojectTitle, Su
                         margin-left: 20px;
                         font-size: 17px;
                         font-weight: bold;
+                        margin-top:60px;
                     }
     
                     .signatory-section {
-                        font-size: 18px;
+                        font-size: 14px;
                         display: flex;
                         justify-content: space-between;
                         padding: 0 20px;
                     }
-                   
+                    td{
+                    font-size: 14px;
+                    border: 1px solid black; 
+                    padding: 8px;
+                    }
     
                     /* Scale down content if it overflows */
                     @media print {
@@ -191,14 +160,13 @@ function FinishedGeneratedCode({ open, close, GeneratedCode, SubprojectTitle, Su
                     <!-- Header with image -->
                     <div class="header">
                         <img src="/images/header.png" alt="Header Image" />
-                        <h1>${SubprojectTitle}</h1>
-                        <h2>Subproject ID Number</h2>
+                        <h1>Subproject ID Number</h1>
                     </div>
     
                     <div class="content">
     <div style="text-align: center; margin-bottom: 20px;">
         <img class="qrcode" src=${qrCode} alt="QR Code" />
-        <div class="generated-code"><b>${GeneratedCode}</b></div>
+        <div class="generated-code"><b>${SubprojectInformations.code}</b></div>
     </div>
 
     <hr />
@@ -210,47 +178,85 @@ function FinishedGeneratedCode({ open, close, GeneratedCode, SubprojectTitle, Su
             <th style="border: 1px solid black; padding: 8px;">Field</th>
             <th style="border: 1px solid black; padding: 8px;">Details</th>
         </tr>
+           <tr>
+            <td><b>Subproject Title</b></td>
+            <td>${SubprojectTitle}</td>
+        </tr>
+        ${SubprojectInformations.briefDescription ? `
+            <tr>
+                <td><b>Coordinate</b></td>
+                <td>${SubprojectInformations.briefDescription}</td>
+            </tr>
+        ` : ''}
+    
         <tr>
-            <td style="border: 1px solid black; padding: 8px;"><b>Component</b></td>
-            <td style="border: 1px solid black; padding: 8px;">${labelSubProjectInformations.component}</td>
+            <td><b>Component</b></td>
+            <td>${SubprojectInformations.component}</td>
         </tr>
         ${SubprojectInformations.optionalEntrepSharedInfra ? `
         <tr>
-            <td style="border: 1px solid black; padding: 8px;"><b>Optional Enterprise Shared Infrastructure</b></td>
-            <td style="border: 1px solid black; padding: 8px;">${SubprojectInformations.optionalEntrepSharedInfra}</td>
+            <td><b>Optional Enterprise Shared Infrastructure</b></td>
+            <td>${SubprojectInformations.optionalEntrepSharedInfra}</td>
         </tr>
         ` : ''}
         <tr>
-            <td style="border: 1px solid black; padding: 8px;"><b>Region</b></td>
-            <td style="border: 1px solid black; padding: 8px;">${labelSubProjectInformations.region}</td>
+            <td><b>Region</b></td>
+            <td>${SubprojectInformations.region}</td>
         </tr>
         <tr>
-            <td style="border: 1px solid black; padding: 8px;"><b>Province</b></td>
-            <td style="border: 1px solid black; padding: 8px;">${labelSubProjectInformations.province}</td>
+            <td><b>Province</b></td>
+            <td>${SubprojectInformations.province}</td>
         </tr>
         <tr>
-            <td style="border: 1px solid black; padding: 8px;"><b>Type</b></td>
-            <td style="border: 1px solid black; padding: 8px;">${labelSubProjectInformations.type}</td>
+            <td><b>Type</b></td>
+            <td>${SubprojectInformations.type}</td>
         </tr>
         <tr>
-            <td style="border: 1px solid black; padding: 8px;"><b>Ancestral Domain Location</b></td>
-            <td style="border: 1px solid black; padding: 8px;">${SubprojectInformations.adLocation}</td>
+            <td><b>Ancestral Domain Location</b></td>
+            <td>${subProjectADLocation}</td>
         </tr>
+           <tr>
+            <td><b>Municipality</b></td>
+            <td>${SubprojectInformations.municipality}</td>
+        </tr>
+                   <!-- Only show Coordinate row if there is data -->
+        ${SubprojectInformations.coordinate ? `
+            <tr>
+                <td><b>Coordinate</b></td>
+                <td>${SubprojectInformations.coordinate}</td>
+            </tr>
+        ` : ''}
+        
+        <!-- Only show Physical Indicator row if there is data -->
+        ${SubprojectInformations.physicalIndicator ? `
+            <tr>
+                <td><b>Physical Indicator</b></td>
+                <td>${SubprojectInformations.physicalIndicator}</td>
+            </tr>
+        ` : ''}
+        
+        <!-- Only show Total Estimate Project Cost row if there is data -->
+        ${SubprojectInformations.tepc ? `
+            <tr>
+                <td><b>Total Estimate Project Cost</b></td>
+                <td>${SubprojectInformations.tepc}</td>
+            </tr>
+        ` : ''}
     </table>
+   
 </div>
-
-    
                     <div class="signatory-section">
                         <div class="signatory">
                             <b>Generated By:</b><br /><br />
                             Errol Robyn M. Abella<br />
                             Programmer<br />
                         </div>
-    
+     <span style="block "><i>See attachment Notice to Proceed</i></span>
                         <div class="signatory">
                             <b>Noted By:</b><br /><br />
                             Nelson C. Faustino<br />
                             M&E Head<br />
+                             <span id="currentDate" style="display: block; margin-top: 30px;"></span>
                         </div>
                     </div>
     
@@ -259,6 +265,17 @@ function FinishedGeneratedCode({ open, close, GeneratedCode, SubprojectTitle, Su
                         <img src="/images/footer.png" alt="Footer Image" />
                     </div>
                 </div>
+                <script>
+    // Function to format the current date as "Month Day, Year"
+    function getCurrentDate() {
+        const today = new Date();
+        const options = { year: 'numeric', month: 'long', day: 'numeric' };
+        return today.toLocaleDateString('en-US', options);
+    }
+
+    // Set the current date in the element with id "currentDate"
+    document.getElementById('currentDate').textContent = getCurrentDate();
+</script>
             `);
                 printWindow.document.write('</body></html>');
                 printWindow.document.close();
@@ -279,7 +296,7 @@ function FinishedGeneratedCode({ open, close, GeneratedCode, SubprojectTitle, Su
             province,
             region,
             type
-        } = labelSubProjectInformations;
+        } = SubprojectInformations;
 
 
         // Generate formatted QR code data
@@ -294,7 +311,7 @@ function FinishedGeneratedCode({ open, close, GeneratedCode, SubprojectTitle, Su
 
         // Generate the QR code
         GenerateQRCodeWithLogo(qrData).then(setQrCode).catch(console.error);
-    }, [labelSubProjectInformations, SubprojectTitle]);
+    }, [SubprojectInformations, SubprojectTitle]);
 
     return (
         <Dialog open={open} onOpenChange={close}>
@@ -316,7 +333,7 @@ function FinishedGeneratedCode({ open, close, GeneratedCode, SubprojectTitle, Su
                     }}
                 >
                     <div className='flex flex-col'>
-                        <Label className='w-full font-semibold text-xl'>{GeneratedCode}</Label>
+                        <Label className='w-full font-semibold text-xl'>{SubprojectInformations.code}</Label>
                         <Label className='w-full italic text-center'>{SubprojectTitle}</Label>
                     </div>
                 </div>

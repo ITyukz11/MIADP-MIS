@@ -4,7 +4,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { TbCloudDataConnection } from "react-icons/tb";
 import { cn } from "@/lib/utils"
-import { navLinks } from "@/config/nav-links";
+import { navLinks } from "@/app/(app)/_components/site-header/nav-links";
 import { Badge } from "./ui/badge";
 import { useCurrentUser } from "./context/CurrentUserContext";
 

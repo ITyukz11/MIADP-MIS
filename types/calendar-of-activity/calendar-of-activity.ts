@@ -90,3 +90,7 @@ export interface User {
     totalActivities: number;
   }
   
+  export interface CountActivitiesParticipants{
+    calendarOfActivityId:string
+    userId: string
+  }

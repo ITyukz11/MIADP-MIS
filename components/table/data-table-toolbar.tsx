@@ -235,17 +235,34 @@ export function DataTableToolbar<TData>({
         const participantsData = (row.original as any).participants || {}
         console.log("data: ", participantsData)
 
-        const participants: (string | undefined)[] = []
+        //const participants: (string | undefined)[] = []
+        const participantsSet: Set<string> = new Set();
 
-        {
-          participantsData.map((participant: any, index: number) => {
-            const user = usersData.find(user => user.id === participant.userId);
-            // console.log("participan user: ", user?.name)
-            participants.push(capitalizeEachWord(user?.name || ''))
-          })
-        }
+        participantsData.forEach((participant: any) => {
+          const user = usersData.find(user => user.id === participant.userId);
+
+          // Ensure the component exists before accessing its characters
+          const componentCode = user?.component
+            ? user.component[0] + user.component[user.component.length - 1]
+            : '';
+
+          const participantString =
+            `${user?.region}-${componentCode}${user?.unit ? "-" + user?.unit : ''}`;
+
+          if (participantString) {
+            participantsSet.add(participantString);
+          }
+        });
+
+        const participants: string[] = Array.from(participantsSet);
+
+        console.log("participants: ", participants);
+
+
+        console.log("participants: ", participants)
         // console.log(participants.toLocaleString())
         rowData['Participants'] = participants.toLocaleString()
+
         return rowData;
       });
 

@@ -27,3 +27,18 @@ export function formatDateAgo(dateString: string): string {
     }
   }
   
+
+  export const formatDateShort = (dateString: string) => {
+    const date = new Date(dateString);
+    const month = date.toLocaleString('default', { month: 'short' });
+    const day = date.getDate();
+    return `${month} ${day}`;
+};
+
+export const formatDateLong = (dateString: string) => {
+    const date = new Date(dateString);
+    const month = date.toLocaleString('default', { month: 'short' });
+    const year = date.toLocaleString('default', { year: 'numeric' });
+    const day = date.getDate();
+    return `${month} ${day}, ${year}`;
+};

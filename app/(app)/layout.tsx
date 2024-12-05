@@ -1,5 +1,3 @@
-import { SiteFooter } from "@/components/site-footer"
-import { SiteHeader } from "@/components/site-header"
 import { authOptions } from "@/lib/auth"
 import { getCurrentUser } from "@/lib/session"
 import { ErrorBoundary } from "next/dist/client/components/error-boundary"
@@ -11,6 +9,11 @@ import { CurrentUserProvider } from "@/components/context/CurrentUserContext"
 import ReduxProvider from "@/components/ReduxProvider"
 import { CalendarOfActivityFilterProvider } from "@/components/context/FilterRegionContext"
 import { SecurityQuestionDialog } from "@/components/dialog/security-question-dialog"
+import { SidebarProvider } from "@/components/ui/sidebar"
+import { SiteSideBar } from "./_components/site-aside/side-nav"
+import { SiteHeader } from "./_components/site-header/site-header"
+import { SiteFooter } from "./_components/site-footer/site-footer"
+import { Card, CardContent } from "@/components/ui/card"
 
 interface AppLayoutProps {
     children: React.ReactNode
@@ -33,20 +36,34 @@ export default async function AppLayout({ children }: AppLayoutProps) {
     return (
         <ReduxProvider>
             <CurrentUserProvider initialUser={session.user as any}>
-                <CalendarOfActivityFilterProvider initialFilter={initialFilter}>
-                    <div className="flex flex-col min-w-[320px] items-center">
-                        <ErrorBoundary errorComponent={GlobalError}>
-                            <SiteHeader />
-                            <main className="flex-1 mt-4 mb-auto h-full min-w-[320px] max-w-[2560px] w-[98vw] px-2 sm:px-8 relative">{children}</main>
-                            <FloatingAIChat />
-                            <SiteFooter />
-                            {!session.user.verificationAnswer &&
-                                <>
-                                {/* <SecurityQuestionDialog open={!session.user.verificationAnswer}/> */}
-                                </>}
-                        </ErrorBoundary>
-                    </div>
-                </CalendarOfActivityFilterProvider>
+                <SidebarProvider>
+                    <CalendarOfActivityFilterProvider initialFilter={initialFilter}>
+                        <div className="flex h-screen w-full">
+                            <ErrorBoundary errorComponent={GlobalError}>
+                                {/* Sidebar */}
+                                <SiteSideBar />
+
+                                {/* Main Content */}
+                                <div className="flex flex-col flex-1">
+                                    <main className="dark:bg-black bg-[#F1F5F9] flex flex-col flex-1 min-w-[320px] max-w-[2560px] w-full">
+                                        {/* Adjusted SiteHeader */}
+                                        <SiteHeader />
+                                        <div className="p-4 overflow-x-auto relative">
+                                            {children}
+                                        </div>
+                                    </main>
+                                    <FloatingAIChat />
+                                    <SiteFooter />
+                                    {!session.user.verificationAnswer &&
+                                        <>
+                                            {/* <SecurityQuestionDialog open={!session.user.verificationAnswer}/> */}
+                                        </>}
+                                </div>
+
+                            </ErrorBoundary>
+                        </div>
+                    </CalendarOfActivityFilterProvider>
+                </SidebarProvider>
             </CurrentUserProvider>
         </ReduxProvider>
     )

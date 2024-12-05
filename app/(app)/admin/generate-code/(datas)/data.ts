@@ -55,3 +55,30 @@ export const codeProvince = [
     { label: 'Medium', value: 'ME', type:'EN' }
   ];
   
+
+  export const codeAncestralDomain = [
+    { label: 'Subanen', value: 'DUM', region: 'R009', municipality: 'Dumingag, Mahayag, Siayan' },
+    { label: 'Higaonon-Kalanawan', value: 'KAL', region: 'R010', municipality: 'Malitbog, Manolo Fortrich, Gingoog City' },
+    { label: 'Bukidnon-Tagolaonen', value: 'IMP', region: 'R010', municipality: 'Impasugong' },
+    { label: 'Ata-Manobo', value: 'TAL', region: 'R011', municipality: 'Sto. Tomas, Kapalong, San Isidro, Talaingod' },
+    { label: 'Blaan-Tagakaulo', value: 'MAL', region: 'R011', municipality: 'Malita' },
+    { label: 'Obo-Manovu', value: 'MAG', region: 'R012', municipality: 'Magpet' },
+    { label: 'Manobo Dulangan', value: 'SEN', region: 'R012', municipality: 'Senator Ninoy Aquino, Kalamansig, Palimbang' },
+    { label: 'Manobo', value: 'ROS', region: 'R013', municipality: 'Rosario' },
+    { label: 'Manobo', value: 'BUN', region: 'R013', municipality: 'Bunawan' },
+    { label: 'Sama-Bangingi', value: 'SAM', region: 'BARMM', municipality: 'Hadji Muhtamad' },
+    { label: 'Lintangan', value: 'LIN', region: 'R009', municipality: 'Sibuco' },
+    { label: 'Anongan', value: 'ANO', region: 'R009', municipality: 'Sibuco' },
+    { label: 'Daraghuyan', value: 'DAR', region: 'R010', municipality: 'Malaybalay City, Bukidnon' },
+    { label: 'Cebukta', value: 'CEB', region: 'R010', municipality: 'Valencia City' },
+    { label: 'Mansaka', value: 'PAN', region: 'R011', municipality: 'Maragusan, Nabunturan, Maco, Mabini, Pantukan, Mawab' },
+    { label: 'Erumanen Menuvu', value: 'PIG', region: 'R012', municipality: 'Pigcawayan' },
+    { label: 'Blaan-Tagakaulo', value: 'PAL', region: 'R012', municipality: 'Palimbang' },
+    { label: 'Blaan-Tagakaulo', value: 'MAU', region: 'R012', municipality: 'Malungon' },
+    { label: 'Tboli & Blaan', value: 'TBO', region: 'R012', municipality: 'Tboli, Surallah, Polomolok, Tupi, Maasim & Maitum (Sarangani)' },
+    { label: 'Manobo', value: 'SNM', region: 'R013', municipality: 'San Miguel' },
+    { label: 'Mamanwa', value: 'MAI', region: 'R013', municipality: 'Mainit, Malimono, San Francisco, Sison, Surigao City' },
+    { label: 'Mamanwa', value: 'REM', region: 'R013', municipality: 'Remedios T. Romualdez' },
+    { label: 'Teduray and Lambangian ICC', value: 'TED', region: 'BARMM', municipality: 'Talayan, Guindulangan, Datu Unsay, Datu Hofer, Ampatuan & South Upi' },
+  ];
+  

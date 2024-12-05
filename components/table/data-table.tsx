@@ -160,7 +160,7 @@ export function DataTable<TData extends { id: string }, TValue>({
   }, [rowSelection, table]);
 
   return (
-    <div className="space-y-4 flex-wrap py-1 w-full">
+    <div className="space-y-4 flex-wrap py-1 w-full overflow-x-auto%ZG%_AG+Z%">
       <DataTableToolbar data={data} table={table} selectedRows={rowSelection} allowDateRange={allowDateRange} allowExportToExcel={allowExportToExcel}/>
       <div className="rounded-md border">
         <Table>

@@ -3,10 +3,16 @@ import { z } from "zod";
 export const GenerateCodeSchema = z.object({
   subprojectTitle: z.string().min(1, "*"),
   component: z.string().min(1, "*"),
-  optionalEntrepSharedInfra: z.string().optional(),
+  sharedFundingWithInfra: z.boolean().optional(),  // mapped from Prisma model
   region: z.string().min(1, "*"),
   province: z.string().min(1, "*"),
-  adLocation: z.string().min(1, "*").max(4,"4 characters only!"),
+  municipality: z.string().optional(), // mapped from Prisma model
+  ancestralDomainLoc: z.string().optional(), // mapped from Prisma model
   type: z.string().min(1, "*"),
-  sequentialNumber: z.string(),
-})
+  coordinate: z.string().optional(), // mapped from Prisma model
+  measurement: z.string().optional(), // mapped from Prisma model
+  physicalIndicator: z.string().optional(), // mapped from Prisma model
+  tepc: z.string().optional(), // mapped from Prisma model
+  briefDescription: z.string().optional(),
+  sequentialNum: z.string().optional(),
+});

@@ -24,7 +24,8 @@ type FormFieldWrapperProps<T extends FieldValues> = {
     isFocus?: boolean;
     note?:string;
     className?:string
-
+    value?:string
+    readOnly?:boolean
 };
 
 const FormFieldWrapper = <T extends FieldValues>({
@@ -42,7 +43,9 @@ const FormFieldWrapper = <T extends FieldValues>({
     tabIndex = -1,
     isFocus = false,
     note,
-    className
+    className,
+    value,
+    readOnly=false
 }: FormFieldWrapperProps<T>) => {
     const inputRef = useRef<HTMLInputElement>(null);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -96,6 +99,7 @@ const FormFieldWrapper = <T extends FieldValues>({
                                 placeholder={placeholder}
                                 tabIndex={isDisabled ? -1 : tabIndex}
                                 ref={textareaRef}
+                                readOnly={readOnly}
                             />
                         ) : type === 'password' ? (
                             <div className="relative">
@@ -108,6 +112,7 @@ const FormFieldWrapper = <T extends FieldValues>({
                                     className="pr-10"
                                     tabIndex={isDisabled ? -1 : tabIndex}
                                     ref={inputRef}
+                                    readOnly={readOnly}
                                 />
                                 {showPassword ? (
                                     <motion.div
@@ -145,6 +150,7 @@ const FormFieldWrapper = <T extends FieldValues>({
                                 className="pr-10 appearance-none"
                                 tabIndex={isDisabled ? -1 : tabIndex}
                                 ref={inputRef}
+                                value={value}
                             />
                         )}
                     </FormControl>

@@ -5,6 +5,7 @@ export interface CalendarOfActivityFilter {
   filter: string;
   typeOfActivity: string;
   unit: string;
+  status: string
   // Add other filter properties if needed
 }
 

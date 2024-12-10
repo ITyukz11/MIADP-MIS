@@ -81,7 +81,7 @@ export default function AnnouncementsPage() {
             </div>
           </div>
           <Tabs defaultValue="overview" className="space-y-4">
-            <TabsList className="hidden sm:flex w-fit">
+            <TabsList className="flex w-fit">
               <TabsTrigger value="overview">Overview</TabsTrigger>
               <TabsTrigger value="analytics" disabled>
                 Analytics

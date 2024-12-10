@@ -3,37 +3,36 @@ import { useCurrentUser } from '@/components/context/CurrentUserContext';
 import { useCalendarOfActivityFilter } from '@/components/context/FilterRegionContext';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { componentOptions, regionOptions, unitOptions } from '@/lib/data/filter'
+import { componentOptions, regionOptions, statusOptions, unitOptions } from '@/lib/data/filter'
 import React from 'react'
 
 type Props = {}
 
-function SelectFilterRegUniCom({ }: Props) {
-  const { currentUser } = useCurrentUser();
+function SelectFilterStatus({ }: Props) {
   const { activityLoading } = useSelector((state) => state.activity);
   const { currentFilter, setCurrentFilter } = useCalendarOfActivityFilter();
 
   const handleValueChange = (value: string) => {
     setCurrentFilter({
-      filter: value,
+      filter: currentFilter?.filter || '',
       typeOfActivity: currentFilter?.typeOfActivity || '',
       unit: currentFilter?.unit || '',
-      status: currentFilter?.status || ''
+      status: value
     });
   };
 
   return (
-    <div >
-      <Label className='font-semibold'>Region:</Label>
-      <Select onValueChange={handleValueChange} value={currentFilter?.filter} disabled={activityLoading}>
+    <div>
+      <Label className='font-semibold'>Status:</Label>
+      <Select onValueChange={handleValueChange} value={currentFilter?.status} disabled={activityLoading}>
         <SelectTrigger className="w-fit">
-          <SelectValue placeholder={currentUser?.region ? currentUser?.region : "Filter"} />
+          <SelectValue placeholder='All' />
         </SelectTrigger>
         <SelectContent>
           <SelectItem value='All'>All</SelectItem>
           <SelectGroup>
-            <SelectLabel>Regions</SelectLabel>
-            {regionOptions.map((option, index) => (
+            <SelectLabel>Status</SelectLabel>
+            {statusOptions.map((option, index) => (
               <SelectItem key={index} value={option}>{option}</SelectItem>
             ))}
           </SelectGroup>
@@ -44,4 +43,4 @@ function SelectFilterRegUniCom({ }: Props) {
   )
 }
 
-export default SelectFilterRegUniCom
+export default SelectFilterStatus

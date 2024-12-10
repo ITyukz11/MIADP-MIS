@@ -9,7 +9,7 @@ import timeGridPlugin from '@fullcalendar/timegrid';
 import multiMonthPlugin from '@fullcalendar/multimonth'
 
 import { Button } from '@/components/ui/button';
-import { FaKaaba, FaPlusCircle, FaRegCalendarAlt } from 'react-icons/fa';
+import { FaRegCalendarAlt } from 'react-icons/fa';
 import {
     Card,
     CardContent,
@@ -20,33 +20,17 @@ import { Separator } from '@/components/ui/separator';
 import { Label } from '@/components/ui/label';
 import CalendarFormDialog from '../calendar-form-dialog';
 import { useRouter } from 'next/navigation';
-import { ViewMySchedDialog } from '../view-my-sched-dialog';
 import { Skeleton } from '@/components/ui/skeleton';
 import { CalendarSheet } from '@/components/calendar-of-activity/CalendarSheet';
 import { formatDate, formatTime } from '@/components/table/data/activities/coa-columns';
-import {
-    Select,
-    SelectContent,
-    SelectGroup,
-    SelectItem,
-    SelectLabel,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
-import { ViewMyParticipatedSchedDialog } from '../view-participated-activity-dialog';
 import './calendarStyles.css';
-import { componentOptions, regionOptions, unitOptions } from '@/lib/data/filter';
-import { useCurrentUser } from '@/components/context/CurrentUserContext';
-import { OpenInNewWindowIcon } from '@radix-ui/react-icons';
-import Link from 'next/link';
 import { FullscreenIcon } from 'lucide-react';
 import dayjs from 'dayjs';
 import { useDispatch, useSelector } from '@/app/store/store';
 import { fetchActivitiesData } from '@/app/store/activityAction';
 import MajorOrIndividualDialog from '../major-or-individual-dialog';
 import { useCalendarOfActivityFilter } from '@/components/context/FilterRegionContext';
-import SelectTypeOfActivity from '../components/SelectTypeOfActivity';
-import SelectFilterRegUniCom from '../components/SelectFilterRegUniCom';
+import { useActivitiesData } from '@/lib/calendar-of-activity/useActivitiesDataHook';
 
 interface Event {
     id: string;
@@ -70,11 +54,10 @@ const page = () => {
     const [filteredOnGoingEvents, setFilteredOnGoingEvents] = useState<Event[]>([]);
 
     // const { activities, loading, error } = useCalendarOfActivityContext();
-    const { activitiesData, activityLoading, activityError } = useSelector((state) => state.activity);
-    const { currentUser } = useCurrentUser();
+    // const { activitiesData, activityLoading, activityError } = useSelector((state) => state.activity);
+    const { activitiesData, activityError, activityLoading } = useActivitiesData()
 
-    const { currentFilter, setCurrentFilter } = useCalendarOfActivityFilter();
-
+    const { currentFilter } = useCalendarOfActivityFilter();
 
     const [filteredData, setFilteredData] = useState<Event[]>([]);
 
@@ -89,28 +72,6 @@ const page = () => {
     };
 
     const calendarRef = useRef<FullCalendar>(null);
-
-    const dispatch = useDispatch()
-
-    useEffect(() => {
-        if (activitiesData.length === 0) {
-            dispatch(fetchActivitiesData());
-        }
-    }, [dispatch, activitiesData.length]);
-
-    const formatDateToISOWithoutTimezone = (date: Date) => {
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const day = String(date.getDate()).padStart(2, '0');
-        return `${year}-${month}-${day}`;
-    };
-
-    const formatStartDateToISOWithoutTimezone = (date: Date) => {
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const day = String(date.getDate()).padStart(2, '0');
-        return `${year}-${month}-${day}`;
-    };
 
     const formatEndDateToISOWithoutTimezone = (endDate: Date, startDate: Date) => {
         const dateEnd = new Date(endDate)
@@ -246,7 +207,7 @@ const page = () => {
                 return true; // If no specific type is selected, include all activities
             });
 
-            const filtered = filteredActivities.filter(item =>
+            const filtered = filteredActivities.filter((item: { user: { region: string | undefined; component: string | undefined; unit: string | undefined; }; }) =>
                 item.user?.region === currentFilter?.filter ||
                 item.user?.component === currentFilter?.filter ||
                 item.user?.unit === currentFilter?.filter
@@ -287,69 +248,14 @@ const page = () => {
         }
     }, [currentFilter, filteredCoaData]);
 
-    const events = [
-        // Replace this with your actual list of events
-        {
-            id: '1',
-            title: 'Orientation cum Meeting with NCIP and MIADP Staff',
-            start: '2024-07-01T13:00',
-            end: '2024-07-01',
-            color: '#ff0000'
-        },
-        {
-            id: '2',
-            title: 'PSO-RPCO 1st Quarter Assessment, Davao City',
-            start: '2024-07-05',
-            end: '2024-07-07',
-            color: '#013220'
-        },
-        {
-            id: '3',
-            title: 'Drone Pilot Training with Introduction to Aerial Mapping using UAVs',
-            start: '2024-07-02T10:00:00', // Include time in ISO 8601 format
-            end: '2024-07-02',   // Include time in ISO 8601 format
-            color: '#0000ff'
-        },
-        {
-            id: '4',
-            title: 'Event 1',
-            start: '2024-07-20',
-            end: '2024-07-25',
-            color: '#ff0000'
-        },
-        {
-            id: '5',
-            title: 'Event 2',
-            start: '2024-07-21',
-            end: '2024-07-07',
-            color: '#013220'
-        },
-        {
-            id: '6',
-            title: 'Event 3',
-            start: '2024-07-26',
-            end: '2024-07-12',
-            color: '#0000ff'
-        },
-        {
-            id: '7',
-            title: 'Event 1',
-            start: '2024-07-30',
-            end: '2024-07-20',
-            color: '#ff0000'
-        },
-        { id: '8', title: 'SDS Orientation', start: '2024-07-05', end: '2024-07-07', color: '#013220' },
-        { id: '9', title: 'Training of Trainers (TOT) - Business Plan Preparation (Modules 1 and 2) (RPCO-LGU-NCIP)', start: '2024-07-07', end: '2024-07-12', color: '#0000ff' },
-    ];
-
     const handleEventClick = (info: any) => {
-        const activity = activitiesData.filter(activity => activity.id === info.event.id);
+        const activity = activitiesData.filter((activity: { id: any; }) => activity.id === info.event.id);
         setActivityData(activity)
         setCalendarSheetOpen(true)
     };
 
     const handleEventClick2 = (id: any) => {
-        const activity = activitiesData.filter(activity => activity.id === id);
+        const activity = activitiesData.filter((activity: { id: any; }) => activity.id === id);
         setActivityData(activity)
         setCalendarSheetOpen(true)
     };
@@ -362,19 +268,6 @@ const page = () => {
     const handleViewChange = (newView: string) => {
         setView(newView);
     };
-
-    // useEffect(() => {
-    //     handleWindowResize()
-    // }, [])
-
-    // const handleWindowResize = () => {
-    //     const calendarApi = calendarRef.current?.getApi();
-    //     if (window.innerWidth < 768) {
-    //         calendarApi?.changeView('timeGridDay');
-    //     } else {
-    //         calendarApi?.changeView('dayGridMonth');
-    //     }
-    // };
 
     const cardRef = useRef<HTMLDivElement>(null);
     const [cardHeight, setCardHeight] = useState(0);
@@ -413,6 +306,32 @@ const page = () => {
         return dayjs(dateString).subtract(1, 'day').format('YYYY-MM-DD');
     };
 
+    if (activityLoading) return (
+        <div className='w-full flex justify-center'>
+             <div className="flex flex-col py-2 md:flex-row gap-5 flex-wrap md:flex-nowrap overflow-hidden w-full max-w-[1800px]"
+                style={{
+                    ...(fullScreenCalendar ? { width: '100%' } : {})
+                }}>
+                    <div className='flex flex-col w-full md:w-1/4 gap-4 justify-start items-center'>
+              <Card className='overflow-y-auto w-full md:max-h-[400px] rounded-xl scrollbar-thin scrollbar-track-rounded-full'>
+                <CardContent className='p-8 flex flex-col gap-2'>
+                    <Skeleton className="h-24 w-full" />
+                    <Skeleton className="h-16 w-full" />
+                    <Skeleton className="h-16 w-full" />
+                    <Skeleton className="h-16 w-full" />
+                </CardContent>
+            </Card>
+            </div>
+            <Card className="h-fit w-full min-h-[700px] mb-2 md:w-3/4 overflow-x-auto scrollbar-thin scrollbar-track-rounded-full"
+                    style={fullScreenCalendar ? { width: '100%', height: '100%' } : undefined}>
+                <CardContent className='p-8 flex flex-col gap-2'>
+                <Skeleton className="h-16 w-full" />
+                <Skeleton className="h-96 w-full" />
+                </CardContent>
+            </Card>
+            </div>
+        </div>)
+    if (activityError) return <Label className='text-destructive'>{activityError}</Label>
     return (
         <div className='w-full flex justify-center'>
             <div className="flex flex-col py-2 md:flex-row gap-5 flex-wrap md:flex-nowrap overflow-hidden w-full max-w-[1800px]"
@@ -544,7 +463,7 @@ const page = () => {
                                             );
                                         }) :
                                         <div className="flex justify-center mt-3 p-2 text-sm md:text-base">
-                                            No going event
+                                            No ongoing event
                                         </div>
                                 }
 
@@ -554,12 +473,7 @@ const page = () => {
                 <Card ref={cardRef}
                     className="h-fit w-full min-h-[700px] mb-2 md:w-3/4 overflow-x-auto scrollbar-thin scrollbar-track-rounded-full"
                     style={fullScreenCalendar ? { width: '100%', height: '100%' } : undefined}>
-                    <div ref={cardRef} className='flex justify-between flex-row gap-2 p-1 px-5 pt-2'>
-                        <div className='flex flex-row gap-1 justify-start'>
-                            <SelectFilterRegUniCom />
-                            <SelectTypeOfActivity />
-                        </div>
-
+                    <div ref={cardRef} className='flex justify-end flex-row gap-2 p-1 px-5 pt-2'>
                         <Button
                             disabled={activityLoading}
                             onClick={toggleFullScreen}

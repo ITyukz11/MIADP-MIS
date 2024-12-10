@@ -5,15 +5,12 @@ import {
     DialogClose,
     DialogContent,
     DialogDescription,
-    DialogFooter,
     DialogHeader,
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog"
-import { DropdownMenuItem } from '@radix-ui/react-dropdown-menu'
-import { Input } from '../ui/input';
 import { Button } from '../ui/button';
-import { Form, FormControl, FormField, FormItem, FormLabel } from '../ui/form';
+import { Form, FormField } from '../ui/form';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -25,16 +22,12 @@ import FinishedGeneratedCode from './finished-generated-code-dialog';
 import { codeAncestralDomain, codeComponent, codeProvince, codeRegion, codeType } from '@/app/(app)/admin/generate-code/(datas)/data';
 import { GenerateCodeSchema } from '@/schemas/forms/generatecode';
 import { FormError } from '../form-error';
-import { ADDRCONFIG } from 'dns';
 import { insertSubProjectCode } from '@/actions/subproject/insertSubProjectCode';
 import { useCurrentUser } from '../context/CurrentUserContext';
+import { avoidDefaultDomBehavior, handleKeyDown } from '@/utils/dialogUtils';
+import { TbNumber123 } from 'react-icons/tb';
 
-interface GenerateCodeDialogProps {
-    open: boolean;
-    close: () => void;
-}
-
-function GenerateCodeDialog({ open, close }: GenerateCodeDialogProps) {
+function GenerateCodeDialog() {
     const [loading, setLoading] = useState(false); // Initialize loading state
     const [isChecked, setIsChecked] = useState<boolean>(false)
     const [finishedGenerate, setFinishedGenerate] = useState<boolean>(false)
@@ -64,7 +57,7 @@ function GenerateCodeDialog({ open, close }: GenerateCodeDialogProps) {
     })
     const onSubmit = async (values: z.infer<typeof GenerateCodeSchema>) => {
         setLoading(true);
-        
+
         console.log("ON SUBMIT VALUES: ", values)
         try {
 
@@ -76,27 +69,27 @@ function GenerateCodeDialog({ open, close }: GenerateCodeDialogProps) {
                     'Content-Type': 'application/json'
                 }
             });
-    
+
             if (!response.ok) {
                 throw new Error('Failed to fetch subproject code count');
             }
-    
+
             const data = await response.json();
 
             console.log("count data: ", data)
             const count = data.count || 0;
 
-              // Set the sequentialNum based on the count + 1
+            // Set the sequentialNum based on the count + 1
             const sequentialNum = (count + 1).toString().padStart(4, '0'); // Ensure a 4-digit format (e.g., "0001", "0002")
 
             const code = "MIADP-" +
-            values.component + "-" +
-            values.region + "-" +
-            values.province + "-AD-" +
-            values.ancestralDomainLoc + "-" +
-            values.type + "-" +
-            sequentialNum;
-            console.log("codecode: ",code)
+                values.component + "-" +
+                values.region + "-" +
+                values.province + "-AD-" +
+                values.ancestralDomainLoc + "-" +
+                values.type + "-" +
+                sequentialNum;
+            console.log("codecode: ", code)
 
             // Replace certain fields with their label counterparts
             values.component = codeComponent.find((item) => item.value === values.component)?.label || values.component;
@@ -105,30 +98,30 @@ function GenerateCodeDialog({ open, close }: GenerateCodeDialogProps) {
             values.type = codeType.find((item) => item.value === values.type)?.label || values.type;
             values.municipality = filteredMunicipality?.municipality;
             const ancestralDomainLoc = codeAncestralDomain.find((AD) => AD.value === values.ancestralDomainLoc)?.label;
-    
+
             // Prepare data for insertion
             const insertSubprojectInformation = {
                 ...values,
                 ancestralDomainLoc: ancestralDomainLoc || values.ancestralDomainLoc,
-                code:code,
+                code: code,
                 userId: currentUser?.id,
-                measurement:'',
-                sequentialNum: sequentialNum        
-            };  
+                measurement: '',
+                sequentialNum: sequentialNum
+            };
 
-  
+
             console.log("insertSubprojectInformation: ", insertSubprojectInformation)
-            
+
             // Insert data using API call or directly (if inside a backend function)
             await insertSubProjectCode(insertSubprojectInformation)
-                .then((data)=>{
-                    if(!data.error){
-                    setSubProjectTitle(values.subprojectTitle || '');
-                    setSubProjectInformations(insertSubprojectInformation);
-                    setSubProjectADLocation(ancestralDomainLoc || '');
-                    setFinishedGenerate(true);
+                .then((data) => {
+                    if (!data.error) {
+                        setSubProjectTitle(values.subprojectTitle || '');
+                        setSubProjectInformations(insertSubprojectInformation);
+                        setSubProjectADLocation(ancestralDomainLoc || '');
+                        setFinishedGenerate(true);
                     }
-                    else{
+                    else {
                         throw new Error('Failed to insert subproject data');
                     }
                 })
@@ -141,8 +134,8 @@ function GenerateCodeDialog({ open, close }: GenerateCodeDialogProps) {
             setLoading(false);
         }
     };
-    
-    
+
+
 
     const selectedRegion = form.watch('region');
     const filteredProvinces = codeProvince.filter(province => province.region === selectedRegion);
@@ -154,11 +147,17 @@ function GenerateCodeDialog({ open, close }: GenerateCodeDialogProps) {
     const filteredMunicipality = codeAncestralDomain.find(AD => AD.value === form.watch('ancestralDomainLoc'))
 
     console.log(form.formState.errors)
-    console.log("subprojectTitle:",form.watch('subprojectTitle'))
+    console.log("subprojectTitle:", form.watch('subprojectTitle'))
     return (
         <>
-            <Dialog open={open} onOpenChange={close}>
-                <DialogContent className="min-w-[60%] overflow-y-auto scrollbar-thin max-h-[95vh] ">
+            <Dialog>
+                <DialogTrigger asChild>
+                    <Label className='flex flex-row gap-2 p-2 cursor-pointer hover:bg-slate-100 rounded-sm dark:hover:bg-slate-800'><TbNumber123 />Request Subproject Code</Label>
+                </DialogTrigger>
+                <DialogContent className="min-w-[60%] overflow-y-auto scrollbar-thin max-h-[95vh] "
+                    onPointerDownOutside={avoidDefaultDomBehavior}
+                    onInteractOutside={avoidDefaultDomBehavior}
+                    onKeyDown={handleKeyDown}>
                     <DialogHeader>
                         <DialogTitle>Generate Sub Project Code</DialogTitle>
                         <DialogDescription>
@@ -178,6 +177,7 @@ function GenerateCodeDialog({ open, close }: GenerateCodeDialogProps) {
                                         placeholder="Input Subproject Title"
                                         tabIndex={1}
                                     />
+
                                     <FormFieldWrapper
                                         control={form.control}
                                         name="component"
@@ -246,16 +246,37 @@ function GenerateCodeDialog({ open, close }: GenerateCodeDialogProps) {
                                         placeholder="Select AD Location"
                                         tabIndex={6}
                                     />
-                                    <FormFieldWrapper
-                                        control={form.control}
-                                        name="municipality"
-                                        label="Municipality"
-                                        isDisabled={loading}
-                                        placeholder="Input Municipality"
-                                        note='(auto generated)'
-                                        tabIndex={8}
-                                        value={filteredMunicipality?.municipality}
-                                    />
+                                    {filteredMunicipality &&
+                                        filteredMunicipality?.municipality?.split(', ').length > 1 ? (
+                                        <FormFieldWrapper
+                                            control={form.control}
+                                            name="municipality"
+                                            label="Municipality"
+                                            type="select"
+                                            selectOptions={filteredMunicipality.municipality
+                                                .split(', ') // Convert the string to an array
+                                                .map((municipality) => ({
+                                                    label: municipality.trim(), // Trim any extra spaces
+                                                    value: municipality.trim(), // Use the same value for simplicity
+                                                }))}
+                                            isDisabled={loading} // Disable if no region is selected
+                                            placeholder="Input Municipality"
+                                             note="(Please select)"
+                                            tabIndex={8}
+                                        />
+                                    ) : (
+                                        <FormFieldWrapper
+                                            control={form.control}
+                                            name="municipality"
+                                            label="Municipality"
+                                            isDisabled={loading}
+                                            placeholder="Input Municipality"
+                                            note="(auto generated)"
+                                            tabIndex={8}
+                                            value={filteredMunicipality?.municipality || ""}
+                                        />
+                                    )}
+
                                     <FormFieldWrapper
                                         control={form.control}
                                         name="coordinate"
@@ -311,16 +332,7 @@ function GenerateCodeDialog({ open, close }: GenerateCodeDialogProps) {
                                 </div>
                             )}
                             {Object.keys(form.formState.errors).length > 0 || error && <FormError message={'An error occurred'} />}
-
                             <div className="flex flex-row justify-end mt-4">
-                                <Button
-                                    className="mr-1"
-                                    variant="destructive"
-                                    disabled={loading}
-                                    onClick={close}
-                                    type="button"
-                                >Cancel
-                                </Button>
                                 <Button
                                     disabled={loading}
                                     type="submit">
@@ -330,7 +342,6 @@ function GenerateCodeDialog({ open, close }: GenerateCodeDialogProps) {
 
                         </form>
                     </Form>
-
                 </DialogContent>
             </Dialog>
             <FinishedGeneratedCode

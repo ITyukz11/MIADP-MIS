@@ -38,7 +38,7 @@ export const SiteSideBar = () => {
   const { open } = useSidebar();
 
   return (
-    <Sidebar variant="sidebar" className="shadow-lg">
+    <Sidebar variant="sidebar" className="shadow-lg z-50">
       {/* Sidebar Header */}
       <SidebarHeader>
         <div className="flex h-fit w-full justify-center border-b">

@@ -66,7 +66,7 @@ export const codeProvince = [
     { label: 'Manobo Dulangan', value: 'SEN', region: 'R012', municipality: 'Senator Ninoy Aquino, Kalamansig, Palimbang' },
     { label: 'Manobo', value: 'ROS', region: 'R013', municipality: 'Rosario' },
     { label: 'Manobo', value: 'BUN', region: 'R013', municipality: 'Bunawan' },
-    { label: 'Sama-Bangingi', value: 'SAM', region: 'BARMM', municipality: 'Hadji Muhtamad' },
+    { label: 'Sama-Bangingi', value: 'SAM', region: 'RBRM', municipality: 'Hadji Muhtamad' },
     { label: 'Lintangan', value: 'LIN', region: 'R009', municipality: 'Sibuco' },
     { label: 'Anongan', value: 'ANO', region: 'R009', municipality: 'Sibuco' },
     { label: 'Daraghuyan', value: 'DAR', region: 'R010', municipality: 'Malaybalay City, Bukidnon' },
@@ -79,6 +79,6 @@ export const codeProvince = [
     { label: 'Manobo', value: 'SNM', region: 'R013', municipality: 'San Miguel' },
     { label: 'Mamanwa', value: 'MAI', region: 'R013', municipality: 'Mainit, Malimono, San Francisco, Sison, Surigao City' },
     { label: 'Mamanwa', value: 'REM', region: 'R013', municipality: 'Remedios T. Romualdez' },
-    { label: 'Teduray and Lambangian ICC', value: 'TED', region: 'BARMM', municipality: 'Talayan, Guindulangan, Datu Unsay, Datu Hofer, Ampatuan & South Upi' },
+    { label: 'Teduray and Lambangian ICC', value: 'TED', region: 'RBRM', municipality: 'Talayan, Guindulangan, Datu Unsay, Datu Hofer, Ampatuan & South Upi' },
   ];
   

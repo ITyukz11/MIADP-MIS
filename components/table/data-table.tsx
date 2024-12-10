@@ -160,10 +160,10 @@ export function DataTable<TData extends { id: string }, TValue>({
   }, [rowSelection, table]);
 
   return (
-    <div className="space-y-4 flex-wrap py-1 w-full overflow-x-auto%ZG%_AG+Z%">
+    <div className="space-y-4 flex-wrap py-1 w-full place-self-center overflow-x-auto transition-all">
       <DataTableToolbar data={data} table={table} selectedRows={rowSelection} allowDateRange={allowDateRange} allowExportToExcel={allowExportToExcel}/>
       <div className="rounded-md border">
-        <Table>
+        <Table className="min-w-full">
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
@@ -182,7 +182,7 @@ export function DataTable<TData extends { id: string }, TValue>({
               </TableRow>
             ))}
           </TableHeader>
-          <TableBody>
+          <TableBody className="overflow-x-auto">
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow

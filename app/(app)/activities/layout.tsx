@@ -19,6 +19,11 @@ import { fetchActivitiesData } from '@/app/store/activityAction'
 import { usePathname } from 'next/navigation'
 import { formatDate } from '@/components/table/data/activities/coa-columns'
 import { formatDateAgo } from '@/utils/dateFormat'
+import SelectFilterRegUniCom from './components/SelectFilterRegUniCom'
+import SelectTypeOfActivity from './components/SelectTypeOfActivity'
+import SelectFilterUnitComponent from './components/SelectFilterUnit'
+import SelectFilterStatus from './components/SelectFilterStatus'
+import { useSidebar } from '@/components/ui/sidebar'
 
 interface ActivitiesLayoutProps {
   children: React.ReactNode
@@ -38,7 +43,7 @@ export default function ActivitiesLayout({ children }: ActivitiesLayoutProps) {
   };
 
   const { activitiesData, activityError, activityLoading } = useActivitiesData()
-
+  const {state} = useSidebar()
   // const dispatch = useDispatch();
   // const { activitiesData, activityLoading, activityError } = useSelector((state) => state.activity);
 
@@ -56,8 +61,8 @@ export default function ActivitiesLayout({ children }: ActivitiesLayoutProps) {
   // }, [activitiesData]);
 
   return (
-    <div className="xs:container space-y-4">
-      <div className='flex flex-row flex-wrap justify-center gap-2 md:justify-between'>
+    <div className="space-y-4 w-full">
+      <div className='flex flex-row flex-wrap gap-2 justify-between'>
         <div className='flex flex-col'>
           <div className='flex flex-row gap-2 items-center'>
             <h2 className="text-xl md:text-3xl font-bold tracking-tight">Calendar of Activities </h2>
@@ -124,7 +129,18 @@ export default function ActivitiesLayout({ children }: ActivitiesLayoutProps) {
           </CardContent>
         </Card>
       </div>
-      <div className='flex justify-center'>
+      <div className='flex flex-row flex-wrap gap-2'>
+        <Card className='flex flex-row gap-2 w-full shadow-none'>
+          <CardContent className='flex items-center justify-center md:justify-start gap-2 w-full p-4 flex-wrap'>
+              <SelectTypeOfActivity />
+              <SelectFilterRegUniCom />
+              <SelectFilterUnitComponent />
+              <SelectFilterStatus />
+          </CardContent>
+        </Card>
+
+      </div>
+      <div className='h-full flex-1 flex-col space-y-8 px-8 md:flex justify-center items-center'>
         {children}
       </div>
       <MajorOrIndividualDialog

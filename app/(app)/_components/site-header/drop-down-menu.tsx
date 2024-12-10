@@ -68,7 +68,8 @@ export const DropDownMenuComponent = ({ }: DropDownMenuComponentProps) => {
             <DropdownMenuSubTrigger><FaWpforms className="mr-2"/>Forms</DropdownMenuSubTrigger>
             <DropdownMenuPortal>
               <DropdownMenuSubContent>
-                <DropdownMenuItem disabled onClick={()=> setGenerateDialog(!openGenerateDialog)}><TbNumber123/>Request Subproject Code</DropdownMenuItem>
+                <GenerateCodeDialog/>
+                {/* <DropdownMenuItem onClick={()=> setGenerateDialog(!openGenerateDialog)}><TbNumber123/>Request Subproject Code</DropdownMenuItem> */}
                 <DropdownMenuItem disabled onClick={()=> setPalTicketDialog(true)}><IoAirplane/>Request Form for PAL Ticket</DropdownMenuItem>
               </DropdownMenuSubContent>
             </DropdownMenuPortal>
@@ -85,8 +86,8 @@ export const DropDownMenuComponent = ({ }: DropDownMenuComponentProps) => {
       </DropdownMenu>
 
       <ProfileDialog open={profileDialog} setClose={()=> setProfileDialog(!profileDialog)}/>
-      {/* <RequestFormPalTicketTest open={palTicketDialog} close={()=> setPalTicketDialog(!palTicketDialog)}/>
-      <GenerateCodeDialog open={openGenerateDialog} close={()=> setGenerateDialog(!openGenerateDialog)}/> */}
+      {/* <RequestFormPalTicketTest open={palTicketDialog} close={()=> setPalTicketDialog(!palTicketDialog)}/> */}
+      {/* <GenerateCodeDialog open={openGenerateDialog} close={()=> setGenerateDialog(!openGenerateDialog)}/> */}
     </>
   )
 }

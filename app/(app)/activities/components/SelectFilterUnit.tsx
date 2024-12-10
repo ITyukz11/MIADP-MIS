@@ -1,6 +1,7 @@
 import { useSelector } from '@/app/store/store';
 import { useCurrentUser } from '@/components/context/CurrentUserContext';
 import { useCalendarOfActivityFilter } from '@/components/context/FilterRegionContext';
+import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { componentOptions, regionOptions, unitOptions } from '@/lib/data/filter'
 import React from 'react'
@@ -16,11 +17,14 @@ function SelectFilterUnitComponent({}: Props) {
         setCurrentFilter({ 
           filter: currentFilter?.filter || '', 
           typeOfActivity:currentFilter?.typeOfActivity || '', 
-          unit:value
+          unit:value,
+          status:currentFilter?.status || ''
         });
       };
 
   return (
+    <div>
+    <Label className='font-semibold'>Unit:</Label>
     <Select onValueChange={handleValueChange} value={currentFilter?.unit} disabled={activityLoading}>
             <SelectTrigger className="w-fit">
               <SelectValue placeholder={currentUser?.unit ? currentUser?.unit : "Filter Unit"} />
@@ -41,6 +45,8 @@ function SelectFilterUnitComponent({}: Props) {
               </SelectGroup>
             </SelectContent>
           </Select>
+  </div>
+  
   )
 }
 

@@ -4,13 +4,16 @@ import { DataTable } from '@/components/table/data-table';
 import { columns } from '@/components/table/data/activities/coa-columns';
 import { Skeleton } from '@/components/ui/skeleton';
 import { CalendarSheet } from '@/components/calendar-of-activity/CalendarSheet';
+import { useDispatch, useSelector } from '@/app/store/store';
+import { fetchActivitiesData } from '@/app/store/activityAction';
 import { useCalendarOfActivityFilter } from '@/components/context/FilterRegionContext';
 import { Label } from '@/components/ui/label';
 import { useActivitiesData } from '@/lib/calendar-of-activity/useActivitiesDataHook';
 import { Card, CardContent } from '@/components/ui/card';
-import { useSidebar } from '@/components/ui/sidebar';
 
-const Page = ({ parentWidth }: { parentWidth: number }) => {
+type Props = {}
+
+const Page = (props: Props) => {
   const [coaData, setCoaData] = useState<any[]>([]);
   const [filteredData, setFilteredData] = useState<any[]>([]);
 
@@ -23,9 +26,10 @@ const Page = ({ parentWidth }: { parentWidth: number }) => {
   const handleViewRowIdPressed = (viewId: string) => {
     setSelectedRowId(viewId);
   };
-
+ 
   const { activitiesData, activityError, activityLoading } = useActivitiesData()
-  const { state } = useSidebar()
+
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -62,51 +66,51 @@ const Page = ({ parentWidth }: { parentWidth: number }) => {
 
   useEffect(() => {
     if (currentFilter?.filter === 'All' && currentFilter?.unit === 'All' && currentFilter?.status === 'All') {
-      console.log("1");
-      console.log("region: ", currentFilter?.filter);
-      console.log("unit/component: ", currentFilter?.unit);
-      console.log("status: ", currentFilter?.status);
-      setFilteredData(coaData); // Return all data
+        console.log("1");
+        console.log("region: ", currentFilter?.filter);
+        console.log("unit/component: ", currentFilter?.unit);
+        console.log("status: ", currentFilter?.status);
+        setFilteredData(coaData); // Return all data
     }
     else if (currentFilter?.filter !== 'All' && currentFilter?.unit === 'All' && currentFilter?.status === 'All') {
-      console.log("2");
-      const filtered = coaData.filter(item =>
-        item.user?.region === currentFilter?.filter
-      );
-      setFilteredData(filtered); // Filter by region only
+        console.log("2");
+        const filtered = coaData.filter(item =>
+            item.user?.region === currentFilter?.filter
+        );
+        setFilteredData(filtered); // Filter by region only
     }
     else if (currentFilter?.filter === 'All' && currentFilter?.unit !== 'All' && currentFilter?.status === 'All') {
-      console.log("3");
-      const filtered = coaData.filter(item =>
-        item.user?.unit === currentFilter?.unit ||
-        item.user?.component === currentFilter?.unit
-      );
-      setFilteredData(filtered); // Filter by unit/component only
+        console.log("3");
+        const filtered = coaData.filter(item =>
+            item.user?.unit === currentFilter?.unit ||
+            item.user?.component === currentFilter?.unit
+        );
+        setFilteredData(filtered); // Filter by unit/component only
     }
     else if (currentFilter?.filter !== 'All' && currentFilter?.unit !== 'All' && currentFilter?.status === 'All') {
-      console.log("4");
-      const filtered = coaData.filter(item =>
-        item.user?.region === currentFilter?.filter &&
-        (
-          item.user?.unit === currentFilter?.unit ||
-          item.user?.component === currentFilter?.unit
-        )
-      );
-      setFilteredData(filtered); // Filter by region and unit/component
+        console.log("4");
+        const filtered = coaData.filter(item =>
+            item.user?.region === currentFilter?.filter &&
+            (
+                item.user?.unit === currentFilter?.unit ||
+                item.user?.component === currentFilter?.unit
+            )
+        );
+        setFilteredData(filtered); // Filter by region and unit/component
     }
     else {
-      console.log("5");
-      // Combine all filters including status
-      const filtered = coaData.filter(item =>
-        (currentFilter?.filter === 'All' || item.user?.region === currentFilter?.filter) &&
-        (currentFilter?.unit === 'All' ||
-          item.user?.unit === currentFilter?.unit ||
-          item.user?.component === currentFilter?.unit) &&
-        (currentFilter?.status === 'All' || item.status === currentFilter?.status)
-      );
-      setFilteredData(filtered); // Apply all filters
+        console.log("5");
+        // Combine all filters including status
+        const filtered = coaData.filter(item =>
+            (currentFilter?.filter === 'All' || item.user?.region === currentFilter?.filter) &&
+            (currentFilter?.unit === 'All' ||
+                item.user?.unit === currentFilter?.unit ||
+                item.user?.component === currentFilter?.unit) &&
+            (currentFilter?.status === 'All' || item.status === currentFilter?.status)
+        );
+        setFilteredData(filtered); // Apply all filters
     }
-  }, [coaData, currentFilter]);
+}, [coaData, currentFilter]);
 
 
 
@@ -119,33 +123,36 @@ const Page = ({ parentWidth }: { parentWidth: number }) => {
     'timeEnd',
     'coa_id',
     'remarks',
-    'userName',
+    'userName'
   ]; // Columns to hide
 
   return (
-    <div className='w-full max-w-[320px] sm:max-w-screen-sm md:max-w-screen-md lg:max-w-screen-xl xl:max-w-screen-2xl'>
-      {!activityLoading ? (
-        <Card>
-          <CardContent className="p-4">
-            <DataTable
-              data={filteredData}
-              columns={columns}
-              hiddenColumns={hiddenColumns}
-              allowSelectRow={false}
-              allowViewCalendar={true}
-              onViewRowId={handleViewRowIdPressed}
-              setAllowViewCalendar={() => setViewCalendar(!viewCalendar)}
-              allowDateRange={true}
-              allowExportToExcel
-            />
-          </CardContent>
-        </Card>
-      ) : (
-        <div className="flex flex-col space-y-3">
-          <Skeleton className="h-[250px] w-full rounded-xl" />
-        </div>
-      )}
-      {activityError && <Label className=' text-destructive'>{activityError}</Label>}
+    <div className='w-full'>
+      <div className='flex flex-col flex-wrap w-full'>
+        {!activityLoading ? (
+          <Card className='w-full overflow-auto crollbar-thin p-1'>
+            <CardContent className='p-4'>
+              <DataTable
+                data={filteredData}
+                columns={columns}
+                hiddenColumns={hiddenColumns}
+                allowSelectRow={false}
+                allowViewCalendar={true}
+                onViewRowId={handleViewRowIdPressed}
+                setAllowViewCalendar={() => setViewCalendar(!viewCalendar)}
+                allowDateRange={true}
+                allowExportToExcel
+              />
+            </CardContent>
+
+          </Card>
+        ) : (
+          <div className="flex flex-col space-y-3">
+            <Skeleton className="h-[250px] w-full rounded-xl" />
+          </div>
+        )}
+        {activityError && <Label className=' text-destructive'>{activityError}</Label>}
+      </div>
       <CalendarSheet activityData={viewCalendarData} openSheet={viewCalendar} closeCalendarSheet={() => setViewCalendar(!viewCalendar)} />
     </div>
   )

@@ -10,7 +10,7 @@ import { useActivitiesData } from '@/lib/calendar-of-activity/useActivitiesDataH
 import { Card, CardContent } from '@/components/ui/card';
 import { useSidebar } from '@/components/ui/sidebar';
 
-const Page = ({ parentWidth }: { parentWidth: number }) => {
+const Page = () => {
   const [coaData, setCoaData] = useState<any[]>([]);
   const [filteredData, setFilteredData] = useState<any[]>([]);
 

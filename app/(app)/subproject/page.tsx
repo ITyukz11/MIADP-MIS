@@ -2,7 +2,6 @@
 
 import React, { useEffect, useMemo, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import GenerateCodeDialog from '@/components/dialog/generate-code-dialog';
 import { useDispatch, useSelector } from '@/app/store/store';
 import { fetchSubprojectData } from '@/app/store/subproject/subprojectAction';
 import { DataTable } from '@/components/table/data-table';
@@ -172,7 +171,6 @@ const Page = (props: Props) => {
           </CardContent>
         </Card>
       </div>
-      <GenerateCodeDialog open={openGenerateDialog} close={() => setGenerateDialog(!openGenerateDialog)} />
       <UnderDevelopmentDialog open={openUnderDev} onClose={()=>setOpenUnderDev(!openUnderDev)}/>
     </div>
   );

@@ -2,6 +2,7 @@ import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { useEffect, useMemo, useState } from "react";
+import { Label } from "@/components/ui/label";
 
   
   interface MarkerData {
@@ -41,7 +42,7 @@ const customMarkerIcon = new L.Icon({
       ],
       []
     );
-  
+  if(!isMounted) return <Label>Loading...</Label>
   
     return (
    
@@ -52,6 +53,7 @@ const customMarkerIcon = new L.Icon({
               zoom={7}
               scrollWheelZoom={true}
               style={{ height: "100%", width: "100%" }}
+              className="rounded-lg"
             >
               <TileLayer
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'

@@ -16,6 +16,8 @@ import { TargetIcon } from '@radix-ui/react-icons';
 import { UnderDevelopmentDialog } from '@/components/UnderDevDialog';
 import { LuConstruction } from "react-icons/lu";
 import { FaStore } from "react-icons/fa";
+import PhilippineMap from '../(components)/PhilippineMap';
+import Image from 'next/image';
 
 // const PhilippineMapz = dynamic(() => import("../(components)/PhilippineMap"), { ssr:false })
 
@@ -92,7 +94,7 @@ const Page = (props: Props) => {
                   </CardHeader>
                   <CardContent>
                   
-                        <div className="text-2xl font-bold">2</div>
+                        <div className="text-2xl font-bold">5</div>
                         <p className="text-xs text-muted-foreground">
                           +2 added from last month
                         </p>
@@ -127,14 +129,13 @@ const Page = (props: Props) => {
 
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">+5</div>
+                    <div className="text-2xl font-bold">+9</div>
                     <p className="text-xs text-muted-foreground">
                       +2 since last month
                     </p>
                   </CardContent>
                 </Card>
               </div>
-      <div className="md:grid grid-cols-2 gap-4 flex flex-wrap">
         <Card>
           <CardHeader></CardHeader>
           <CardContent>
@@ -151,26 +152,32 @@ const Page = (props: Props) => {
                allowSelectRow={false}
                hiddenColumns={[
                  'subprojectTitle',
-                 'component',
                  'province',
                  'municipality',
                  'ancestralDomainLoc',
-                 'type',
                  'createdAt',
                ]}
              />}
           </CardContent>
         </Card>
-        <Card className="w-full">
+      
+      <Card className="w-full">
           <CardHeader></CardHeader>
           <CardContent className="w-full">
-          <div style={{ padding: "20px" }}>
-               {/* <PhilippineMapz/> */}
-               MAP HERE**
-    </div>
+          ***MAP HERE
+          <div className="flex justify-center">
+                        <Image
+                            src={'/under-development/1.png'}
+                            alt="Under Development"
+                            width={300} // Adjust width as needed
+                            height={200} // Adjust height as needed
+                            className="rounded-lg" // Optional styling
+                        />
+                </div>
+               {/* <PhilippineMap/> */}
+
           </CardContent>
         </Card>
-      </div>
       <UnderDevelopmentDialog open={openUnderDev} onClose={()=>setOpenUnderDev(!openUnderDev)}/>
     </div>
   );

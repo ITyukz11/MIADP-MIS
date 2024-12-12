@@ -163,7 +163,7 @@ export function DataTableToolbar<TData>({
       // Define title, date, and filter data
       const title = 'CALENDAR OF ACTIVITIES';
       const date = `Date: ${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}`;
-      const filterData = `Type: ${currentFilter?.typeOfActivity} | Filtered by: ${currentFilter?.filter}`
+      const filterData = `Type: ${currentFilter?.typeOfActivity} | Filtered by: ${currentFilter?.region}`
       const filteredDate = `${formatDate(dateRange?.from)} - ${formatDate(dateRange?.to)}`
 
       // Add title

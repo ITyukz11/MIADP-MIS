@@ -184,7 +184,7 @@ const page = () => {
 
 
     useEffect(() => {
-        if (currentFilter?.filter === 'All') {
+        if (currentFilter?.region === 'All') {
             setFilteredData(filteredCoaData);
 
             const filteredUpcomingData = filteredCoaData
@@ -208,9 +208,9 @@ const page = () => {
             });
 
             const filtered = filteredActivities.filter((item: { user: { region: string | undefined; component: string | undefined; unit: string | undefined; }; }) =>
-                item.user?.region === currentFilter?.filter ||
-                item.user?.component === currentFilter?.filter ||
-                item.user?.unit === currentFilter?.filter
+                item.user?.region === currentFilter?.region ||
+                item.user?.component === currentFilter?.region ||
+                item.user?.unit === currentFilter?.region
             );
 
             const formattedData = filtered.map((event: any) => {

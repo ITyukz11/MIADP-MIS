@@ -210,6 +210,13 @@ export const UACSCode: UACSCodeData = {
     }
 };
 
+export const statusPriority: { [key: string]: number } = {
+    Ongoing: 1,
+    Upcoming: 2,
+    Postponed: 3,
+    Completed: 4,
+    Cancelled: 5
+};
 
 
 

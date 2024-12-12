@@ -97,6 +97,23 @@ export const positionOptions = [
 
 export const statusOptions = ["Upcoming", "Ongoing", "Completed", "Cancelled", "Postponed"]
 
+export const wfpYearOptions = ["2023", "2024", "2025", "2026", "2027", "2028"]
+
+export const monthOptions = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December"
+  ];
+
 export const correspondencePurposeOptions = [
     "For compliance",
     "Give Priority/RUSH/URGENT",

@@ -2,17 +2,19 @@
 import React, { createContext, useState, useContext, ReactNode, FC, useEffect } from 'react';
 
 export interface CalendarOfActivityFilter {
-  filter: string;
+  region: string;
   typeOfActivity: string;
   unit: string;
   status: string
+  month: string
+  wfpYear: string
   // Add other filter properties if needed
 }
 
 // Define the shape of the context value
 interface CalendarOfActivityFilterValue {
   currentFilter: CalendarOfActivityFilter | null;
-  setCurrentFilter: (filter: CalendarOfActivityFilter | null) => void;
+  setCurrentFilter: (region: CalendarOfActivityFilter | null) => void;
 }
 
 // Create the context with a default value
@@ -38,8 +40,8 @@ export const CalendarOfActivityFilterProvider: FC<CalendarOfActivityFilterProvid
     }
   }, [currentFilter]);
 
-  const setCurrentFilter = (filter: CalendarOfActivityFilter | null) => {
-    setCurrentFilterState(filter);
+  const setCurrentFilter = (region: CalendarOfActivityFilter | null) => {
+    setCurrentFilterState(region);
   };
 
   return (

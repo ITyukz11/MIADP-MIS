@@ -2,12 +2,12 @@ import { useSelector } from '@/app/store/store';
 import { useCalendarOfActivityFilter } from '@/components/context/FilterRegionContext';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { statusOptions } from '@/lib/data/filter'
+import { wfpYearOptions } from '@/lib/data/filter'
 import React from 'react'
 
 type Props = {}
 
-function SelectFilterStatus({ }: Props) {
+function SelectFilterWFPYear({ }: Props) {
   const { activityLoading } = useSelector((state) => state.activity);
   const { currentFilter, setCurrentFilter } = useCalendarOfActivityFilter();
 
@@ -16,24 +16,24 @@ function SelectFilterStatus({ }: Props) {
       region: currentFilter?.region || '',
       typeOfActivity: currentFilter?.typeOfActivity || '',
       unit: currentFilter?.unit || '',
-      wfpYear: currentFilter?.wfpYear || '',
+      status:  currentFilter?.status || '',
       month: currentFilter?.month || '',
-      status: value
+      wfpYear: value
     });
   };
 
   return (
     <div>
-      <Label className='font-semibold'>Status:</Label>
-      <Select onValueChange={handleValueChange} value={currentFilter?.status} disabled={activityLoading}>
+      <Label className='font-semibold'>Year:</Label>
+      <Select onValueChange={handleValueChange} value={currentFilter?.wfpYear} disabled={activityLoading}>
         <SelectTrigger className="w-fit">
           <SelectValue placeholder='All' />
         </SelectTrigger>
         <SelectContent>
           <SelectItem value='All'>All</SelectItem>
           <SelectGroup>
-            <SelectLabel>Status</SelectLabel>
-            {statusOptions.map((option, index) => (
+          <SelectLabel>WFP Year</SelectLabel>
+            {wfpYearOptions.map((option, index) => (
               <SelectItem key={index} value={option}>{option}</SelectItem>
             ))}
           </SelectGroup>
@@ -44,4 +44,4 @@ function SelectFilterStatus({ }: Props) {
   )
 }
 
-export default SelectFilterStatus
+export default SelectFilterWFPYear

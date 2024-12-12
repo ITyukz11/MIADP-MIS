@@ -15,10 +15,12 @@ function SelectFilterUnitComponent({}: Props) {
 
     const handleValueChange = (value: string) => {
         setCurrentFilter({ 
-          filter: currentFilter?.filter || '', 
+          region: currentFilter?.region || '', 
           typeOfActivity:currentFilter?.typeOfActivity || '', 
           unit:value,
-          status:currentFilter?.status || ''
+          status:currentFilter?.status || '',
+          month: currentFilter?.month || '',
+          wfpYear: currentFilter?.wfpYear || ''
         });
       };
 

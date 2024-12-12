@@ -15,17 +15,19 @@ function SelectFilterRegUniCom({ }: Props) {
 
   const handleValueChange = (value: string) => {
     setCurrentFilter({
-      filter: value,
+      region: value,
       typeOfActivity: currentFilter?.typeOfActivity || '',
       unit: currentFilter?.unit || '',
-      status: currentFilter?.status || ''
+      status: currentFilter?.status || '',
+      month: currentFilter?.month || '',
+      wfpYear: currentFilter?.wfpYear || ''
     });
   };
 
   return (
     <div >
       <Label className='font-semibold'>Region:</Label>
-      <Select onValueChange={handleValueChange} value={currentFilter?.filter} disabled={activityLoading}>
+      <Select onValueChange={handleValueChange} value={currentFilter?.region} disabled={activityLoading}>
         <SelectTrigger className="w-fit">
           <SelectValue placeholder={currentUser?.region ? currentUser?.region : "Filter"} />
         </SelectTrigger>

@@ -24,6 +24,10 @@ import SelectTypeOfActivity from './components/SelectTypeOfActivity'
 import SelectFilterUnitComponent from './components/SelectFilterUnit'
 import SelectFilterStatus from './components/SelectFilterStatus'
 import { useSidebar } from '@/components/ui/sidebar'
+import SelectFilterWFPYear from './components/SelectFilterWFPYear'
+import SelectFilterMonth from './components/SelectFilterMonth'
+import { IoMdHelpCircle } from 'react-icons/io'
+import MIADPColorCodeDialog from './components/Dialog/MIADPColorCode'
 
 interface ActivitiesLayoutProps {
   children: React.ReactNode
@@ -35,6 +39,7 @@ export default function ActivitiesLayout({ children }: ActivitiesLayoutProps) {
   const [individualActivity, setIndividualActivity] = useState(false)
   const [fetchActivitiesDataDate, setActivitiesDataDate] = useState<string>('');
 
+  const [viewMapColorCode, setViewMapColorCode] = useState<boolean>(false);
   const pathname = usePathname()
 
   const handleSetIndividualActivity = (isIndividual: boolean) => {
@@ -43,7 +48,7 @@ export default function ActivitiesLayout({ children }: ActivitiesLayoutProps) {
   };
 
   const { activitiesData, activityError, activityLoading } = useActivitiesData()
-  const {state} = useSidebar()
+  const { state } = useSidebar()
   // const dispatch = useDispatch();
   // const { activitiesData, activityLoading, activityError } = useSelector((state) => state.activity);
 
@@ -132,10 +137,16 @@ export default function ActivitiesLayout({ children }: ActivitiesLayoutProps) {
       <div className='flex flex-row flex-wrap gap-2'>
         <Card className='flex flex-row gap-2 w-full shadow-none'>
           <CardContent className='flex items-center justify-center md:justify-start gap-2 w-full p-4 flex-wrap'>
-              <SelectTypeOfActivity />
-              <SelectFilterRegUniCom />
-              <SelectFilterUnitComponent />
-              <SelectFilterStatus />
+            <SelectTypeOfActivity />
+            <SelectFilterRegUniCom />
+            <SelectFilterUnitComponent />
+            <SelectFilterStatus />
+            <SelectFilterMonth />
+            <SelectFilterWFPYear />
+            <Button className='ml-auto' onClick={() => setViewMapColorCode(true)}>
+              <IoMdHelpCircle className='shrink-0 w-10 h-10' />
+              Legend
+            </Button>
           </CardContent>
         </Card>
 
@@ -153,6 +164,7 @@ export default function ActivitiesLayout({ children }: ActivitiesLayoutProps) {
       <CalendarFormDialog open={calendarFormOpen}
         setClose={() => setCalendarFormOpen(false)}
         individualActivity_={individualActivity} />
+      <MIADPColorCodeDialog open={viewMapColorCode} setClose={() => setViewMapColorCode(!viewMapColorCode)} />
     </div>
   )
 }

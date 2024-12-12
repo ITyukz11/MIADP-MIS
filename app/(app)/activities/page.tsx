@@ -61,21 +61,21 @@ const Page = () => {
 
 
   useEffect(() => {
-    if (currentFilter?.filter === 'All' && currentFilter?.unit === 'All' && currentFilter?.status === 'All') {
+    if (currentFilter?.region === 'All' && currentFilter?.unit === 'All' && currentFilter?.status === 'All') {
       console.log("1");
-      console.log("region: ", currentFilter?.filter);
+      console.log("region: ", currentFilter?.region);
       console.log("unit/component: ", currentFilter?.unit);
       console.log("status: ", currentFilter?.status);
       setFilteredData(coaData); // Return all data
     }
-    else if (currentFilter?.filter !== 'All' && currentFilter?.unit === 'All' && currentFilter?.status === 'All') {
+    else if (currentFilter?.region !== 'All' && currentFilter?.unit === 'All' && currentFilter?.status === 'All') {
       console.log("2");
       const filtered = coaData.filter(item =>
-        item.user?.region === currentFilter?.filter
+        item.user?.region === currentFilter?.region
       );
       setFilteredData(filtered); // Filter by region only
     }
-    else if (currentFilter?.filter === 'All' && currentFilter?.unit !== 'All' && currentFilter?.status === 'All') {
+    else if (currentFilter?.region === 'All' && currentFilter?.unit !== 'All' && currentFilter?.status === 'All') {
       console.log("3");
       const filtered = coaData.filter(item =>
         item.user?.unit === currentFilter?.unit ||
@@ -83,10 +83,10 @@ const Page = () => {
       );
       setFilteredData(filtered); // Filter by unit/component only
     }
-    else if (currentFilter?.filter !== 'All' && currentFilter?.unit !== 'All' && currentFilter?.status === 'All') {
+    else if (currentFilter?.region !== 'All' && currentFilter?.unit !== 'All' && currentFilter?.status === 'All') {
       console.log("4");
       const filtered = coaData.filter(item =>
-        item.user?.region === currentFilter?.filter &&
+        item.user?.region === currentFilter?.region &&
         (
           item.user?.unit === currentFilter?.unit ||
           item.user?.component === currentFilter?.unit
@@ -98,7 +98,7 @@ const Page = () => {
       console.log("5");
       // Combine all filters including status
       const filtered = coaData.filter(item =>
-        (currentFilter?.filter === 'All' || item.user?.region === currentFilter?.filter) &&
+        (currentFilter?.region === 'All' || item.user?.region === currentFilter?.region) &&
         (currentFilter?.unit === 'All' ||
           item.user?.unit === currentFilter?.unit ||
           item.user?.component === currentFilter?.unit) &&

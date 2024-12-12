@@ -55,6 +55,7 @@ export interface User {
     color: string;
     attachments: any;
     status: string;
+    WFPYear:string
     userName: string;
     createdAt: string;
     updatedAt: string;

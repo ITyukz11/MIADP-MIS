@@ -33,30 +33,49 @@ const Page: React.FC = () => {
             }
             return true;
         });
+        const statusPriority: { [key: string]: number } = {
+            Ongoing: 1,
+            Upcoming: 2,
+            Postponed: 3,
+            Completed: 4,
+            Others: 5,
+        };
 
-        const sortedActivities = filteredActivities.sort(
-            (a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-        );
-        setCoaData(sortedActivities);
+        const currentDate = new Date();
+        const sortedActivities = filteredActivities.sort((a: any, b: any) => {
+            // Sort by status priority first
+            const statusComparison =
+                (statusPriority[a.status] || 999) - (statusPriority[b.status] || 999);
+            if (statusComparison !== 0) return statusComparison;
+
+            // If statuses are equal, sort by date proximity to the current date
+            const dateA = new Date(a.date);
+            const dateB = new Date(b.date);
+
+            return Math.abs(dateA.getTime() - currentDate.getTime()) -
+                Math.abs(dateB.getTime() - currentDate.getTime());
+        });
+
         setFilteredData(sortedActivities);
+        setCoaData(sortedActivities);
     }, [activitiesData, currentFilter, itemsToShow]);
 
     useEffect(() => {
-        if (currentFilter?.filter === 'All' && currentFilter?.unit === 'All' && currentFilter?.status === 'All') {
+        if (currentFilter?.region === 'All' && currentFilter?.unit === 'All' && currentFilter?.status === 'All') {
             console.log("1");
-            console.log("region: ", currentFilter?.filter);
+            console.log("region: ", currentFilter?.region);
             console.log("unit/component: ", currentFilter?.unit);
             console.log("status: ", currentFilter?.status);
             setFilteredData(coaData); // Return all data
         }
-        else if (currentFilter?.filter !== 'All' && currentFilter?.unit === 'All' && currentFilter?.status === 'All') {
+        else if (currentFilter?.region !== 'All' && currentFilter?.unit === 'All' && currentFilter?.status === 'All') {
             console.log("2");
             const filtered = coaData.filter(item =>
-                item.user?.region === currentFilter?.filter
+                item.user?.region === currentFilter?.region
             );
             setFilteredData(filtered); // Filter by region only
         }
-        else if (currentFilter?.filter === 'All' && currentFilter?.unit !== 'All' && currentFilter?.status === 'All') {
+        else if (currentFilter?.region === 'All' && currentFilter?.unit !== 'All' && currentFilter?.status === 'All') {
             console.log("3");
             const filtered = coaData.filter(item =>
                 item.user?.unit === currentFilter?.unit ||
@@ -64,10 +83,10 @@ const Page: React.FC = () => {
             );
             setFilteredData(filtered); // Filter by unit/component only
         }
-        else if (currentFilter?.filter !== 'All' && currentFilter?.unit !== 'All' && currentFilter?.status === 'All') {
+        else if (currentFilter?.region !== 'All' && currentFilter?.unit !== 'All' && currentFilter?.status === 'All') {
             console.log("4");
             const filtered = coaData.filter(item =>
-                item.user?.region === currentFilter?.filter &&
+                item.user?.region === currentFilter?.region &&
                 (
                     item.user?.unit === currentFilter?.unit ||
                     item.user?.component === currentFilter?.unit
@@ -79,7 +98,7 @@ const Page: React.FC = () => {
             console.log("5");
             // Combine all filters including status
             const filtered = coaData.filter(item =>
-                (currentFilter?.filter === 'All' || item.user?.region === currentFilter?.filter) &&
+                (currentFilter?.region === 'All' || item.user?.region === currentFilter?.region) &&
                 (currentFilter?.unit === 'All' ||
                     item.user?.unit === currentFilter?.unit ||
                     item.user?.component === currentFilter?.unit) &&
@@ -89,8 +108,12 @@ const Page: React.FC = () => {
         }
     }, [coaData, currentFilter]);
 
+    useEffect(() => {
+        if (currentFilter?.wfpYear === "All") {
+            setFilteredData(coaData); // Return all data
 
-
+        } else setFilteredData(coaData.filter((data) => data.WFPYear == currentFilter?.wfpYear))
+    }, [currentFilter?.wfpYear, coaData])
 
     const handleLoadMore = () => {
         const nextItems = itemsToShow + 5;
@@ -133,7 +156,7 @@ const Page: React.FC = () => {
         '/crying-cat/crying-cat-5.gif',
     ]
 
-    
+
     if (activityError) {
         return <Label className="text-destructive">{activityError}</Label>;
     }
@@ -219,8 +242,8 @@ const Page: React.FC = () => {
                             {/* Information Section */}
                             <div className="flex flex-col gap-2 w-full md:pr-14">
                                 {/* Date, Type, and Location */}
-                                <div className="text-sm">
-                                    <Label>{data.dateFrom == data.dateTo ? formatDateLong(data.dateFrom) : `${formatDateLong(data.dateFrom)} - ${formatDateLong(data.dateTo)}`} | </Label>
+                                <div className='flex items-center'>
+                                    <Label className='font-bold text-lg'>{data.dateFrom == data.dateTo ? formatDateLong(data.dateFrom) : `${formatDateLong(data.dateFrom)} - ${formatDateLong(data.dateTo)}`} | </Label>
                                     <Label className="font-semibold">{data.type} | </Label>
                                     <Label>{data.location}</Label>
                                 </div>
@@ -233,23 +256,28 @@ const Page: React.FC = () => {
                                     {/* Target Participants */}
                                     {data.targetParticipant.split(',').map((item, index) => (
                                         <Badge
+                                            variant={'secondary'}
                                             key={index}>
                                             {item.trim()}
                                         </Badge>
                                     ))}
                                     <Separator orientation="vertical" className="h-4 mx-2" />
                                     {/* Region and Component / Unit */}
-                                    <Badge className="bg-gray-100 text-gray-800 px-2 py-1 rounded-md whitespace-nowrap">
+                                    <Badge className="whitespace-nowrap">
                                         {data.user.region}
                                     </Badge>
-                                    <Badge className="bg-gray-100 text-gray-800 px-2 py-1 rounded-md whitespace-nowrap">
+                                    <Badge className="whitespace-nowrap">
                                         {data.user.component}
                                     </Badge>
                                     {data.user.unit && (
-                                        <Badge className="bg-gray-100 text-gray-800 px-2 py-1 rounded-md whitespace-nowrap">
+                                        <Badge className="whitespace-nowrap">
                                             {data.user.unit}
                                         </Badge>
                                     )}
+                                    <Separator orientation="vertical" className="h-4 mx-2" />
+                                    <Badge variant={'secondary'} className='whitespace-nowrap'>
+                                        {data.WFPYear}
+                                    </Badge>
                                 </div>
                                 {/* Activity Details */}
                                 <Label className="pb-2">{data.activityDescription}</Label>

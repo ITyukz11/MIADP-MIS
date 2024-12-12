@@ -11,10 +11,12 @@ function SelectTypeOfActivity({ }: Props) {
     const { currentFilter, setCurrentFilter } = useCalendarOfActivityFilter();
     const handleTypeOfActivtyChange = (value: string) => {
         setCurrentFilter({
-            filter: currentFilter?.filter || '',
+            region: currentFilter?.region || '',
             unit: currentFilter?.unit || '',
             typeOfActivity: value,
-            status: currentFilter?.status || ''
+            status: currentFilter?.status || '',
+            month: currentFilter?.month || '',
+            wfpYear: currentFilter?.wfpYear || ''
         });
     };
 

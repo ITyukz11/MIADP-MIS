@@ -2,12 +2,12 @@ import { useSelector } from '@/app/store/store';
 import { useCalendarOfActivityFilter } from '@/components/context/FilterRegionContext';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { statusOptions } from '@/lib/data/filter'
+import { monthOptions, wfpYearOptions } from '@/lib/data/filter'
 import React from 'react'
 
 type Props = {}
 
-function SelectFilterStatus({ }: Props) {
+function SelectFilterMonth({ }: Props) {
   const { activityLoading } = useSelector((state) => state.activity);
   const { currentFilter, setCurrentFilter } = useCalendarOfActivityFilter();
 
@@ -16,24 +16,24 @@ function SelectFilterStatus({ }: Props) {
       region: currentFilter?.region || '',
       typeOfActivity: currentFilter?.typeOfActivity || '',
       unit: currentFilter?.unit || '',
-      wfpYear: currentFilter?.wfpYear || '',
-      month: currentFilter?.month || '',
-      status: value
+      status:  currentFilter?.status || '',
+      month: value,
+      wfpYear: currentFilter?.wfpYear || ''
     });
   };
 
   return (
     <div>
-      <Label className='font-semibold'>Status:</Label>
-      <Select onValueChange={handleValueChange} value={currentFilter?.status} disabled={activityLoading}>
-        <SelectTrigger className="w-fit">
+      <Label className='font-semibold'>Month:</Label>
+      <Select onValueChange={handleValueChange} value={currentFilter?.month} disabled={activityLoading}>
+        <SelectTrigger className="w-fit" disabled>
           <SelectValue placeholder='All' />
         </SelectTrigger>
         <SelectContent>
           <SelectItem value='All'>All</SelectItem>
           <SelectGroup>
-            <SelectLabel>Status</SelectLabel>
-            {statusOptions.map((option, index) => (
+          <SelectLabel>Months</SelectLabel>
+            {monthOptions.map((option, index) => (
               <SelectItem key={index} value={option}>{option}</SelectItem>
             ))}
           </SelectGroup>
@@ -44,4 +44,4 @@ function SelectFilterStatus({ }: Props) {
   )
 }
 
-export default SelectFilterStatus
+export default SelectFilterMonth

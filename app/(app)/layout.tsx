@@ -28,10 +28,12 @@ export default async function AppLayout({ children }: AppLayoutProps) {
 
     // Default value for typeOfActivity
     const initialFilter = {
-        filter: session.user.region as string,
+        region: session.user.region as string,
         typeOfActivity: 'WFP Activities', // Default value or set as needed
         unit: 'All',
-        status: 'All'
+        status: 'All',
+        wfpYear: 'All',
+        month: 'All'
     };
     console.log("session.user:", session.user.verificationAnswer)
     return (
@@ -39,14 +41,13 @@ export default async function AppLayout({ children }: AppLayoutProps) {
             <CurrentUserProvider initialUser={session.user as any}>
                 <SidebarProvider>
                     <CalendarOfActivityFilterProvider initialFilter={initialFilter}>
-                        <div className="flex justify-center w-full min-w-[320px] overflow-x-auto">
                             <ErrorBoundary errorComponent={GlobalError}>
                                 {/* Sidebar */}
                                 <SiteSideBar />
 
                                 {/* Main Content */}
                                 <div className="flex flex-col flex-1">
-                                    <main className="dark:bg-black bg-[#F1F5F9] flex flex-col flex-1 w-full">
+                                    <main className="dark:bg-black bg-[#F1F5F9] flex flex-col flex-1 w-full relative">
                                         {/* Adjusted SiteHeader */}
                                         <SiteHeader />
                                         <div className="p-4 overflow-x-hidden">
@@ -62,7 +63,6 @@ export default async function AppLayout({ children }: AppLayoutProps) {
                                 </div>
 
                             </ErrorBoundary>
-                        </div>
                     </CalendarOfActivityFilterProvider>
                 </SidebarProvider>
             </CurrentUserProvider>

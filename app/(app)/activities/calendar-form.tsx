@@ -115,14 +115,14 @@ const CalendarForm = ({ setDialogClose, individualActivity_ }: Props) => {
     const [dateToError, setDateToError] = useState(false)
     const [preparatoryContentError, setPreparatoryContentError] = useState(false)
 
-    const [WFPYear, setWFPYear] = useState(new Date().getFullYear().toString());
+    // const [WFPYear, setWFPYear] = useState(new Date().getFullYear().toString());
 
     const form = useForm<z.infer<typeof CalendarOfActivitySchema>>({
         resolver: zodResolver(CalendarOfActivitySchema),
         defaultValues: {
             authorizeOther: false,
             individualActivity: individualActivity_,
-            WFPYear: WFPYear,
+            WFPYear: new Date().getFullYear().toString(),
             activityTitle: '',
             activityDescription: '',
             targetParticipant: '',
@@ -455,7 +455,7 @@ const CalendarForm = ({ setDialogClose, individualActivity_ }: Props) => {
                             isDisabled={loadingForm}
                         />
                         <div className='mt-auto'>
-                            <Select onValueChange={(value) => setWFPYear(value)} defaultValue={WFPYear} disabled={loadingForm}>
+                            {/* <Select onValueChange={(value) => setWFPYear(value)} defaultValue={WFPYear} disabled={loadingForm}>
                                 <SelectTrigger className='text-xs sm:text-sm'>
                                     <SelectValue placeholder="Year" />
                                 </SelectTrigger>
@@ -471,7 +471,21 @@ const CalendarForm = ({ setDialogClose, individualActivity_ }: Props) => {
                                         </SelectItem>
                                     ))}
                                 </SelectContent>
-                            </Select>
+                            </Select> */}
+                            <FormFieldWrapper
+                                control={form.control}
+                                name='WFPYear'
+                                label='WFP Year'
+                                placeholder='WFP Year'
+                                isDisabled={loadingForm}
+                                tabIndex={1}
+                                type='select'
+                                selectOptions={
+                                    WFPYears.map((year, index) => (
+                                        { label: year, value: year }
+                                    ))
+                                }
+                            />
                         </div>
                     </div>
                     <FormFieldWrapper

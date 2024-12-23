@@ -14,6 +14,7 @@ import {
     SelectTrigger,
     SelectValue,
   } from "@/components/ui/select"
+import { useEffect } from "react"
   
   interface DataTablePaginationProps<TData> {
     table: Table<TData>
@@ -22,6 +23,11 @@ import {
   export function DataTablePagination<TData>({
     table,
   }: DataTablePaginationProps<TData>) {
+
+    useEffect(() => {
+     table.setPageSize(20)
+    }, [table])
+    
     return (
       <div className="flex items-center justify-between px-2 flex-wrap">
         <div className="flex-1 text-sm text-muted-foreground flex-wrap sm:justify-center">

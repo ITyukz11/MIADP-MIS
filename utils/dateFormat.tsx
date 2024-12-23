@@ -42,3 +42,9 @@ export const formatDateLong = (dateString: string) => {
     const day = date.getDate();
     return `${month} ${day}, ${year}`;
 };
+
+export const getMonth = (dateString: string): string => {
+  const date = new Date(dateString); // Parse the date string
+  const options = { month: "long" } as const; // Specify the format for the month name
+  return date.toLocaleDateString("en-US", options); // Return the month name in English
+};

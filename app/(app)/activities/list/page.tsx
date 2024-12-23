@@ -1,38 +1,66 @@
 'use client';
+import React, { useEffect, useState, useMemo } from 'react';
+import Image from 'next/image';
 import { useCalendarOfActivityFilter } from '@/components/context/FilterRegionContext';
-import { formatDate, getStatusColor } from '@/components/table/data/activities/coa-columns';
+import { formatDateLong, formatDateShort, getMonth } from '@/utils/dateFormat';
 import { Badge } from '@/components/ui/badge';
-import { Button, buttonVariants } from '@/components/ui/button';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useActivitiesData } from '@/lib/calendar-of-activity/useActivitiesDataHook';
-import { statusOptions } from '@/lib/data/filter';
-import { cn } from '@/lib/utils';
+import { getStatusColor } from '@/components/table/data/activities/coa-columns';
 import { Activity } from '@/types/calendar-of-activity/calendar-of-activity';
-import { formatDateLong, formatDateShort } from '@/utils/dateFormat';
-import Image from 'next/image';
-import React, { useEffect, useState } from 'react';
+import { CalendarSheet } from '@/components/calendar-of-activity/CalendarSheet';
 
 const Page: React.FC = () => {
     const { activitiesData, activityError, activityLoading } = useActivitiesData();
+    const { currentFilter } = useCalendarOfActivityFilter();
     const [filteredData, setFilteredData] = useState<Activity[]>([]);
     const [itemsToShow, setItemsToShow] = useState(5);
-    const [coaData, setCoaData] = useState<any[]>([]);
-    const { currentFilter } = useCalendarOfActivityFilter();
 
+    const [viewCalendarData, setViewCalendarData] = useState<any[]>([]);
+    const [viewCalendar, setViewCalendar] = useState(false);
+
+    // Helper function to apply all filters
+    const applyFilters = useMemo(() => {
+        return (data: Activity[]) => {
+            return data.filter((activity) => {
+                const matchesType =
+                    currentFilter?.typeOfActivity === 'WFP Activities'
+                        ? !activity.individualActivity
+                        : currentFilter?.typeOfActivity === 'Individual Activities'
+                            ? activity.individualActivity
+                            : true;
+
+                const matchesRegion =
+                    currentFilter?.region === 'All' || activity.user?.region === currentFilter?.region;
+
+                const matchesUnit =
+                    currentFilter?.unit === 'All' ||
+                    activity.user?.unit === currentFilter?.unit ||
+                    activity.user?.component === currentFilter?.unit;
+
+                const matchesStatus =
+                    currentFilter?.status === 'All' || activity.status === currentFilter?.status;
+
+                const matchesMonth =
+                    currentFilter?.month === 'All' || getMonth(activity.dateFrom) === currentFilter?.month;
+
+                const matchesWFPYear =
+                    currentFilter?.wfpYear === 'All' || activity.WFPYear === currentFilter?.wfpYear;
+
+                return matchesType && matchesRegion && matchesUnit && matchesStatus && matchesMonth && matchesWFPYear;
+            });
+        };
+    }, [currentFilter]);
+
+    // Apply filters and sort data
     useEffect(() => {
         if (!activitiesData) return;
 
-        const filteredActivities = activitiesData.filter((activity: any) => {
-            if (currentFilter?.typeOfActivity === 'WFP Activities') {
-                return !activity.individualActivity;
-            } else if (currentFilter?.typeOfActivity === 'Individual Activities') {
-                return activity.individualActivity;
-            }
-            return true;
-        });
+        const filtered = applyFilters(activitiesData);
         const statusPriority: { [key: string]: number } = {
             Ongoing: 1,
             Upcoming: 2,
@@ -42,111 +70,42 @@ const Page: React.FC = () => {
         };
 
         const currentDate = new Date();
-        const sortedActivities = filteredActivities.sort((a: any, b: any) => {
-            // Sort by status priority first
+        const sorted = filtered.sort((a, b) => {
             const statusComparison =
                 (statusPriority[a.status] || 999) - (statusPriority[b.status] || 999);
             if (statusComparison !== 0) return statusComparison;
 
-            // If statuses are equal, sort by date proximity to the current date
-            const dateA = new Date(a.date);
-            const dateB = new Date(b.date);
-
-            return Math.abs(dateA.getTime() - currentDate.getTime()) -
-                Math.abs(dateB.getTime() - currentDate.getTime());
+            const dateA = new Date(a.dateFrom).getTime();
+            const dateB = new Date(b.dateFrom).getTime();
+            return Math.abs(dateA - currentDate.getTime()) - Math.abs(dateB - currentDate.getTime());
         });
 
-        setFilteredData(sortedActivities);
-        setCoaData(sortedActivities);
-    }, [activitiesData, currentFilter, itemsToShow]);
-
-    useEffect(() => {
-        if (currentFilter?.region === 'All' && currentFilter?.unit === 'All' && currentFilter?.status === 'All') {
-            console.log("1");
-            console.log("region: ", currentFilter?.region);
-            console.log("unit/component: ", currentFilter?.unit);
-            console.log("status: ", currentFilter?.status);
-            setFilteredData(coaData); // Return all data
-        }
-        else if (currentFilter?.region !== 'All' && currentFilter?.unit === 'All' && currentFilter?.status === 'All') {
-            console.log("2");
-            const filtered = coaData.filter(item =>
-                item.user?.region === currentFilter?.region
-            );
-            setFilteredData(filtered); // Filter by region only
-        }
-        else if (currentFilter?.region === 'All' && currentFilter?.unit !== 'All' && currentFilter?.status === 'All') {
-            console.log("3");
-            const filtered = coaData.filter(item =>
-                item.user?.unit === currentFilter?.unit ||
-                item.user?.component === currentFilter?.unit
-            );
-            setFilteredData(filtered); // Filter by unit/component only
-        }
-        else if (currentFilter?.region !== 'All' && currentFilter?.unit !== 'All' && currentFilter?.status === 'All') {
-            console.log("4");
-            const filtered = coaData.filter(item =>
-                item.user?.region === currentFilter?.region &&
-                (
-                    item.user?.unit === currentFilter?.unit ||
-                    item.user?.component === currentFilter?.unit
-                )
-            );
-            setFilteredData(filtered); // Filter by region and unit/component
-        }
-        else {
-            console.log("5");
-            // Combine all filters including status
-            const filtered = coaData.filter(item =>
-                (currentFilter?.region === 'All' || item.user?.region === currentFilter?.region) &&
-                (currentFilter?.unit === 'All' ||
-                    item.user?.unit === currentFilter?.unit ||
-                    item.user?.component === currentFilter?.unit) &&
-                (currentFilter?.status === 'All' || item.status === currentFilter?.status)
-            );
-            setFilteredData(filtered); // Apply all filters
-        }
-    }, [coaData, currentFilter]);
-
-    useEffect(() => {
-        if (currentFilter?.wfpYear === "All") {
-            setFilteredData(coaData); // Return all data
-
-        } else setFilteredData(coaData.filter((data) => data.WFPYear == currentFilter?.wfpYear))
-    }, [currentFilter?.wfpYear, coaData])
+        setFilteredData(sorted);
+    }, [activitiesData, applyFilters]);
 
     const handleLoadMore = () => {
-        const nextItems = itemsToShow + 5;
-        setItemsToShow(nextItems);
+        setItemsToShow((prev) => prev + 5);
     };
 
-    type ColorMapping = {
-        [key: string]: string;
-    };
-
-    const regionColors: ColorMapping = {
-        'PSO': '#C80000',
+    const regionColors: Record<string, string> = {
+        PSO: '#C80000',
         'RPCO 9': '#ffc124',
         'RPCO 10': '#9117c2',
         'RPCO 11': '#0173bc',
         'RPCO 12': '#ff6f00',
         'RPCO 13': '#ff0090',
-        'BARMM': '#3cb54b'
-    }
-
-    type RegionLogoMapping = {
-        [key: string]: string;
+        BARMM: '#3cb54b',
     };
 
-    const regionLogo: RegionLogoMapping = {
-        'PSO': '/miadp-pso.jpg',
+    const regionLogo: Record<string, string> = {
+        PSO: '/miadp-pso.jpg',
         'RPCO 9': '/miadp-region-ix.jpg',
         'RPCO 10': '/miadp-region-x.jpg',
         'RPCO 11': '/miadp-region-xi.jpg',
         'RPCO 12': '/miadp-region-xii.jpg',
         'RPCO 13': '/miadp-region-xiii.jpg',
-        'BARMM': '/miadp-barmm.jpg'
-    }
+        BARMM: '/miadp-barmm.jpg',
+    };
 
     const cryingCat = [
         '/crying-cat/crying-cat-1.gif',
@@ -154,83 +113,74 @@ const Page: React.FC = () => {
         '/crying-cat/crying-cat-3.gif',
         '/crying-cat/crying-cat-4.gif',
         '/crying-cat/crying-cat-5.gif',
-    ]
-
+    ];
 
     if (activityError) {
         return <Label className="text-destructive">{activityError}</Label>;
     }
 
     if (activityLoading) {
-        return <div className='flex flex-col gap-4 max-w-5xl self-center w-full'>
-            <Skeleton className="h-28 w-full" />
-            <Skeleton className="h-28 w-full" />
-            <Skeleton className="h-28 w-full" />
-            <Skeleton className="h-28 w-full" />
-        </div>;
+        return (
+            <div className="flex flex-col gap-4 max-w-5xl self-center w-full">
+                <Skeleton className="h-28 w-full" />
+                <Skeleton className="h-28 w-full" />
+                <Skeleton className="h-28 w-full" />
+                <Skeleton className="h-28 w-full" />
+            </div>
+        );
     }
 
-    if (filteredData.length == 0) return (
-        <div className='flex flex-col items-center'>
-
-            <Label className='text-destructive text-3xl font-bold'>No data</Label>
-            <Image
-                src={cryingCat[Math.floor(Math.random() * cryingCat.length)]}
-                width={300}
-                height={300}
-                alt="Crying cat logo"
-                className="rounded-xl"
-            />
-        </div>
-    );
-
-
+    if (filteredData.length === 0) {
+        return (
+            <div className="flex flex-col items-center">
+                <Label className="text-destructive text-3xl font-bold">No data</Label>
+                <Image
+                    src={cryingCat[Math.floor(Math.random() * cryingCat.length)]}
+                    width={300}
+                    height={300}
+                    alt="Crying cat"
+                    className="rounded-xl"
+                />
+            </div>
+        );
+    }
 
     return (
         <div className="max-w-5xl self-center w-full">
-            {/* Filters Section */}
-            {/* <div className="flex flex-wrap gap-2 mb-6">
-                {['All', ...statusOptions].map((filter) => (
-                    <Button
-                        key={filter}
-                        className={cn(
-                            buttonVariants({ variant: 'outline' }),
-                            'hover:bg-blue-100 text-gray-700 dark:hover:bg-blue-700 border-gray-300 rounded-[6px] xs:w-[200px] md:w-fit flex flex-row gap-1 items-center justify-center overflow-hidden text-xs lg:text-sm',
-                            {
-                                'font-bold hover:bg-blue-100 dark:hover:bg-blue-700 bg-blue-100 dark:bg-blue-700': filter === 'All',
-                            }
-                        )}
-                    >
-                        {filter}
-                    </Button>
-                ))}
-            </div> */}
-
-            {/* Event Cards */}
             <div className="space-y-4">
-                {filteredData.slice(0, itemsToShow).map((data: Activity) => (
-                    <Card key={data.id} className="shadow-md">
+                {filteredData.slice(0, itemsToShow).map((data) => (
+                    <Card
+                        key={data.id}
+                        className="shadow-md cursor-pointer dark:hover:bg-slate-900 hover:bg-slate-100"
+                        onClick={() => {
+                            setViewCalendarData([data]);
+                            setViewCalendar(!viewCalendar);
+                        }}
+                    >
                         <CardContent className="flex flex-row p-4 gap-4 relative overflow-hidden rounded-tr-xl">
                             {/* Region Color */}
-                            {/* <div className='absolute -top-24 -right-32 w-48 h-48 -rotate-45 shadow-md'
-                                style={{ backgroundColor: regionColors[data.user.region] }}>
-                            </div> */}
-                            <div className='hidden absolute top-0 right-0 w-28 h-16 rounded-bl-full shadow-md md:flex justify-center items-center border-2'
-                                style={{ backgroundColor: regionColors[data.user.region] }}>
-                                <Label className='text-2xl ml-4 mb-1 text-white'>{formatDateShort(data.dateFrom)}</Label>
+                            <div
+                                className="absolute top-0 right-0 w-28 h-16 rounded-bl-full shadow-md md:flex justify-center items-center border-2 cursor-pointer"
+                                style={{ backgroundColor: regionColors[data.user.region] }}
+                            >
+                                <Label className="text-2xl ml-4 mb-1 text-white">
+                                    {formatDateShort(data.dateFrom)}
+                                </Label>
                             </div>
 
                             {/* Image Section */}
-                            <div className='hidden flex-shrink-0 gap-4 md:flex flex-col'>
+                            <div className="flex-shrink-0 gap-4 md:flex flex-col">
                                 <Image
                                     src={regionLogo[data.user.region]}
                                     width={80}
                                     height={80}
                                     alt={`${data.activityTitle} logo`}
-                                    className="rounded-full"
+                                    className="rounded-full cursor-pointer"
                                 />
                                 <Badge
-                                    className={`font-medium cursor-default shadow-sm z-10 dark:text-white hover:${getStatusColor(data.status)} ${getStatusColor(data.status)}`}
+                                    className={`font-medium shadow-sm z-10 dark:text-white cursor-pointer hover:${getStatusColor(
+                                        data.status
+                                    )} ${getStatusColor(data.status)}`}
                                 >
                                     {data.status}
                                     {data.status === 'Ongoing' && (
@@ -241,61 +191,47 @@ const Page: React.FC = () => {
 
                             {/* Information Section */}
                             <div className="flex flex-col gap-2 w-full md:pr-14">
-                                {/* Date, Type, and Location */}
-                                <div className='flex items-center'>
-                                    <Label className='font-bold text-lg'>{data.dateFrom == data.dateTo ? formatDateLong(data.dateFrom) : `${formatDateLong(data.dateFrom)} - ${formatDateLong(data.dateTo)}`} | </Label>
-                                    <Label className="font-semibold">{data.type} | </Label>
-                                    <Label>{data.location}</Label>
+                                <div className="flex items-center">
+                                    <Label className="font-bold text-lg cursor-pointer">
+                                        {data.dateFrom === data.dateTo
+                                            ? formatDateLong(data.dateFrom)
+                                            : `${formatDateLong(data.dateFrom)} - ${formatDateLong(data.dateTo)}`}
+                                        {' '}|
+                                    </Label>
+                                    <Label className="font-semibold cursor-pointer">{data.type} | </Label>
+                                    <Label className="cursor-pointer">{data.location}</Label>
                                 </div>
-
-                                {/* Activity Title */}
-                                <Label className="text-xl font-semibold">{data.activityTitle}</Label>
-
-                                {/* Target Participants */}
+                                <Label className="text-xl font-semibold cursor-pointer">{data.activityTitle}</Label>
                                 <div className="text-sm flex gap-2 flex-wrap items-center">
-                                    {/* Target Participants */}
                                     {data.targetParticipant.split(',').map((item, index) => (
-                                        <Badge
-                                            variant={'secondary'}
-                                            key={index}>
+                                        <Badge key={index} variant="secondary" className="cursor-pointer">
                                             {item.trim()}
                                         </Badge>
                                     ))}
                                     <Separator orientation="vertical" className="h-4 mx-2" />
-                                    {/* Region and Component / Unit */}
-                                    <Badge className="whitespace-nowrap">
-                                        {data.user.region}
-                                    </Badge>
-                                    <Badge className="whitespace-nowrap">
-                                        {data.user.component}
-                                    </Badge>
-                                    {data.user.unit && (
-                                        <Badge className="whitespace-nowrap">
-                                            {data.user.unit}
-                                        </Badge>
-                                    )}
+                                    <Badge className="cursor-pointer">{data.user.region}</Badge>
+                                    <Badge className="cursor-pointer">{data.user.component}</Badge>
+                                    {data.user.unit && <Badge className="cursor-pointer">{data.user.unit}</Badge>}
                                     <Separator orientation="vertical" className="h-4 mx-2" />
-                                    <Badge variant={'secondary'} className='whitespace-nowrap'>
-                                        {data.WFPYear}
-                                    </Badge>
+                                    <Badge variant="secondary" className="cursor-pointer">{data.WFPYear}</Badge>
                                 </div>
-                                {/* Activity Details */}
-                                <Label className="pb-2">{data.activityDescription}</Label>
-
+                                <Label className="pb-2 cursor-pointer">{data.activityDescription}</Label>
                             </div>
                         </CardContent>
                     </Card>
                 ))}
             </div>
 
-            {/* Load More Button */}
             {filteredData.slice(0, itemsToShow).length < filteredData.length && (
                 <div className="mt-6 text-center">
-                    <Button variant={'default'} onClick={handleLoadMore}>
-                        Load More
-                    </Button>
+                    <Button onClick={handleLoadMore}>Load More</Button>
                 </div>
             )}
+            <CalendarSheet
+                activityData={viewCalendarData}
+                openSheet={viewCalendar}
+                closeCalendarSheet={() => setViewCalendar(!viewCalendar)}
+            />
         </div>
     );
 };

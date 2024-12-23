@@ -26,7 +26,7 @@ function SelectFilterMonth({ }: Props) {
     <div>
       <Label className='font-semibold'>Month:</Label>
       <Select onValueChange={handleValueChange} value={currentFilter?.month} disabled={activityLoading}>
-        <SelectTrigger className="w-fit" disabled>
+        <SelectTrigger className="w-fit">
           <SelectValue placeholder='All' />
         </SelectTrigger>
         <SelectContent>

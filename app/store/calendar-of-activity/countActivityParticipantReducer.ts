@@ -15,7 +15,7 @@ const initialState: ParticipantCountActivityState = {
 };
 
 const countParticipantActivitySlice = createSlice({
-  name: 'countParticipantActivity',
+  name: 'countParticipantActivitiesData',
   initialState,
   reducers: {},
   extraReducers: (builder) => {

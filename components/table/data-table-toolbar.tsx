@@ -40,14 +40,14 @@ export function DataTableToolbar<TData>({
 
   const { currentFilter } = useCalendarOfActivityFilter();
   const { usersData, loadingUser, errorUser } = useSelector((state) => state.users)
-  const [dateRange, setDateRange] = useState<DateRange | undefined>({
-    from: new Date(2024, 0, 1), // January 1, 2024
-    to: new Date(2024, 11, 31), // December 31, 2024
-  });
+  // const [dateRange, setDateRange] = useState<DateRange | undefined>({
+  //   from: new Date(2024, 0, 1), // January 1, 2024
+  //   to: new Date(2024, 11, 31), // December 31, 2024
+  // });
 
-  const isDateRangeDifferent = dateRange &&
-    (dateRange.from?.getTime() !== new Date(2024, 0, 1).getTime() ||
-      dateRange.to?.getTime() !== new Date(2024, 11, 31).getTime());
+  // const isDateRangeDifferent = dateRange &&
+  //   (dateRange.from?.getTime() !== new Date(2024, 0, 1).getTime() ||
+  //     dateRange.to?.getTime() !== new Date(2024, 11, 31).getTime());
 
   const filteredData = table.getFilteredRowModel().rows.map((row) => row.original);
 
@@ -81,25 +81,25 @@ export function DataTableToolbar<TData>({
     return () => clearTimeout(timeoutId);
   }, [filterInput, table]);
 
-  useEffect(() => {
-    if (dateRange?.from && dateRange?.to) {
-      table.setColumnFilters((old) => [
-        ...old.filter(
-          (filter) => filter.id !== 'dateFrom' && filter.id !== 'dateTo'
-        ),
-        {
-          id: 'dateFrom',
-          value: dateRange,
-        },
-        {
-          id: 'dateTo',
-          value: dateRange,
-        },
-      ]);
-    } else {
-      table.resetColumnFilters();
-    }
-  }, [dateRange, table]);
+  // useEffect(() => {
+  //   if (dateRange?.from && dateRange?.to) {
+  //     table.setColumnFilters((old) => [
+  //       ...old.filter(
+  //         (filter) => filter.id !== 'dateFrom' && filter.id !== 'dateTo'
+  //       ),
+  //       {
+  //         id: 'dateFrom',
+  //         value: dateRange,
+  //       },
+  //       {
+  //         id: 'dateTo',
+  //         value: dateRange,
+  //       },
+  //     ]);
+  //   } else {
+  //     table.resetColumnFilters();
+  //   }
+  // }, [dateRange, table]);
 
 
   const [selectedMonth, setSelectedMonth] = useState<string>('');
@@ -123,14 +123,14 @@ export function DataTableToolbar<TData>({
     return options;
   };
 
-  useEffect(() => {
-    if (selectedMonth) {
-      const [year, month] = selectedMonth.split('-').map(Number);
-      const from = new Date(year, month - 1, 1);
-      const to = new Date(year, month, 0);
-      setDateRange({ from, to });
-    }
-  }, [selectedMonth]);
+  // useEffect(() => {
+  //   if (selectedMonth) {
+  //     const [year, month] = selectedMonth.split('-').map(Number);
+  //     const from = new Date(year, month - 1, 1);
+  //     const to = new Date(year, month, 0);
+  //     setDateRange({ from, to });
+  //   }
+  // }, [selectedMonth]);
 
   // Call getDateRangeOptions to get the month options
   const monthOptions = getDateRangeOptions();
@@ -164,7 +164,7 @@ export function DataTableToolbar<TData>({
       const title = 'CALENDAR OF ACTIVITIES';
       const date = `Date: ${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}`;
       const filterData = `Type: ${currentFilter?.typeOfActivity} | Filtered by: ${currentFilter?.region}`
-      const filteredDate = `${formatDate(dateRange?.from)} - ${formatDate(dateRange?.to)}`
+      // const filteredDate = `${formatDate(dateRange?.from)} - ${formatDate(dateRange?.to)}`
 
       // Add title
       worksheet.mergeCells('A1:' + String.fromCharCode(65 + headers.length - 1) + '1');
@@ -190,7 +190,7 @@ export function DataTableToolbar<TData>({
       // Add date
       worksheet.mergeCells('A4:' + String.fromCharCode(65 + headers.length - 1) + '4');
       const dateRangeCell = worksheet.getCell('A4');
-      dateRangeCell.value = filteredDate
+      dateRangeCell.value = currentFilter?.month + ',' + currentFilter?.wfpYear
       dateRangeCell.font = {
         size: 12,
         bold: true,          // Bold text
@@ -434,7 +434,7 @@ export function DataTableToolbar<TData>({
 
       </div>
       <div className="flex flex-row gap-2 items-center">
-        {allowDateRange && (
+        {/* {allowDateRange && (
           <>
             {isFiltered && isDateRangeDifferent && (
               <Button
@@ -469,7 +469,7 @@ export function DataTableToolbar<TData>({
               </SelectContent>
             </Select>
           </>
-        )}
+        )} */}
 
         {/* <Button
               variant="outline"

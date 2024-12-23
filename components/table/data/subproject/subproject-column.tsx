@@ -3,6 +3,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { DataTableColumnHeader } from "../../data-table-column-header";
 import { SubProjectCodeType } from "@/types/subproject/subproject-type";
 import { SubprojectDataTableRowActions } from "./data-table-row-actions";
+import Link from "next/link";
 
 export const subprojectColumn: ColumnDef<SubProjectCodeType>[] = [
   {
@@ -13,7 +14,7 @@ export const subprojectColumn: ColumnDef<SubProjectCodeType>[] = [
     cell: ({ row }) => (
       <div className="flex space-x-2">
         <span className="max-w-[500px] truncate font-medium">
-          {row.getValue("code")}
+          <Link href={`subproject/${row.getValue("code")}`} className="text-[#0000EE] underline">{row.getValue("code")}</Link>
         </span>
       </div>
     ),
@@ -122,3 +123,4 @@ export const subprojectColumn: ColumnDef<SubProjectCodeType>[] = [
     )
 }
 ];
+  

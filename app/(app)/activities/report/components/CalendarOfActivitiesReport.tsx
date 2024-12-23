@@ -212,6 +212,7 @@ const CalendarOfActivitiesReport = () => {
                   <CardTitle>Total activities as participants</CardTitle>
                 </CardHeader>
                 <CardContent className="flex justify-center max-w-[320px] sm:max-w-screen-sm md:max-w-screen-md lg:max-w-screen-xl xl:max-w-screen-2xl">
+                
                 <DataTable
                     data={countParticipantActivitiesData}
                     columns={countParticipantActivityColumn}

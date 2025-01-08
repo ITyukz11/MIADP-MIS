@@ -147,6 +147,7 @@ ${formattedPreparatoryList}`;
     id,
     activityTitle,
     userName,
+    WFPYear,
     dateFrom,
     dateTo,
     timeStart,
@@ -242,6 +243,7 @@ ${formattedPreparatoryList}`;
     setContentDialogTitle(title)
     setOpenContentDialog(!openContentDialog)
   }
+  console.log("WFPYear: ",WFPYear)
   return (
     <>
       <Sheet open={openSheet} onOpenChange={closeCalendarSheet}>
@@ -346,7 +348,8 @@ ${formattedPreparatoryList}`;
                 <Badge variant='outline' className="shadow-sm">
                   {dateFrom === dateTo
                     ? formatDate(dateFrom)
-                    : `${formatDate(dateFrom)} - ${formatDate(dateTo)}`}
+                    : `${formatDate(dateFrom)} - ${formatDate(dateTo)}, `}
+                    {WFPYear}
                 </Badge>
               </div>
               {timeEnd && (

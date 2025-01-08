@@ -24,7 +24,7 @@ function SelectFilterWFPYear({ }: Props) {
 
   return (
     <div>
-      <Label className='font-semibold'>Year:</Label>
+      <Label className='font-semibold'>WFP Year:</Label>
       <Select onValueChange={handleValueChange} value={currentFilter?.wfpYear} disabled={activityLoading}>
         <SelectTrigger className="w-fit">
           <SelectValue placeholder='All' />

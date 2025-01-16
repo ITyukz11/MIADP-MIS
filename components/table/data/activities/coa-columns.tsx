@@ -1,15 +1,17 @@
-import React from 'react';
+import React from "react";
 import { ColumnDef } from "@tanstack/react-table";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DataTableColumnHeader } from "../../data-table-column-header";
 import { DataTableRowActions } from "../pending-users/data-table-row-actions";
 import { Badge } from "../../../ui/badge";
 // import { dateInRangeFilter } from '../../date-range-filter';
-import { Activity } from '@/types/calendar-of-activity/calendar-of-activity';
+import { Activity } from "@/types/calendar-of-activity/calendar-of-activity";
+import { Label } from "@/components/ui/label";
+import { ColumnMeta } from "@/types/table/table";
 
 export const formatDate = (dateString: string) => {
   const date = new Date(dateString);
-  const month = date.toLocaleString('default', { month: 'short' });
+  const month = date.toLocaleString("default", { month: "short" });
   const day = date.getDate();
   return `${month} ${day}`;
 };
@@ -18,10 +20,10 @@ export const formatTime = (timeString: string) => {
   // Check if the timeString is already in "HH:MM" format
   const timePattern = /^([01]?\d|2[0-3]):([0-5]\d)$/;
   if (timePattern.test(timeString)) {
-    const [hours, minutes] = timeString.split(':').map(Number);
-    const amOrPm = hours >= 12 ? 'pm' : 'am';
+    const [hours, minutes] = timeString.split(":").map(Number);
+    const amOrPm = hours >= 12 ? "pm" : "am";
     const formattedHours = hours % 12 || 12; // Convert to 12-hour format
-    const formattedMinutes = minutes < 10 ? '0' + minutes : minutes;
+    const formattedMinutes = minutes < 10 ? "0" + minutes : minutes;
     return `${formattedHours}:${formattedMinutes} ${amOrPm}`;
   }
 
@@ -30,9 +32,9 @@ export const formatTime = (timeString: string) => {
   if (!isNaN(date.getTime())) {
     const hours = date.getHours();
     const minutes = date.getMinutes();
-    const amOrPm = hours >= 12 ? 'pm' : 'am';
+    const amOrPm = hours >= 12 ? "pm" : "am";
     const formattedHours = hours % 12 || 12; // Convert to 12-hour format
-    const formattedMinutes = minutes < 10 ? '0' + minutes : minutes;
+    const formattedMinutes = minutes < 10 ? "0" + minutes : minutes;
     return `${formattedHours}:${formattedMinutes} ${amOrPm}`;
   }
 
@@ -40,21 +42,21 @@ export const formatTime = (timeString: string) => {
   return timeString;
 };
 export const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'Ongoing':
-        return 'bg-[#00a354]'; // Green
-      case 'Upcoming':
-        return 'bg-[#f2c018]'; // Yellow
-      case 'Completed':
-        return 'bg-[#4682B4]'; // Blue
-      case 'Cancelled':
-        return 'bg-[#b03620]'; // Red
-      case 'Postponed':
-        return 'bg-[#e38812]'; // Orange
-      default:
-        return 'bg-[#FFFFFF]'; // Default color
-    }
-  };
+  switch (status) {
+    case "Ongoing":
+      return "bg-[#00a354]"; // Green
+    case "Upcoming":
+      return "bg-[#f2c018]"; // Yellow
+    case "Completed":
+      return "bg-[#4682B4]"; // Blue
+    case "Cancelled":
+      return "bg-[#b03620]"; // Red
+    case "Postponed":
+      return "bg-[#e38812]"; // Orange
+    default:
+      return "bg-[#FFFFFF]"; // Default color
+  }
+};
 
 export const columns: ColumnDef<Activity>[] = [
   // {
@@ -93,28 +95,35 @@ export const columns: ColumnDef<Activity>[] = [
         </span>
       </div>
     ),
+    maxSize: 100,
+    minSize: 0,
   },
   {
     accessorKey: "activityTitle",
-   // enableHiding: false,
+    // enableHiding: false,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Activity Title" />
     ),
     cell: ({ row }) => (
       <div className="flex space-x-2">
-        <span className="max-w-[500px] truncate font-medium cursor-default gap-1 flex">
-        <Badge>
-        {row.original.user?.region }</Badge>
-        <Badge variant={'outline'}>
-          {row.original.user?.unit? row.original.user?.unit: row.original.user?.component}</Badge>
-        {row.getValue("activityTitle")}
-        </span>
+        <Label className="truncate font-medium cursor-default gap-1 flex">
+          <Badge className="hidden sm:block">{row.original.user?.region}</Badge>
+          <Badge className="hidden md:block" variant={"outline"}>
+            {row.original.user?.unit
+              ? row.original.user?.unit
+              : row.original.user?.component}
+          </Badge>
+          {row.getValue("activityTitle")}
+        </Label>
       </div>
     ),
+    maxSize: 700,
+    size: 500,
+    minSize: 100,
   },
   {
     accessorKey: "activityDescription",
-   // enableHiding: false,
+    // enableHiding: false,
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Activity Description" />
     ),
@@ -125,6 +134,9 @@ export const columns: ColumnDef<Activity>[] = [
         </span>
       </div>
     ),
+    meta: { columnClasses: "hidden md:table-cell" } as ColumnMeta,
+    maxSize: 400,
+    minSize: 0,
   },
   {
     accessorKey: "type",
@@ -134,11 +146,20 @@ export const columns: ColumnDef<Activity>[] = [
     cell: ({ row }) => (
       <div className="flex space-x-2">
         <span className="max-w-[500px] truncate font-medium cursor-default">
-        <Badge variant={'secondary'}> {row.getValue("type")}</Badge>
+          <Badge variant={"secondary"}>
+            {" "}
+            {row.getValue("type") === "Other"
+              ? `Other-${row.original.otherType}`
+              : row.getValue("type")}
+          </Badge>
         </span>
       </div>
     ),
+    meta: { columnClasses: "hidden md:table-cell" } as ColumnMeta,
+    maxSize: 150,
+    minSize: 0,
   },
+
   {
     accessorKey: "targetParticipant",
     header: ({ column }) => (
@@ -151,6 +172,9 @@ export const columns: ColumnDef<Activity>[] = [
         </span>
       </div>
     ),
+    meta: { columnClasses: "hidden md:table-cell" } as ColumnMeta,
+    maxSize: 300,
+    minSize: 0,
   },
   {
     accessorKey: "status",
@@ -160,28 +184,28 @@ export const columns: ColumnDef<Activity>[] = [
     cell: ({ row }) => {
       const status = row.getValue("status") as string;
       // let variant: "secondary" | "outline" | "destructive" | "default" | null = null;
-      
+
       return (
         <div className="flex space-x-2">
-        <span className="max-w-[500px] truncate">
-          <Badge
-            // variant={variant}
-            className={`font-medium cursor-default shadow-sm z-10 dark:text-white hover:${
-              getStatusColor(status) 
-            } ${
-              getStatusColor(status) 
-            }`}
-          >
-            {status}
-            {status === "Ongoing" && (
-                    <div className="h-3 w-3 rounded-full bg-white animate-pulse ml-1"></div>
-                  )}
-          </Badge>
-        </span>
-      </div>
-      
+          <span className="max-w-[500px] truncate">
+            <Badge
+              // variant={variant}
+              className={`font-medium cursor-default shadow-sm z-10 dark:text-white hover:${getStatusColor(
+                status
+              )} ${getStatusColor(status)}`}
+            >
+              {status}
+              {status === "Ongoing" && (
+                <div className="h-3 w-3 rounded-full bg-white animate-pulse ml-1"></div>
+              )}
+            </Badge>
+          </span>
+        </div>
       );
     },
+    meta: { columnClasses: "hidden sm:table-cell" } as ColumnMeta,
+    maxSize: 100,
+    minSize: 0,
     filterFn: (row, id, value) => value.includes(row.getValue(id)),
   },
   {
@@ -196,6 +220,9 @@ export const columns: ColumnDef<Activity>[] = [
         </span>
       </div>
     ),
+    meta: { columnClasses: "hidden sm:table-cell" } as ColumnMeta,
+    maxSize: 100,
+    minSize: 0,
     // filterFn: dateInRangeFilter,
   },
   {
@@ -210,6 +237,9 @@ export const columns: ColumnDef<Activity>[] = [
         </span>
       </div>
     ),
+    meta: { columnClasses: "hidden md:table-cell" } as ColumnMeta,
+    maxSize: 100,
+    minSize: 0,
     // filterFn: dateInRangeFilter,
   },
   {
@@ -224,6 +254,9 @@ export const columns: ColumnDef<Activity>[] = [
         </span>
       </div>
     ),
+    meta: { columnClasses: "hidden md:table-cell" } as ColumnMeta,
+    maxSize: 100,
+    minSize: 0,
   },
   {
     accessorKey: "timeEnd",
@@ -237,6 +270,9 @@ export const columns: ColumnDef<Activity>[] = [
         </span>
       </div>
     ),
+    meta: { columnClasses: "hidden md:table-cell" } as ColumnMeta,
+    maxSize: 100,
+    minSize: 0,
   },
   {
     accessorKey: "location",
@@ -250,6 +286,9 @@ export const columns: ColumnDef<Activity>[] = [
         </span>
       </div>
     ),
+    meta: { columnClasses: "hidden md:table-cell" } as ColumnMeta,
+    maxSize: 150,
+    minSize: 0,
   },
   {
     accessorKey: "remarks",
@@ -263,6 +302,9 @@ export const columns: ColumnDef<Activity>[] = [
         </span>
       </div>
     ),
+    meta: { columnClasses: "hidden md:table-cell" } as ColumnMeta,
+    maxSize: 400,
+    minSize: 0,
   },
 
   {
@@ -277,6 +319,8 @@ export const columns: ColumnDef<Activity>[] = [
         </span>
       </div>
     ),
-    
+    meta: { columnClasses: "hidden md:table-cell" } as ColumnMeta,
+    maxSize: 100,
+    minSize: 0,
   },
 ];

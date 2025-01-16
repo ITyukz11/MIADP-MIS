@@ -1,24 +1,25 @@
-'use client'
-import React, { useEffect, useState, useMemo } from 'react';
-import { DataTable } from '@/components/table/data-table';
-import { columns } from '@/components/table/data/activities/coa-columns';
-import { Skeleton } from '@/components/ui/skeleton';
-import { CalendarSheet } from '@/components/calendar-of-activity/CalendarSheet';
-import { useCalendarOfActivityFilter } from '@/components/context/FilterRegionContext';
-import { Label } from '@/components/ui/label';
-import { useActivitiesData } from '@/lib/calendar-of-activity/useActivitiesDataHook';
-import { Card, CardContent } from '@/components/ui/card';
-import { getMonth } from '@/utils/dateFormat';
+"use client";
+import React, { useEffect, useState, useMemo } from "react";
+import { DataTable } from "@/components/table/data-table";
+import { columns } from "@/components/table/data/activities/coa-columns";
+import { Skeleton } from "@/components/ui/skeleton";
+import { CalendarSheet } from "@/components/calendar-of-activity/CalendarSheet";
+import { useCalendarOfActivityFilter } from "@/components/context/FilterRegionContext";
+import { Label } from "@/components/ui/label";
+import { useActivitiesData } from "@/lib/calendar-of-activity/useActivitiesDataHook";
+import { Card, CardContent } from "@/components/ui/card";
+import { getMonth } from "@/utils/dateFormat";
 
 const Page = () => {
   const [coaData, setCoaData] = useState<any[]>([]);
   const [filteredData, setFilteredData] = useState<any[]>([]);
   const [viewCalendarData, setViewCalendarData] = useState<any[]>([]);
   const [viewCalendar, setViewCalendar] = useState(false);
-  const [selectedRowId, setSelectedRowId] = useState('');
+  const [selectedRowId, setSelectedRowId] = useState("");
 
   const { currentFilter } = useCalendarOfActivityFilter();
-  const { activitiesData, activityError, activityLoading } = useActivitiesData();
+  const { activitiesData, activityError, activityLoading } =
+    useActivitiesData();
 
   const handleViewRowIdPressed = (viewId: string) => {
     setSelectedRowId(viewId);
@@ -27,32 +28,43 @@ const Page = () => {
   // Consolidated Filtering Logic
   const filterActivities = useMemo(() => {
     return (data: any[]) => {
-      return data.filter(activity => {
+      return data.filter((activity) => {
         const matchesType =
-          currentFilter?.typeOfActivity === 'WFP Activities'
+          currentFilter?.typeOfActivity === "WFP Activities"
             ? !activity.individualActivity
-            : currentFilter?.typeOfActivity === 'Individual Activities'
+            : currentFilter?.typeOfActivity === "Individual Activities"
             ? activity.individualActivity
             : true;
 
         const matchesRegion =
-          currentFilter?.region === 'All' || activity.user?.region === currentFilter?.region;
+          currentFilter?.region === "All" ||
+          activity.user?.region === currentFilter?.region;
 
         const matchesUnit =
-          currentFilter?.unit === 'All' ||
+          currentFilter?.unit === "All" ||
           activity.user?.unit === currentFilter?.unit ||
           activity.user?.component === currentFilter?.unit;
 
         const matchesStatus =
-          currentFilter?.status === 'All' || activity.status === currentFilter?.status;
+          currentFilter?.status === "All" ||
+          activity.status === currentFilter?.status;
 
         const matchesWFPYear =
-          currentFilter?.wfpYear === 'All' || activity.WFPYear === currentFilter?.wfpYear;
+          currentFilter?.wfpYear === "All" ||
+          activity.WFPYear === currentFilter?.wfpYear;
 
         const matchesMonth =
-          currentFilter?.month === 'All' || getMonth(activity.dateFrom) === currentFilter?.month;
+          currentFilter?.month === "All" ||
+          getMonth(activity.dateFrom) === currentFilter?.month;
 
-        return matchesType && matchesRegion && matchesUnit && matchesStatus && matchesWFPYear && matchesMonth;
+        return (
+          matchesType &&
+          matchesRegion &&
+          matchesUnit &&
+          matchesStatus &&
+          matchesWFPYear &&
+          matchesMonth
+        );
       });
     };
   }, [currentFilter]);
@@ -61,13 +73,14 @@ const Page = () => {
     const fetchData = async () => {
       try {
         const sortedActivities = activitiesData.sort(
-          (a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          (a: any, b: any) =>
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
         );
 
         setCoaData(sortedActivities);
         setFilteredData(filterActivities(sortedActivities));
       } catch (error) {
-        console.error('Error fetching calendar of activity:', error);
+        console.error("Error fetching calendar of activity:", error);
       }
     };
 
@@ -75,19 +88,21 @@ const Page = () => {
   }, [activitiesData, filterActivities]);
 
   useEffect(() => {
-    setViewCalendarData(filteredData.filter(activity => activity.id === selectedRowId));
+    setViewCalendarData(
+      filteredData.filter((activity) => activity.id === selectedRowId)
+    );
   }, [filteredData, selectedRowId]);
 
   const hiddenColumns = [
-    'id',
-    'authorizeOther',
-    'targetParticipant',
-    'activityDescription',
-    'timeStart',
-    'timeEnd',
-    'coa_id',
-    'remarks',
-    'userName',
+    "id",
+    "authorizeOther",
+    "targetParticipant",
+    "activityDescription",
+    "timeStart",
+    "timeEnd",
+    "coa_id",
+    "remarks",
+    "userName",
   ]; // Columns to hide
 
   return (
@@ -113,7 +128,9 @@ const Page = () => {
           <Skeleton className="h-[250px] w-full rounded-xl" />
         </div>
       )}
-      {activityError && <Label className="text-destructive">{activityError}</Label>}
+      {activityError && (
+        <Label className="text-destructive">{activityError}</Label>
+      )}
       <CalendarSheet
         activityData={viewCalendarData}
         openSheet={viewCalendar}

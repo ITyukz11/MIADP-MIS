@@ -1,44 +1,61 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-import { withAccelerate } from '@prisma/extension-accelerate';
+import { NextRequest, NextResponse } from "next/server";
+import { PrismaClient } from "@prisma/client";
+import { withAccelerate } from "@prisma/extension-accelerate";
 
 const prisma = new PrismaClient().$extends(withAccelerate());
 
 export async function GET(request) {
-    try {
-        // Step 1: Fetch all activities and associated user regions
-        const activities = await prisma.calendarOfActivity.findMany({
-            include: {
-                user: {
-                    select: {
-                        component: true,
-                        region:true
-                    },
-                },
-            },
-        });
+  try {
+    // Extract query parameters
+    const { searchParams } = new URL(request.url);
 
-        const countsByRegionAndComponent = activities.reduce((acc, activity) => {
-            const { region, component } = activity.user;
+    // Normalize the key to lowercase for case-insensitivity
+    const params = Object.fromEntries(searchParams.entries());
+    const wfpYear = params.WFPYear || params.WFPyear || params.wfpyear;
 
-            if (!acc[region]) {
-                acc[region] = {}; // Initialize an empty object for the region
-            }
+    console.log("Query Parameters:", params);
+    console.log("Filtering by WFPYear:", wfpYear);
 
-            if (!acc[region][component]) {
-                acc[region][component] = 0; // Initialize count for the component in this region
-            }
+    // Fetch activities filtered by WFPYear
+    const activities = await prisma.calendarOfActivity.findMany({
+      where: {
+        ...(wfpYear && { WFPYear: Number(wfpYear) }),
+        individualActivity: false, // Add the individualActivity filter
+      },
+      include: {
+        user: {
+          select: {
+            component: true,
+            region: true,
+          },
+        },
+      },
+    });
 
-            acc[region][component] += 1; // Increment count for the component
+    const countsByRegionAndComponent = activities.reduce((acc, activity) => {
+      const { region, component } = activity.user;
 
-            return acc;
-        }, {});
+      if (!acc[region]) {
+        acc[region] = {};
+      }
 
-        return NextResponse.json(countsByRegionAndComponent);
-    } catch (error) {
-        console.error('Error fetching activities:', error);
-        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
-    } finally {
-        await prisma.$disconnect();
-    }
+      if (!acc[region][component]) {
+        acc[region][component] = 0;
+      }
+
+      acc[region][component] += 1;
+
+      return acc;
+    }, {});
+
+    return NextResponse.json(countsByRegionAndComponent);
+  } catch (error) {
+    console.error("Error fetching activities:", error);
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 }
+    );
+  } finally {
+    await prisma.$disconnect();
+  }
 }

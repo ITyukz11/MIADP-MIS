@@ -1,67 +1,92 @@
-import { Label } from "@/components/ui/label"
+import { Label } from "@/components/ui/label";
 import {
   Sheet,
   SheetContent,
   SheetHeader,
   SheetTitle,
-} from "@/components/ui/sheet"
+} from "@/components/ui/sheet";
 
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "@/components/ui/accordion"
+} from "@/components/ui/accordion";
 
-import { CalendarFold, Clock, Component, FlagTriangleRight, Info, Map, NotebookPen, Pencil, PencilIcon, TargetIcon, Trash, Trash2, UserCircle, Users } from "lucide-react"
-import { formatDate, formatTime, getStatusColor } from "../table/data/activities/coa-columns"
-import { Badge } from "../ui/badge"
-import Image from "next/image"
-import { TbNotes, TbStatusChange } from "react-icons/tb"
-import { FaQrcode } from "react-icons/fa"
-import { useEffect, useState } from "react"
-import { GenerateQRCodeWithLogo } from "../GenerateQrCodeWithLogo"
-import { MdAttachment, MdDateRange, MdOutlineDateRange } from "react-icons/md"
-import Profile from "../profile/Profile"
-import Link from "next/link"
-import { useDispatch, useSelector } from "@/app/store/store"
-import { fetchUsersData } from "@/app/store/userAction"
-import { TooltipComponent } from "../Tooltip"
-import { RiAttachmentLine } from "react-icons/ri"
-import DisplayHTMLDialog from "../dialog/display-content-dialog"
-import { capitalizeEachWord } from "@/utils/capitalizeEachWord"
-import { Button } from "../ui/button"
-import { IoPencilOutline, IoTrashOutline } from "react-icons/io5"
-import { PiNotePencilBold } from "react-icons/pi"
-import UpdateActivityDialog from "../dialog/update-dialog"
-import ConfirmDeleteDialog from "../dialog/delete-dialog"
-import { ToastAction } from "../ui/toast"
-import { toast } from "../ui/use-toast"
-import { deleteCalendarOfActivity } from "@/actions/calendar-of-activity/delete"
-import { fetchActivitiesData } from "@/app/store/activityAction"
-import { getCurrentUser } from "@/lib/session"
-import { useCurrentUser } from "../context/CurrentUserContext"
-import DisplayContentDialog from "../dialog/display-content-dialog"
-import { LoadingSpinner } from "../LoadingSpinner"
+import {
+  CalendarFold,
+  Clock,
+  Component,
+  FlagTriangleRight,
+  Info,
+  Map,
+  NotebookPen,
+  Pencil,
+  PencilIcon,
+  TargetIcon,
+  Trash,
+  Trash2,
+  UserCircle,
+  Users,
+} from "lucide-react";
+import {
+  formatDate,
+  formatTime,
+  getStatusColor,
+} from "../table/data/activities/coa-columns";
+import { Badge } from "../ui/badge";
+import Image from "next/image";
+import { TbNotes, TbStatusChange } from "react-icons/tb";
+import { FaQrcode } from "react-icons/fa";
+import { useEffect, useState } from "react";
+import { GenerateQRCodeWithLogo } from "../GenerateQrCodeWithLogo";
+import { MdAttachment, MdDateRange, MdOutlineDateRange } from "react-icons/md";
+import Profile from "../profile/Profile";
+import Link from "next/link";
+import { useDispatch, useSelector } from "@/app/store/store";
+import { fetchUsersData } from "@/app/store/userAction";
+import { TooltipComponent } from "../Tooltip";
+import { RiAttachmentLine } from "react-icons/ri";
+import DisplayHTMLDialog from "../dialog/display-content-dialog";
+import { capitalizeEachWord } from "@/utils/capitalizeEachWord";
+import { Button } from "../ui/button";
+import { IoPencilOutline, IoTrashOutline } from "react-icons/io5";
+import { PiNotePencilBold } from "react-icons/pi";
+import UpdateActivityDialog from "../dialog/update-dialog";
+import ConfirmDeleteDialog from "../dialog/delete-dialog";
+import { ToastAction } from "../ui/toast";
+import { toast } from "../ui/use-toast";
+import { deleteCalendarOfActivity } from "@/actions/calendar-of-activity/delete";
+import { fetchActivitiesData } from "@/app/store/activityAction";
+import { getCurrentUser } from "@/lib/session";
+import { useCurrentUser } from "../context/CurrentUserContext";
+import DisplayContentDialog from "../dialog/display-content-dialog";
+import { LoadingSpinner } from "../LoadingSpinner";
 
 interface CalendarSheetProps {
-  activityData: any[]
-  openSheet: boolean
-  closeCalendarSheet: () => void
+  activityData: any[];
+  openSheet: boolean;
+  closeCalendarSheet: () => void;
 }
-export function CalendarSheet({ activityData, openSheet, closeCalendarSheet }: CalendarSheetProps) {
+export function CalendarSheet({
+  activityData,
+  openSheet,
+  closeCalendarSheet,
+}: CalendarSheetProps) {
   const [openUpdateDialog, setOpenUpdateDialog] = useState(false);
-  const [openDeleteDialog, setOpenDeleteDialog] = useState(false)
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 
   const [loadingDelete, setLoadingDelete] = useState(false);
 
-  const [contentHTMLData, setContentHTMLData] = useState<string>('')
-  const [contentDialogTitle, setContentDialogTitle] = useState<string>('')
-  const [contentData, setContentData] = useState<string>('')
+  const [contentHTMLData, setContentHTMLData] = useState<string>("");
+  const [contentDialogTitle, setContentDialogTitle] = useState<string>("");
+  const [contentData, setContentData] = useState<string>("");
 
   const dispatch = useDispatch();
-  const { usersData, loadingUser, errorUser } = useSelector((state) => state.users)
-  const { currentUser } = useCurrentUser()
+  const { usersData, loadingUser, errorUser } = useSelector(
+    (state) => state.users
+  );
+  const { currentUser } = useCurrentUser();
   useEffect(() => {
     if (usersData.length === 0) {
       dispatch(fetchUsersData());
@@ -69,10 +94,10 @@ export function CalendarSheet({ activityData, openSheet, closeCalendarSheet }: C
   }, [dispatch, usersData.length]);
 
   const [qrCode, setQrCode] = useState<string | null>(null);
-  const [openProfile, setOpenProfile] = useState(false)
-  const [openContentDialog, setOpenContentDialog] = useState(false)
+  const [openProfile, setOpenProfile] = useState(false);
+  const [openContentDialog, setOpenContentDialog] = useState(false);
 
-  const { activityLoading } = useSelector((state) => state.activity)
+  const { activityLoading } = useSelector((state) => state.activity);
   useEffect(() => {
     // Ensure activityData is defined and has at least one element
     if (!activityData || activityData.length === 0) {
@@ -98,38 +123,50 @@ export function CalendarSheet({ activityData, openSheet, closeCalendarSheet }: C
       preparatoryList,
       participants,
       preparatoryContent,
-      createdAt
+      createdAt,
     } = activityData[0];
 
     // Format preparatoryList and participants
-    const formattedPreparatoryList = preparatoryList.map((item: { description: any; status: any; remarks: any }, index: number) => `
+    const formattedPreparatoryList = preparatoryList
+      .map(
+        (
+          item: { description: any; status: any; remarks: any },
+          index: number
+        ) => `
 Preparatory Item ${index + 1}:
 - Description: ${item.description}
 - Status: ${item.status}
-- Remarks: ${item.remarks}`).join('\n');
+- Remarks: ${item.remarks}`
+      )
+      .join("\n");
 
-    const formattedParticipants = participants.length > 0
-      ? `Participants:\n${participants.map((participant: any, index: any) => {
-        const user = usersData.find(user => user.id === participant.userId);
-        return `${index + 1}. ${user?.name}`;
-      }).join('\n')}`
-      : `Participants: -`;
+    const formattedParticipants =
+      participants.length > 0
+        ? `Participants:\n${participants
+            .map((participant: any, index: any) => {
+              const user = usersData.find(
+                (user) => user.id === participant.userId
+              );
+              return `${index + 1}. ${user?.name}`;
+            })
+            .join("\n")}`
+        : `Participants: -`;
 
     // Generate formatted QR code data
     const qrData = `Activity Title: ${activityTitle}\n
 Activity Description: ${activityDescription}\n
 Type: ${type}\n
-${otherType ? `Other Type: ${otherType}` : ''}
+${otherType ? `Other Type: ${otherType}` : ""}
 Target Participant: ${targetParticipant}\n
 Location: ${location}\n
-Date From: ${formatDate(dateFrom) || '-'}\n
-Date To: ${formatDate(dateTo) || '-'}\n
-Time Start: ${formatTime(timeStart) || '-'}\n
-Time End: ${formatTime(timeEnd) || '-'}\n
-Attachments: ${attachments || '-'}\n
-Status: ${status || '-'}\n
-Remarks: ${remarks || '-'}\n
-Author: ${userName || '-'}\n
+Date From: ${formatDate(dateFrom) || "-"}\n
+Date To: ${formatDate(dateTo) || "-"}\n
+Time Start: ${formatTime(timeStart) || "-"}\n
+Time End: ${formatTime(timeEnd) || "-"}\n
+Attachments: ${attachments || "-"}\n
+Status: ${status || "-"}\n
+Remarks: ${remarks || "-"}\n
+Author: ${userName || "-"}\n
 ${formattedParticipants}
 ${formattedPreparatoryList}`;
 
@@ -164,7 +201,7 @@ ${formattedPreparatoryList}`;
     calendarOfActivityAttachment,
     preparatoryList,
     preparatoryContent,
-    createdAt
+    createdAt,
   } = activityData[0];
 
   const isValidUrl = (string: string) => {
@@ -179,29 +216,28 @@ ${formattedPreparatoryList}`;
     const date = new Date(timestamp);
 
     const options: Intl.DateTimeFormatOptions = {
-      month: 'short', // 'Aug'
-      day: 'numeric', // '6'
-      year: 'numeric', // '2024'
-      hour: '2-digit', // 'hh'
-      minute: '2-digit', // 'mm'
-      hour12: true // am/pm
+      month: "short", // 'Aug'
+      day: "numeric", // '6'
+      year: "numeric", // '2024'
+      hour: "2-digit", // 'hh'
+      minute: "2-digit", // 'mm'
+      hour12: true, // am/pm
     };
 
     // Format date and time
-    const formattedDate = date.toLocaleString('en-US', options);
+    const formattedDate = date.toLocaleString("en-US", options);
 
     // Format output as 'Aug 6, 2024 - hh:mm am/pm'
-    return `${formattedDate.replace(/,/, ' -')}`;
+    return `${formattedDate.replace(/,/, " -")}`;
   };
 
   const handleCancelUpdate = () => {
     setOpenUpdateDialog(false);
   };
 
-
   const handleCancelDelete = () => {
     // Handle cancel action here
-    setOpenDeleteDialog(false)
+    setOpenDeleteDialog(false);
   };
 
   const handleConfirmDelete = async () => {
@@ -212,38 +248,39 @@ ${formattedPreparatoryList}`;
     if (response.success) {
       toast({
         title: "Success",
-        description: "The calendar of activity you selected has been deleted successfully.",
+        description:
+          "The calendar of activity you selected has been deleted successfully.",
         duration: 5000,
-        action: (
-          <ToastAction altText="Ok">Ok</ToastAction>
-        ),
+        action: <ToastAction altText="Ok">Ok</ToastAction>,
       });
 
-      dispatch(fetchActivitiesData())
+      dispatch(fetchActivitiesData());
     } else {
       toast({
         title: "Error",
-        variant: 'destructive',
-        description: response.error ?? 'An unexpected error occurred.',
+        variant: "destructive",
+        description: response.error ?? "An unexpected error occurred.",
         duration: 5000,
-        action: (
-          <ToastAction altText="Ok">Ok</ToastAction>
-        ),
+        action: <ToastAction altText="Ok">Ok</ToastAction>,
       });
     }
     if (!activityLoading && !loadingDelete) {
       setOpenDeleteDialog(false);
-      closeCalendarSheet()
+      closeCalendarSheet();
     }
   };
 
-  const handleOpenContentDialog = (title:string, content: string, html: string) =>{
-    setContentHTMLData(html)
-    setContentData(content)
-    setContentDialogTitle(title)
-    setOpenContentDialog(!openContentDialog)
-  }
-  console.log("WFPYear: ",WFPYear)
+  const handleOpenContentDialog = (
+    title: string,
+    content: string,
+    html: string
+  ) => {
+    setContentHTMLData(html);
+    setContentData(content);
+    setContentDialogTitle(title);
+    setOpenContentDialog(!openContentDialog);
+  };
+  console.log("WFPYear: ", WFPYear);
   return (
     <>
       <Sheet open={openSheet} onOpenChange={closeCalendarSheet}>
@@ -256,41 +293,67 @@ ${formattedPreparatoryList}`;
               ></div>
               {activityTitle}
             </SheetTitle>
-            {user.id == currentUser?.id &&
+            {user.id == currentUser?.id && (
               <div className="flex flex-col gap-2 absolute top-8 right-4">
-                <PiNotePencilBold size={20} className="cursor-pointer" onClick={() => setOpenUpdateDialog(true)} />
-                <IoTrashOutline size={20} className="cursor-pointer" onClick={() => setOpenDeleteDialog(true)} />
+                <PiNotePencilBold
+                  size={20}
+                  className="cursor-pointer"
+                  onClick={() => setOpenUpdateDialog(true)}
+                />
+                <IoTrashOutline
+                  size={20}
+                  className="cursor-pointer"
+                  onClick={() => setOpenDeleteDialog(true)}
+                />
               </div>
-            }
+            )}
           </SheetHeader>
           <div className="mt-4 gap-5 grid grid-cols-1 md:grid-cols-2 auto-rows-min">
             <div className="flex flex-col space-y-2 gap-5">
               <div className="flex items-center">
                 <TooltipComponent
-                  trigger={<div className='flex items-center cursor-help'><UserCircle className="h-5 w-5 shrink-0" /></div>}
+                  trigger={
+                    <div className="flex items-center cursor-help">
+                      <UserCircle className="h-5 w-5 shrink-0" />
+                    </div>
+                  }
                   description="Encoder"
                 />
 
                 <div className="flex space-x-2 justify-start items-center ml-1">
                   <div className="flex space-x-2">
-                    <Label className="flex items-center space-x-1 p-1 rounded-full border-2 shadow-md cursor-pointer" onClick={() => setOpenProfile(true)}>
+                    <Label
+                      className="flex items-center space-x-1 p-1 rounded-full border-2 shadow-md cursor-pointer"
+                      onClick={() => setOpenProfile(true)}
+                    >
                       <Image
                         className="rounded-full border-2"
-                        src={user.region === 'PSO' ? '/miadp-pso.jpg' :
-                          user.region === 'RPCO 13' ? '/miadp-region-xiii.jpg' :
-                            user.region === 'RPCO 12' ? '/miadp-region-xii.jpg' :
-                              user.region === 'RPCO 11' ? '/miadp-region-xi.jpg' :
-                                user.region === 'RPCO 10' ? '/miadp-region-x.jpg' :
-                                  user.region === 'RPCO 9' ? '/miadp-region-ix.jpg' :
-                                    '/miadp-barmm.jpg'
+                        src={
+                          user.region === "PSO"
+                            ? "/miadp-pso.jpg"
+                            : user.region === "RPCO 13"
+                            ? "/miadp-region-xiii.jpg"
+                            : user.region === "RPCO 12"
+                            ? "/miadp-region-xii.jpg"
+                            : user.region === "RPCO 11"
+                            ? "/miadp-region-xi.jpg"
+                            : user.region === "RPCO 10"
+                            ? "/miadp-region-x.jpg"
+                            : user.region === "RPCO 9"
+                            ? "/miadp-region-ix.jpg"
+                            : "/miadp-barmm.jpg"
                         }
-                        alt={'MIADP pso Logo'}
+                        alt={"MIADP pso Logo"}
                         width={30}
                         height={30}
                       />
                       <div className="flex flex-col w-full items-center pr-1 cursor-pointer">
-                        <Label className="text-sm font-medium text-center cursor-pointer">{capitalizeEachWord(userName)}</Label>
-                        <Label className="text-xs font-light  cursor-pointer">{user.position}</Label>
+                        <Label className="text-sm font-medium text-center cursor-pointer">
+                          {capitalizeEachWord(userName)}
+                        </Label>
+                        <Label className="text-xs font-light  cursor-pointer">
+                          {user.position}
+                        </Label>
                       </div>
                     </Label>
                   </div>
@@ -298,27 +361,33 @@ ${formattedPreparatoryList}`;
               </div>
               <div className="flex items-center space-x-2">
                 <TooltipComponent
-                  trigger={<div className='flex items-center cursor-help'><Component className="h-5 w-5 shrink-0" /></div>}
+                  trigger={
+                    <div className="flex items-center cursor-help">
+                      <Component className="h-5 w-5 shrink-0" />
+                    </div>
+                  }
                   description="Region - Component - Unit (if any)"
                 />
-                <Badge variant={'outline'} className="shadow-sm">
-                  {user.region}-
-                  {user.component}
+                <Badge variant={"outline"} className="shadow-sm">
+                  {user.region}-{user.component}
                   {user.unit && <>-{user.unit}</>}
                 </Badge>
-
               </div>
               <div className="flex items-center space-x-2">
                 <TooltipComponent
-                  trigger={<div className='flex items-center cursor-help'><TbStatusChange className="h-5 w-5 shrink-0" /></div>}
+                  trigger={
+                    <div className="flex items-center cursor-help">
+                      <TbStatusChange className="h-5 w-5 shrink-0" />
+                    </div>
+                  }
                   description="Activity Status"
                 />
 
                 <Badge
                   // variant={variant}
-                  className={`font-medium cursor-default shadow-md  dark:text-white hover:${getStatusColor(status)
-                    } ${getStatusColor(status)
-                    }`}
+                  className={`font-medium cursor-default shadow-md  dark:text-white hover:${getStatusColor(
+                    status
+                  )} ${getStatusColor(status)}`}
                 >
                   {status}
                   {status === "Ongoing" && (
@@ -328,76 +397,120 @@ ${formattedPreparatoryList}`;
               </div>
               <div className="flex items-center space-x-2 mt-2">
                 <TooltipComponent
-                  trigger={<div className='flex items-center cursor-help'><MdOutlineDateRange size={24} /></div>}
+                  trigger={
+                    <div className="flex items-center cursor-help">
+                      <MdOutlineDateRange size={24} />
+                    </div>
+                  }
                   description="Date Created"
                 />
-                <Badge variant={'outline'} className="font-medium shadow-md">{formatProperDateTime(createdAt)}</Badge>
+                <Badge variant={"outline"} className="font-medium shadow-md">
+                  {formatProperDateTime(createdAt)}
+                </Badge>
               </div>
               <div className="flex items-center space-x-2 mt-2">
                 <TooltipComponent
-                  trigger={<div className='flex items-center cursor-help'><FlagTriangleRight size={24} /></div>}
+                  trigger={
+                    <div className="flex items-center cursor-help">
+                      <FlagTriangleRight size={24} />
+                    </div>
+                  }
                   description="Activity Type"
                 />
-                <Badge variant={'secondary'} className="font-medium shadow-md">{type} {otherType ? ' - ' + otherType : ''}</Badge>
+                <Badge variant={"secondary"} className="font-medium shadow-md">
+                  {type} {otherType ? " - " + otherType : ""}
+                </Badge>
               </div>
               <div className="flex items-center space-x-2 mt-2">
                 <TooltipComponent
-                  trigger={<div className='flex items-center cursor-help'><CalendarFold className="h-5 w-5 shrink-0" /></div>}
+                  trigger={
+                    <div className="flex items-center cursor-help">
+                      <CalendarFold className="h-5 w-5 shrink-0" />
+                    </div>
+                  }
                   description="Activity Date"
                 />
-                <Badge variant='outline' className="shadow-sm">
+                <Badge variant="outline" className="shadow-sm">
                   {dateFrom === dateTo
                     ? formatDate(dateFrom)
                     : `${formatDate(dateFrom)} - ${formatDate(dateTo)}, `}
-                    {WFPYear}
+                  {WFPYear}
                 </Badge>
               </div>
               {timeEnd && (
                 <div className="flex items-center space-x-2 mt-2">
                   <TooltipComponent
-                    trigger={<div className='flex items-center cursor-help'><Clock className="h-5 w-5 shrink-0" /></div>}
+                    trigger={
+                      <div className="flex items-center cursor-help">
+                        <Clock className="h-5 w-5 shrink-0" />
+                      </div>
+                    }
                     description="Activity Time"
                   />
-                  <Badge variant='outline' className="shadow-sm">
+                  <Badge variant="outline" className="shadow-sm">
                     {formatTime(timeStart)} - {formatTime(timeEnd)}
                   </Badge>
                 </div>
               )}
               <div className="flex items-center space-x-2 mt-2">
                 <TooltipComponent
-                  trigger={<div className='flex items-center cursor-help'><Map className="h-5 w-5 shrink-0" /></div>}
+                  trigger={
+                    <div className="flex items-center cursor-help">
+                      <Map className="h-5 w-5 shrink-0" />
+                    </div>
+                  }
                   description="Activity Location"
                 />
-                <Badge variant='outline' className="shadow-sm">{location}</Badge>
+                <Badge variant="outline" className="shadow-sm">
+                  {location}
+                </Badge>
               </div>
               <div className="flex items-start space-x-2 mt-4">
                 <TooltipComponent
-                  trigger={<div className='flex items-center cursor-help'><TargetIcon className="h-5 w-5 shrink-0" /></div>}
+                  trigger={
+                    <div className="flex items-center cursor-help">
+                      <TargetIcon className="h-5 w-5 shrink-0" />
+                    </div>
+                  }
                   description="Activity Target Participants"
                 />
-                <Badge variant={'outline'} className=" shadow-sm">
+                <Badge variant={"outline"} className=" shadow-sm">
                   <p className="text-xs">{targetParticipant}</p>
                 </Badge>
               </div>
               <div className="flex items-start space-x-2 mt-4">
                 <TooltipComponent
-                  trigger={<div className='flex items-center cursor-help'><Info className="h-5 w-5 shrink-0" /></div>}
+                  trigger={
+                    <div className="flex items-center cursor-help">
+                      <Info className="h-5 w-5 shrink-0" />
+                    </div>
+                  }
                   description="Activity Description"
                 />
-                <Badge 
-                  variant={'outline'} 
-                  className="cursor-pointer shadow-sm" 
-                  onClick={()=> handleOpenContentDialog("Activity Description", activityDescription, "")}>
+                <Badge
+                  variant={"outline"}
+                  className="cursor-pointer shadow-sm"
+                  onClick={() =>
+                    handleOpenContentDialog(
+                      "Activity Description",
+                      activityDescription,
+                      ""
+                    )
+                  }
+                >
                   <p className="text-xs">{activityDescription}</p>
                 </Badge>
               </div>
-
             </div>
             <div className="flex flex-col space-y-2">
               {attachments && (
                 <div className="flex items-center space-x-2 mt-2">
                   <TooltipComponent
-                    trigger={<div className='flex items-center cursor-help'><MdAttachment className="h-5 w-5 shrink-0" /></div>}
+                    trigger={
+                      <div className="flex items-center cursor-help">
+                        <MdAttachment className="h-5 w-5 shrink-0" />
+                      </div>
+                    }
                     description="Activity Attachment"
                   />
                   {isValidUrl(attachments) ? (
@@ -414,90 +527,148 @@ ${formattedPreparatoryList}`;
               {remarks && (
                 <div className="flex items-center space-x-2 mt-2 pr-2">
                   <TooltipComponent
-                    trigger={<div className='flex items-center cursor-help'><TbNotes className="h-5 w-5 shrink-0" /></div>}
+                    trigger={
+                      <div className="flex items-center cursor-help">
+                        <TbNotes className="h-5 w-5 shrink-0" />
+                      </div>
+                    }
                     description="Activity Remarks"
                   />
-                     <Badge 
-                  variant={'outline'} 
-                  className="cursor-pointer shadow-sm" 
-                  onClick={()=> handleOpenContentDialog("Remarks", remarks, "")}>
-                  {remarks}
-                </Badge>
-                
+                  <Badge
+                    variant={"outline"}
+                    className="cursor-pointer shadow-sm"
+                    onClick={() =>
+                      handleOpenContentDialog("Remarks", remarks, "")
+                    }
+                  >
+                    {remarks}
+                  </Badge>
                 </div>
               )}
 
-              {participants[0] && <>
-                <Accordion type="single" collapsible>
-                <AccordionItem value="participants">
-                  <AccordionTrigger className="flex items-center justify-start space-x-2">
-                    <div className="flex flex-row flex-start gap-2 items-center">
-                      <TooltipComponent
-                        trigger={<div className='flex items-center cursor-help'><Users className="shrink-0" /></div>}
-                        description="Activity Participants"
-                      />
-                      <Label className="cursor-pointer">Participants</Label><Badge variant="outline">{participants.length}</Badge>
-                    </div>
-                  </AccordionTrigger>
-                  <AccordionContent>
-                    <div className="flex flex-wrap justify-start gap-1 p-2 border rounded-lg">
-                      {participants.map((participant: any, index: number) => {
-                        const user = usersData.find(user => user.id === participant.userId);
-                        return (
-                          <div key={index} className="flex flex-wrap cursor-pointer">
-                            {user ? (
-                              <>
-                                <div className="flex justify-start p-1 shadow-md items-center space-x-1 rounded-full cursor-pointer border-2 border-[#E5E5E6]">
-                                  <div className={`flex items-center justify-center px-1 rounded-full text-white`}
-                                    style={{ backgroundColor: user.color }}>
-                                    <Label className="text-xs font-normal">{user.name.split(' ').map((n: string) => n[0]).join('')}</Label>
-                                  </div>
-                                  <Label className="text-xs font-normal text-black dark:text-white">{capitalizeEachWord(user.name)}</Label>
+              {participants[0] && (
+                <>
+                  <Accordion type="single" collapsible>
+                    <AccordionItem value="participants">
+                      <AccordionTrigger className="flex items-center justify-start space-x-2">
+                        <div className="flex flex-row flex-start gap-2 items-center">
+                          <TooltipComponent
+                            trigger={
+                              <div className="flex items-center cursor-help">
+                                <Users className="shrink-0" />
+                              </div>
+                            }
+                            description="Activity Participants"
+                          />
+                          <Label className="cursor-pointer">Participants</Label>
+                          <Badge variant="outline">{participants.length}</Badge>
+                        </div>
+                      </AccordionTrigger>
+                      <AccordionContent>
+                        <div className="flex flex-wrap justify-start gap-1 p-2 border rounded-lg">
+                          {participants.map(
+                            (participant: any, index: number) => {
+                              const user = usersData.find(
+                                (user) => user.id === participant.userId
+                              );
+                              return (
+                                <div
+                                  key={index}
+                                  className="flex flex-wrap cursor-pointer"
+                                >
+                                  {user ? (
+                                    <>
+                                      <div className="flex justify-start p-1 shadow-md items-center space-x-1 rounded-full cursor-pointer border-2 border-[#E5E5E6]">
+                                        <div
+                                          className={`flex items-center justify-center px-1 rounded-full text-white`}
+                                          style={{
+                                            backgroundColor: user.color,
+                                          }}
+                                        >
+                                          <Label className="text-xs font-normal">
+                                            {user.name
+                                              .split(" ")
+                                              .map((n: string) => n[0])
+                                              .join("")}
+                                          </Label>
+                                        </div>
+                                        <Label className="text-xs font-normal text-black dark:text-white">
+                                          {capitalizeEachWord(user.name)}
+                                        </Label>
+                                      </div>
+                                    </>
+                                  ) : (
+                                    <Badge variant="outline">
+                                      <Label>User details not found.</Label>
+                                    </Badge>
+                                  )}
+                                  {loadingUser && <LoadingSpinner />}
+                                  {errorUser && (
+                                    <Label className="text-destructive">
+                                      {errorUser}
+                                    </Label>
+                                  )}
                                 </div>
-                              </>
-                            ) : (
-                              <Badge variant="outline">
-                                <Label>User details not found.</Label>
-                              </Badge>
-                            )}
-                            {loadingUser && <LoadingSpinner/>}
-                            {errorUser && <Label className="text-destructive">{errorUser}</Label>}
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </AccordionContent>
-                </AccordionItem>
-              </Accordion>
-              </>}
-          
-              {preparatoryContent ?
+                              );
+                            }
+                          )}
+                        </div>
+                      </AccordionContent>
+                    </AccordionItem>
+                  </Accordion>
+                </>
+              )}
+
+              {preparatoryContent ? (
                 <Accordion type="single" collapsible>
                   <AccordionItem value={"2"}>
                     <AccordionTrigger className="flex items-center justify-start space-x-2">
                       <div className="flex flex-row flex-start gap-2 items-center">
                         <TooltipComponent
-                          trigger={<div className='flex items-center cursor-help'><NotebookPen className="h-5 w-5 shrink-0" /></div>}
+                          trigger={
+                            <div className="flex items-center cursor-help">
+                              <NotebookPen className="h-5 w-5 shrink-0" />
+                            </div>
+                          }
                           description="Activity Preparatories"
                         />
-                        <Label className="cursor-pointer">Preparatory Content</Label>
+                        <Label className="cursor-pointer">
+                          Preparatory Content
+                        </Label>
                       </div>
                     </AccordionTrigger>
                     <AccordionContent>
-                      <div className="flex text-sm flex-col space-y-2 p-2 border rounded-lg shadow-md cursor-pointer" onClick={() => handleOpenContentDialog("Preparatory Content","",preparatoryContent)} dangerouslySetInnerHTML={{ __html: preparatoryContent }} />
+                      <div
+                        className="flex text-sm flex-col space-y-2 p-2 border rounded-lg shadow-md cursor-pointer"
+                        onClick={() =>
+                          handleOpenContentDialog(
+                            "Preparatory Content",
+                            "",
+                            preparatoryContent
+                          )
+                        }
+                        dangerouslySetInnerHTML={{ __html: preparatoryContent }}
+                      />
                     </AccordionContent>
                   </AccordionItem>
-                </Accordion> :
+                </Accordion>
+              ) : (
                 <Accordion type="single" collapsible>
                   {preparatoryList.map((prep: any, index: number) => (
                     <AccordionItem key={prep.id} value={prep.id}>
                       <AccordionTrigger className="flex items-center justify-start space-x-2">
                         <div className="flex flex-row flex-start gap-2 items-center">
                           <TooltipComponent
-                            trigger={<div className='flex items-center cursor-help'><NotebookPen className="h-5 w-5 shrink-0" /></div>}
+                            trigger={
+                              <div className="flex items-center cursor-help">
+                                <NotebookPen className="h-5 w-5 shrink-0" />
+                              </div>
+                            }
                             description="Activity Preparatories"
                           />
-                          <Label className="cursor-pointer">Preparatory List {index + 1}</Label>
+                          <Label className="cursor-pointer">
+                            Preparatory List {index + 1}
+                          </Label>
                         </div>
                       </AccordionTrigger>
                       <AccordionContent>
@@ -506,51 +677,14 @@ ${formattedPreparatoryList}`;
                             <strong>Description:</strong> {prep.description}
                           </div>
                           <div>
-                            <strong>Status:</strong> {prep.status || 'None'}
+                            <strong>Status:</strong> {prep.status || "None"}
                           </div>
                           <div>
-                            <strong>Remarks:</strong> {prep.remarks || 'None'}
+                            <strong>Remarks:</strong> {prep.remarks || "None"}
                           </div>
                           <div>
-                            <strong>Created At:</strong> {new Date(prep.createdAt).toLocaleString()}
-                          </div>
-                        </div>
-                      </AccordionContent>
-                    </AccordionItem>
-                  ))}
-                </Accordion>
-              }
-              {calendarOfActivityAttachment && calendarOfActivityAttachment.length > 0 && calendarOfActivityAttachment[0].details && (
-                <Accordion type="single" collapsible>
-                  {calendarOfActivityAttachment.map((attachment: any, index: number) => (
-                    <AccordionItem key={attachment.id} value={attachment.id}>
-                      <AccordionTrigger className="flex items-center justify-start space-x-2">
-                        <div className="flex flex-row flex-start gap-2 items-center">
-                          <TooltipComponent
-                            trigger={<div className='flex items-center cursor-help'><RiAttachmentLine className="h-5 w-5 shrink-0" /></div>}
-                            description="Activity Attachments"
-                          />
-                          <Label className="cursor-pointer">Attachment {index + 1}</Label>
-                        </div>
-                      </AccordionTrigger>
-                      <AccordionContent>
-                        <div className="flex flex-col space-y-2 p-2 border rounded-lg shadow-md pr-2">
-                          <div>
-                            <strong>Details:</strong> <Label className="break-words"> {attachment.details}</Label>
-                          </div>
-                          <div>
-                            <strong>Link: </strong>
-                            {isValidUrl(attachment.link) ? (
-                              <Link href={attachment.link} passHref target="_blank" rel="noopener noreferrer"
-                                className=" text-blue-500 hover:text-blue-400 cursor-pointer break-words">
-                                <Label className="cursor-pointer">{attachment.link}</Label>
-                              </Link>
-                            ) : (
-                              <Label>(Not a link) {attachment.link}</Label>
-                            )}
-                          </div>
-                          <div>
-                            <strong>Created At:</strong> {new Date(attachment.createdAt).toLocaleString()}
+                            <strong>Created At:</strong>{" "}
+                            {new Date(prep.createdAt).toLocaleString()}
                           </div>
                         </div>
                       </AccordionContent>
@@ -558,21 +692,94 @@ ${formattedPreparatoryList}`;
                   ))}
                 </Accordion>
               )}
+              {calendarOfActivityAttachment &&
+                calendarOfActivityAttachment.length > 0 &&
+                calendarOfActivityAttachment[0].details && (
+                  <Accordion type="single" collapsible>
+                    {calendarOfActivityAttachment.map(
+                      (attachment: any, index: number) => (
+                        <AccordionItem
+                          key={attachment.id}
+                          value={attachment.id}
+                        >
+                          <AccordionTrigger className="flex items-center justify-start space-x-2">
+                            <div className="flex flex-row flex-start gap-2 items-center">
+                              <TooltipComponent
+                                trigger={
+                                  <div className="flex items-center cursor-help">
+                                    <RiAttachmentLine className="h-5 w-5 shrink-0" />
+                                  </div>
+                                }
+                                description="Activity Attachments"
+                              />
+                              <Label className="cursor-pointer">
+                                Attachment {index + 1}
+                              </Label>
+                            </div>
+                          </AccordionTrigger>
+                          <AccordionContent>
+                            <div className="flex flex-col space-y-2 p-2 border rounded-lg shadow-md pr-2">
+                              <div>
+                                <strong>Details:</strong>{" "}
+                                <Label className="break-words">
+                                  {" "}
+                                  {attachment.details}
+                                </Label>
+                              </div>
+                              <div>
+                                <strong>Link: </strong>
+                                {isValidUrl(attachment.link) ? (
+                                  <Link
+                                    href={attachment.link}
+                                    passHref
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className=" text-blue-500 hover:text-blue-400 cursor-pointer break-words"
+                                  >
+                                    <Label className="cursor-pointer">
+                                      {attachment.link}
+                                    </Label>
+                                  </Link>
+                                ) : (
+                                  <Label>(Not a link) {attachment.link}</Label>
+                                )}
+                              </div>
+                              <div>
+                                <strong>Created At:</strong>{" "}
+                                {new Date(
+                                  attachment.createdAt
+                                ).toLocaleString()}
+                              </div>
+                            </div>
+                          </AccordionContent>
+                        </AccordionItem>
+                      )
+                    )}
+                  </Accordion>
+                )}
 
               {qrCode && (
                 <div className="flex flex-col">
                   <div className="flex flex-row gap-2 mb-2">
                     <TooltipComponent
-                      trigger={<div className='flex items-center cursor-help'><FaQrcode /></div>}
+                      trigger={
+                        <div className="flex items-center cursor-help">
+                          <FaQrcode />
+                        </div>
+                      }
                       description="Scanned me!"
                     />
                     <Label className="font-semibold">QR Code:</Label>
                   </div>
-                  <Image src={qrCode} className="shadow-md" width={250} height={250} alt="QR Code" />
+                  <Image
+                    src={qrCode}
+                    className="shadow-md"
+                    width={250}
+                    height={250}
+                    alt="QR Code"
+                  />
                 </div>
               )}
-
-
             </div>
           </div>
 
@@ -587,13 +794,15 @@ ${formattedPreparatoryList}`;
       <Profile
         openProfileDialog={openProfile}
         setProfileDialogClose={() => setOpenProfile(!openProfile)}
-        profileUserName={userName} />
+        profileUserName={userName}
+      />
       <DisplayContentDialog
         html={contentHTMLData}
         title={contentDialogTitle}
         content={contentData}
         openDeleteDialog={openContentDialog}
-        setDeleteDialogClose={() => setOpenContentDialog(!openContentDialog)} />
+        setDeleteDialogClose={() => setOpenContentDialog(!openContentDialog)}
+      />
       <UpdateActivityDialog
         activityId={[id]}
         onCancel={handleCancelUpdate}
@@ -607,10 +816,8 @@ ${formattedPreparatoryList}`;
         onConfirm={handleConfirmDelete}
         openDeleteDialog={openDeleteDialog}
         setDeleteDialogClose={() => setOpenDeleteDialog(!openDeleteDialog)}
-        loading={loadingDelete} />
+        loading={loadingDelete}
+      />
     </>
-  )
+  );
 }
-
-
-

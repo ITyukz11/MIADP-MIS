@@ -25,18 +25,19 @@ import { DataTablePagination } from "./data-table-pagination";
 import { DataTableToolbar } from "./data-table-toolbar";
 import { Checkbox } from "@/components/ui/checkbox"; // Adjust the import according to your file structure
 import { Button } from "../ui/button";
+import { ColumnMeta } from "@/types/table/table";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   hiddenColumns?: string[];
   onSelectedRowIdsChange?: (selectedRowIds: string[]) => void;
-  allowSelectRow: boolean
-  allowViewCalendar?: boolean
+  allowSelectRow: boolean;
+  allowViewCalendar?: boolean;
   setAllowViewCalendar?: () => void;
   onViewRowId?: (id: string) => void;
-  allowDateRange?:boolean;
-  allowExportToExcel?:boolean;
+  allowDateRange?: boolean;
+  allowExportToExcel?: boolean;
 }
 
 export function DataTable<TData extends { id: string }, TValue>({
@@ -48,17 +49,20 @@ export function DataTable<TData extends { id: string }, TValue>({
   allowViewCalendar,
   setAllowViewCalendar,
   onViewRowId,
-  allowDateRange=false,
-  allowExportToExcel=false
+  allowDateRange = false,
+  allowExportToExcel = false,
 }: DataTableProps<TData, TValue>) {
-  const [rowSelection, setRowSelection] = React.useState<Record<string, boolean>>({});
-  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>(() => {
-    const initialVisibility: VisibilityState = {};
-    hiddenColumns.forEach((columnId) => {
-      initialVisibility[columnId] = false;
+  const [rowSelection, setRowSelection] = React.useState<
+    Record<string, boolean>
+  >({});
+  const [columnVisibility, setColumnVisibility] =
+    React.useState<VisibilityState>(() => {
+      const initialVisibility: VisibilityState = {};
+      hiddenColumns.forEach((columnId) => {
+        initialVisibility[columnId] = false;
+      });
+      return initialVisibility;
     });
-    return initialVisibility;
-  });
 
   React.useEffect(() => {
     const updatedVisibility: VisibilityState = {};
@@ -67,14 +71,18 @@ export function DataTable<TData extends { id: string }, TValue>({
     });
 
     setColumnVisibility((prevVisibility) => {
-      if (JSON.stringify(prevVisibility) !== JSON.stringify(updatedVisibility)) {
+      if (
+        JSON.stringify(prevVisibility) !== JSON.stringify(updatedVisibility)
+      ) {
         return updatedVisibility;
       }
       return prevVisibility;
     });
   }, [hiddenColumns]);
 
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
+    []
+  );
   const [sorting, setSorting] = React.useState<SortingState>([]);
 
   const numberingColumn: ColumnDef<TData, any> = {
@@ -105,6 +113,8 @@ export function DataTable<TData extends { id: string }, TValue>({
         className="translate-y-[2px]"
       />
     ),
+    size: 30,
+    maxSize: 30,
     enableSorting: false,
     enableHiding: false,
   };
@@ -121,8 +131,8 @@ export function DataTable<TData extends { id: string }, TValue>({
   };
 
   const columnsWithNumbering = allowSelectRow
-  ? [selectColumn, numberingColumn, ...columns]
-  : [numberingColumn, ...columns];
+    ? [selectColumn, numberingColumn, ...columns]
+    : [numberingColumn, ...columns];
 
   const table = useReactTable({
     data,
@@ -154,28 +164,47 @@ export function DataTable<TData extends { id: string }, TValue>({
     if (onSelectedRowIdsChangeRef.current) {
       const selectedRowIds = Object.keys(rowSelection)
         .filter((id) => rowSelection[id])
-        .map((rowId) => table.getRow(rowId).getValue('id') as string); // Get the value of the 'id' column for selected rows and assert it as string
+        .map((rowId) => table.getRow(rowId).getValue("id") as string); // Get the value of the 'id' column for selected rows and assert it as string
       onSelectedRowIdsChangeRef.current(selectedRowIds);
     }
   }, [rowSelection, table]);
 
   return (
     <div className="space-y-4 flex-wrap py-1 w-full place-self-center overflow-x-auto transition-all">
-      <DataTableToolbar data={data} table={table} selectedRows={rowSelection} allowDateRange={allowDateRange} allowExportToExcel={allowExportToExcel}/>
+      <DataTableToolbar
+        data={data}
+        table={table}
+        selectedRows={rowSelection}
+        allowDateRange={allowDateRange}
+        allowExportToExcel={allowExportToExcel}
+      />
       <div className="rounded-md border">
-        <Table className="min-w-full">
+        <Table className="min-w-full table-fixed">
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
                   return (
-                    <TableHead key={header.id} colSpan={header.colSpan}>
+                    <TableHead
+                      key={header.id}
+                      className={
+                        (header.column.columnDef.meta as ColumnMeta)
+                          ?.columnClasses
+                      }
+                      colSpan={header.colSpan}
+                      style={{
+                        width:
+                          header.column.id === "#"
+                            ? 40
+                            : header.column.getSize(),
+                      }}
+                    >
                       {header.isPlaceholder
                         ? null
                         : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
                     </TableHead>
                   );
                 })}
@@ -189,15 +218,25 @@ export function DataTable<TData extends { id: string }, TValue>({
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
                   onClick={() => handleRowClick(row.original.id)}
-                  style={{ cursor: allowViewCalendar ? 'pointer' : 'default' }} // Conditional cursor style
+                  style={{ cursor: allowViewCalendar ? "pointer" : "default" }} // Conditional cursor style
                 >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id} className="text-xs sm:text-sm">
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                  {row.getVisibleCells().map((cell, index) => (
+                    <TableCell
+                      key={cell.id}
+                      className={`text-xs sm:text-sm ${
+                        index === 0 ? "w-1/4" : "w-[150px]" // Match header widths
+                      } whitespace-nowrap ${
+                        (cell.column.columnDef.meta as ColumnMeta) //to remove table cell data if width is small depend on columnDef file using tailwind sm md lg
+                          ?.columnClasses
+                      }`}
+                    >
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
                     </TableCell>
                   ))}
                 </TableRow>
-
               ))
             ) : (
               <TableRow>
@@ -210,7 +249,6 @@ export function DataTable<TData extends { id: string }, TValue>({
               </TableRow>
             )}
           </TableBody>
-
         </Table>
       </div>
       <DataTablePagination table={table} />

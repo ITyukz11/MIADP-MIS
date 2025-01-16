@@ -1,27 +1,25 @@
-"use client"
+"use client";
 
-import { DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu"
-import { MixerHorizontalIcon } from "@radix-ui/react-icons"
-import { Table } from "@tanstack/react-table"
+import { DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu";
+import { MixerHorizontalIcon } from "@radix-ui/react-icons";
+import { Table } from "@tanstack/react-table";
 
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-} from "@/components/ui/dropdown-menu"
-import { useEffect } from "react"
+} from "@/components/ui/dropdown-menu";
 
 interface DataTableViewOptionsProps<TData> {
-  table: Table<TData>
+  table: Table<TData>;
 }
 
 export function DataTableViewOptions<TData>({
   table,
 }: DataTableViewOptionsProps<TData>) {
-
   // table.getAllColumns().forEach((column) => {
   //   if (column.id === "user_id") {
   //     column.toggleVisibility(false);
@@ -34,13 +32,16 @@ export function DataTableViewOptions<TData>({
         <Button
           variant="outline"
           size="sm"
-          className="ml-auto h-9 flex"
+          className="hidden md:flex ml-auto h-9"
         >
           <MixerHorizontalIcon className="mr-2 h-4 w-4" />
           View
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-fit grid grid-cols-2 overflow-y-auto">
+      <DropdownMenuContent
+        align="end"
+        className="w-fit grid grid-cols-2 overflow-y-auto"
+      >
         <DropdownMenuLabel>Toggle columns</DropdownMenuLabel>
         <DropdownMenuSeparator />
         {table
@@ -55,14 +56,15 @@ export function DataTableViewOptions<TData>({
                 key={column.id}
                 className="capitalize cursor-pointer"
                 checked={column.getIsVisible()}
-                onCheckedChange={(value) => { column.toggleVisibility(value) }}
+                onCheckedChange={(value) => {
+                  column.toggleVisibility(value);
+                }}
               >
                 {column.id == "userName" ? "Author" : column.id}
               </DropdownMenuCheckboxItem>
             );
-
           })}
       </DropdownMenuContent>
     </DropdownMenu>
-  )
+  );
 }

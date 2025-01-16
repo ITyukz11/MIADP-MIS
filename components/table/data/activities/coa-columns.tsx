@@ -84,21 +84,6 @@ export const columns: ColumnDef<Activity>[] = [
   //   enableHiding: false,
   // },
   {
-    accessorKey: "id",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="COA ID" />
-    ),
-    cell: ({ row }) => (
-      <div className="flex space-x-2">
-        <span className="max-w-[500px] truncate font-medium cursor-default">
-          {row.getValue("id")}
-        </span>
-      </div>
-    ),
-    maxSize: 100,
-    minSize: 0,
-  },
-  {
     accessorKey: "activityTitle",
     // enableHiding: false,
     header: ({ column }) => (
@@ -107,8 +92,8 @@ export const columns: ColumnDef<Activity>[] = [
     cell: ({ row }) => (
       <div className="flex space-x-2">
         <Label className="truncate font-medium cursor-default gap-1 flex">
-          <Badge className="hidden sm:block">{row.original.user?.region}</Badge>
-          <Badge className="hidden md:block" variant={"outline"}>
+          <Badge className="hidden md:block">{row.original.user?.region}</Badge>
+          <Badge className="hidden lg:block" variant={"outline"}>
             {row.original.user?.unit
               ? row.original.user?.unit
               : row.original.user?.component}
@@ -118,8 +103,7 @@ export const columns: ColumnDef<Activity>[] = [
       </div>
     ),
     maxSize: 700,
-    size: 500,
-    minSize: 100,
+    minSize: 300,
   },
   {
     accessorKey: "activityDescription",
@@ -155,7 +139,7 @@ export const columns: ColumnDef<Activity>[] = [
         </span>
       </div>
     ),
-    meta: { columnClasses: "hidden md:table-cell" } as ColumnMeta,
+    meta: { columnClasses: "hidden lg:table-cell" } as ColumnMeta,
     maxSize: 150,
     minSize: 0,
   },
@@ -220,7 +204,7 @@ export const columns: ColumnDef<Activity>[] = [
         </span>
       </div>
     ),
-    meta: { columnClasses: "hidden sm:table-cell" } as ColumnMeta,
+    meta: { columnClasses: "hidden md:table-cell" } as ColumnMeta,
     maxSize: 100,
     minSize: 0,
     // filterFn: dateInRangeFilter,
@@ -237,7 +221,7 @@ export const columns: ColumnDef<Activity>[] = [
         </span>
       </div>
     ),
-    meta: { columnClasses: "hidden md:table-cell" } as ColumnMeta,
+    meta: { columnClasses: "hidden lg:table-cell" } as ColumnMeta,
     maxSize: 100,
     minSize: 0,
     // filterFn: dateInRangeFilter,
@@ -286,7 +270,7 @@ export const columns: ColumnDef<Activity>[] = [
         </span>
       </div>
     ),
-    meta: { columnClasses: "hidden md:table-cell" } as ColumnMeta,
+    meta: { columnClasses: "hidden lg:table-cell" } as ColumnMeta,
     maxSize: 150,
     minSize: 0,
   },

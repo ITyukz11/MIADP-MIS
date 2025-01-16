@@ -106,7 +106,7 @@ const Page = () => {
   ]; // Columns to hide
 
   return (
-    <div className="w-full max-w-[320px] sm:max-w-screen-sm md:max-w-screen-md lg:max-w-screen-xl xl:max-w-screen-2xl">
+    <div className="w-full">
       {!activityLoading ? (
         <Card>
           <CardContent className="p-4">

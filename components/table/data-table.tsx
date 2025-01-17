@@ -113,8 +113,6 @@ export function DataTable<TData extends { id: string }, TValue>({
         className="translate-y-[2px]"
       />
     ),
-    size: 25,
-    maxSize: 25,
     enableSorting: false,
     enableHiding: false,
   };
@@ -195,7 +193,7 @@ export function DataTable<TData extends { id: string }, TValue>({
                       style={{
                         width:
                           header.column.id === "#"
-                            ? 40
+                            ? 5
                             : header.column.getSize(),
                       }}
                     >

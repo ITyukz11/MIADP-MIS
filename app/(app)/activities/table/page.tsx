@@ -72,13 +72,15 @@ const Page = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const sortedActivities = activitiesData.sort(
-          (a: any, b: any) =>
-            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-        );
+        if (activitiesData) {
+          const sortedActivities = activitiesData.sort(
+            (a: any, b: any) =>
+              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          );
 
-        setCoaData(sortedActivities);
-        setFilteredData(filterActivities(sortedActivities));
+          setCoaData(sortedActivities);
+          setFilteredData(filterActivities(sortedActivities));
+        }
       } catch (error) {
         console.error("Error fetching calendar of activity:", error);
       }

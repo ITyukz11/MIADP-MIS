@@ -22,12 +22,7 @@ import {
   Info,
   Map,
   NotebookPen,
-  Pencil,
-  PencilIcon,
-  Target,
   TargetIcon,
-  Trash,
-  Trash2,
   UserCircle,
   Users,
 } from "lucide-react";
@@ -42,17 +37,15 @@ import { TbNotes, TbStatusChange } from "react-icons/tb";
 import { FaQrcode } from "react-icons/fa";
 import { useEffect, useState } from "react";
 import { GenerateQRCodeWithLogo } from "../GenerateQrCodeWithLogo";
-import { MdAttachment, MdDateRange, MdOutlineDateRange } from "react-icons/md";
+import { MdAttachment, MdOutlineDateRange } from "react-icons/md";
 import Profile from "../profile/Profile";
 import Link from "next/link";
 import { useDispatch, useSelector } from "@/app/store/store";
 import { fetchUsersData } from "@/app/store/userAction";
 import { TooltipComponent } from "../Tooltip";
 import { RiAttachmentLine } from "react-icons/ri";
-import DisplayHTMLDialog from "../dialog/display-content-dialog";
 import { capitalizeEachWord } from "@/utils/capitalizeEachWord";
-import { Button } from "../ui/button";
-import { IoPencilOutline, IoTrashOutline } from "react-icons/io5";
+import { IoTrashOutline } from "react-icons/io5";
 import { PiNotePencilBold } from "react-icons/pi";
 import UpdateActivityDialog from "../dialog/update-dialog";
 import ConfirmDeleteDialog from "../dialog/delete-dialog";
@@ -60,7 +53,6 @@ import { ToastAction } from "../ui/toast";
 import { toast } from "../ui/use-toast";
 import { deleteCalendarOfActivity } from "@/actions/calendar-of-activity/delete";
 import { fetchActivitiesData } from "@/app/store/activityAction";
-import { getCurrentUser } from "@/lib/session";
 import { useCurrentUser } from "../context/CurrentUserContext";
 import DisplayContentDialog from "../dialog/display-content-dialog";
 import { LoadingSpinner } from "../LoadingSpinner";
@@ -289,12 +281,16 @@ ${formattedPreparatoryList}`;
       <Sheet open={openSheet} onOpenChange={closeCalendarSheet}>
         <SheetContent className="overflow-y-auto scrollbar-thin sm:min-w-[600px] h-full">
           <SheetHeader>
-            <SheetTitle className="flex flex-row gap-2 items-center pr-4">
+            <SheetTitle className="flex flex-col md:flex-row gap-2 items-center pr-4 font-bold text-xs sm:text-sm md:text-base lg:text-lg">
               <div
                 style={{ backgroundColor: user.color }}
-                className="border rounded-full w-5 h-5 flex-shrink-0"
+                className="border rounded-full w-5 h-5 flex-shrink-0 md:flex hidden"
               ></div>
               {activityTitle}
+              <div
+                style={{ backgroundColor: user.color }}
+                className="border w-full h-1 md:hidden"
+              ></div>
             </SheetTitle>
             {user.id == currentUser?.id && (
               <div className="flex flex-col gap-2 absolute top-8 right-4">
@@ -351,7 +347,7 @@ ${formattedPreparatoryList}`;
                         height={30}
                       />
                       <div className="flex flex-col w-full items-center pr-1 cursor-pointer">
-                        <Label className="text-sm font-medium text-center cursor-pointer">
+                        <Label className="text-xs md:text-sm font-medium md:font-bold text-center cursor-pointer">
                           {capitalizeEachWord(userName)}
                         </Label>
                         <Label className="text-xs font-light  cursor-pointer">
@@ -388,7 +384,7 @@ ${formattedPreparatoryList}`;
 
                 <Badge
                   // variant={variant}
-                  className={`font-medium cursor-default shadow-md  dark:text-white hover:${getStatusColor(
+                  className={`cursor-default shadow-md  dark:text-white hover:${getStatusColor(
                     status
                   )} ${getStatusColor(status)}`}
                 >
@@ -650,7 +646,9 @@ ${formattedPreparatoryList}`;
                             preparatoryContent
                           )
                         }
-                        dangerouslySetInnerHTML={{ __html: preparatoryContent }}
+                        dangerouslySetInnerHTML={{
+                          __html: truncateText(preparatoryContent, 200),
+                        }}
                       />
                     </AccordionContent>
                   </AccordionItem>

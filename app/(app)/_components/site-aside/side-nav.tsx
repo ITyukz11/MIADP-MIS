@@ -17,7 +17,6 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarMenuSub,
-  useSidebar,
 } from "@/components/ui/sidebar";
 import { Label } from "@/components/ui/label";
 import {
@@ -36,12 +35,11 @@ import {
 
 import { TbActivity } from "react-icons/tb";
 import { cn } from "@/lib/utils";
+import { SheetHeader, SheetTitle } from "@/components/ui/sheet";
 
 export const SiteSideBar = () => {
   const pathname = usePathname();
   const { currentUser } = useCurrentUser();
-  // Use `useSidebar` to access the sidebar state
-  const { open } = useSidebar();
 
   return (
     <Sidebar variant="sidebar" className="shadow-lg z-50">
@@ -57,7 +55,6 @@ export const SiteSideBar = () => {
           />
         </div>
       </SidebarHeader>
-
       {/* Sidebar Content */}
       <SidebarContent>
         <SidebarGroup>

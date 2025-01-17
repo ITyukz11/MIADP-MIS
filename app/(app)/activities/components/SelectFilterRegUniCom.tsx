@@ -1,14 +1,26 @@
-import { useSelector } from '@/app/store/store';
-import { useCurrentUser } from '@/components/context/CurrentUserContext';
-import { useCalendarOfActivityFilter } from '@/components/context/FilterRegionContext';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { componentOptions, regionOptions, unitOptions } from '@/lib/data/filter'
-import React from 'react'
+import { useSelector } from "@/app/store/store";
+import { useCurrentUser } from "@/components/context/CurrentUserContext";
+import { useCalendarOfActivityFilter } from "@/components/context/FilterRegionContext";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  componentOptions,
+  regionOptions,
+  unitOptions,
+} from "@/lib/data/filter";
+import React from "react";
 
-type Props = {}
+type Props = {};
 
-function SelectFilterRegUniCom({ }: Props) {
+function SelectFilterRegUniCom({}: Props) {
   const { currentUser } = useCurrentUser();
   const { activityLoading } = useSelector((state) => state.activity);
   const { currentFilter, setCurrentFilter } = useCalendarOfActivityFilter();
@@ -16,34 +28,47 @@ function SelectFilterRegUniCom({ }: Props) {
   const handleValueChange = (value: string) => {
     setCurrentFilter({
       region: value,
-      typeOfActivity: currentFilter?.typeOfActivity || '',
-      unit: currentFilter?.unit || '',
-      status: currentFilter?.status || '',
-      month: currentFilter?.month || '',
-      wfpYear: currentFilter?.wfpYear || ''
+      typeOfActivity: currentFilter?.typeOfActivity || "",
+      unit: currentFilter?.unit || "",
+      status: currentFilter?.status || "",
+      month: currentFilter?.month || "",
+      wfpYear: currentFilter?.wfpYear || "",
     });
   };
 
   return (
-    <div >
-      <Label className='font-semibold'>Region:</Label>
-      <Select onValueChange={handleValueChange} value={currentFilter?.region} disabled={activityLoading}>
-        <SelectTrigger className="w-fit">
-          <SelectValue placeholder={currentUser?.region ? currentUser?.region : "Filter"} />
+    <div>
+      <Label className="font-semibold text-xs md:text-sm">Region:</Label>
+      <Select
+        onValueChange={handleValueChange}
+        value={currentFilter?.region}
+        disabled={activityLoading}
+      >
+        <SelectTrigger className="w-fit text-xs md:text-sm">
+          <SelectValue
+            placeholder={currentUser?.region ? currentUser?.region : "Filter"}
+          />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value='All'>All</SelectItem>
+          <SelectItem className="text-xs md:text-sm cursor-pointer" value="All">
+            All
+          </SelectItem>
           <SelectGroup>
-            <SelectLabel>Regions</SelectLabel>
+            <SelectLabel className="text-xs md:text-sm">Regions</SelectLabel>
             {regionOptions.map((option, index) => (
-              <SelectItem key={index} value={option}>{option}</SelectItem>
+              <SelectItem
+                className="text-xs md:text-sm cursor-pointer"
+                key={index}
+                value={option}
+              >
+                {option}
+              </SelectItem>
             ))}
           </SelectGroup>
         </SelectContent>
       </Select>
     </div>
-
-  )
+  );
 }
 
-export default SelectFilterRegUniCom
+export default SelectFilterRegUniCom;

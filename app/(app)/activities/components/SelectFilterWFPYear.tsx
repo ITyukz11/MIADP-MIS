@@ -30,21 +30,27 @@ function SelectFilterWFPYear(className: any) {
 
   return (
     <div className={className}>
-      <Label className="font-semibold">WFP Year:</Label>
+      <Label className="font-semibold text-xs md:text-sm">WFP Year:</Label>
       <Select
         onValueChange={handleValueChange}
         value={currentFilter?.wfpYear}
         disabled={activityLoading}
       >
-        <SelectTrigger className="w-fit">
+        <SelectTrigger className="w-fit text-xs md:text-sm">
           <SelectValue placeholder="All" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="All">All</SelectItem>
+          <SelectItem className="text-xs md:text-sm cursor-pointer" value="All">
+            All
+          </SelectItem>
           <SelectGroup>
-            <SelectLabel>WFP Year</SelectLabel>
+            <SelectLabel className="text-xs md:text-sm">WFP Year</SelectLabel>
             {wfpYearOptions.map((option, index) => (
-              <SelectItem key={index} value={option}>
+              <SelectItem
+                className="text-xs md:text-sm cursor-pointer"
+                key={index}
+                value={option}
+              >
                 {option}
               </SelectItem>
             ))}

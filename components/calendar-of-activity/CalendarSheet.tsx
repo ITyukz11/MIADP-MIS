@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/accordion";
 
 import {
+  CalendarDays,
   CalendarFold,
   Clock,
   Component,
@@ -23,6 +24,7 @@ import {
   NotebookPen,
   Pencil,
   PencilIcon,
+  Target,
   TargetIcon,
   Trash,
   Trash2,
@@ -62,6 +64,8 @@ import { getCurrentUser } from "@/lib/session";
 import { useCurrentUser } from "../context/CurrentUserContext";
 import DisplayContentDialog from "../dialog/display-content-dialog";
 import { LoadingSpinner } from "../LoadingSpinner";
+import { formatDateLong } from "@/utils/dateFormat";
+import { truncateText } from "@/utils/truncateText";
 
 interface CalendarSheetProps {
   activityData: any[];
@@ -280,7 +284,6 @@ ${formattedPreparatoryList}`;
     setContentDialogTitle(title);
     setOpenContentDialog(!openContentDialog);
   };
-  console.log("WFPYear: ", WFPYear);
   return (
     <>
       <Sheet open={openSheet} onOpenChange={closeCalendarSheet}>
@@ -395,19 +398,7 @@ ${formattedPreparatoryList}`;
                   )}
                 </Badge>
               </div>
-              <div className="flex items-center space-x-2 mt-2">
-                <TooltipComponent
-                  trigger={
-                    <div className="flex items-center cursor-help">
-                      <MdOutlineDateRange size={24} />
-                    </div>
-                  }
-                  description="Date Created"
-                />
-                <Badge variant={"outline"} className="font-medium shadow-md">
-                  {formatProperDateTime(createdAt)}
-                </Badge>
-              </div>
+
               <div className="flex items-center space-x-2 mt-2">
                 <TooltipComponent
                   trigger={
@@ -433,8 +424,7 @@ ${formattedPreparatoryList}`;
                 <Badge variant="outline" className="shadow-sm">
                   {dateFrom === dateTo
                     ? formatDate(dateFrom)
-                    : `${formatDate(dateFrom)} - ${formatDate(dateTo)}, `}
-                  {WFPYear}
+                    : `${formatDate(dateFrom)} - ${formatDateLong(dateTo)}`}
                 </Badge>
               </div>
               {timeEnd && (
@@ -452,6 +442,19 @@ ${formattedPreparatoryList}`;
                   </Badge>
                 </div>
               )}
+              <div className="flex items-center space-x-2 mt-2">
+                <TooltipComponent
+                  trigger={
+                    <div className="flex items-center cursor-help">
+                      <CalendarDays className="h-5 w-5 shrink-0" />
+                    </div>
+                  }
+                  description="WFP Year"
+                />
+                <Badge variant="outline" className="shadow-sm">
+                  {WFPYear}
+                </Badge>
+              </div>
               <div className="flex items-center space-x-2 mt-2">
                 <TooltipComponent
                   trigger={
@@ -475,7 +478,7 @@ ${formattedPreparatoryList}`;
                   description="Activity Target Participants"
                 />
                 <Badge variant={"outline"} className=" shadow-sm">
-                  <p className="text-xs">{targetParticipant}</p>
+                  {targetParticipant}
                 </Badge>
               </div>
               <div className="flex items-start space-x-2 mt-4">
@@ -498,7 +501,7 @@ ${formattedPreparatoryList}`;
                     )
                   }
                 >
-                  <p className="text-xs">{activityDescription}</p>
+                  {truncateText(activityDescription, 200)}
                 </Badge>
               </div>
             </div>
@@ -780,6 +783,19 @@ ${formattedPreparatoryList}`;
                   />
                 </div>
               )}
+              <div className="flex items-center space-x-2 mt-2">
+                <TooltipComponent
+                  trigger={
+                    <div className="flex items-center cursor-help">
+                      <MdOutlineDateRange size={24} />
+                    </div>
+                  }
+                  description="Date Created"
+                />
+                <Badge variant={"outline"} className="font-medium shadow-md">
+                  {formatProperDateTime(createdAt)}
+                </Badge>
+              </div>
             </div>
           </div>
 

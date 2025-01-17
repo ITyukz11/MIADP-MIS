@@ -166,7 +166,7 @@ const Page: React.FC = () => {
         {filteredData.slice(0, itemsToShow).map((data) => (
           <Card
             key={data.id}
-            className="shadow-md cursor-pointer dark:hover:bg-slate-900 hover:bg-slate-100"
+            className="shadow-md cursor-pointer dark:hover:bg-slate-900 hover:bg-neutral-100"
             onClick={() => {
               setViewCalendarData([data]);
               setViewCalendar(!viewCalendar);
@@ -224,22 +224,14 @@ const Page: React.FC = () => {
                 </Label>
                 <div className="text-sm flex gap-2 flex-wrap items-center">
                   {data.targetParticipant.split(",").map((item, index) => (
-                    <Badge
-                      key={index}
-                      variant="secondary"
-                      className="cursor-pointer"
-                    >
-                      {item.trim()}
-                    </Badge>
+                    <Badge key={index}>{item.trim()}</Badge>
                   ))}
                   <Separator
                     orientation="vertical"
                     className="h-4 mx-2 lg:block hidden"
                   />
-                  <Badge className="cursor-pointer">{data.user.region}</Badge>
-                  <Badge className="cursor-pointer">
-                    {data.user.component}
-                  </Badge>
+                  <Badge>{data.user.region}</Badge>
+                  <Badge>{data.user.component}</Badge>
                   {data.user.unit && (
                     <Badge className="cursor-pointer">{data.user.unit}</Badge>
                   )}
@@ -247,9 +239,7 @@ const Page: React.FC = () => {
                     orientation="vertical"
                     className="hidden lg:block h-4 mx-2"
                   />
-                  <Badge variant="secondary" className="cursor-pointer">
-                    {data.WFPYear}
-                  </Badge>
+                  <Badge className="cursor-pointer">{data.WFPYear}</Badge>
                   <Badge
                     className={`md:hidden flex font-medium shadow-sm z-10 dark:text-white cursor-pointer hover:${getStatusColor(
                       data.status
@@ -261,7 +251,7 @@ const Page: React.FC = () => {
                     )}
                   </Badge>
                 </div>
-                <Label className="pb-2 cursor-pointer text-xs md:text-sm">
+                <Label className="cursor-pointer text-xs md:text-sm">
                   {data.activityDescription}
                 </Label>
               </div>

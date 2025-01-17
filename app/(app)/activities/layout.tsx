@@ -22,7 +22,13 @@ import SelectFilterWFPYear from "./components/SelectFilterWFPYear";
 import SelectFilterMonth from "./components/SelectFilterMonth";
 import { IoMdHelpCircle } from "react-icons/io";
 import MIADPColorCodeDialog from "./components/Dialog/MIADPColorCode";
-import { useCalendarOfActivityFilter } from "@/components/context/FilterRegionContext";
+import { useIsMobile } from "@/hooks/useIsMobile";
+import {
+  Select,
+  SelectTrigger,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select"; // Import Select from ShadCN or your UI library
 
 interface ActivitiesLayoutProps {
   children: React.ReactNode;
@@ -34,7 +40,7 @@ export default function ActivitiesLayout({ children }: ActivitiesLayoutProps) {
   const [individualActivity, setIndividualActivity] = useState(false);
 
   const [viewMapColorCode, setViewMapColorCode] = useState<boolean>(false);
-
+  const isMobile = useIsMobile();
   const pathname = usePathname();
 
   const handleSetIndividualActivity = useCallback((isIndividual: boolean) => {
@@ -54,6 +60,22 @@ export default function ActivitiesLayout({ children }: ActivitiesLayoutProps) {
   }, []);
 
   console.log("ACTIVITY PARENT RENDERS");
+
+  const links = [
+    { href: "/activities/list", label: "List", icon: <List size={22} /> },
+    { href: "/activities", label: "Table", icon: <TableIcon size={22} /> },
+    {
+      href: "/activities/calendar",
+      label: "Calendar",
+      icon: <Calendar size={22} />,
+    },
+    {
+      href: "/activities/report",
+      label: "Report",
+      icon: <TbReportAnalytics size={25} />,
+    },
+  ];
+
   return (
     <div className="space-y-4 w-full">
       <div className="flex flex-row flex-wrap gap-2 justify-between">
@@ -77,66 +99,65 @@ export default function ActivitiesLayout({ children }: ActivitiesLayoutProps) {
                 className="flex flex-row items-center gap-1 justify-center text-xs lg:text-sm"
                 onClick={() => setPlanningActivityOpen(true)}
               >
-                <FaPlusCircle size={18} className="shrink-0" /> Create new
-                activity
+                <FaPlusCircle size={18} className="shrink-0" />
+                <span className="md:block hidden">Create new activity</span>
               </Button>
               <ViewMySchedDialog />
               <ViewMyParticipatedSchedDialog />
             </div>
-            <div className="flex sm:flex-row gap-2 flex-wrap justify-center sm:justify-end">
-              <Link
-                href="/activities/list"
-                className={cn(
-                  buttonVariants({ variant: "secondary" }),
-                  "hover:bg-blue-100 dark:hover:bg-blue-700 rounded-[6px] xs:w-[200px] md:w-fit flex flex-row gap-1 items-center justify-center overflow-hidden text-xs lg:text-sm",
-                  {
-                    "font-bold hover:bg-blue-100 dark:hover:bg-blue-700 bg-blue-100 dark:bg-blue-700":
-                      pathname === "/activities/list",
-                  }
-                )}
-              >
-                <List size={22} /> List
-              </Link>
-              <Link
-                href="/activities"
-                className={cn(
-                  buttonVariants({ variant: "secondary" }),
-                  "hover:bg-blue-100 dark:hover:bg-blue-700 rounded-[6px] xs:w-[200px] md:w-fit flex flex-row gap-1 items-center justify-center overflow-hidden text-xs lg:text-sm",
-                  {
-                    "font-bold hover:bg-blue-100 dark:hover:bg-blue-700 bg-blue-100 dark:bg-blue-700":
-                      pathname === "/activities",
-                  }
-                )}
-              >
-                <TableIcon size={22} /> Table
-              </Link>
-              <Link
-                href="/activities/calendar"
-                className={cn(
-                  buttonVariants({ variant: "secondary" }),
-                  "hover:bg-blue-100 dark:hover:bg-blue-700 rounded-[6px] xs:w-[200px] md:w-fit flex flex-row gap-1 items-center justify-center overflow-hidden text-xs lg:text-sm",
-                  {
-                    "font-bold hover:bg-blue-100 dark:hover:bg-blue-700 bg-blue-100 dark:bg-blue-700":
-                      pathname === "/activities/calendar",
-                  }
-                )}
-              >
-                <Calendar size={22} /> Calendar
-              </Link>
-              <Link
-                href="/activities/report"
-                className={cn(
-                  buttonVariants({ variant: "secondary" }),
-                  "hover:bg-blue-100 dark:hover:bg-blue-700 rounded-[6px] xs:w-[200px] md:w-fit flex flex-row gap-1 items-center justify-center overflow-hidden text-xs lg:text-sm",
-                  {
-                    "font-bold hover:bg-blue-100 dark:hover:bg-blue-700 bg-blue-100 dark:bg-blue-700":
-                      pathname === "/activities/report",
-                  }
-                )}
-              >
-                <TbReportAnalytics size={25} /> Report
-              </Link>
-            </div>
+            {/* <div className="flex sm:justify-end justify-center">
+              {isMobile ? (
+                // Use Select for small screens
+                <Select
+                  onValueChange={(value) => {
+                    window.location.href = value; // Navigate to the selected link
+                  }}
+                >
+                  <SelectTrigger className="w-full text-xs md:text-sm md:w-fit">
+                    <span>
+                      {
+                        // Display the active link label based on pathname
+                        links.find((link) => pathname === link.href)?.label ||
+                          "Select View"
+                      }
+                    </span>
+                  </SelectTrigger>
+                  <SelectContent>
+                    {links.map((link) => (
+                      <SelectItem
+                        key={link.href}
+                        value={link.href}
+                        className={cn("flex items-center gap-2", {
+                          " bg-slate-100 dark:text-slate-800":
+                            pathname === link.href, // Highlight the selected item
+                        })}
+                      >
+                        <div className="flex items-center gap-2 text-xs md:text-sm">
+                          {link.icon}
+                          {link.label}
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              ) : (
+                // Render links as buttons for larger screens
+                <div className="flex sm:flex-row gap-2 flex-wrap">
+                  {links.map((link) => (
+                    <Link key={link.href} href={link.href}>
+                      <Button
+                        className={cn("text-xs lg:text-sm", {
+                          "font-bold underline": pathname === link.href,
+                        })}
+                      >
+                        {link.icon}
+                        {link.label}
+                      </Button>
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div> */}
           </CardContent>
         </Card>
       </div>
@@ -150,7 +171,7 @@ export default function ActivitiesLayout({ children }: ActivitiesLayoutProps) {
             <SelectFilterMonth />
             <SelectFilterWFPYear />
             <Button
-              className="ml-auto"
+              className="md:ml-auto lg:flex flex-row hidden"
               onClick={() => setViewMapColorCode(true)}
             >
               <IoMdHelpCircle className="shrink-0 w-10 h-10" />

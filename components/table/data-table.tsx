@@ -113,8 +113,8 @@ export function DataTable<TData extends { id: string }, TValue>({
         className="translate-y-[2px]"
       />
     ),
-    size: 30,
-    maxSize: 30,
+    size: 25,
+    maxSize: 25,
     enableSorting: false,
     enableHiding: false,
   };
@@ -170,7 +170,7 @@ export function DataTable<TData extends { id: string }, TValue>({
   }, [rowSelection, table]);
 
   return (
-    <div className="space-y-4 flex-wrap py-1 w-full place-self-center overflow-x-auto transition-all">
+    <div className="space-y-2 flex-wrap py-1 w-full place-self-center overflow-x-auto transition-all">
       <DataTableToolbar
         data={data}
         table={table}
@@ -178,8 +178,8 @@ export function DataTable<TData extends { id: string }, TValue>({
         allowDateRange={allowDateRange}
         allowExportToExcel={allowExportToExcel}
       />
-      <div className="rounded-md border">
-        <Table className="min-w-full table-fixed">
+      <div className="rounded-md border mx-1">
+        <Table className="min-w-0 table-fixed">
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>

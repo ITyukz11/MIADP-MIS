@@ -21,7 +21,6 @@ const fetchAllActivities = async () => {
 };
 
 export const useActivitiesData = () => {
-  console.log("useActivitiesData");
   const { data, error } = useSWR(
     "/api/auth/calendar-of-activity",
     fetchAllActivities,

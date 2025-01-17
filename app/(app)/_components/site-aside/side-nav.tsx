@@ -1,9 +1,8 @@
-'use client';
+"use client";
 
 import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { cn } from "@/lib/utils";
 import { useCurrentUser } from "@/components/context/CurrentUserContext";
 import Image from "next/image";
 import {
@@ -15,21 +14,28 @@ import {
   SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
-  SidebarMenuBadge,
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarMenuSub,
-  SidebarMenuSubItem,
   useSidebar,
 } from "@/components/ui/sidebar";
 import { Label } from "@/components/ui/label";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { FaFacebook, FaFrog } from "react-icons/fa";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 import { GrUserAdmin } from "react-icons/gr";
 import { Separator } from "@/components/ui/separator";
-import { ChevronUp, User2 } from "lucide-react";
-import { managementLinks, navLinks } from "../site-header/nav-links";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { ChevronUp } from "lucide-react";
+import {
+  activityLinks,
+  managementLinks,
+  navLinks,
+} from "../site-header/nav-links";
+
+import { TbActivity } from "react-icons/tb";
+import { cn } from "@/lib/utils";
 
 export const SiteSideBar = () => {
   const pathname = usePathname();
@@ -60,19 +66,59 @@ export const SiteSideBar = () => {
             <SidebarMenu>
               {navLinks.map((link, index) => (
                 <SidebarMenuItem key={index}>
-                  <SidebarMenuButton asChild isActive={pathname === link.href ? true : false}>
-                    <Link href={link.href}>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={pathname === link.href ? true : false}
+                  >
+                    <Link
+                      href={link.href}
+                      className={cn("hover:text-popover-foreground", {
+                        "text-popover-foreground": pathname === link.href,
+                      })}
+                    >
                       <link.icon />
                       <span>{link.text}</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
+              <Collapsible defaultOpen className="group/collapsible">
+                <CollapsibleTrigger asChild>
+                  <SidebarMenuButton>
+                    <TbActivity /> Activities
+                    <ChevronUp className="ml-auto transition-transform group-data-[state=open]/collapsible:-rotate-180" />
+                  </SidebarMenuButton>
+                </CollapsibleTrigger>
+                <CollapsibleContent
+                  className={cn(
+                    "outline-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2"
+                  )}
+                >
+                  <SidebarMenuSub>
+                    {activityLinks.map((link, index) => (
+                      <SidebarMenuItem key={index}>
+                        <SidebarMenuButton
+                          asChild
+                          isActive={pathname === link.href ? true : false}
+                        >
+                          <Link
+                            href={link.href}
+                            className="hover:text-popover-foreground "
+                          >
+                            <link.icon />
+                            <span>{link.text}</span>
+                          </Link>
+                        </SidebarMenuButton>
+                      </SidebarMenuItem>
+                    ))}
+                  </SidebarMenuSub>
+                </CollapsibleContent>
+              </Collapsible>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
         <Separator />
-        {currentUser?.role == "ADMIN" &&
+        {currentUser?.role == "ADMIN" && (
           <SidebarGroup>
             <SidebarGroupLabel>Admin</SidebarGroupLabel>
             <Collapsible defaultOpen className="group/collapsible">
@@ -86,7 +132,10 @@ export const SiteSideBar = () => {
                 <SidebarMenuSub>
                   {managementLinks.map((link, index) => (
                     <SidebarMenuItem key={index}>
-                      <SidebarMenuButton asChild isActive={pathname === link.href ? true : false}>
+                      <SidebarMenuButton
+                        asChild
+                        isActive={pathname === link.href ? true : false}
+                      >
                         <Link href={link.href}>
                           <link.icon />
                           <span>{link.text}</span>
@@ -97,7 +146,8 @@ export const SiteSideBar = () => {
                 </SidebarMenuSub>
               </CollapsibleContent>
             </Collapsible>
-          </SidebarGroup>}
+          </SidebarGroup>
+        )}
       </SidebarContent>
 
       <Separator />

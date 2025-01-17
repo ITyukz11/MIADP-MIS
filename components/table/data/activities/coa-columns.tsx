@@ -1,13 +1,10 @@
 import React from "react";
 import { ColumnDef } from "@tanstack/react-table";
-import { Checkbox } from "@/components/ui/checkbox";
 import { DataTableColumnHeader } from "../../data-table-column-header";
-import { DataTableRowActions } from "../pending-users/data-table-row-actions";
 import { Badge } from "../../../ui/badge";
-// import { dateInRangeFilter } from '../../date-range-filter';
 import { Activity } from "@/types/calendar-of-activity/calendar-of-activity";
-import { Label } from "@/components/ui/label";
 import { ColumnMeta } from "@/types/table/table";
+import { formatDateLong } from "@/utils/dateFormat";
 
 export const formatDate = (dateString: string) => {
   const date = new Date(dateString);
@@ -84,6 +81,9 @@ export const columns: ColumnDef<Activity>[] = [
   //   enableHiding: false,
   // },
   {
+    accessorKey: "id", //DONT REMOVE THIS, THIS IS IMPORTANT TO FETCH DATA WHEN UPDATING SPECIFIC RECORD ON ACTIVITIES
+  },
+  {
     accessorKey: "activityTitle",
     // enableHiding: false,
     header: ({ column }) => (
@@ -92,7 +92,7 @@ export const columns: ColumnDef<Activity>[] = [
     cell: ({ row }) => (
       <div className="flex space-x-2 items-center">
         <span className="truncate font-medium cursor-default gap-1 flex">
-          <Badge className="hidden md:block">{row.original.user?.region}</Badge>
+          <Badge className="hidden lg:block">{row.original.user?.region}</Badge>
           <Badge className="hidden lg:block" variant={"outline"}>
             {row.original.user?.unit
               ? row.original.user?.unit
@@ -103,7 +103,7 @@ export const columns: ColumnDef<Activity>[] = [
       </div>
     ),
     maxSize: 700,
-    minSize: 300,
+    minSize: 100,
   },
   {
     accessorKey: "activityDescription",
@@ -140,7 +140,7 @@ export const columns: ColumnDef<Activity>[] = [
       </div>
     ),
     meta: { columnClasses: "hidden lg:table-cell" } as ColumnMeta,
-    maxSize: 150,
+    maxSize: 100,
     minSize: 0,
   },
 
@@ -188,8 +188,8 @@ export const columns: ColumnDef<Activity>[] = [
       );
     },
     meta: { columnClasses: "hidden sm:table-cell" } as ColumnMeta,
-    maxSize: 100,
-    minSize: 0,
+    maxSize: 80,
+    minSize: 80,
     filterFn: (row, id, value) => value.includes(row.getValue(id)),
   },
   {
@@ -200,12 +200,12 @@ export const columns: ColumnDef<Activity>[] = [
     cell: ({ row }) => (
       <div className="flex space-x-2">
         <span className="max-w-[500px] truncate font-medium cursor-default">
-          {formatDate(row.getValue("dateFrom"))}
+          {formatDateLong(row.getValue("dateFrom"))}
         </span>
       </div>
     ),
     meta: { columnClasses: "hidden md:table-cell" } as ColumnMeta,
-    maxSize: 100,
+    maxSize: 70,
     minSize: 0,
     // filterFn: dateInRangeFilter,
   },
@@ -217,12 +217,12 @@ export const columns: ColumnDef<Activity>[] = [
     cell: ({ row }) => (
       <div className="flex space-x-2">
         <span className="max-w-[500px] truncate font-medium cursor-default">
-          {formatDate(row.getValue("dateTo"))}
+          {formatDateLong(row.getValue("dateTo"))}
         </span>
       </div>
     ),
     meta: { columnClasses: "hidden lg:table-cell" } as ColumnMeta,
-    maxSize: 100,
+    maxSize: 70,
     minSize: 0,
     // filterFn: dateInRangeFilter,
   },
@@ -271,7 +271,7 @@ export const columns: ColumnDef<Activity>[] = [
       </div>
     ),
     meta: { columnClasses: "hidden lg:table-cell" } as ColumnMeta,
-    maxSize: 150,
+    maxSize: 100,
     minSize: 0,
   },
   {

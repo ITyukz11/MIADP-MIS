@@ -1,83 +1,81 @@
-  .fc .fc-toolbar,
-  .fc .fc-header-toolbar {
-    @apply text-xs sm:text-sm  font-light p-2 flex flex-wrap justify-center gap-1 lg:justify-between;
-  }
+.fc .fc-toolbar,
+.fc .fc-header-toolbar {
+  @apply text-xs sm:text-sm  font-light p-2 flex flex-wrap justify-center gap-1 lg:justify-between;
+}
 
 .fc .fc-button {
-    @apply inline-flex dark:text-black items-center hover:text-white bg-primary justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50;
-  }
+  @apply inline-flex dark:text-black items-center hover:text-white bg-primary justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50;
+}
 .fc .fc-today-button {
-    @apply dark:text-black
-  }
-  
-  .fc .fc-prev-button,
-  .fc .fc-next-button{
-    @apply hover:text-white
-  }
+  @apply dark:text-black;
+}
 
-  .fc-button{
-    @apply bg-[#0F172A]
-  }
+.fc .fc-prev-button,
+.fc .fc-next-button {
+  @apply hover:text-white;
+}
 
-  .fc .fc-toolbar-title{
-    @apply text-xs sm:text-base md:text-xl
-  }
-  .fc .fc-list-button,
-  .fc .fc-timeGridDay-button,
-  .fc .fc-timeGridWeek-button,
-  .fc .fc-dayGridMonth-button,
-  .fc .fc-multiMonthYear-button {
-    @apply hover:text-white;
-  }
-  
-  .fc .fc-button-icon {
-    @apply h-9 w-9;
-  }
-  
-  .fc-multiMonthYear-view,
-  .fc-daygrid-day-frame{
-    @apply dark:bg-black
-  } 
+.fc-button {
+  @apply bg-[#0F172A];
+}
 
-  .fc-popover-header,
-  .fc-scrollgrid-sync-inner,
-  .fc-list-day-cushion,
-  .fc-multimonth-title{
-    @apply dark:bg-[#020817]
-  }
+.fc .fc-toolbar-title {
+  @apply text-xs sm:text-base md:text-xl;
+}
+.fc .fc-list-button,
+.fc .fc-timeGridDay-button,
+.fc .fc-timeGridWeek-button,
+.fc .fc-dayGridMonth-button,
+.fc .fc-multiMonthYear-button {
+  @apply hover:text-white;
+}
 
+.fc .fc-button-icon {
+  @apply h-9 w-9;
+}
 
-  .fc .fc-multimonth-header-table,
-  .fc .fc-scrollgrid-section-header{
-    @apply dark:bg-[#020817] bg-[#F2F2F2]
-  }
+.fc-multiMonthYear-view,
+.fc-daygrid-day-frame {
+  @apply dark:bg-black;
+}
 
-  .fc-multimonth-title{
-    @apply dark:bg-[#020817] bg-[#dfdfdf]
-  }
+.fc-popover-header,
+.fc-scrollgrid-sync-inner,
+.fc-list-day-cushion,
+.fc-multimonth-title {
+  @apply dark:bg-[#020817];
+}
 
-  .fc-list-event{
-    @apply dark:hover:text-black
-  }
+.fc .fc-multimonth-header-table,
+.fc .fc-scrollgrid-section-header {
+  @apply dark:bg-[#020817] bg-[#F2F2F2];
+}
 
-  .fc{
-    @apply text-xs sm:text-sm
-  }
+.fc-multimonth-title {
+  @apply dark:bg-[#020817] bg-[#dfdfdf];
+}
 
-  .fc .fc-scroller{
-    @apply scrollbar-none
-  }
-  .fc .fc-daygrid-day-frame,
-  .fc .fc-scrollgrid-sync-inner{
-    @apply h-fit
-  }
+.fc-list-event {
+  @apply dark:hover:text-black;
+}
 
+.fc {
+  @apply text-xs sm:text-sm;
+}
 
-  .fc .fc-h-event,
-  .fc .fc-event-time{
-    @apply overflow-visible
-  }
+.fc .fc-scroller {
+  @apply scrollbar-none;
+}
+.fc .fc-daygrid-day-frame,
+.fc .fc-scrollgrid-sync-inner {
+  @apply h-fit;
+}
 
-  .fc .fc-scroller-liquid-absolute{
-    @apply relative
-  }
+.fc .fc-h-event,
+.fc .fc-event-time {
+  @apply overflow-visible;
+}
+
+.fc .fc-scroller-liquid-absolute {
+  @apply relative;
+}

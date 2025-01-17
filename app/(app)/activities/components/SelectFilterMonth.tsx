@@ -32,21 +32,29 @@ function SelectFilterMonth({}: Props) {
 
   return (
     <div>
-      <Label className="font-semibold">Month:</Label>
+      <Label className="font-semibold text-xs md:text-sm">Month:</Label>
       <Select
         onValueChange={handleValueChange}
         value={currentFilter?.month}
         disabled={activityLoading}
       >
-        <SelectTrigger className="w-fit">
+        <SelectTrigger className="w-fit text-xs md:text-sm">
           <SelectValue placeholder="All" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="All">All</SelectItem>
+          <SelectItem value="All" className="text-xs md:text-sm cursor-pointer">
+            All
+          </SelectItem>
           <SelectGroup>
-            <SelectLabel>Months</SelectLabel>
+            <SelectLabel className="text-xs md:text-sm cursor-default">
+              Months
+            </SelectLabel>
             {monthOptions.map((option, index) => (
-              <SelectItem key={index} value={option}>
+              <SelectItem
+                className="text-xs md:text-sm cursor-pointer"
+                key={index}
+                value={option}
+              >
                 {option}
               </SelectItem>
             ))}

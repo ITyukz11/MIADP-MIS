@@ -90,8 +90,8 @@ export const columns: ColumnDef<Activity>[] = [
       <DataTableColumnHeader column={column} title="Activity Title" />
     ),
     cell: ({ row }) => (
-      <div className="flex space-x-2">
-        <Label className="truncate font-medium cursor-default gap-1 flex">
+      <div className="flex space-x-2 items-center">
+        <span className="truncate font-medium cursor-default gap-1 flex">
           <Badge className="hidden md:block">{row.original.user?.region}</Badge>
           <Badge className="hidden lg:block" variant={"outline"}>
             {row.original.user?.unit
@@ -99,7 +99,7 @@ export const columns: ColumnDef<Activity>[] = [
               : row.original.user?.component}
           </Badge>
           {row.getValue("activityTitle")}
-        </Label>
+        </span>
       </div>
     ),
     maxSize: 700,

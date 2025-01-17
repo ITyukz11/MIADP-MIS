@@ -175,7 +175,7 @@ const Page: React.FC = () => {
             <CardContent className="flex flex-row p-4 gap-4 relative overflow-hidden rounded-tr-xl">
               {/* Region Color */}
               <div
-                className="absolute -top-6 -right-12 w-28 rotate-45 h-16 shadow-md md:flex justify-center items-center border-2 cursor-pointer"
+                className="absolute -top-8 -right-16 md:-top-6 md:-right-12 w-28 rotate-45 h-16 shadow-md md:flex justify-center items-center border-2 cursor-pointer"
                 style={{ backgroundColor: regionColors[data.user.region] }}
               ></div>
 
@@ -232,7 +232,10 @@ const Page: React.FC = () => {
                       {item.trim()}
                     </Badge>
                   ))}
-                  <Separator orientation="vertical" className="h-4 mx-2" />
+                  <Separator
+                    orientation="vertical"
+                    className="h-4 mx-2 lg:block hidden"
+                  />
                   <Badge className="cursor-pointer">{data.user.region}</Badge>
                   <Badge className="cursor-pointer">
                     {data.user.component}
@@ -242,10 +245,20 @@ const Page: React.FC = () => {
                   )}
                   <Separator
                     orientation="vertical"
-                    className="hidden  md:block h-4 mx-2"
+                    className="hidden lg:block h-4 mx-2"
                   />
                   <Badge variant="secondary" className="cursor-pointer">
                     {data.WFPYear}
+                  </Badge>
+                  <Badge
+                    className={`md:hidden flex font-medium shadow-sm z-10 dark:text-white cursor-pointer hover:${getStatusColor(
+                      data.status
+                    )} ${getStatusColor(data.status)}`}
+                  >
+                    {data.status}
+                    {data.status === "Ongoing" && (
+                      <div className="h-3 w-3 rounded-full bg-white animate-pulse ml-1"></div>
+                    )}
                   </Badge>
                 </div>
                 <Label className="pb-2 cursor-pointer text-xs md:text-sm">

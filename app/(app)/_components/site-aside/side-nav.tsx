@@ -79,7 +79,7 @@ export const SiteSideBar = () => {
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
-              <Collapsible defaultOpen className="group/collapsible">
+              <Collapsible className="group/collapsible">
                 <CollapsibleTrigger asChild>
                   <SidebarMenuButton>
                     <TbActivity /> Activities

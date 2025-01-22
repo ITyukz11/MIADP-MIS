@@ -72,6 +72,11 @@ const GoogleDriveData = () => {
   };
 
   const searchFolder = (contents: any[], query: string) => {
+    // Ensure contents is always an array
+    if (!contents || !Array.isArray(contents)) {
+      return [];
+    }
+
     return contents.reduce((acc: any[], item: any) => {
       const matchesName = item.name.toLowerCase().includes(query.toLowerCase());
       const matchesSubfolder =

@@ -1,6 +1,7 @@
 // navLinks.ts
 
 import {
+  FaBook,
   FaCalendar,
   FaCode,
   FaHome,
@@ -15,7 +16,8 @@ import { MdScreenSearchDesktop } from "react-icons/md";
 export const navLinks = [
   { href: "/", text: "Home", icon: FaHome },
   { href: "/subproject", text: "Subproject", icon: FaProjectDiagram },
-  { href: "/document-tracking", text: "Doctrack", icon: MdScreenSearchDesktop },
+  { href: "/e-library", text: "E-Library", icon: FaBook },
+  // { href: "/document-tracking", text: "Doctrack", icon: MdScreenSearchDesktop },
 ];
 
 export const managementLinks = [

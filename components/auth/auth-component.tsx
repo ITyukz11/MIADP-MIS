@@ -111,15 +111,14 @@ export default function AuthenticationPage() {
 
           <div className="relative z-20 ">
             <blockquote className="space-y-2">
-              <p className="text-base text-center text-red-600">
-                ***MAINTENANCE IN PROGRESS*** <br />
-                Our system is currently undergoing maintenance to improve
-                performance and features. We will notify you once the website is
-                back online. Thank you for your patience and understanding!
+              <p className="text-base">
+                Welcome to the MIADP Management Information System! Our system
+                tracks encoded documents, streamlines management, features a
+                calendar to track events, and an activity feed.
               </p>
 
               <footer className="text-sm flex flex-row gap-1">
-                <Construction /> Admin
+                PSO Programmer
               </footer>
             </blockquote>
           </div>

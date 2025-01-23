@@ -177,12 +177,7 @@ export const LoginForm = () => {
           </div>
           {/* <FormSuccess message={success} /> */}
           <FormError message={error} />
-          <Button
-            typeof="submit"
-            className="w-full"
-            disabled //MAINTENANCE
-            //   disabled={loading}
-          >
+          <Button typeof="submit" className="w-full" disabled={loading}>
             {loading ? <LoadingSpinner /> : "Login"}
           </Button>
         </form>
@@ -207,8 +202,7 @@ export const LoginForm = () => {
       <div className="relative flex justify-center text-xs uppercase">
         <Button
           variant={"link"}
-          disabled //MAINTENANCE
-          // disabled={loading}
+          disabled={loading}
           className="bg-background px-2 text-muted-foreground"
           onClick={() => setForgotPass(true)}
         >

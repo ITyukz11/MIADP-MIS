@@ -44,7 +44,7 @@ const ConfirmDeleteDialog: React.FC<ConfirmDeleteDialogProps> = ({
         onKeyDown={handleKeyDown}
       >
         <DialogHeader>
-          <DialogTitle>Change password</DialogTitle>
+          <DialogTitle>Delete</DialogTitle>
           <DialogDescription>
             Click submit when you&apos;re done.
           </DialogDescription>

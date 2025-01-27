@@ -155,7 +155,6 @@ export default function AuthenticationPage() {
             <Button
               variant={"link"}
               onClick={() => setUserLogginIn(!userLogginIn)}
-              disabled //MAINTENANCE
             >
               {userLogginIn
                 ? "Don't have an account?"

@@ -33,7 +33,10 @@ export default async function AppLayout({ children }: AppLayoutProps) {
     wfpYear: "All",
     month: "All",
   };
-  console.log("session.user:", session.user.verificationAnswer);
+  // console.log(
+  //   "session.user.verificationAnswer:",
+  //   session.user.verificationAnswer
+  // );
   return (
     <ReduxProvider>
       <CurrentUserProvider initialUser={session.user as any}>

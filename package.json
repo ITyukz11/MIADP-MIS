@@ -124,7 +124,7 @@
     "eslint": "^8",
     "eslint-config-next": "14.2.2",
     "postcss": "^8",
-    "prisma": "^5.13.0",
+    "prisma": "^6.3.0-dev.29",
     "tailwindcss": "^3.4.1",
     "typescript": "^5"
   }

@@ -107,7 +107,7 @@ export const ViewMySchedDialog = (props: Props) => {
 
   useEffect(() => {
     if (currentUser && currentUser.id && activitiesData) {
-      const filtered = activitiesData.filter(
+      const filtered = activitiesData?.filter(
         (activity: any) => activity.user?.id === currentUser.id
       );
       setFilteredData(filtered);
@@ -124,6 +124,15 @@ export const ViewMySchedDialog = (props: Props) => {
     "remarks",
     "userName",
   ]; // Columns to hide
+
+  if (!activitiesData) {
+    return <p>Loading activities...</p>;
+  }
+
+  if (activityError) {
+    return <p>Error loading activities.</p>;
+  }
+
   return (
     <Dialog>
       <DialogTrigger asChild>

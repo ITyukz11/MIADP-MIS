@@ -24,8 +24,6 @@ import {
 import "./calendarStyles.css";
 import { FullscreenIcon } from "lucide-react";
 import dayjs from "dayjs";
-import { useDispatch, useSelector } from "@/app/store/store";
-import { fetchActivitiesData } from "@/app/store/activityAction";
 import MajorOrIndividualDialog from "../major-or-individual-dialog";
 import { useCalendarOfActivityFilter } from "@/components/context/FilterRegionContext";
 import { useActivitiesData } from "@/lib/calendar-of-activity/useActivitiesDataHook";
@@ -36,6 +34,7 @@ interface Event {
   start: string; // Assuming start date is a string in ISO 8601 format
   end: string; // Assuming end date is a string in ISO 8601 format
   color: string;
+  status: string;
 
   // Add other properties if needed
 }
@@ -164,7 +163,7 @@ const page = () => {
 
               return {
                 id: event.id,
-                title: event.activityTitle,
+                title: `[${event.status}]${event.activityTitle}`,
                 // start: formatStartDateToISOWithoutTimezone(startDate) + addingTimeEvent(event.timeStart), // Format date without timezone
                 // end: formatEndDateToISOWithoutTimezone(endDate, startDate) + addingTimeEvent(event.timeEnd),
                 start: startDate + timeStartFormat(event.timeStart),

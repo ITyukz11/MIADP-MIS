@@ -45,9 +45,7 @@ const ConfirmDeleteDialog: React.FC<ConfirmDeleteDialogProps> = ({
       >
         <DialogHeader>
           <DialogTitle>Delete</DialogTitle>
-          <DialogDescription>
-            Click submit when you&apos;re done.
-          </DialogDescription>
+          <DialogDescription>Deleting activity.</DialogDescription>
         </DialogHeader>
         <DialogDescription>
           {items.length ? (

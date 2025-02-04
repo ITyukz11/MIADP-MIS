@@ -1,19 +1,15 @@
 "use client";
-import { Button, buttonVariants } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import Link from "next/link";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { useCallback, useState } from "react";
 import MajorOrIndividualDialog from "./major-or-individual-dialog";
 import CalendarFormDialog from "./calendar-form-dialog";
 import { useActivitiesData } from "@/lib/calendar-of-activity/useActivitiesDataHook";
-import { Calendar, List, TableIcon } from "lucide-react";
+import { RefreshCcw } from "lucide-react";
 import { Label } from "@radix-ui/react-label";
 import { Card, CardContent } from "@/components/ui/card";
 import { ViewMySchedDialog } from "./view-my-sched-dialog";
-import { ViewMyParticipatedSchedDialog } from "./view-participated-activity-dialog";
+import ViewMyParticipatedSchedDialog from "./view-participated-activity-dialog";
 import { FaPlusCircle } from "react-icons/fa";
-import { TbReportAnalytics } from "react-icons/tb";
-import { usePathname } from "next/navigation";
 import SelectFilterRegUniCom from "./components/SelectFilterRegUniCom";
 import SelectTypeOfActivity from "./components/SelectTypeOfActivity";
 import SelectFilterUnitComponent from "./components/SelectFilterUnit";
@@ -22,13 +18,6 @@ import SelectFilterWFPYear from "./components/SelectFilterWFPYear";
 import SelectFilterMonth from "./components/SelectFilterMonth";
 import { IoMdHelpCircle } from "react-icons/io";
 import MIADPColorCodeDialog from "./components/Dialog/MIADPColorCode";
-import { useIsMobile } from "@/hooks/useIsMobile";
-import {
-  Select,
-  SelectTrigger,
-  SelectContent,
-  SelectItem,
-} from "@/components/ui/select"; // Import Select from ShadCN or your UI library
 
 interface ActivitiesLayoutProps {
   children: React.ReactNode;
@@ -40,8 +29,9 @@ export default function ActivitiesLayout({ children }: ActivitiesLayoutProps) {
   const [individualActivity, setIndividualActivity] = useState(false);
 
   const [viewMapColorCode, setViewMapColorCode] = useState<boolean>(false);
-  const isMobile = useIsMobile();
-  const pathname = usePathname();
+  const [isRefreshing, setIsRefreshing] = useState(false); // Local loading state
+
+  const { refetchActivities, activityLoading } = useActivitiesData();
 
   const handleSetIndividualActivity = useCallback((isIndividual: boolean) => {
     setIndividualActivity(isIndividual);
@@ -59,23 +49,16 @@ export default function ActivitiesLayout({ children }: ActivitiesLayoutProps) {
     setPlanningActivityOpen((prevState) => !prevState);
   }, []);
 
-  console.log("ACTIVITY PARENT RENDERS");
-
-  const links = [
-    { href: "/activities/list", label: "List", icon: <List size={22} /> },
-    { href: "/activities", label: "Table", icon: <TableIcon size={22} /> },
-    {
-      href: "/activities/calendar",
-      label: "Calendar",
-      icon: <Calendar size={22} />,
-    },
-    {
-      href: "/activities/report",
-      label: "Report",
-      icon: <TbReportAnalytics size={25} />,
-    },
-  ];
-
+  const handleRefresh = async () => {
+    setIsRefreshing(true); // Start loading
+    try {
+      await refetchActivities(); // Wait for data to refetch
+    } catch (error) {
+      console.error("Error refreshing activities:", error);
+    } finally {
+      setIsRefreshing(false); // End loading
+    }
+  };
   return (
     <div className="space-y-4 w-full">
       <div className="flex flex-row flex-wrap gap-2 justify-between">
@@ -105,59 +88,6 @@ export default function ActivitiesLayout({ children }: ActivitiesLayoutProps) {
               <ViewMySchedDialog />
               <ViewMyParticipatedSchedDialog />
             </div>
-            {/* <div className="flex sm:justify-end justify-center">
-              {isMobile ? (
-                // Use Select for small screens
-                <Select
-                  onValueChange={(value) => {
-                    window.location.href = value; // Navigate to the selected link
-                  }}
-                >
-                  <SelectTrigger className="w-full text-xs md:text-sm md:w-fit">
-                    <span>
-                      {
-                        // Display the active link label based on pathname
-                        links.find((link) => pathname === link.href)?.label ||
-                          "Select View"
-                      }
-                    </span>
-                  </SelectTrigger>
-                  <SelectContent>
-                    {links.map((link) => (
-                      <SelectItem
-                        key={link.href}
-                        value={link.href}
-                        className={cn("flex items-center gap-2", {
-                          " bg-slate-100 dark:text-slate-800":
-                            pathname === link.href, // Highlight the selected item
-                        })}
-                      >
-                        <div className="flex items-center gap-2 text-xs md:text-sm">
-                          {link.icon}
-                          {link.label}
-                        </div>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              ) : (
-                // Render links as buttons for larger screens
-                <div className="flex sm:flex-row gap-2 flex-wrap">
-                  {links.map((link) => (
-                    <Link key={link.href} href={link.href}>
-                      <Button
-                        className={cn("text-xs lg:text-sm", {
-                          "font-bold underline": pathname === link.href,
-                        })}
-                      >
-                        {link.icon}
-                        {link.label}
-                      </Button>
-                    </Link>
-                  ))}
-                </div>
-              )}
-            </div> */}
           </CardContent>
         </Card>
       </div>
@@ -170,13 +100,31 @@ export default function ActivitiesLayout({ children }: ActivitiesLayoutProps) {
             <SelectFilterStatus />
             <SelectFilterMonth />
             <SelectFilterWFPYear />
-            <Button
-              className="md:ml-auto lg:flex flex-row hidden"
-              onClick={() => setViewMapColorCode(true)}
-            >
-              <IoMdHelpCircle className="shrink-0 w-10 h-10" />
-              Legend
-            </Button>
+            <div className="flex flex-row gap-2 md:ml-auto">
+              <Button
+                onClick={handleRefresh}
+                disabled={activityLoading || isRefreshing}
+              >
+                {isRefreshing ? (
+                  <span className="flex items-center">
+                    <span className="spinner mr-2"></span> Fetching latest
+                    data...
+                  </span>
+                ) : (
+                  <>
+                    Fetch Data <RefreshCcw />
+                  </>
+                )}
+              </Button>
+
+              <Button
+                className="lg:flex flex-row hidden"
+                onClick={() => setViewMapColorCode(true)}
+              >
+                <IoMdHelpCircle className="shrink-0 w-10 h-10" />
+                Legend
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </div>

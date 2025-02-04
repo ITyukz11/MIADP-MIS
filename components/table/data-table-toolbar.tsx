@@ -1,28 +1,14 @@
 import React, { useEffect, useState, useTransition } from "react";
-import { Cross2Icon } from "@radix-ui/react-icons";
 import { Table as TanstackTable } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DataTableViewOptions } from "./data-table-view-options";
-import { CSVLink } from "react-csv";
 import { DialogApprovePendingUsers } from "../admin/dialog-accounts";
 import { AiOutlineExport, AiOutlinePrinter } from "react-icons/ai";
-import { Calendar, CalendarCheck, SearchIcon } from "lucide-react";
-import { DateRange, Months } from "react-day-picker";
-import { CalendarDateRangePicker } from "../dashboard/date-range-picker";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "../ui/select";
+import { SearchIcon } from "lucide-react";
 import * as ExcelJS from "exceljs";
 import { useCalendarOfActivityFilter } from "../context/FilterRegionContext";
 import { useSelector } from "@/app/store/store";
-import { capitalizeEachWord } from "@/utils/capitalizeEachWord";
 import { Label } from "../ui/label";
 
 interface DataTableToolbarProps<TData> {

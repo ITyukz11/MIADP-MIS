@@ -113,6 +113,7 @@ export function DataTable<TData extends { id: string }, TValue>({
         className="translate-y-[2px]"
       />
     ),
+    size: 13,
     enableSorting: false,
     enableHiding: false,
   };

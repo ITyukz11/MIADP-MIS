@@ -1,7 +1,5 @@
 import useSWR from "swr";
 
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
-
 const fetchAllActivities = async () => {
   try {
     const response = await fetch("/api/auth/calendar-of-activity", {
@@ -21,11 +19,14 @@ const fetchAllActivities = async () => {
 };
 
 export const useActivitiesData = () => {
-  const { data, error } = useSWR(
+  const { data, error, mutate } = useSWR(
     "/api/auth/calendar-of-activity",
     fetchAllActivities,
     {
-      refreshInterval: 5000,
+      revalidateOnFocus: false, // Prevent re-fetching on tab focus
+      revalidateOnReconnect: false, // Prevent re-fetching on network reconnection
+      refreshInterval: 0, // Disable polling
+      dedupingInterval: 60 * 1000,
     }
   );
 
@@ -33,7 +34,6 @@ export const useActivitiesData = () => {
     activitiesData: data,
     activityLoading: !error && !data,
     activityError: error,
+    refetchActivities: mutate, // Manually refetch when needed
   };
 };
-
-//THIS IS SWR BUT ITS TOO EXPENSIVE IN VERCEL COST

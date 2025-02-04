@@ -29,5 +29,5 @@ export const activityLinks = [
   { href: "/activities/list", text: "List", icon: FaList },
   { href: "/activities/table", text: "Table", icon: FaTable },
   { href: "/activities/calendar", text: "Calendar", icon: FaCalendar },
-  { href: "/activities/report", text: "Report", icon: TbReportAnalytics },
+  // { href: "/activities/report", text: "Report", icon: TbReportAnalytics },
 ];

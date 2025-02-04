@@ -36,9 +36,8 @@ function MajorOrIndividualDialog({
         <Separator />
         <div className="flex flex-row flex-wrap justify-around gap-1">
           <div className="relative cursor-pointer">
-            <HiUser className="absolute left-14 top-4" size={70} />
             <Button
-              className="flex w-32 h-44 sm:w-44 flex-col shadow-2xl hover:border-2 pt-12"
+              className="flex w-32 h-44 sm:w-44 flex-col shadow-2xl hover:border-2"
               variant={"secondary"}
               onClick={() => {
                 setCalendarFormOpen();
@@ -46,22 +45,20 @@ function MajorOrIndividualDialog({
                 setClose();
               }}
             >
+              <HiUser className="!w-20 !h-20 dark:text-white text-black" />
               <Label className="cursor-pointer">Individual Activity</Label>
             </Button>
           </div>
           <div className="relative cursor-pointer">
-            <HiUserGroup
-              className="absolute left-14 top-4 dark:text-black text-white"
-              size={70}
-            />
             <Button
-              className="flex w-32 h-44 sm:w-44 flex-col shadow-2xl hover:border-2 pt-12"
+              className="flex w-32 h-44 sm:w-44 flex-col shadow-2xl hover:border-2 z-10"
               onClick={() => {
                 setCalendarFormOpen();
                 setIndividualActivity(false);
                 setClose();
               }}
             >
+              <HiUserGroup className="!w-20 !h-20 dark:text-black text-white" />
               <Label className="cursor-pointer"> Major Activity</Label>
               <Label className="cursor-pointer">(WFP)</Label>
             </Button>

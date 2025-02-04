@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -11,54 +11,48 @@ import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/table/data-table";
 import { useCurrentUser } from "@/components/context/CurrentUserContext";
 import { columns } from "@/components/table/data/activities/coa-columns";
-import { deleteCalendarOfActivity } from "@/actions/calendar-of-activity/delete";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
-import { toast } from "@/components/ui/use-toast";
-import { ToastAction } from "@/components/ui/toast";
-import { FaPeopleGroup } from "react-icons/fa6";
 import { Label } from "@/components/ui/label";
 import { CalendarSheet } from "@/components/calendar-of-activity/CalendarSheet";
-import { useSelector } from "@/app/store/store";
-import { IoPeopleCircle } from "react-icons/io5";
 import { MdPeople } from "react-icons/md";
 import { useActivitiesData } from "@/lib/calendar-of-activity/useActivitiesDataHook";
 
 type Props = {};
 
-export const ViewMyParticipatedSchedDialog = (props: Props) => {
-  // const { activities, loading, error, fetchActivitiesData } = useCalendarOfActivityContext();
-  // const { activitiesData, activityLoading, activityError } = useSelector((state)=> state.activity)
+const ViewMyParticipatedSchedDialog = (props: Props) => {
   const { activitiesData, activityError, activityLoading } =
     useActivitiesData();
   const { currentUser } = useCurrentUser();
-  const [filteredData, setFilteredData] = useState<any[]>([]);
   const [viewCalendarData, setViewCalendarData] = useState<any[]>([]);
   const [viewCalendar, setViewCalendar] = useState(false);
   const [selectedRowId, setSelectedRowId] = useState("");
 
   const handleViewRowIdPressed = (viewId: string) => {
     setSelectedRowId(viewId);
-    // console.log("viewId ZZ: ", viewId)
   };
 
-  useEffect(() => {
-    // console.log("currentUser.id: ", currentUser?.id)
-    if (currentUser && currentUser.name && activitiesData) {
-      const filtered = activitiesData.filter((activity: any) =>
-        activity.participants.some(
-          (participant: any) => participant.userId === currentUser?.id
-        )
-      );
-      setFilteredData(filtered);
+  console.log("view activitiesData: ", activitiesData);
+  console.log("view currentUser: ", currentUser);
+  // Memoized filtered data
+  const filteredData = useMemo(() => {
+    if (!currentUser?.id || !activitiesData) {
+      return [];
     }
+
+    return activitiesData.filter((activity: any) =>
+      activity.participants.some(
+        (participant: any) => participant.userId === currentUser.id
+      )
+    );
   }, [currentUser, activitiesData]);
 
+  // Update calendar data when row ID changes
   useEffect(() => {
     const viewCalendarDataFiltered = filteredData.filter(
-      (activity) => activity.id == selectedRowId
+      (activity: { id: string }) => activity.id === selectedRowId
     );
     setViewCalendarData(viewCalendarDataFiltered);
-  }, [activitiesData, currentUser?.id, filteredData, selectedRowId]);
+  }, [filteredData, selectedRowId]);
 
   const hiddenColumns = [
     "id",
@@ -70,7 +64,8 @@ export const ViewMyParticipatedSchedDialog = (props: Props) => {
     "coa_id",
     "remarks",
     "userName",
-  ]; // Columns to hide
+  ];
+
   return (
     <>
       <Dialog>
@@ -123,3 +118,5 @@ export const ViewMyParticipatedSchedDialog = (props: Props) => {
     </>
   );
 };
+
+export default React.memo(ViewMyParticipatedSchedDialog);

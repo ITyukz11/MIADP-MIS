@@ -5,13 +5,13 @@ import GlobalError from "../error";
 import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import FloatingAIChat from "@/components/FloatingAIChat";
-import { CurrentUserProvider } from "@/components/context/CurrentUserContext";
 import ReduxProvider from "@/components/ReduxProvider";
 import { CalendarOfActivityFilterProvider } from "@/components/context/FilterRegionContext";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { SiteSideBar } from "./_components/site-aside/side-nav";
 import { SiteHeader } from "./_components/site-header/site-header";
 import { SiteFooter } from "./_components/site-footer/site-footer";
+import { AuthProvider } from "@/lib/SessionProvider";
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -39,7 +39,7 @@ export default async function AppLayout({ children }: AppLayoutProps) {
   // );
   return (
     <ReduxProvider>
-      <CurrentUserProvider initialUser={session.user as any}>
+      <AuthProvider>
         <SidebarProvider>
           <CalendarOfActivityFilterProvider initialFilter={initialFilter}>
             <ErrorBoundary errorComponent={GlobalError}>
@@ -64,7 +64,7 @@ export default async function AppLayout({ children }: AppLayoutProps) {
             </ErrorBoundary>
           </CalendarOfActivityFilterProvider>
         </SidebarProvider>
-      </CurrentUserProvider>
+      </AuthProvider>
     </ReduxProvider>
   );
 }

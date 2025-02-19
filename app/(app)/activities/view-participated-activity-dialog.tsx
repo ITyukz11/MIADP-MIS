@@ -65,6 +65,11 @@ const ViewMyParticipatedSchedDialog = (props: Props) => {
     "remarks",
     "userName",
   ];
+  if (activityError) {
+    return (
+      <Label className="text-destructive">Error loading activities.</Label>
+    );
+  }
 
   return (
     <>
@@ -73,6 +78,7 @@ const ViewMyParticipatedSchedDialog = (props: Props) => {
           <Button
             variant="outline"
             className="flex flex-row items-center gap-1 justify-center overflow-hidden text-xs lg:text-sm"
+            disabled={activityLoading}
           >
             <MdPeople className="shrink-0" size={25} />
             <span className="md:block hidden">

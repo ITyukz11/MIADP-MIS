@@ -122,12 +122,10 @@ export const ViewMySchedDialog = (props: Props) => {
     "userName",
   ]; // Columns to hide
 
-  if (!activitiesData) {
-    return <p>Loading activities...</p>;
-  }
-
   if (activityError) {
-    return <p>Error loading activities.</p>;
+    return (
+      <Label className="text-destructive">Error loading activities.</Label>
+    );
   }
 
   return (
@@ -136,6 +134,7 @@ export const ViewMySchedDialog = (props: Props) => {
         <Button
           variant="outline"
           className="flex flex-row items-center gap-1 justify-center overflow-hidden text-xs lg:text-sm"
+          disabled={activityLoading}
         >
           <FaCalendarAlt className="shrink-0" size={20} />
           <span className="md:block hidden"> View encoded activities</span>

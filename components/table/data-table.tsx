@@ -177,78 +177,82 @@ export function DataTable<TData extends { id: string }, TValue>({
         allowDateRange={allowDateRange}
         allowExportToExcel={allowExportToExcel}
       />
-      <div className="rounded-md border mx-1">
-        <Table className="min-w-0 table-fixed">
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead
-                      key={header.id}
-                      className={
-                        (header.column.columnDef.meta as ColumnMeta)
-                          ?.columnClasses
-                      }
-                      colSpan={header.colSpan}
-                      style={{
-                        width:
-                          header.column.id === "#"
-                            ? 5
-                            : header.column.getSize(),
-                      }}
-                    >
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                    </TableHead>
-                  );
-                })}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody className="overflow-x-auto">
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                  onClick={() => handleRowClick(row.original.id)}
-                  style={{ cursor: allowViewCalendar ? "pointer" : "default" }} // Conditional cursor style
-                >
-                  {row.getVisibleCells().map((cell, index) => (
-                    <TableCell
-                      key={cell.id}
-                      className={`text-xs sm:text-sm ${
-                        index === 0 ? "w-1/4" : "w-[150px]" // Match header widths
-                      } whitespace-nowrap ${
-                        (cell.column.columnDef.meta as ColumnMeta) //to remove table cell data if width is small depend on columnDef file using tailwind sm md lg
-                          ?.columnClasses
-                      }`}
-                    >
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </TableCell>
-                  ))}
+      <div className="grid">
+        <div className="min-w-0 rounded-md border mx-1">
+          <Table className="min-w-0 table-fixed">
+            <TableHeader>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <TableRow key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => {
+                    return (
+                      <TableHead
+                        key={header.id}
+                        className={
+                          (header.column.columnDef.meta as ColumnMeta)
+                            ?.columnClasses
+                        }
+                        colSpan={header.colSpan}
+                        style={{
+                          width:
+                            header.column.id === "#"
+                              ? 5
+                              : header.column.getSize(),
+                        }}
+                      >
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(
+                              header.column.columnDef.header,
+                              header.getContext()
+                            )}
+                      </TableHead>
+                    );
+                  })}
                 </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={columnsWithNumbering.length}
-                  className="h-24 text-center"
-                >
-                  No results.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
+              ))}
+            </TableHeader>
+            <TableBody className="overflow-x-auto">
+              {table.getRowModel().rows?.length ? (
+                table.getRowModel().rows.map((row) => (
+                  <TableRow
+                    key={row.id}
+                    data-state={row.getIsSelected() && "selected"}
+                    onClick={() => handleRowClick(row.original.id)}
+                    style={{
+                      cursor: allowViewCalendar ? "pointer" : "default",
+                    }} // Conditional cursor style
+                  >
+                    {row.getVisibleCells().map((cell, index) => (
+                      <TableCell
+                        key={cell.id}
+                        className={`text-xs sm:text-sm ${
+                          index === 0 ? "w-1/4" : "w-[150px]" // Match header widths
+                        } whitespace-nowrap ${
+                          (cell.column.columnDef.meta as ColumnMeta) //to remove table cell data if width is small depend on columnDef file using tailwind sm md lg
+                            ?.columnClasses
+                        }`}
+                      >
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell
+                    colSpan={columnsWithNumbering.length}
+                    className="h-24 text-center"
+                  >
+                    No results.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
       </div>
       <DataTablePagination table={table} />
     </div>

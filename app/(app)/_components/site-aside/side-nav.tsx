@@ -3,7 +3,6 @@
 import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useCurrentUser } from "@/components/context/CurrentUserContext";
 import Image from "next/image";
 import {
   Sidebar,
@@ -36,10 +35,11 @@ import {
 import { TbActivity } from "react-icons/tb";
 import { cn } from "@/lib/utils";
 import { SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { useSession } from "next-auth/react";
 
 export const SiteSideBar = () => {
   const pathname = usePathname();
-  const { currentUser } = useCurrentUser();
+  const { data: currentUser } = useSession();
 
   return (
     <Sidebar variant="sidebar" className="shadow-lg z-50">
@@ -115,7 +115,7 @@ export const SiteSideBar = () => {
           </SidebarGroupContent>
         </SidebarGroup>
         <Separator />
-        {currentUser?.role == "ADMIN" && (
+        {currentUser?.user.role == "ADMIN" && (
           <SidebarGroup>
             <SidebarGroupLabel>Admin</SidebarGroupLabel>
             <Collapsible defaultOpen className="group/collapsible">

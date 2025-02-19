@@ -53,11 +53,11 @@ import { ToastAction } from "../ui/toast";
 import { toast } from "../ui/use-toast";
 import { deleteCalendarOfActivity } from "@/actions/calendar-of-activity/delete";
 import { fetchActivitiesData } from "@/app/store/activityAction";
-import { useCurrentUser } from "../context/CurrentUserContext";
 import DisplayContentDialog from "../dialog/display-content-dialog";
 import { LoadingSpinner } from "../LoadingSpinner";
 import { formatDateLong } from "@/utils/dateFormat";
 import { truncateText } from "@/utils/truncateText";
+import { useSession } from "next-auth/react";
 
 interface CalendarSheetProps {
   activityData: any[];
@@ -82,7 +82,7 @@ export function CalendarSheet({
   const { usersData, loadingUser, errorUser } = useSelector(
     (state) => state.users
   );
-  const { currentUser } = useCurrentUser();
+  const { data: currentUser } = useSession();
   useEffect(() => {
     if (usersData.length === 0) {
       dispatch(fetchUsersData());
@@ -292,7 +292,7 @@ ${formattedPreparatoryList}`;
                 className="border w-full h-1 md:hidden"
               ></div>
             </SheetTitle>
-            {user.id == currentUser?.id && (
+            {user.id == currentUser?.user.id && (
               <div className="flex flex-col gap-2 absolute top-8 right-4">
                 <PiNotePencilBold
                   size={20}

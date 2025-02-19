@@ -62,7 +62,7 @@ export const LoginForm = () => {
           if (!data.error) {
             router.push("/"); // Redirect to '/' if there's no error (login is successful)
           }
-          setLoading(false);
+          // setLoading(false);
 
           // if (!data.error) {
           //     setTimeout(() => {

@@ -8,18 +8,14 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import { FaCalendarAlt } from "react-icons/fa";
 import { DataTable } from "@/components/table/data-table";
-import { useCurrentUser } from "@/components/context/CurrentUserContext";
 import { columns } from "@/components/table/data/activities/coa-columns";
 import TrashLottieAnimation from "@/components/lottie-icon-animations/Trash";
 import AssignmentLottieAnimation from "@/components/lottie-icon-animations/Assignment";
 import ConfirmDeleteDialog from "@/components/dialog/delete-dialog";
 import { deleteCalendarOfActivity } from "@/actions/calendar-of-activity/delete";
-import { Skeleton } from "@/components/ui/skeleton";
 import UpdateActivityDialog from "@/components/dialog/update-dialog";
-import { updateCalendarOfActivity } from "@/actions/calendar-of-activity/update";
 import { Label } from "@/components/ui/label";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { toast } from "@/components/ui/use-toast";
@@ -27,6 +23,7 @@ import { ToastAction } from "@/components/ui/toast";
 import { useDispatch, useSelector } from "@/app/store/store";
 import { fetchActivitiesData } from "@/app/store/activityAction";
 import { useActivitiesData } from "@/lib/calendar-of-activity/useActivitiesDataHook";
+import { useSession } from "next-auth/react";
 
 type Props = {};
 
@@ -35,7 +32,7 @@ export const ViewMySchedDialog = (props: Props) => {
   // const {activitiesData, activityLoading, activityError} =useSelector((state)=> state.activity)
   const { activitiesData, activityError, activityLoading } =
     useActivitiesData();
-  const { currentUser } = useCurrentUser();
+  const { data: currentUser } = useSession();
 
   const [filteredData, setFilteredData] = useState<any[]>([]);
   const [isHoveredTrash, setIsHoveredTrash] = useState(false);
@@ -106,9 +103,9 @@ export const ViewMySchedDialog = (props: Props) => {
   };
 
   useEffect(() => {
-    if (currentUser && currentUser.id && activitiesData) {
+    if (currentUser && currentUser?.user.id && activitiesData) {
       const filtered = activitiesData?.filter(
-        (activity: any) => activity.user?.id === currentUser.id
+        (activity: any) => activity.user?.id === currentUser?.user.id
       );
       setFilteredData(filtered);
     }

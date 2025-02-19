@@ -1,5 +1,4 @@
 import { useSelector } from "@/app/store/store";
-import { useCurrentUser } from "@/components/context/CurrentUserContext";
 import { useCalendarOfActivityFilter } from "@/components/context/FilterRegionContext";
 import { Label } from "@/components/ui/label";
 import {
@@ -16,12 +15,13 @@ import {
   regionOptions,
   unitOptions,
 } from "@/lib/data/filter";
+import { useSession } from "next-auth/react";
 import React from "react";
 
 type Props = {};
 
 function SelectFilterUnitComponent({}: Props) {
-  const { currentUser } = useCurrentUser();
+  const { data: currentUser } = useSession();
   const { activityLoading } = useSelector((state) => state.activity);
   const { currentFilter, setCurrentFilter } = useCalendarOfActivityFilter();
 
@@ -46,7 +46,9 @@ function SelectFilterUnitComponent({}: Props) {
       >
         <SelectTrigger className="text-xs md:text-sm w-fit">
           <SelectValue
-            placeholder={currentUser?.unit ? currentUser?.unit : "Filter Unit"}
+            placeholder={
+              currentUser?.user.unit ? currentUser?.user.unit : "Filter Unit"
+            }
           />
         </SelectTrigger>
         <SelectContent>

@@ -45,7 +45,6 @@ import { ToastAction } from "@/components/ui/toast";
 import { calendarOfActivity } from "@/actions/calendar-of-activity/calendarofactivity";
 import { toast } from "@/components/ui/use-toast";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
-import { useCurrentUser } from "@/components/context/CurrentUserContext";
 import axios from "axios";
 import { formatDate } from "@/components/table/data/activities/coa-columns";
 import { Badge } from "@/components/ui/badge";
@@ -67,6 +66,7 @@ import { FaX } from "react-icons/fa6";
 import { userAgent } from "next/server";
 import FormFieldWrapper from "@/components/FormFieldWrapper";
 import { useActivitiesData } from "@/lib/calendar-of-activity/useActivitiesDataHook";
+import { useSession } from "next-auth/react";
 
 export const QuillEditor = dynamic(() => import("react-quill"), { ssr: false });
 
@@ -112,7 +112,7 @@ const CalendarForm = ({ setDialogClose, individualActivity_ }: Props) => {
   const { usersData, loadingUser, errorUser } = useSelector(
     (state) => state.users
   );
-  const { currentUser } = useCurrentUser();
+  const { data: currentUser } = useSession();
 
   const [filteredUsersData, setFilteredUsersData] = useState<User[]>([]);
   const [selectedParticipants, setSelectedParticipants] = useState<String[]>(
@@ -136,7 +136,7 @@ const CalendarForm = ({ setDialogClose, individualActivity_ }: Props) => {
   const dispatch = useDispatch();
   const { refetchActivities } = useActivitiesData();
 
-  const [filterRegion, setFilterRegion] = useState(currentUser?.region);
+  const [filterRegion, setFilterRegion] = useState(currentUser?.user.region);
 
   const [participantError, setParticipantError] = useState(false);
   const [preparatoryError, setPreparatoryError] = useState(false);
@@ -171,7 +171,7 @@ const CalendarForm = ({ setDialogClose, individualActivity_ }: Props) => {
       preparatoryContent: "",
       calendarOfActivityAttachment: [{ details: "", link: "" }],
       remarks: "",
-      name: currentUser?.name,
+      name: currentUser?.user.name || "",
     },
   });
 
@@ -329,16 +329,16 @@ const CalendarForm = ({ setDialogClose, individualActivity_ }: Props) => {
         setTimeout(() => {
           if (!data.error) {
             try {
-              currentUser?.expoPushToken &&
-                sendPushNotificationToMobileUser(
-                  currentUser?.expoPushToken,
-                  `New activity by ${currentUser?.name}`,
-                  `${currentUser?.component} | ${currentUser?.unit} - ${
-                    values.activityTitle
-                  }\n${values.activityDescription}\n${formatDate(
-                    values.dateFrom as any
-                  )} - ${formatDate(values.dateTo as any)}`
-                );
+              // currentUser?.user.expoPushToken &&
+              //   sendPushNotificationToMobileUser(
+              //     currentUser?.user.expoPushToken,
+              //     `New activity by ${currentUser?.name}`,
+              //     `${currentUser?.user.component} | ${currentUser?.user.unit} - ${
+              //       values.activityTitle
+              //     }\n${values.activityDescription}\n${formatDate(
+              //       values.dateFrom as any
+              //     )} - ${formatDate(values.dateTo as any)}`
+              //   );
 
               toast({
                 title: "Success",
@@ -479,7 +479,7 @@ const CalendarForm = ({ setDialogClose, individualActivity_ }: Props) => {
       convertUsersToDropdownData(filteredUsersData);
     setMultiSelectUsersDropdownData(multiSelectUsersDropdownData);
     setFilteredUsersData(filteredUsersData);
-  }, [currentUser?.region, usersData, filterRegion]);
+  }, [currentUser?.user.region, usersData, filterRegion]);
 
   const clearFunctionRef = useRef<() => void | null>(null);
   const selectAllFunctionRef = useRef<() => void | null>(null);

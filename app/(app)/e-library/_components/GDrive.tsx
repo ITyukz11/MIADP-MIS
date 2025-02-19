@@ -8,10 +8,9 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { FaFolder, FaGoogleDrive, FaLink } from "react-icons/fa";
+import { FaFolder, FaLink } from "react-icons/fa";
 
 const GoogleDriveData = () => {
   const [data, setData] = useState<any>(null);

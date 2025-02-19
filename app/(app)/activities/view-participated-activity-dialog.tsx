@@ -9,20 +9,20 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/table/data-table";
-import { useCurrentUser } from "@/components/context/CurrentUserContext";
 import { columns } from "@/components/table/data/activities/coa-columns";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { Label } from "@/components/ui/label";
 import { CalendarSheet } from "@/components/calendar-of-activity/CalendarSheet";
 import { MdPeople } from "react-icons/md";
 import { useActivitiesData } from "@/lib/calendar-of-activity/useActivitiesDataHook";
+import { useSession } from "next-auth/react";
 
 type Props = {};
 
 const ViewMyParticipatedSchedDialog = (props: Props) => {
   const { activitiesData, activityError, activityLoading } =
     useActivitiesData();
-  const { currentUser } = useCurrentUser();
+  const { data: currentUser } = useSession();
   const [viewCalendarData, setViewCalendarData] = useState<any[]>([]);
   const [viewCalendar, setViewCalendar] = useState(false);
   const [selectedRowId, setSelectedRowId] = useState("");
@@ -35,13 +35,13 @@ const ViewMyParticipatedSchedDialog = (props: Props) => {
   console.log("view currentUser: ", currentUser);
   // Memoized filtered data
   const filteredData = useMemo(() => {
-    if (!currentUser?.id || !activitiesData) {
+    if (!currentUser?.user.id || !activitiesData) {
       return [];
     }
 
     return activitiesData.filter((activity: any) =>
       activity.participants.some(
-        (participant: any) => participant.userId === currentUser.id
+        (participant: any) => participant.userId === currentUser.user.id
       )
     );
   }, [currentUser, activitiesData]);

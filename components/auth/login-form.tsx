@@ -25,6 +25,7 @@ import { LoadingSpinner } from "../LoadingSpinner";
 import { PiEyeBold, PiEyeClosedBold } from "react-icons/pi";
 import { motion } from "framer-motion";
 import { ForgotPasswordDialog } from "./forgot-password-dialog";
+import { toast } from "../ui/use-toast";
 
 export const LoginForm = () => {
   const [isPending, startTransition] = useTransition();
@@ -48,42 +49,25 @@ export const LoginForm = () => {
   });
 
   const onSubmit = async (values: z.infer<typeof LoginSchema>) => {
+    console.log("client values: ", values);
     setError("");
     setSuccess("");
-    setLoading(true); // Set loading state to true
+    setLoading(true); // Set loading state to true before submitting
 
-    startTransition(() => {
-      setLoading(true);
-      login(values)
-        .then((data) => {
-          setError(data.error);
-          setSuccess(data.success);
+    try {
+      const data = await login(values); // Ensure `login` is awaited properly
 
-          if (!data.error) {
-            router.push("/"); // Redirect to '/' if there's no error (login is successful)
-          }
-          // setLoading(false);
-
-          // if (!data.error) {
-          //     setTimeout(() => {
-          //         if (!data.error) {
-          //             router.push('/'); // Redirect to '/' if there's no error (login is successful)
-          //         }
-          //     }, 2000); // Delay for 2 seconds
-
-          // } else {
-          //     setLoading(false);
-
-          // }
-        })
-        .catch((error) => {
-          setError("An error occurred while logging in. Error: " + error);
-          setLoading(false); // Set loading state to false if there's an error
-        });
-    });
-
-    //Pwde axios diri
-    //axios.post("/your/api/router", values).then .get etc
+      if (data.error) {
+        setError(data.error);
+        setLoading(false); // Set loading false only if there's an error
+      } else {
+        setSuccess(data.success);
+        router.push("/"); // Redirect on success (don't set loading false here)
+      }
+    } catch (error) {
+      setError("An error occurred while logging in. Error: " + error);
+      setLoading(false); // Ensure loading is turned off in case of error
+    }
   };
 
   return (

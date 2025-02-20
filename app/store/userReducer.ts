@@ -1,10 +1,10 @@
 // src/app/store/userReducer.ts
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { fetchUsersData } from './userAction';
-import { User } from '@/types/users/userType';
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { fetchUsersData } from "./userAction";
+import { UserType } from "@/types/users/userType";
 
 interface UserState {
-  usersData: User[];
+  usersData: UserType[];
   loadingUser: boolean;
   errorUser: string | null;
 }
@@ -16,7 +16,7 @@ const initialState: UserState = {
 };
 
 const userSlice = createSlice({
-  name: 'users',
+  name: "users",
   initialState,
   reducers: {},
   extraReducers: (builder) => {
@@ -25,13 +25,16 @@ const userSlice = createSlice({
         state.loadingUser = true;
         state.errorUser = null;
       })
-      .addCase(fetchUsersData.fulfilled, (state, action: PayloadAction<User[]>) => {
-        state.usersData = action.payload;
-        state.loadingUser = false;
-      })
+      .addCase(
+        fetchUsersData.fulfilled,
+        (state, action: PayloadAction<UserType[]>) => {
+          state.usersData = action.payload;
+          state.loadingUser = false;
+        }
+      )
       .addCase(fetchUsersData.rejected, (state, action) => {
         state.loadingUser = false;
-        state.errorUser = action.error.message || 'Failed to load users';
+        state.errorUser = action.error.message || "Failed to load users";
       });
   },
 });

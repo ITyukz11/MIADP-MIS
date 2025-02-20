@@ -50,7 +50,7 @@ import { ToastAction } from "../ui/toast";
 import { toast } from "../ui/use-toast";
 import { MdPeopleAlt } from "react-icons/md";
 import { useDispatch, useSelector } from "@/app/store/store";
-import { User } from "@/types/users/userType";
+import { UserType } from "@/types/users/userType";
 import { fetchActivitiesData } from "@/app/store/activityAction";
 import { Framework } from "../MultiSelect";
 import FancyMultiSelectUpdateActivity from "../MultiSelectUpdateActivity";
@@ -112,7 +112,7 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
 
   const [filterRegion, setFilterRegion] = useState(currentUser?.user.region);
 
-  const [filteredUsersData, setFilteredUsersData] = useState<User[]>([]);
+  const [filteredUsersData, setFilteredUsersData] = useState<UserType[]>([]);
 
   const [multiSelectUsersDropdownData, setMultiSelectUsersDropdownData] =
     useState<Framework[]>([]);
@@ -150,7 +150,7 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
       name: "",
     },
   });
-  const convertUsersToDropdownData = (users: User[]) => {
+  const convertUsersToDropdownData = (users: UserType[]) => {
     return users.map((user) => ({
       value: user.id,
       label: `${user.region} - ${user.name}`,

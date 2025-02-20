@@ -53,7 +53,7 @@ import { MdPeopleAlt } from "react-icons/md";
 import { Upload } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { FancyMultiSelect, Framework } from "@/components/MultiSelect";
-import { User } from "@/types/users/userType";
+import { UserType } from "@/types/users/userType";
 import { fetchActivitiesData } from "@/app/store/activityAction";
 import { useDispatch, useSelector } from "@/app/store/store";
 import { TypeOfActivity } from "@/components/forms/data";
@@ -114,7 +114,7 @@ const CalendarForm = ({ setDialogClose, individualActivity_ }: Props) => {
   );
   const { data: currentUser } = useSession();
 
-  const [filteredUsersData, setFilteredUsersData] = useState<User[]>([]);
+  const [filteredUsersData, setFilteredUsersData] = useState<UserType[]>([]);
   const [selectedParticipants, setSelectedParticipants] = useState<String[]>(
     []
   );
@@ -462,7 +462,7 @@ const CalendarForm = ({ setDialogClose, individualActivity_ }: Props) => {
     }
   };
 
-  const convertUsersToDropdownData = (users: User[]) => {
+  const convertUsersToDropdownData = (users: UserType[]) => {
     return users.map((user) => ({
       value: user.id,
       label: `${user.region} - ${user.name}`,

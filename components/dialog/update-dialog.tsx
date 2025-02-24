@@ -29,7 +29,6 @@ import {
 } from "@/components/ui/select";
 import { updateCalendarOfActivity } from "@/actions/calendar-of-activity/update";
 import { FormError } from "@/components/form-error";
-import { FormSuccess } from "@/components/form-success";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -49,9 +48,8 @@ import { ChevronLeftCircleIcon, ChevronRightCircleIcon } from "lucide-react";
 import { ToastAction } from "../ui/toast";
 import { toast } from "../ui/use-toast";
 import { MdPeopleAlt } from "react-icons/md";
-import { useDispatch, useSelector } from "@/app/store/store";
+import { useSelector } from "@/app/store/store";
 import { UserType } from "@/types/users/userType";
-import { fetchActivitiesData } from "@/app/store/activityAction";
 import { Framework } from "../MultiSelect";
 import FancyMultiSelectUpdateActivity from "../MultiSelectUpdateActivity";
 import {
@@ -93,7 +91,6 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
     useActivitiesData();
 
   console.log("UPDATE activityId: ", activityId);
-  const dispatch = useDispatch();
 
   const [allDayChecked, setAllDayChecked] = useState(false);
   const { RangePicker } = DatePicker;
@@ -103,6 +100,9 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
   const [preparatoryError, setPreparatoryError] = useState(false);
   const [timeError, setTimeError] = useState(false);
   const [dateToError, setDateToError] = useState(false);
+
+  const { refetchActivities } = useActivitiesData();
+
   // const { usersData, loadingUser, errorUser, fetchUsers } = useUsers();
   const { usersData, loadingUser, errorUser } = useSelector(
     (state) => state.users
@@ -414,7 +414,7 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
             setUpdateDialogClose(false);
           }
 
-          dispatch(fetchActivitiesData());
+          refetchActivities();
         } else if (result.error) {
           toast({
             variant: "destructive",

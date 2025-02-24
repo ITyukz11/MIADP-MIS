@@ -20,8 +20,6 @@ import { Label } from "@/components/ui/label";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { toast } from "@/components/ui/use-toast";
 import { ToastAction } from "@/components/ui/toast";
-import { useDispatch, useSelector } from "@/app/store/store";
-import { fetchActivitiesData } from "@/app/store/activityAction";
 import { useActivitiesData } from "@/lib/calendar-of-activity/useActivitiesDataHook";
 import { useSession } from "next-auth/react";
 
@@ -30,7 +28,7 @@ type Props = {};
 export const ViewMySchedDialog = (props: Props) => {
   // const { activities, loading, error, fetchActivitiesData } = useCalendarOfActivityContext();
   // const {activitiesData, activityLoading, activityError} =useSelector((state)=> state.activity)
-  const { activitiesData, activityError, activityLoading } =
+  const { activitiesData, activityError, activityLoading, refetchActivities } =
     useActivitiesData();
   const { data: currentUser } = useSession();
 
@@ -52,8 +50,6 @@ export const ViewMySchedDialog = (props: Props) => {
   console.log("currentUser: ", currentUser);
   console.log("filteredData: ", filteredData);
 
-  const dispatch = useDispatch();
-
   const handleSelectedRowIdsChange = (selectedIds: string[]) => {
     setSelectedRowIds(selectedIds);
     // console.log('Selected row IDs:', selectedIds);
@@ -74,7 +70,7 @@ export const ViewMySchedDialog = (props: Props) => {
         action: <ToastAction altText="Ok">Ok</ToastAction>,
       });
 
-      dispatch(fetchActivitiesData());
+      refetchActivities();
     } else {
       setAlert({
         type: "error",

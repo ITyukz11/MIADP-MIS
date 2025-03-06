@@ -36,11 +36,22 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { wfpYearOptions } from "@/lib/data/filter";
+import { useSubprojectCountData } from "@/lib/subproject/useSubprojectCount";
+import { useRouter } from "next/navigation";
 
 export default function AnnouncementsPage() {
+  const {
+    subprojectCountData,
+    subprojectCountError,
+    subprojectCountLoading,
+    refetchSubprojectCount,
+  } = useSubprojectCountData();
+
   // Randomly select an image from the public/under-development folder
   const imageNumber = Math.floor(Math.random() * 6) + 1;
   const imagePath = `/under-development/${imageNumber}.png`;
+
+  const route = useRouter();
 
   const {
     countParticipantActivitiesData,
@@ -74,6 +85,10 @@ export default function AnnouncementsPage() {
       setTotalCount(total);
     }
   }, [activitiesData]);
+
+  const handleRouteToSubproject = () => {
+    route.push("/subproject");
+  };
 
   console.log("completedCount: ", completedCount);
   console.log("totalCount: ", totalCount);
@@ -193,7 +208,7 @@ export default function AnnouncementsPage() {
                   </Card>
                   <Card
                     className="hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer"
-                    onClick={() => setOpenUnderDev(true)}
+                    onClick={handleRouteToSubproject}
                   >
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                       <CardTitle className="text-sm font-medium">
@@ -216,10 +231,21 @@ export default function AnnouncementsPage() {
                       </svg>
                     </CardHeader>
                     <CardContent>
-                      <div className="text-2xl font-bold">+5</div>
-                      <p className="text-xs text-muted-foreground">
-                        +2 since last month
-                      </p>
+                      {subprojectCountLoading ? (
+                        <div className="flex flex-col gap-2">
+                          <Skeleton className="w-full h-10" />
+                          <Skeleton className="w-full h-5" />
+                        </div>
+                      ) : (
+                        <>
+                          <div className="text-2xl font-bold">
+                            {subprojectCountData.count}
+                          </div>
+                          <p className="text-xs text-muted-foreground">
+                            +{subprojectCountData.recentlyAdded} recently added
+                          </p>
+                        </>
+                      )}
                     </CardContent>
                   </Card>
                 </div>

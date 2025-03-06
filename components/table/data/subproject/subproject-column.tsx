@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { ColumnDef } from "@tanstack/react-table";
 import { DataTableColumnHeader } from "../../data-table-column-header";
 import { SubProjectCodeType } from "@/types/subproject/subproject-type";
@@ -13,8 +13,13 @@ export const subprojectColumn: ColumnDef<SubProjectCodeType>[] = [
     ),
     cell: ({ row }) => (
       <div className="flex space-x-2">
-        <span className="max-w-[500px] truncate font-medium">
-          <Link href={`subproject/${row.getValue("code")}`} className="text-[#0000EE] underline">{row.getValue("code")}</Link>
+        <span className="truncate font-medium">
+          <Link
+            href={`subproject/${row.getValue("code")}`}
+            className="text-[#0000EE] underline"
+          >
+            {row.getValue("code")}
+          </Link>
         </span>
       </div>
     ),
@@ -79,7 +84,10 @@ export const subprojectColumn: ColumnDef<SubProjectCodeType>[] = [
   {
     accessorKey: "ancestralDomainLoc",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Ancestral Domain Location" />
+      <DataTableColumnHeader
+        column={column}
+        title="Ancestral Domain Location"
+      />
     ),
     cell: ({ row }) => (
       <span className="max-w-[500px] truncate font-medium">
@@ -112,15 +120,14 @@ export const subprojectColumn: ColumnDef<SubProjectCodeType>[] = [
   {
     accessorKey: "action",
     header: ({ column }) => (
-        <DataTableColumnHeader column={column} title="Action" />
+      <DataTableColumnHeader column={column} title="Action" />
     ),
-    cell: ({row}) => (
-        <div className="flex space-x-2">
-            <span className="p-1 max-w-[500px] truncate font-medium cursor-default">
-               <SubprojectDataTableRowActions rowData={row.original}/>
-            </span>
-        </div>
-    )
-}
+    cell: ({ row }) => (
+      <div className="flex space-x-2">
+        <span className="p-1 max-w-[500px] truncate font-medium cursor-default">
+          <SubprojectDataTableRowActions rowData={row.original} />
+        </span>
+      </div>
+    ),
+  },
 ];
-  

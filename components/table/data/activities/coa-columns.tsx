@@ -91,7 +91,7 @@ export const columns: ColumnDef<Activity>[] = [
     ),
     cell: ({ row }) => (
       <div className="flex space-x-2 items-center">
-        <span className="truncate font-medium cursor-default gap-1 flex">
+        <span className="truncate max-w-[400px] font-medium cursor-default gap-1 flex">
           <Badge className="hidden lg:block">{row.original.user?.region}</Badge>
           <Badge className="hidden lg:block" variant={"outline"}>
             {row.original.user?.unit
@@ -113,7 +113,7 @@ export const columns: ColumnDef<Activity>[] = [
     ),
     cell: ({ row }) => (
       <div className="flex space-x-2">
-        <span className="max-w-[500px] truncate font-medium cursor-default">
+        <span className="max-w-[250px] truncate font-medium cursor-default">
           {row.getValue("activityDescription")}
         </span>
       </div>
@@ -129,7 +129,7 @@ export const columns: ColumnDef<Activity>[] = [
     ),
     cell: ({ row }) => (
       <div className="flex space-x-2">
-        <span className="max-w-[500px] truncate font-medium cursor-default">
+        <span className="max-w-[250px] truncate font-medium cursor-default">
           <Badge variant={"secondary"}>
             {" "}
             {row.getValue("type") === "Other"
@@ -151,7 +151,7 @@ export const columns: ColumnDef<Activity>[] = [
     ),
     cell: ({ row }) => (
       <div className="flex space-x-2">
-        <span className="max-w-[500px] truncate font-medium cursor-default">
+        <span className="max-w-[250px] truncate font-medium cursor-default">
           {row.getValue("targetParticipant")}
         </span>
       </div>
@@ -171,7 +171,7 @@ export const columns: ColumnDef<Activity>[] = [
 
       return (
         <div className="flex space-x-2">
-          <span className="max-w-[500px] truncate">
+          <span className="max-w-[250px] truncate">
             <Badge
               // variant={variant}
               className={`font-medium cursor-default shadow-sm z-10 dark:text-white hover:${getStatusColor(
@@ -199,7 +199,7 @@ export const columns: ColumnDef<Activity>[] = [
     ),
     cell: ({ row }) => (
       <div className="flex space-x-2">
-        <span className="max-w-[500px] truncate font-medium cursor-default">
+        <span className="max-w-[250px] truncate font-medium cursor-default">
           {formatDateLong(row.getValue("dateFrom"))}
         </span>
       </div>
@@ -216,7 +216,7 @@ export const columns: ColumnDef<Activity>[] = [
     ),
     cell: ({ row }) => (
       <div className="flex space-x-2">
-        <span className="max-w-[500px] truncate font-medium cursor-default">
+        <span className="max-w-[250px] truncate font-medium cursor-default">
           {formatDateLong(row.getValue("dateTo"))}
         </span>
       </div>
@@ -233,7 +233,7 @@ export const columns: ColumnDef<Activity>[] = [
     ),
     cell: ({ row }) => (
       <div className="flex space-x-2">
-        <span className="max-w-[500px] truncate font-medium cursor-default">
+        <span className="max-w-[250px] truncate font-medium cursor-default">
           {formatTime(row.getValue("timeStart"))}
         </span>
       </div>
@@ -249,7 +249,7 @@ export const columns: ColumnDef<Activity>[] = [
     ),
     cell: ({ row }) => (
       <div className="flex space-x-2">
-        <span className="max-w-[500px] truncate font-medium cursor-default">
+        <span className="max-w-[250px] truncate font-medium cursor-default">
           {formatTime(row.getValue("timeEnd"))}
         </span>
       </div>
@@ -265,7 +265,7 @@ export const columns: ColumnDef<Activity>[] = [
     ),
     cell: ({ row }) => (
       <div className="flex space-x-2">
-        <span className="max-w-[500px] truncate font-medium cursor-default">
+        <span className="max-w-[250px] truncate font-medium cursor-default">
           {row.getValue("location")}
         </span>
       </div>
@@ -281,7 +281,7 @@ export const columns: ColumnDef<Activity>[] = [
     ),
     cell: ({ row }) => (
       <div className="flex space-x-2">
-        <span className="max-w-[500px] truncate font-medium cursor-default">
+        <span className="max-w-[250px] truncate font-medium cursor-default">
           {row.getValue("remarks")}
         </span>
       </div>
@@ -298,7 +298,7 @@ export const columns: ColumnDef<Activity>[] = [
     ),
     cell: ({ row }) => (
       <div className="flex space-x-2">
-        <span className="max-w-[500px] truncate font-medium cursor-default">
+        <span className="max-w-[250px] truncate font-medium cursor-default">
           {row.getValue("userName")}
         </span>
       </div>

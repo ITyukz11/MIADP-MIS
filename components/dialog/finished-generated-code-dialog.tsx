@@ -1,72 +1,93 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
 } from "@/components/ui/dialog";
-import { Button } from '@/components/ui/button';
-import confetti from 'canvas-confetti';
-import { Label } from '@/components/ui/label';
-import html2canvas from 'html2canvas'; // Import html2canvas
-import { FaDownload, FaPrint } from 'react-icons/fa';
-import { codeAncestralDomain, codeComponent, codeProvince, codeRegion, codeType } from '@/app/(app)/admin/generate-code/(datas)/data';
-import { GenerateQRCodeWithLogo } from '../GenerateQrCodeWithLogo';
-
+import { Button } from "@/components/ui/button";
+import confetti from "canvas-confetti";
+import { Label } from "@/components/ui/label";
+import html2canvas from "html2canvas"; // Import html2canvas
+import { FaDownload, FaPrint } from "react-icons/fa";
+import {
+  codeAncestralDomain,
+  codeComponent,
+  codeProvince,
+  codeRegion,
+  codeType,
+} from "@/app/(app)/admin/generate-code/(datas)/data";
+import { GenerateQRCodeWithLogo } from "../GenerateQrCodeWithLogo";
 
 interface FinishedGeneratedCodeDialogProps {
-    open: boolean;
-    close: () => void;
-    SubprojectTitle: string;
-    SubprojectInformations: any
-    subProjectADLocation?: string
+  open: boolean;
+  close: () => void;
+  SubprojectTitle: string;
+  SubprojectInformations: any;
+  subProjectADLocation?: string;
 }
 
-function FinishedGeneratedCode({ open, close, SubprojectTitle, SubprojectInformations, subProjectADLocation }: FinishedGeneratedCodeDialogProps) {
+function FinishedGeneratedCode({
+  open,
+  close,
+  SubprojectTitle,
+  SubprojectInformations,
+  subProjectADLocation,
+}: FinishedGeneratedCodeDialogProps) {
+  const [qrCode, setQrCode] = useState<string | null>(null);
+  console.log("SubprojectInformations: ", SubprojectInformations);
 
-    const [qrCode, setQrCode] = useState<string | null>(null);
-    console.log("SubprojectInformations: ", SubprojectInformations)
+  useEffect(() => {
+    if (open) {
+      const duration = 15 * 1000; // 15 seconds
+      const animationEnd = Date.now() + duration;
+      const defaults = {
+        startVelocity: 30,
+        spread: 360,
+        ticks: 60,
+        zIndex: 9999,
+      };
 
-    useEffect(() => {
-        if (open) {
-            const duration = 15 * 1000; // 15 seconds
-            const animationEnd = Date.now() + duration;
-            const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 9999 };
-
-            const interval = setInterval(() => {
-                const timeLeft = animationEnd - Date.now();
-                if (timeLeft <= 0) {
-                    clearInterval(interval);
-                    return;
-                }
-                const particleCount = 50 * (timeLeft / duration);
-                confetti({ ...defaults, particleCount, origin: { x: Math.random(), y: Math.random() - 0.2 } });
-            }, 250);
-            return () => clearInterval(interval);
+      const interval = setInterval(() => {
+        const timeLeft = animationEnd - Date.now();
+        if (timeLeft <= 0) {
+          clearInterval(interval);
+          return;
         }
-    }, [open]);
+        const particleCount = 50 * (timeLeft / duration);
+        confetti({
+          ...defaults,
+          particleCount,
+          origin: { x: Math.random(), y: Math.random() - 0.2 },
+        });
+      }, 250);
+      return () => clearInterval(interval);
+    }
+  }, [open]);
 
-    // Function to download the div as an image
-    const handleDownload = async () => {
-        const element = document.getElementById('print-id');
-        if (element) {
-            const canvas = await html2canvas(element);
-            const image = canvas.toDataURL('image/png');
-            const link = document.createElement('a');
-            link.href = image;
-            link.download = 'generated-code.png'; // Set the download file name
-            link.click();
-        }
-    };
-    const handlePrint = () => {
-        const element = document.getElementById('print-id');
-        if (element) {
-            const printWindow = window.open('', '', 'height=800,width=600');
-            if (printWindow) {
-                printWindow.document.write('<html><head><title>Generate Code Subproject</title>');
-                printWindow.document.write(`
+  // Function to download the div as an image
+  const handleDownload = async () => {
+    const element = document.getElementById("print-id");
+    if (element) {
+      const canvas = await html2canvas(element);
+      const image = canvas.toDataURL("image/png");
+      const link = document.createElement("a");
+      link.href = image;
+      link.download = "generated-code.png"; // Set the download file name
+      link.click();
+    }
+  };
+  const handlePrint = () => {
+    const element = document.getElementById("print-id");
+    if (element) {
+      const printWindow = window.open("", "", "height=800,width=600");
+      if (printWindow) {
+        printWindow.document.write(
+          "<html><head><title>Generate Code Subproject</title>"
+        );
+        printWindow.document.write(`
                 <style>
                     @page {
                         size: A4;
@@ -154,8 +175,8 @@ function FinishedGeneratedCode({ open, close, SubprojectTitle, SubprojectInforma
                     }
                 </style>
             `);
-                printWindow.document.write('</head><body>');
-                printWindow.document.write(`
+        printWindow.document.write("</head><body>");
+        printWindow.document.write(`
                 <div id="print-id">
                     <!-- Header with image -->
                     <div class="header">
@@ -182,23 +203,31 @@ function FinishedGeneratedCode({ open, close, SubprojectTitle, SubprojectInforma
             <td><b>Subproject Title</b></td>
             <td>${SubprojectTitle}</td>
         </tr>
-        ${SubprojectInformations.briefDescription ? `
+        ${
+          SubprojectInformations.briefDescription
+            ? `
             <tr>
                 <td><b>Coordinate</b></td>
                 <td>${SubprojectInformations.briefDescription}</td>
             </tr>
-        ` : ''}
+        `
+            : ""
+        }
     
         <tr>
             <td><b>Component</b></td>
             <td>${SubprojectInformations.component}</td>
         </tr>
-        ${SubprojectInformations.optionalEntrepSharedInfra ? `
+        ${
+          SubprojectInformations.optionalEntrepSharedInfra
+            ? `
         <tr>
             <td><b>Optional Enterprise Shared Infrastructure</b></td>
             <td>${SubprojectInformations.optionalEntrepSharedInfra}</td>
         </tr>
-        ` : ''}
+        `
+            : ""
+        }
         <tr>
             <td><b>Region</b></td>
             <td>${SubprojectInformations.region}</td>
@@ -220,28 +249,40 @@ function FinishedGeneratedCode({ open, close, SubprojectTitle, SubprojectInforma
             <td>${SubprojectInformations.municipality}</td>
         </tr>
                    <!-- Only show Coordinate row if there is data -->
-        ${SubprojectInformations.coordinate ? `
+        ${
+          SubprojectInformations.coordinate
+            ? `
             <tr>
                 <td><b>Coordinate</b></td>
                 <td>${SubprojectInformations.coordinate}</td>
             </tr>
-        ` : ''}
+        `
+            : ""
+        }
         
         <!-- Only show Physical Indicator row if there is data -->
-        ${SubprojectInformations.physicalIndicator ? `
+        ${
+          SubprojectInformations.physicalIndicator
+            ? `
             <tr>
                 <td><b>Physical Indicator</b></td>
                 <td>${SubprojectInformations.physicalIndicator}</td>
             </tr>
-        ` : ''}
+        `
+            : ""
+        }
         
         <!-- Only show Total Estimate Project Cost row if there is data -->
-        ${SubprojectInformations.tepc ? `
+        ${
+          SubprojectInformations.tepc
+            ? `
             <tr>
                 <td><b>Total Estimate Project Cost</b></td>
                 <td>${SubprojectInformations.tepc}</td>
             </tr>
-        ` : ''}
+        `
+            : ""
+        }
     </table>
    
 </div>
@@ -251,7 +292,7 @@ function FinishedGeneratedCode({ open, close, SubprojectTitle, SubprojectInforma
                             Errol Robyn M. Abella<br />
                             Programmer<br />
                         </div>
-     <span style="block "><i>See attachment Notice to Proceed</i></span>
+     <span style="block "><i>See attachment Notice to Commence</i></span>
                         <div class="signatory">
                             <b>Noted By:</b><br /><br />
                             Nelson C. Faustino<br />
@@ -277,31 +318,20 @@ function FinishedGeneratedCode({ open, close, SubprojectTitle, SubprojectInforma
     document.getElementById('currentDate').textContent = getCurrentDate();
 </script>
             `);
-                printWindow.document.write('</body></html>');
-                printWindow.document.close();
-                printWindow.print();
-            }
-        } else {
-            console.error("Element with id 'print-id' not found.");
-        }
-    };
+        printWindow.document.write("</body></html>");
+        printWindow.document.close();
+        printWindow.print();
+      }
+    } else {
+      console.error("Element with id 'print-id' not found.");
+    }
+  };
 
+  useEffect(() => {
+    const { component, province, region, type } = SubprojectInformations;
 
-
-
-
-    useEffect(() => {
-        const {
-            component,
-            province,
-            region,
-            type
-        } = SubprojectInformations;
-
-
-        // Generate formatted QR code data
-        const qrData =
-            `
+    // Generate formatted QR code data
+    const qrData = `
         Subproject title ${SubprojectTitle}\n
         Component: ${component}\n
          Province: ${province}\n
@@ -309,43 +339,49 @@ function FinishedGeneratedCode({ open, close, SubprojectTitle, SubprojectInforma
         Type: ${type}
   `;
 
-        // Generate the QR code
-        GenerateQRCodeWithLogo(qrData).then(setQrCode).catch(console.error);
-    }, [SubprojectInformations, SubprojectTitle]);
+    // Generate the QR code
+    GenerateQRCodeWithLogo(qrData).then(setQrCode).catch(console.error);
+  }, [SubprojectInformations, SubprojectTitle]);
 
-    return (
-        <Dialog open={open} onOpenChange={close}>
-            <DialogContent className="w-full flex items-center flex-col">
-                <DialogHeader>
-                    <DialogTitle>🎉🎉CONGRATULATIONS!🎉🎉</DialogTitle>
-                    <DialogDescription>
-                        You have now generated a new code!
-                    </DialogDescription>
-                </DialogHeader>
-                <div
-                    id='print-id'
-                    style={{
-                        backgroundSize: 'cover',
-                        backgroundPosition: 'center',
-                        height: '100%',
-                        width: '100%',
-                        padding: '20px', // Add padding for better presentation
-                    }}
-                >
-                    <div className='flex flex-col'>
-                        <Label className='w-full font-semibold text-xl'>{SubprojectInformations.code}</Label>
-                        <Label className='w-full italic text-center'>{SubprojectTitle}</Label>
-                    </div>
-                </div>
-                <DialogFooter className='flex justify-between w-full'>
-                    <div className='w-full'>
-                        <Button onClick={handlePrint}><FaPrint /></Button>
-                    </div>
-                    <Button onClick={close}>Continue</Button>
-                </DialogFooter>
-            </DialogContent>
-        </Dialog>
-    );
+  return (
+    <Dialog open={open} onOpenChange={close}>
+      <DialogContent className="w-full flex items-center flex-col">
+        <DialogHeader>
+          <DialogTitle>🎉🎉CONGRATULATIONS!🎉🎉</DialogTitle>
+          <DialogDescription>
+            You have now generated a new code!
+          </DialogDescription>
+        </DialogHeader>
+        <div
+          id="print-id"
+          style={{
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            height: "100%",
+            width: "100%",
+            padding: "20px", // Add padding for better presentation
+          }}
+        >
+          <div className="flex flex-col">
+            <Label className="w-full font-semibold text-xl">
+              {SubprojectInformations.code}
+            </Label>
+            <Label className="w-full italic text-center">
+              {SubprojectTitle}
+            </Label>
+          </div>
+        </div>
+        <DialogFooter className="flex justify-between w-full">
+          <div className="w-full">
+            <Button onClick={handlePrint}>
+              <FaPrint />
+            </Button>
+          </div>
+          <Button onClick={close}>Continue</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
 }
 
 export default FinishedGeneratedCode;

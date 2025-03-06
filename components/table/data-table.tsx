@@ -1,3 +1,4 @@
+"use client";
 import * as React from "react";
 import {
   ColumnDef,
@@ -24,8 +25,6 @@ import {
 import { DataTablePagination } from "./data-table-pagination";
 import { DataTableToolbar } from "./data-table-toolbar";
 import { Checkbox } from "@/components/ui/checkbox"; // Adjust the import according to your file structure
-import { Button } from "../ui/button";
-import { ColumnMeta } from "@/types/table/table";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -113,7 +112,6 @@ export function DataTable<TData extends { id: string }, TValue>({
         className="translate-y-[2px]"
       />
     ),
-    size: 13,
     enableSorting: false,
     enableHiding: false,
   };
@@ -169,7 +167,7 @@ export function DataTable<TData extends { id: string }, TValue>({
   }, [rowSelection, table]);
 
   return (
-    <div className="space-y-2 flex-wrap py-1 w-full place-self-center overflow-x-auto transition-all">
+    <div className="space-y-4 flex-wrap py-1 w-full">
       <DataTableToolbar
         data={data}
         table={table}
@@ -177,43 +175,31 @@ export function DataTable<TData extends { id: string }, TValue>({
         allowDateRange={allowDateRange}
         allowExportToExcel={allowExportToExcel}
       />
-      <div className="grid">
-        <div className="min-w-0 rounded-md border mx-1">
-          <Table className="min-w-0 table-fixed">
+      <div className="rounded-md border grid overflow-auto">
+        <div className="min-w-0">
+          <Table>
             <TableHeader>
               {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => {
-                    return (
-                      <TableHead
-                        key={header.id}
-                        className={
-                          (header.column.columnDef.meta as ColumnMeta)
-                            ?.columnClasses
-                        }
-                        colSpan={header.colSpan}
-                        style={{
-                          width:
-                            header.column.id === "#"
-                              ? 5
-                              : header.column.getSize(),
-                        }}
-                      >
-                        {header.isPlaceholder
-                          ? null
-                          : flexRender(
-                              header.column.columnDef.header,
-                              header.getContext()
-                            )}
-                      </TableHead>
-                    );
-                  })}
+                <TableRow
+                  key={headerGroup.id}
+                  className="hover:bg-[#F1F5F9] bg-[#FFFFFF] dark:hover:bg-[#000000] dark:bg-[#020817]"
+                >
+                  {headerGroup.headers.map((header) => (
+                    <TableHead key={header.id} colSpan={header.colSpan}>
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                    </TableHead>
+                  ))}
                 </TableRow>
               ))}
             </TableHeader>
-            <TableBody className="overflow-x-auto">
+            <TableBody>
               {table.getRowModel().rows?.length ? (
-                table.getRowModel().rows.map((row) => (
+                table.getRowModel().rows.map((row, index) => (
                   <TableRow
                     key={row.id}
                     data-state={row.getIsSelected() && "selected"}
@@ -221,17 +207,14 @@ export function DataTable<TData extends { id: string }, TValue>({
                     style={{
                       cursor: allowViewCalendar ? "pointer" : "default",
                     }} // Conditional cursor style
+                    className={`${
+                      index % 2 === 0
+                        ? "bg-[#F1F5F9] dark:bg-[#000000]" // Light gray for even rows
+                        : "bg-[#FFFFFF] dark:bg-[#020817]" // Background match
+                    }`}
                   >
-                    {row.getVisibleCells().map((cell, index) => (
-                      <TableCell
-                        key={cell.id}
-                        className={`text-xs sm:text-sm ${
-                          index === 0 ? "w-1/4" : "w-[150px]" // Match header widths
-                        } whitespace-nowrap ${
-                          (cell.column.columnDef.meta as ColumnMeta) //to remove table cell data if width is small depend on columnDef file using tailwind sm md lg
-                            ?.columnClasses
-                        }`}
-                      >
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id} className="text-xs sm:text-sm">
                         {flexRender(
                           cell.column.columnDef.cell,
                           cell.getContext()
@@ -254,6 +237,7 @@ export function DataTable<TData extends { id: string }, TValue>({
           </Table>
         </div>
       </div>
+
       <DataTablePagination table={table} />
     </div>
   );

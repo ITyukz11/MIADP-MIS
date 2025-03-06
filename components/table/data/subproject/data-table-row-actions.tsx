@@ -1,64 +1,57 @@
-"use client"
+"use client";
 
-import { DotsHorizontalIcon } from "@radix-ui/react-icons"
-import { Button } from "@/components/ui/button"
+import { DotsHorizontalIcon } from "@radix-ui/react-icons";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { useEffect, useState } from "react"
-import { useForm } from "react-hook-form"
-import { RegisterSchema } from "@/schemas"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { z } from "zod"
-import { FaEye, FaPrint } from "react-icons/fa"
-import { GenerateQRCodeWithLogo } from "@/components/GenerateQrCodeWithLogo"
-import { Label } from "@/components/ui/label"
-import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
-import QRCode from 'qrcode';
+} from "@/components/ui/dropdown-menu";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { RegisterSchema } from "@/schemas";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { FaEye, FaPrint } from "react-icons/fa";
+import { GenerateQRCodeWithLogo } from "@/components/GenerateQrCodeWithLogo";
+import { Label } from "@/components/ui/label";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
+import QRCode from "qrcode";
 
 interface SubprojectDataTableRowActionsProps {
   rowData: any;
 }
 
-export function SubprojectDataTableRowActions({ rowData }: SubprojectDataTableRowActionsProps) {
+export function SubprojectDataTableRowActions({
+  rowData,
+}: SubprojectDataTableRowActionsProps) {
   const [qrCode, setQrCode] = useState<string | null>(null);
   console.log("rowData: ", rowData);
   const generatePDF = async () => {
-      const element = document.getElementById('print-id');
-      if (element) {
-          const canvas = await html2canvas(element);
-          const imageData = canvas.toDataURL('image/png');
-          
-          const pdf = new jsPDF();
-          pdf.addImage(imageData, 'PNG', 10, 10, 180, 0);
-          
-          // Save the PDF file to a URL or as a Blob URL
-          const pdfBlob = pdf.output('blob');
-          const pdfUrl = URL.createObjectURL(pdfBlob);
-  
-          return pdfUrl;
-      }
-      return null;
+    const element = document.getElementById("print-id");
+    if (element) {
+      const canvas = await html2canvas(element);
+      const imageData = canvas.toDataURL("image/png");
+
+      const pdf = new jsPDF();
+      pdf.addImage(imageData, "PNG", 10, 10, 180, 0);
+
+      // Save the PDF file to a URL or as a Blob URL
+      const pdfBlob = pdf.output("blob");
+      const pdfUrl = URL.createObjectURL(pdfBlob);
+
+      return pdfUrl;
+    }
+    return null;
   };
   useEffect(() => {
-    const {
-      subprojectTitle,
-        component,
-        province,
-        region,
-        type
-    } = rowData;
-
-  
+    const { subprojectTitle, component, province, region, type } = rowData;
 
     // Generate formatted QR code data
-    const qrData =
-        `
+    const qrData = `
     Subproject title ${subprojectTitle}\n
     Component: ${component}\n
     Province: ${province}\n
@@ -68,22 +61,22 @@ export function SubprojectDataTableRowActions({ rowData }: SubprojectDataTableRo
 
     // Generate the QR code
     GenerateQRCodeWithLogo(qrData).then(setQrCode).catch(console.error);
-}, [rowData]);
-
-
+  }, [rowData]);
 
   const handlePrint = async () => {
     const pdfUrl = await generatePDF();
     if (pdfUrl) {
-        // Generate the QR code with the PDF URL
-        const qrCodeData = await QRCode.toDataURL(pdfUrl);
+      // Generate the QR code with the PDF URL
+      const qrCodeData = await QRCode.toDataURL(pdfUrl);
     }
-    const element = document.getElementById('print-id');
+    const element = document.getElementById("print-id");
     if (element) {
-        const printWindow = window.open('', '', 'height=800,width=600');
-        if (printWindow) {
-            printWindow.document.write(`<html><head><title>${rowData.code}</title>`);
-            printWindow.document.write(`
+      const printWindow = window.open("", "", "height=800,width=600");
+      if (printWindow) {
+        printWindow.document.write(
+          `<html><head><title>${rowData.code}</title>`
+        );
+        printWindow.document.write(`
             <style>
                 @page {
                     size: A4;
@@ -171,8 +164,8 @@ export function SubprojectDataTableRowActions({ rowData }: SubprojectDataTableRo
                 }
             </style>
         `);
-            printWindow.document.write('</head><body>');
-            printWindow.document.write(`
+        printWindow.document.write("</head><body>");
+        printWindow.document.write(`
             <div id="print-id">
                 <!-- Header with image -->
                 <div class="header">
@@ -199,23 +192,31 @@ export function SubprojectDataTableRowActions({ rowData }: SubprojectDataTableRo
         <td><b>Subproject Title</b></td>
         <td>${rowData.subprojectTitle}</td>
     </tr>
-    ${rowData.briefDescription ? `
+    ${
+      rowData.briefDescription
+        ? `
         <tr>
             <td><b>Coordinate</b></td>
             <td>${rowData.briefDescription}</td>
         </tr>
-    ` : ''}
+    `
+        : ""
+    }
 
     <tr>
         <td><b>Component</b></td>
         <td>${rowData.component}</td>
     </tr>
-    ${rowData.optionalEntrepSharedInfra ? `
+    ${
+      rowData.optionalEntrepSharedInfra
+        ? `
     <tr>
         <td><b>Optional Enterprise Shared Infrastructure</b></td>
         <td>${rowData.optionalEntrepSharedInfra}</td>
     </tr>
-    ` : ''}
+    `
+        : ""
+    }
     <tr>
         <td><b>Region</b></td>
         <td>${rowData.region}</td>
@@ -237,28 +238,40 @@ export function SubprojectDataTableRowActions({ rowData }: SubprojectDataTableRo
         <td>${rowData.municipality}</td>
     </tr>
                <!-- Only show Coordinate row if there is data -->
-    ${rowData.coordinate ? `
+    ${
+      rowData.coordinate
+        ? `
         <tr>
             <td><b>Coordinate</b></td>
             <td>${rowData.coordinate}</td>
         </tr>
-    ` : ''}
+    `
+        : ""
+    }
     
     <!-- Only show Physical Indicator row if there is data -->
-    ${rowData.physicalIndicator ? `
+    ${
+      rowData.physicalIndicator
+        ? `
         <tr>
             <td><b>Physical Indicator</b></td>
             <td>${rowData.physicalIndicator}</td>
         </tr>
-    ` : ''}
+    `
+        : ""
+    }
     
     <!-- Only show Total Estimate Project Cost row if there is data -->
-    ${rowData.tepc ? `
+    ${
+      rowData.tepc
+        ? `
         <tr>
             <td><b>Total Estimate Project Cost</b></td>
             <td>${rowData.tepc}</td>
         </tr>
-    ` : ''}
+    `
+        : ""
+    }
 </table>
 
 </div>
@@ -268,7 +281,7 @@ export function SubprojectDataTableRowActions({ rowData }: SubprojectDataTableRo
                         Errol Robyn M. Abella<br />
                         Programmer<br />
                     </div>
- <span style="block "><i>See attachment Notice to Proceed</i></span>
+ <span style="block "><i>See attachment Notice to Commence</i></span>
                     <div class="signatory">
                         <b>Noted By:</b><br /><br />
                         Nelson C. Faustino<br />
@@ -297,20 +310,22 @@ export function SubprojectDataTableRowActions({ rowData }: SubprojectDataTableRo
                 document.getElementById('currentDate').textContent = formatDate(createdAt);
             </script>
         `);
-            printWindow.document.write('</body></html>');
-            printWindow.document.close();
-            printWindow.print();
-        }
+        printWindow.document.write("</body></html>");
+        printWindow.document.close();
+        printWindow.print();
+      }
     } else {
-        console.error("Element with id 'print-id' not found.");
+      console.error("Element with id 'print-id' not found.");
     }
-};
+  };
 
   return (
     <div className="flex flex-row gap-2" id="print-id">
-      <FaPrint className="w-5 h-5 text-green-800 cursor-pointer" onClick={()=> handlePrint()}/>
+      <FaPrint
+        className="w-5 h-5 text-green-800 cursor-pointer"
+        onClick={() => handlePrint()}
+      />
       {/* <FaEye className="w-5 h-5 text-blue-800 cursor-pointer"/> */}
     </div>
-
-  )
+  );
 }

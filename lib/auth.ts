@@ -1,9 +1,8 @@
-import { NextAuthOptions } from "next-auth"
-import CredentialsProvider from 'next-auth/providers/credentials';
-import { compare } from 'bcrypt';
-import prisma from '@/lib/prisma';
+import { NextAuthOptions } from "next-auth";
+import CredentialsProvider from "next-auth/providers/credentials";
+import { compare } from "bcrypt";
+import prisma from "@/lib/prisma";
 import { UserRole } from "@prisma/client";
-import { boolean } from "zod";
 
 type CustomUser = {
   id: string;
@@ -12,110 +11,88 @@ type CustomUser = {
   role: UserRole;
 };
 
-
 export const authOptions: NextAuthOptions = {
-    session: {
-      strategy: 'jwt'
-    },
-    providers: [
-      CredentialsProvider({
-        type: 'credentials',
-        credentials: {
-          email: {},
-          password: {}
-        },
-        async authorize(credentials, req) {
-          try {
-            const user = await prisma.user.findUnique({
-              where: {
-                email: credentials?.email
-              }
-            });
-  
-            if (!user) {
-              throw new Error('User not found');
-            }
-            // let passwordCorrect = false;
-            // if(user.email == "admin@gmail.com"){
-            //   passwordCorrect = await compare(
-            //     credentials?.password || '',
-            //     user.password
-            //   );
-            // }else{
-            //   passwordCorrect =  credentials?.password == user.password
-            // }
-
-            const passwordCorrect = user.email == "admin@gmail.com"? credentials?.password ==user.password: await compare(credentials?.password || '',user.password);
-
-            if (passwordCorrect) {
-              console.log({
-                id: user.id,
-                email: user.email,
-                name: user.name,
-                role: user.role,
-                region:user.region,
-                component:user.component,
-                unit:user.unit,
-                position:user.position,
-                expoPushToken:user.expoPushToken
-              }
-            
-              )
-              return {
-                id: user.id,
-                email: user.email,
-                name: user.name,
-                role: user.role,
-                region:user.region,
-                component:user.component,
-                unit:user.unit,
-                position:user.position,
-                expoPushToken:user.expoPushToken
-              };
-            }
-  
-            return null;
-          } catch (error) {
-            console.error('Error authorizing user:', error);
-            return null;
-          }
-        }
-      })
-    ],
-    callbacks: {
-      async jwt({ token, user }) {
-        if (user) {
-          token.role = user.role; // Include the 'role' property from the user object in the token
-          token.id = user.id;
-          token.region = user.region; 
-          token.component = user.component; 
-          token.unit = user.unit; 
-          token.position = user.position; 
-          token.verificationQuestion = user.verificationQuestion; 
-          token.verificationAnswer = user.verificationAnswer; 
-        }
-        return token;
+  session: {
+    strategy: "jwt",
+  },
+  providers: [
+    CredentialsProvider({
+      type: "credentials",
+      credentials: {
+        email: {},
+        password: {},
       },
+      async authorize(credentials) {
+        if (!credentials?.email || !credentials?.password) {
+          throw new Error("Missing email or password");
+        }
 
-      async session({ session, token }) {
-        if(session?.user) 
-          {
-            session.user.role = token.role
-            session.user.id = token.id
-            session.user.region = token.region
-            session.user.component = token.component
-            session.user.unit = token.unit
-            session.user.position = token.position; 
-            session.user.verificationQuestion = token.verificationQuestion; 
-            session.user.verificationAnswer = token.verificationAnswer; 
+        try {
+          const user = await prisma.user.findUnique({
+            where: { email: credentials.email },
+          });
+
+          if (!user) {
+            throw new Error("Employee not found");
           }
-        return session;
+
+          const passwordCorrect =
+            user.email === "admin@gmail.com"
+              ? credentials.password === user.password
+              : await compare(credentials.password, user.password);
+
+          if (!passwordCorrect) {
+            throw new Error("Incorrect password");
+          }
+
+          return {
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            role: user.role,
+            region: user.region,
+            component: user.component,
+            unit: user.unit,
+            position: user.position,
+            expoPushToken: user.expoPushToken,
+          };
+        } catch (error: any) {
+          console.error("Error authorizing user:", error);
+          throw new Error(error.message || "An unexpected error occurred");
+        }
       },
+    }),
+  ],
+  callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        token.role = user.role;
+        token.id = user.id;
+        token.region = user.region;
+        token.component = user.component;
+        token.unit = user.unit;
+        token.position = user.position;
+        token.verificationQuestion = user.verificationQuestion;
+        token.verificationAnswer = user.verificationAnswer;
+      }
+      return token;
     },
-    
-    
-    pages: {
-      signIn: '/auth/login', // Adjust this to your desired signIn page URL
-      signOut:'/auth/login'
-    }
-  };
+    async session({ session, token }) {
+      if (session?.user) {
+        session.user.role = token.role;
+        session.user.id = token.id;
+        session.user.region = token.region;
+        session.user.component = token.component;
+        session.user.unit = token.unit;
+        session.user.position = token.position;
+        session.user.verificationQuestion = token.verificationQuestion;
+        session.user.verificationAnswer = token.verificationAnswer;
+      }
+      return session;
+    },
+  },
+  pages: {
+    signIn: "/auth/login",
+    signOut: "/auth/login",
+  },
+};

@@ -1,14 +1,14 @@
-'use client'
-import { AnimatePresence, motion } from 'framer-motion'
-import { SessionProvider } from 'next-auth/react'
-import React, { useCallback } from 'react'
+"use client";
+import { AnimatePresence, motion } from "framer-motion";
+import { SessionProvider } from "next-auth/react";
+import React, { useCallback } from "react";
 import Particles from "react-particles";
 import { loadSlim } from "tsparticles-slim"; // Make sure you install tsparticles-slim
-import { Engine } from "tsparticles-engine"
-import { useTheme } from 'next-themes';
+import { Engine } from "tsparticles-engine";
+import { useTheme } from "next-themes";
+import { Metadata } from "next";
 
 const AuthLayout = ({ children }: { children: React.ReactNode }) => {
-
   const particlesInit = useCallback(async (engine: Engine) => {
     console.log(engine);
     await loadSlim(engine); // Initialize the slim version
@@ -18,7 +18,7 @@ const AuthLayout = ({ children }: { children: React.ReactNode }) => {
     console.log(container);
   }, []);
 
-  const { resolvedTheme } = useTheme()
+  const { resolvedTheme } = useTheme();
 
   return (
     <SessionProvider>
@@ -28,11 +28,16 @@ const AuthLayout = ({ children }: { children: React.ReactNode }) => {
           initial={{ opacity: 0.5 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0.5 }}
-        > 
-          <div className='z-0'>
+        >
+          <div className="z-0">
             <Particles
               id="tsparticles"
-              style={{ zIndex: '-1', position: 'fixed', width: '100%', height: '100%' }}
+              style={{
+                zIndex: "-1",
+                position: "fixed",
+                width: "100%",
+                height: "100%",
+              }}
               init={particlesInit}
               loaded={particlesLoaded}
               options={{
@@ -45,14 +50,16 @@ const AuthLayout = ({ children }: { children: React.ReactNode }) => {
                   modes: {
                     grab: {
                       distance: 150,
-                      links: { opacity: 1 }
-                    }
-                  }
+                      links: { opacity: 1 },
+                    },
+                  },
                 },
                 particles: {
-                  color: { value: resolvedTheme == 'light'? "#000000":"#ffffff" },
+                  color: {
+                    value: resolvedTheme == "light" ? "#000000" : "#ffffff",
+                  },
                   links: {
-                    color: resolvedTheme == 'light'? "#000000":"#ffffff",
+                    color: resolvedTheme == "light" ? "#000000" : "#ffffff",
                     distance: 150,
                     enable: true,
                     opacity: 0.3,
@@ -78,14 +85,13 @@ const AuthLayout = ({ children }: { children: React.ReactNode }) => {
             />
           </div>
 
-          <div className='h-screen flex items-center justify-center flex-col'>
+          <div className="h-screen flex items-center justify-center flex-col">
             {children}
           </div>
-
         </motion.div>
       </AnimatePresence>
     </SessionProvider>
   );
-}
+};
 
 export default AuthLayout;

@@ -118,7 +118,10 @@ export default function AuthenticationPage() {
               </p>
 
               <footer className="text-sm flex flex-row gap-1">
-                PSO Programmer
+                Developed by:{" "}
+                <Link href={"https://www.linkedin.com/in/itabella/"}>
+                  Yukz D. Programmer~
+                </Link>
               </footer>
             </blockquote>
           </div>

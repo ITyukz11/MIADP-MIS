@@ -66,6 +66,7 @@ export const SiteSideBar = () => {
                   <SidebarMenuButton
                     asChild
                     isActive={pathname === link.href ? true : false}
+                    disabled={link.disable}
                   >
                     <Link
                       href={link.href}

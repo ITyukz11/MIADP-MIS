@@ -32,6 +32,7 @@ export default async function AppLayout({ children }: AppLayoutProps) {
     status: "All",
     wfpYear: "All",
     month: "All",
+    type: "All",
   };
   // console.log(
   //   "session.user.verificationAnswer:",

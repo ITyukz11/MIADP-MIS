@@ -12,11 +12,18 @@ import {
 } from "react-icons/fa";
 import { TbReportAnalytics } from "react-icons/tb";
 import { MdScreenSearchDesktop } from "react-icons/md";
+import { Construction } from "lucide-react";
 
 export const navLinks = [
-  { href: "/", text: "Home", icon: FaHome },
-  { href: "/subproject", text: "Subproject", icon: FaProjectDiagram },
-  { href: "/e-library", text: "E-Library", icon: FaBook },
+  { href: "/", text: "Home", icon: FaHome, disable: false },
+  { href: "/ad-infra", text: "AD Infra", icon: Construction, disable: true },
+  {
+    href: "/subproject",
+    text: "Subproject",
+    icon: FaProjectDiagram,
+    disable: false,
+  },
+  { href: "/e-library", text: "E-Library", icon: FaBook, disable: false },
   // { href: "/document-tracking", text: "Doctrack", icon: MdScreenSearchDesktop },
 ];
 

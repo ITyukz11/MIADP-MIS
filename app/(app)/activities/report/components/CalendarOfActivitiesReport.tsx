@@ -132,10 +132,10 @@ const CalendarOfActivitiesReport = () => {
   };
   return (
     <>
-      {/* Adjusted grid layout */}
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
+      {/* Adjusted flex layout */}
+      <div className="flex flex-wrap gap-4">
         {/* Rankings Card */}
-        <Card className="col-span-1 md:col-span-1">
+        <Card className="flex-1 lg:w-1/4 flex-shrink-0">
           <CardHeader>
             <CardTitle>
               Rankings
@@ -145,59 +145,68 @@ const CalendarOfActivitiesReport = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="w-full h-96 overflow-y-auto scrollbar-thin">
-              <ol className="space-y-3">
-                {activitiesCountLoading ? (
-                  <>
-                    {[...Array(6)].map((_, i) => (
+            <div className="w-full h-fit overflow-y-auto scrollbar-thin">
+              <ol className="space-y-1">
+                {activitiesCountLoading
+                  ? [...Array(6)].map((_, i) => (
                       <Skeleton key={i} className="h-4 w-full" />
-                    ))}
-                  </>
-                ) : (
-                  sortedActivities &&
-                  sortedActivities.map(([region, count], index) => (
-                    <React.Fragment key={index}>
-                      <li
-                        className={`flex items-center p-2 rounded-md ${
-                          index === 0
-                            ? "bg-yellow-100 border border-yellow-300"
-                            : ""
-                        }`}
-                      >
-                        <div className="flex-shrink-0 mr-3">
-                          <Image
-                            src="/miadp-logo.png"
-                            alt="region image"
-                            className="rounded-full"
-                            width={40}
-                            height={40}
-                          />
-                        </div>
-                        <div className="flex flex-col">
-                          <div className="flex items-center">
-                            <span
-                              className={`text-lg font-semibold ${
-                                index === 0 && "text-black"
-                              }`}
-                            >
-                              {region}
-                            </span>
-                            {index === 0 && (
-                              <FaCrown
-                                className="ml-2 text-yellow-500"
-                                size={24}
-                              /> // Display crown icon for the top item
-                            )}
+                    ))
+                  : sortedActivities?.map(([region, count], index) => (
+                      <React.Fragment key={index}>
+                        <li
+                          className={`flex items-center p-2 rounded-md ${
+                            index === 0
+                              ? "bg-yellow-100 border border-yellow-300"
+                              : ""
+                          }`}
+                        >
+                          <div className="flex-shrink-0 mr-3">
+                            <Image
+                              src={
+                                region == "PSO"
+                                  ? "/miadp-pso.jpg"
+                                  : region == "RPCO 9"
+                                  ? "/miadp-region-ix.jpg"
+                                  : region == "RPCO 10"
+                                  ? "/miadp-region-x.jpg"
+                                  : region == "RPCO 11"
+                                  ? "/miadp-region-xi.jpg"
+                                  : region == "RPCO 12"
+                                  ? "/miadp-region-xii.jpg"
+                                  : region == "RPCO 13"
+                                  ? "/miadp-region-xiii.jpg"
+                                  : "/miadp-barmm.jpg"
+                              }
+                              alt="region image"
+                              className="rounded-full"
+                              width={40}
+                              height={40}
+                            />
                           </div>
-                          <span className="text-sm text-gray-500 dark:text-gray-400">
-                            {count} activities
-                          </span>
-                        </div>
-                      </li>
-                      <Separator />
-                    </React.Fragment>
-                  ))
-                )}
+                          <div className="flex flex-row gap-2 items-center lg:items-start lg:flex-col lg:gap-0">
+                            <div className="flex items-center">
+                              <span
+                                className={`text-lg font-semibold ${
+                                  index === 0 && "text-black"
+                                }`}
+                              >
+                                {region}
+                              </span>
+                              {index === 0 && (
+                                <FaCrown
+                                  className="ml-2 text-yellow-500"
+                                  size={24}
+                                />
+                              )}
+                            </div>
+                            <span className="text-sm text-gray-500 dark:text-gray-400">
+                              {count} activities
+                            </span>
+                          </div>
+                        </li>
+                        <Separator />
+                      </React.Fragment>
+                    ))}
                 {activitiesCountError && (
                   <Label className="text-red-500">
                     *{activitiesCountError}
@@ -209,7 +218,7 @@ const CalendarOfActivitiesReport = () => {
         </Card>
 
         {/* Chart Card */}
-        <Card className="col-span-1 md:col-span-3 overflow-hidden">
+        <Card className="w-full lg:w-3/4">
           <CardHeader className="flex flex-col md:flex-row md:items-center md:justify-between">
             <div>
               <CardTitle>
@@ -266,7 +275,7 @@ const CalendarOfActivitiesReport = () => {
             <CardHeader>
               <CardTitle>Total activities as participants</CardTitle>
             </CardHeader>
-            <CardContent className="flex justify-center max-w-[320px] sm:max-w-screen-sm md:max-w-screen-md lg:max-w-screen-xl xl:max-w-screen-2xl">
+            <CardContent className="flex justify-center max-w-full">
               <DataTable
                 data={countParticipantActivitiesData}
                 columns={countParticipantActivityColumn}

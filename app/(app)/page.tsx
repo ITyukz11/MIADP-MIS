@@ -1,20 +1,9 @@
 "use client";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { CalendarDateRangePicker } from "@/components/dashboard/date-range-picker";
-import { Overview } from "@/components/dashboard/overview";
-import { Announcements } from "@/components/dashboard/announcements";
+
 import { Label } from "@/components/ui/label";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { FaTools } from "react-icons/fa";
-import Image from "next/image";
+
 import { TargetIcon } from "lucide-react";
 import { useActivitiesData } from "@/lib/calendar-of-activity/useActivitiesDataHook";
 import { useEffect, useState } from "react";
@@ -235,6 +224,10 @@ export default function AnnouncementsPage() {
                         <div className="flex flex-col gap-2">
                           <Skeleton className="w-full h-10" />
                           <Skeleton className="w-full h-5" />
+                        </div>
+                      ) : subprojectCountError ? (
+                        <div className="text-red-500">
+                          Error: {subprojectCountError}
                         </div>
                       ) : (
                         <>

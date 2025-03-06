@@ -18,6 +18,7 @@ import SelectFilterWFPYear from "./components/SelectFilterWFPYear";
 import SelectFilterMonth from "./components/SelectFilterMonth";
 import { IoMdHelpCircle } from "react-icons/io";
 import MIADPColorCodeDialog from "./components/Dialog/MIADPColorCode";
+import SelecterFilterType from "./components/SelecterFilterType";
 
 interface ActivitiesLayoutProps {
   children: React.ReactNode;
@@ -95,6 +96,7 @@ export default function ActivitiesLayout({ children }: ActivitiesLayoutProps) {
         <Card className="flex flex-row gap-2 w-full shadow-none">
           <CardContent className="flex items-center justify-center md:justify-start gap-2 w-full p-4 flex-wrap">
             <SelectTypeOfActivity />
+            <SelecterFilterType />
             <SelectFilterRegUniCom />
             <SelectFilterUnitComponent />
             <SelectFilterStatus />

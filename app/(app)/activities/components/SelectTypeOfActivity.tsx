@@ -20,6 +20,7 @@ function SelectTypeOfActivity({}: Props) {
   const handleTypeOfActivtyChange = (value: string) => {
     setCurrentFilter({
       region: currentFilter?.region || "",
+      type: currentFilter?.type || "",
       unit: currentFilter?.unit || "",
       typeOfActivity: value,
       status: currentFilter?.status || "",

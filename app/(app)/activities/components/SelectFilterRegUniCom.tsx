@@ -24,6 +24,7 @@ function SelectFilterRegUniCom({}: Props) {
   const handleValueChange = (value: string) => {
     setCurrentFilter({
       region: value,
+      type: currentFilter?.type || "",
       typeOfActivity: currentFilter?.typeOfActivity || "",
       unit: currentFilter?.unit || "",
       status: currentFilter?.status || "",

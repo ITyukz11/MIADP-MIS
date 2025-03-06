@@ -1,4 +1,5 @@
 import { useSelector } from "@/app/store/store";
+import { TypeData } from "@/components/calendar-of-activity/data";
 import { useCalendarOfActivityFilter } from "@/components/context/FilterRegionContext";
 import { Label } from "@/components/ui/label";
 import {
@@ -10,33 +11,32 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { monthOptions, wfpYearOptions } from "@/lib/data/filter";
 import React from "react";
 
 type Props = {};
 
-function SelectFilterMonth({}: Props) {
+function SelecterFilterType({}: Props) {
   const { activityLoading } = useSelector((state) => state.activity);
   const { currentFilter, setCurrentFilter } = useCalendarOfActivityFilter();
 
   const handleValueChange = (value: string) => {
     setCurrentFilter({
       region: currentFilter?.region || "",
-      type: currentFilter?.type || "",
+      type: value,
       typeOfActivity: currentFilter?.typeOfActivity || "",
       unit: currentFilter?.unit || "",
       status: currentFilter?.status || "",
-      month: value,
+      month: currentFilter?.month || "",
       wfpYear: currentFilter?.wfpYear || "",
     });
   };
 
   return (
     <div>
-      <Label className="font-semibold text-xs md:text-sm">Month:</Label>
+      <Label className="font-semibold text-xs md:text-sm">Type:</Label>
       <Select
         onValueChange={handleValueChange}
-        value={currentFilter?.month}
+        value={currentFilter?.type}
         disabled={activityLoading}
       >
         <SelectTrigger className="w-fit text-xs md:text-sm">
@@ -48,15 +48,15 @@ function SelectFilterMonth({}: Props) {
           </SelectItem>
           <SelectGroup>
             <SelectLabel className="text-xs md:text-sm cursor-default">
-              Months
+              Type
             </SelectLabel>
-            {monthOptions.map((option, index) => (
+            {TypeData.map((option, index) => (
               <SelectItem
                 className="text-xs md:text-sm cursor-pointer"
                 key={index}
-                value={option}
+                value={option.value}
               >
-                {option}
+                {option.label}
               </SelectItem>
             ))}
           </SelectGroup>
@@ -66,4 +66,4 @@ function SelectFilterMonth({}: Props) {
   );
 }
 
-export default SelectFilterMonth;
+export default SelecterFilterType;

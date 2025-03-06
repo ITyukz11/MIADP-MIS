@@ -22,6 +22,7 @@ function SelectFilterStatus({}: Props) {
   const handleValueChange = (value: string) => {
     setCurrentFilter({
       region: currentFilter?.region || "",
+      type: currentFilter?.type || "",
       typeOfActivity: currentFilter?.typeOfActivity || "",
       unit: currentFilter?.unit || "",
       wfpYear: currentFilter?.wfpYear || "",

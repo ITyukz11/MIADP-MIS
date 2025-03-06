@@ -1,13 +1,21 @@
-'use client'
-import React, { createContext, useState, useContext, ReactNode, FC, useEffect } from 'react';
+"use client";
+import React, {
+  createContext,
+  useState,
+  useContext,
+  ReactNode,
+  FC,
+  useEffect,
+} from "react";
 
 export interface CalendarOfActivityFilter {
   region: string;
+  type: string;
   typeOfActivity: string;
   unit: string;
-  status: string
-  month: string
-  wfpYear: string
+  status: string;
+  month: string;
+  wfpYear: string;
   // Add other filter properties if needed
 }
 
@@ -18,7 +26,9 @@ interface CalendarOfActivityFilterValue {
 }
 
 // Create the context with a default value
-const CalendarOfActivityFilterContext = createContext<CalendarOfActivityFilterValue | undefined>(undefined);
+const CalendarOfActivityFilterContext = createContext<
+  CalendarOfActivityFilterValue | undefined
+>(undefined);
 
 // Create a Provider component
 interface CalendarOfActivityFilterProviderProps {
@@ -26,17 +36,23 @@ interface CalendarOfActivityFilterProviderProps {
   initialFilter: CalendarOfActivityFilter;
 }
 
-export const CalendarOfActivityFilterProvider: FC<CalendarOfActivityFilterProviderProps> = ({ children, initialFilter }) => {
-  const [currentFilter, setCurrentFilterState] = useState<CalendarOfActivityFilter | null>(() => {
-    const storedFilter = localStorage.getItem('calendarOfActivityFilter');
-    return storedFilter ? JSON.parse(storedFilter) : initialFilter;
-  });
+export const CalendarOfActivityFilterProvider: FC<
+  CalendarOfActivityFilterProviderProps
+> = ({ children, initialFilter }) => {
+  const [currentFilter, setCurrentFilterState] =
+    useState<CalendarOfActivityFilter | null>(() => {
+      const storedFilter = localStorage.getItem("calendarOfActivityFilter");
+      return storedFilter ? JSON.parse(storedFilter) : initialFilter;
+    });
 
   useEffect(() => {
     if (currentFilter) {
-      localStorage.setItem('calendarOfActivityFilter', JSON.stringify(currentFilter));
+      localStorage.setItem(
+        "calendarOfActivityFilter",
+        JSON.stringify(currentFilter)
+      );
     } else {
-      localStorage.removeItem('calendarOfActivityFilter');
+      localStorage.removeItem("calendarOfActivityFilter");
     }
   }, [currentFilter]);
 
@@ -45,17 +61,21 @@ export const CalendarOfActivityFilterProvider: FC<CalendarOfActivityFilterProvid
   };
 
   return (
-    <CalendarOfActivityFilterContext.Provider value={{ currentFilter, setCurrentFilter }}>
+    <CalendarOfActivityFilterContext.Provider
+      value={{ currentFilter, setCurrentFilter }}
+    >
       {children}
     </CalendarOfActivityFilterContext.Provider>
   );
 };
 
-
-export const useCalendarOfActivityFilter = (): CalendarOfActivityFilterValue => {
-  const context = useContext(CalendarOfActivityFilterContext);
-  if (!context) {
-    throw new Error('useCalendarOfActivityFilter must be used within a CalendarOfActivityFilterProvider');
-  }
-  return context;
-};
+export const useCalendarOfActivityFilter =
+  (): CalendarOfActivityFilterValue => {
+    const context = useContext(CalendarOfActivityFilterContext);
+    if (!context) {
+      throw new Error(
+        "useCalendarOfActivityFilter must be used within a CalendarOfActivityFilterProvider"
+      );
+    }
+    return context;
+  };

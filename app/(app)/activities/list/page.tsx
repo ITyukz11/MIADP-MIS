@@ -39,6 +39,10 @@ const Page: React.FC = () => {
           currentFilter?.region === "All" ||
           activity.user?.region === currentFilter?.region;
 
+        const matchesActivityType =
+          currentFilter?.type === "All" ||
+          activity.type === currentFilter?.type;
+
         const matchesUnit =
           currentFilter?.unit === "All" ||
           activity.user?.unit === currentFilter?.unit ||
@@ -58,6 +62,7 @@ const Page: React.FC = () => {
 
         return (
           matchesType &&
+          matchesActivityType &&
           matchesRegion &&
           matchesUnit &&
           matchesStatus &&

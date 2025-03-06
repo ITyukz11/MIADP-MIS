@@ -31,6 +31,7 @@ import { fetchCountActivityParticipantsData } from "@/app/store/calendar-of-acti
 import { DataTable } from "@/components/table/data-table";
 import { countParticipantActivityColumn } from "@/components/table/data/activities/count-participant-activity-column";
 import ChartSwitcher, { ChartType } from "./ChartSwitcher";
+import { useActivitiesCountData } from "@/lib/calendar-of-activity/countActivities";
 
 const data = [
   { name: "PSO", C1: 5, C2: 4, C3: 4, C4: 20, amt: 34 },
@@ -45,19 +46,26 @@ const data = [
 const CalendarOfActivitiesReport = () => {
   const colors = ["#8884d8", "#82ca9d", "#ffc658", "#ff7300"]; // Colors for components
 
+  const {
+    activitiesCountData,
+    activitiesCountError,
+    activitiesCountLoading,
+    refetchActivitiesCount,
+  } = useActivitiesCountData();
+
   const dispatch = useDispatch();
-  const { countActivitiesData, countActivityLoading, countActivityError } =
-    useSelector((state) => state.countActivity);
+  // const { countActivitiesData, countActivityLoading, countActivityError } =
+  //   useSelector((state) => state.countActivity);
   const {
     countParticipantActivitiesData,
     countParticipantActivityLoading,
     countParticipantActivityError,
   } = useSelector((state) => state.countActivityParticipant);
-  useEffect(() => {
-    if (Object.keys(countActivitiesData).length === 0) {
-      dispatch(fetchCountActivitiesData());
-    }
-  }, [dispatch, countActivitiesData.length, countActivitiesData]);
+  // useEffect(() => {
+  //   if (Object.keys(countActivitiesData).length === 0) {
+  //     dispatch(fetchCountActivitiesData());
+  //   }
+  // }, [dispatch, countActivitiesData.length, countActivitiesData]);
 
   useEffect(() => {
     if (Object.keys(countParticipantActivitiesData).length === 0) {
@@ -67,24 +75,18 @@ const CalendarOfActivitiesReport = () => {
   }, [countParticipantActivitiesData, dispatch]);
 
   // Ensure the data is typed correctly
-  const sortedActivities = Object.entries(countActivitiesData).sort(
-    ([, countA]: [string, number], [, countB]: [string, number]) =>
-      countB - countA
-  );
+  const sortedActivities = activitiesCountData
+    ? Object.entries(activitiesCountData as Record<string, number>).sort(
+        ([, countA], [, countB]) => countB - countA
+      )
+    : [];
+
   const {
     componentActivityCountsData,
     componentActivityCountsLoading,
     componentActivityCountsError,
   } = useSelector((state) => state.countByComponentActivity);
-  console.log(
-    "countParticipantActivitiesData: ",
-    countParticipantActivitiesData
-  );
-  console.log(
-    "countParticipantActivityLoading: ",
-    countParticipantActivityLoading
-  );
-  console.log("countParticipantActivityError: ", countParticipantActivityError);
+
   useEffect(() => {
     if (Object.keys(componentActivityCountsData).length === 0) {
       dispatch(fetchComponentCountsData());
@@ -145,7 +147,7 @@ const CalendarOfActivitiesReport = () => {
           <CardContent>
             <div className="w-full h-96 overflow-y-auto scrollbar-thin">
               <ol className="space-y-3">
-                {countActivityLoading ? (
+                {activitiesCountLoading ? (
                   <>
                     {[...Array(6)].map((_, i) => (
                       <Skeleton key={i} className="h-4 w-full" />
@@ -196,8 +198,10 @@ const CalendarOfActivitiesReport = () => {
                     </React.Fragment>
                   ))
                 )}
-                {countActivityError && (
-                  <Label className="text-red-500">*{countActivityError}</Label>
+                {activitiesCountError && (
+                  <Label className="text-red-500">
+                    *{activitiesCountError}
+                  </Label>
                 )}
               </ol>
             </div>

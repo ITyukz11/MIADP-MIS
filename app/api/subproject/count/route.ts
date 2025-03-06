@@ -1,43 +1,54 @@
-import { PrismaClient } from '@prisma/client';
-import { NextRequest, NextResponse } from 'next/server';
+import { PrismaClient } from "@prisma/client";
+import { NextRequest, NextResponse } from "next/server";
 
 const prisma = new PrismaClient();
 
 export async function GET(request: NextRequest) {
-  // Parse the query parameter from the request URL
   const url = new URL(request.url);
-  const componentData = url.searchParams.get('component'); // Retrieve the 'component' from query parameters
+  const componentData = url.searchParams.get("component");
+
+  const today = new Date();
+  const firstDayOfCurrentMonth = new Date(
+    today.getFullYear(),
+    today.getMonth(),
+    1
+  );
+  const firstDayOfLastMonth = new Date(
+    today.getFullYear(),
+    today.getMonth() - 1,
+    1
+  );
 
   try {
-    console.log('Received Component Parameter:', componentData);
+    console.log("Received Component Parameter:", componentData);
 
-    // Debugging: Check for data matching the filter
-    if (componentData) {
-      const testQuery = await prisma.subProjectCode.findMany({
-        where: {
-          component: componentData,
-        },
-      });
-      console.log('Matching Records:', testQuery);
-    }
-
-    // Count the subproject codes, applying a filter if 'component' is provided
     const subprojectCodeCount = await prisma.subProjectCode.count({
-      where: componentData
-        ? {
-          component: {
-            equals: componentData,
-            mode: 'insensitive',
-          },
-        }
-        : undefined, // Count all if no filter
+      where: {
+        component: componentData
+          ? { equals: componentData, mode: "insensitive" }
+          : undefined,
+      },
     });
 
-    return NextResponse.json({ count: subprojectCodeCount });
+    const recentlyAddedCount = await prisma.subProjectCode.count({
+      where: {
+        AND: [
+          componentData
+            ? { component: { equals: componentData, mode: "insensitive" } }
+            : {},
+          { createdAt: { gte: firstDayOfCurrentMonth } },
+        ],
+      },
+    });
+
+    return NextResponse.json({
+      count: subprojectCodeCount,
+      recentlyAdded: recentlyAddedCount,
+    });
   } catch (error: any) {
-    console.error('Error counting subproject codes:', error);
+    console.error("Error counting subproject codes:", error);
     return NextResponse.json(
-      { message: 'Internal Server Error', error: error.message },
+      { message: "Internal Server Error", error: error.message },
       { status: 500 }
     );
   }

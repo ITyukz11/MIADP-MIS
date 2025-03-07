@@ -264,7 +264,7 @@ const CalendarOfActivitiesReport = () => {
       </div>
 
       {/* Data Table Section */}
-      <div className="mt-4">
+      {/* <div className="mt-4">
         {componentActivityCountsLoading ? (
           <div className="space-y-2 p-2">
             <Skeleton className="h-4 w-full" />
@@ -285,7 +285,7 @@ const CalendarOfActivitiesReport = () => {
             </CardContent>
           </Card>
         )}
-      </div>
+      </div> */}
     </>
   );
 };

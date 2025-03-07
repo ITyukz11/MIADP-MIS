@@ -245,7 +245,7 @@ export default function AnnouncementsPage() {
                 <CalendarOfActivitiesReport />
               </TabsContent>
             </Tabs>
-            <div className="absolute right-0 top-0 flex flex-row gap-2 items-center">
+            {/* <div className="absolute right-0 top-0 flex flex-row gap-2 items-center">
               <Label>Filter WFP Year:</Label>
               <Select
               // onValueChange={handleValueChange}
@@ -267,9 +267,9 @@ export default function AnnouncementsPage() {
                   </SelectGroup>
                 </SelectContent>
               </Select>
-            </div>
+            </div> */}
 
-            <SelectFilterWFPYear />
+            {/* <SelectFilterWFPYear /> */}
           </div>
         </div>
       </div>

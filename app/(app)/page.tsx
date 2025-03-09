@@ -245,31 +245,6 @@ export default function AnnouncementsPage() {
                 <CalendarOfActivitiesReport />
               </TabsContent>
             </Tabs>
-            {/* <div className="absolute right-0 top-0 flex flex-row gap-2 items-center">
-              <Label>Filter WFP Year:</Label>
-              <Select
-              // onValueChange={handleValueChange}
-              // value={currentFilter?.wfpYear}
-              >
-                <SelectTrigger className="w-fit">
-                  <SelectValue placeholder="All" />
-                </SelectTrigger>
-
-                <SelectContent>
-                  <SelectItem value="All">All</SelectItem>
-                  <SelectGroup>
-                    <SelectLabel>WFP Year</SelectLabel>
-                    {wfpYearOptions.map((option, index) => (
-                      <SelectItem key={index} value={option}>
-                        {option}
-                      </SelectItem>
-                    ))}
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-            </div> */}
-
-            {/* <SelectFilterWFPYear /> */}
           </div>
         </div>
       </div>

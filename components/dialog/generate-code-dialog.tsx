@@ -122,7 +122,8 @@ function GenerateCodeDialog() {
       values.type =
         codeType.find((item) => item.value === values.type)?.label ||
         values.type;
-      values.municipality = filteredMunicipality?.municipality;
+
+      values.municipality = values?.municipality;
       const ancestralDomainLoc = codeAncestralDomain.find(
         (AD) => AD.value === values.ancestralDomainLoc
       )?.label;
@@ -176,6 +177,7 @@ function GenerateCodeDialog() {
 
   console.log(form.formState.errors);
   console.log("subprojectTitle:", form.watch("subprojectTitle"));
+  console.log("form: ", form.watch("municipality"));
   return (
     <>
       <Dialog>

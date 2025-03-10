@@ -1,0 +1,8 @@
+{
+  "cron": [
+    {
+      "path": "/api/server/calendar-of-activities",
+      "schedule": "0 0 * * *"
+    }
+  ]
+}

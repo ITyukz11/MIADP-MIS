@@ -20,6 +20,8 @@ import PhilippineMap from "../(components)/PhilippineMap";
 import Image from "next/image";
 import { useSubprojectData } from "@/lib/subproject/useSuproject";
 import { useSubprojectCountData } from "@/lib/subproject/useSubprojectCount";
+import { useSubprojectInfrastructureCountData } from "@/lib/subproject/useSubprojectInfrastructureCount";
+import { useSubprojectEnterpriseCountData } from "@/lib/subproject/useSubprojectEnterpriseCount";
 
 // const PhilippineMapz = dynamic(() => import("../(components)/PhilippineMap"), { ssr:false })
 
@@ -45,6 +47,17 @@ const Page = (props: Props) => {
     subprojectCountLoading,
     refetchSubprojectCount,
   } = useSubprojectCountData();
+
+  const {
+    subprojectCountInfrastructureData,
+    subprojectCountInfrastructureLoading,
+    subprojectCountInfrastructureError,
+  } = useSubprojectInfrastructureCountData();
+  const {
+    subprojectCountEnterpriseData,
+    subprojectCountEnterpriseLoading,
+    subprojectCountEnterpriseError,
+  } = useSubprojectEnterpriseCountData();
   const {
     subprojectData,
     subprojectLoading,
@@ -68,10 +81,26 @@ const Page = (props: Props) => {
             <LuConstruction className="text-muted-foreground w-5 h-5" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">4</div>
-            <p className="text-xs text-muted-foreground">
-              +2 added from last month
-            </p>
+            {subprojectCountInfrastructureLoading ? (
+              <div className="flex flex-col gap-2">
+                <Skeleton className="w-full h-10" />
+                <Skeleton className="w-full h-5" />
+              </div>
+            ) : subprojectCountInfrastructureError ? (
+              <div className="text-red-500">
+                Error: {subprojectCountInfrastructureError}
+              </div>
+            ) : (
+              <>
+                <div className="text-2xl font-bold">
+                  {subprojectCountInfrastructureData.count}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  +{subprojectCountInfrastructureData.recentlyAdded} recently
+                  added
+                </p>
+              </>
+            )}
           </CardContent>
         </Card>
         <Card
@@ -83,10 +112,25 @@ const Page = (props: Props) => {
             <FaStore className="text-muted-foreground w-5 h-5" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">5</div>
-            <p className="text-xs text-muted-foreground">
-              +2 added from last month
-            </p>
+            {subprojectCountEnterpriseLoading ? (
+              <div className="flex flex-col gap-2">
+                <Skeleton className="w-full h-10" />
+                <Skeleton className="w-full h-5" />
+              </div>
+            ) : subprojectCountEnterpriseError ? (
+              <div className="text-red-500">
+                Error: {subprojectCountEnterpriseError}
+              </div>
+            ) : (
+              <>
+                <div className="text-2xl font-bold">
+                  {subprojectCountEnterpriseData.count}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  +{subprojectCountEnterpriseData.recentlyAdded} recently added
+                </p>
+              </>
+            )}
           </CardContent>
         </Card>
         <Card
@@ -100,9 +144,9 @@ const Page = (props: Props) => {
             <TargetIcon className="text-muted-foreground w-5 h-5" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">15%</div>
+            <div className="text-2xl font-bold">0%</div>
             <p className="text-xs text-muted-foreground">
-              +1% added from last month
+              +0% added from last month
             </p>
           </CardContent>
         </Card>

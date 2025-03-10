@@ -7,23 +7,23 @@ export async function GET(req: NextRequest) {
 
     const today = new Date().toISOString().split("T")[0]; // Get current date in YYYY-MM-DD format
 
-    // Update to "Ongoing" if today is between dateFrom and dateTo
+    // Update to "Ongoing" if today is between dateFrom and dateTo, excluding Postponed and Cancelled
     await prisma.calendarOfActivity.updateMany({
       where: {
         dateFrom: { lte: today },
         dateTo: { gte: today },
-        status: { not: "Ongoing" },
+        status: { notIn: ["Ongoing", "Postponed", "Cancelled"] },
       },
       data: { status: "Ongoing" },
     });
 
     console.log("Updated activities to Ongoing where applicable");
 
-    // Update to "Completed" if today is after dateTo
+    // Update to "Completed" if today is after dateTo, excluding Postponed and Cancelled
     await prisma.calendarOfActivity.updateMany({
       where: {
         dateTo: { lt: today },
-        status: { not: "Completed" },
+        status: { notIn: ["Completed", "Postponed", "Cancelled"] },
       },
       data: { status: "Completed" },
     });

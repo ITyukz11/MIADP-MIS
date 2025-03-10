@@ -93,7 +93,10 @@ export const columns: ColumnDef<Activity>[] = [
       <div className="flex space-x-2 items-center">
         <span className="truncate max-w-[400px] font-medium cursor-default gap-1 flex">
           <Badge className="hidden lg:block">{row.original.user?.region}</Badge>
-          <Badge className="hidden lg:block" variant={"outline"}>
+          <Badge
+            className="hidden lg:block font-medium cursor-default shadow-sm z-10 dark:text-white hover:bg-gray-600 bg-gray-600 text-white"
+            variant={"outline"}
+          >
             {row.original.user?.unit
               ? row.original.user?.unit
               : row.original.user?.component}
@@ -130,7 +133,10 @@ export const columns: ColumnDef<Activity>[] = [
     cell: ({ row }) => (
       <div className="flex space-x-2">
         <span className="max-w-[250px] truncate font-medium cursor-default">
-          <Badge variant={"secondary"}>
+          <Badge
+            // variant={variant}
+            className={`font-medium cursor-default shadow-sm z-10 dark:text-white hover:bg-gray-600 bg-gray-600`}
+          >
             {" "}
             {row.getValue("type") === "Other"
               ? `Other-${row.original.otherType}`

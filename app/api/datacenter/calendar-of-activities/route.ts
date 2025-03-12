@@ -10,10 +10,8 @@ export async function GET(req: NextRequest) {
 
   if (
     !credentials ||
-    credentials.username !==
-      process.env.NEXT_PUBLIC_BASIC_AUTH_USERNAME_DATACENTER ||
-    credentials.password !==
-      process.env.NEXT_PUBLIC_BASIC_AUTH_PASSWORD_DATACENTER
+    credentials.username !== process.env.BASIC_AUTH_USERNAME_DATACENTER ||
+    credentials.password !== process.env.BASIC_AUTH_PASSWORD_DATACENTER
   ) {
     return NextResponse.json(
       { error: "Unauthorized", message: "Invalid credentials" },

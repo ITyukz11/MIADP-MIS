@@ -31,8 +31,30 @@ export async function GET(req: NextRequest) {
   const includePreparatoryContent =
     req.nextUrl.searchParams.get("includePreparatoryContent") === "true";
 
+  const dateFrom = req.nextUrl.searchParams.get("dateFrom");
+  const dateTo = req.nextUrl.searchParams.get("dateTo");
+  const type = req.nextUrl.searchParams.get("type");
+  const WFPYear = req.nextUrl.searchParams.get("WFPYear");
+  const status = req.nextUrl.searchParams.get("status");
+  const component = req.nextUrl.searchParams.get("component");
+  const unit = req.nextUrl.searchParams.get("unit");
+  const region = req.nextUrl.searchParams.get("region");
+
   try {
     const calendarOfActivity = await prisma.calendarOfActivity.findMany({
+      where: {
+        individualActivity: false,
+        dateFrom: dateFrom ? { gte: dateFrom } : undefined,
+        dateTo: dateTo ? { lte: dateTo } : undefined,
+        type: type || undefined,
+        WFPYear: WFPYear || undefined,
+        status: status || undefined,
+        user: {
+          component: component || undefined,
+          unit: unit || undefined,
+          region: region || undefined,
+        },
+      },
       select: {
         WFPYear: true,
         activityTitle: true,
@@ -58,9 +80,9 @@ export async function GET(req: NextRequest) {
                 region: true,
               },
             }
-          : false,
-        participants: includeParticipants,
-        calendarOfActivityHistory: includeHistory,
+          : undefined,
+        participants: includeParticipants || undefined,
+        calendarOfActivityHistory: includeHistory || undefined,
         calendarOfActivityAttachment: includeAttachments
           ? {
               select: {
@@ -68,7 +90,7 @@ export async function GET(req: NextRequest) {
                 link: true,
               },
             }
-          : false,
+          : undefined,
         preparatoryList: includePreparatoryList
           ? {
               select: {
@@ -76,9 +98,8 @@ export async function GET(req: NextRequest) {
                 status: true,
               },
             }
-          : false,
+          : undefined,
       },
-
       cacheStrategy: { ttl: 3600, swr: 300 },
     });
 

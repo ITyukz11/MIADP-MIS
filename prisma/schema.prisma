@@ -346,3 +346,13 @@ model SubProjectPhoto {
   user             User           @relation(fields: [userId], references: [id])
   createdAt        DateTime       @default(now()) @map(name: "created_at")
 }
+
+model DeletionRequest {
+  id            String         @id @default(cuid())
+  email         String
+  reason        String
+  confirmation  Boolean
+  approved      Boolean        @default(false)
+  createdAt     DateTime       @default(now()) @map(name: "created_at")
+  updatedAt     DateTime       @updatedAt @map(name: "updated_at")
+}

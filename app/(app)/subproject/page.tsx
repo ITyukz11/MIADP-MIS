@@ -205,14 +205,15 @@ const Page = (props: Props) => {
           {subprojectLoading ? (
             <div className="flex flex-col gap-2">
               <Skeleton className="w-full h-10" />
-              <Skeleton className="w-full h-50" />
-              <Skeleton className="w-full h-10" />
+              <Skeleton className="h-[250px] w-full rounded-xl" />
             </div>
           ) : (
             <DataTable
               data={subprojectData}
               columns={subprojectColumn}
               allowSelectRow={false}
+              allowExportToExcel
+              tableType="subproject"
               hiddenColumns={[
                 "subprojectTitle",
                 "province",

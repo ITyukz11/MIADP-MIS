@@ -17,6 +17,7 @@ interface DataTableToolbarProps<TData> {
   selectedRows: Record<string, boolean>;
   allowDateRange: boolean;
   allowExportToExcel?: boolean;
+  tableType?: string;
 }
 
 type CSVRow = Record<string, any>;
@@ -27,6 +28,7 @@ export function DataTableToolbar<TData>({
   selectedRows,
   allowDateRange,
   allowExportToExcel,
+  tableType,
 }: DataTableToolbarProps<TData>) {
   const isFiltered = table.getState().columnFilters.length > 0;
   const [isPending, startTransition] = useTransition();
@@ -430,6 +432,148 @@ export function DataTableToolbar<TData>({
 
   // console.log("Filtered rows:", table.getFilteredRowModel().rows);
 
+  const handleExportToExcelSubproject = async () => {
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("MIADP Subproject");
+
+    try {
+      // Get visible columns and remove "action" column
+      const visibleColumns = table
+        .getAllColumns()
+        .filter(
+          (column) =>
+            column.getIsVisible() && column.id !== "action" && column.id !== "#"
+        );
+
+      // Define headers
+      const headers = ["#", ...visibleColumns.map((column) => column.id)];
+      console.log("Headers:", headers);
+
+      // Define title and date
+      const title = "MIADP Subproject";
+      const date = `Date: ${new Date().toLocaleDateString("en-US", {
+        month: "long",
+        day: "numeric",
+        year: "numeric",
+      })}`;
+
+      // Merge and style title
+      worksheet.mergeCells(
+        `A1:${String.fromCharCode(65 + headers.length - 1)}1`
+      );
+      const titleCell = worksheet.getCell("A1");
+      titleCell.value = title;
+      titleCell.font = { bold: true, size: 14 };
+      titleCell.alignment = { horizontal: "center", vertical: "middle" };
+
+      // Merge and style date
+      worksheet.mergeCells(
+        `A2:${String.fromCharCode(65 + headers.length - 1)}2`
+      );
+      const dateCell = worksheet.getCell("A2");
+      dateCell.value = date;
+      dateCell.font = { size: 12 };
+      dateCell.alignment = { horizontal: "center", vertical: "middle" };
+
+      // Add blank row for spacing
+      worksheet.addRow([]);
+
+      // Add headers to the worksheet
+      const headerRow = worksheet.addRow(headers);
+      headerRow.eachCell({ includeEmpty: true }, (cell) => {
+        cell.font = { bold: true };
+        cell.alignment = { horizontal: "center" };
+        cell.value = cell.value?.toString().toUpperCase();
+        cell.fill = {
+          type: "pattern",
+          pattern: "solid",
+          fgColor: { argb: "8DB4E2" },
+        };
+        cell.border = {
+          top: { style: "thin", color: { argb: "000000" } },
+          left: { style: "thin", color: { argb: "000000" } },
+          bottom: { style: "thin", color: { argb: "000000" } },
+          right: { style: "thin", color: { argb: "000000" } },
+        };
+      });
+
+      // Get rows and exclude "action" column
+      let rows = table.getFilteredRowModel().rows.map((row) => {
+        return visibleColumns.reduce((acc, column) => {
+          acc[column.id] = (row.original as any)[column.id] || "";
+          return acc;
+        }, {} as Record<string, any>);
+      });
+
+      // Sort rows alphabetically by "code" column (if it exists)
+      rows.sort((a: any, b: any) => {
+        const codeA: any = a.code ? new Date(a.code) : 0;
+        const codeB: any = b.code ? new Date(b.code) : 0;
+        return codeA - codeB;
+      });
+
+      // Add rows and auto-increment the first column
+      rows.forEach((data: any, index: number) => {
+        const rowValues = [
+          index + 1,
+          ...headers.slice(1).map((header) => data[header]),
+        ];
+        const row = worksheet.addRow(rowValues);
+
+        // Apply row styling without wrapping text
+        row.eachCell({ includeEmpty: true }, (cell) => {
+          cell.alignment = { vertical: "middle", horizontal: "center" }; // No wrap text
+          cell.fill = {
+            type: "pattern",
+            pattern: "solid",
+            fgColor: { argb: index % 2 === 0 ? "F2F2F2" : "DCE6F1" },
+          };
+          cell.border = {
+            top: { style: "thin", color: { argb: "000000" } },
+            left: { style: "thin", color: { argb: "000000" } },
+            bottom: { style: "thin", color: { argb: "000000" } },
+            right: { style: "thin", color: { argb: "000000" } },
+          };
+        });
+      });
+
+      // Adjust column width dynamically based on content
+      worksheet.columns.forEach((column, index) => {
+        let maxLength = headers[index]?.length || 10; // Start with header length
+        rows.forEach((row) => {
+          const cellValue = row[headers[index]]
+            ? row[headers[index]].toString()
+            : "";
+          maxLength = Math.max(maxLength, cellValue.length);
+        });
+        column.width = maxLength + 2; // Adjust width
+      });
+
+      // Set page setup for printing
+      worksheet.pageSetup = {
+        paperSize: 9, // A4
+        orientation: "landscape",
+        fitToPage: true,
+        fitToWidth: 1,
+        fitToHeight: 0,
+      };
+
+      // Generate Excel file and trigger download
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "MIADP Subproject.xlsx";
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Error generating Excel file:", error);
+    }
+  };
+  console.log("tableType: ", tableType);
   return (
     <div className="flex items-center justify-between flex-wrap overflow-x-auto px-1">
       <div className="flex flex-1 items-center gap-2 py-1 flex-wrap justify-start">
@@ -446,7 +590,13 @@ export function DataTableToolbar<TData>({
           <Button
             variant="outline"
             className="flex flex-row items-center justify-center text-xs md:text-sm"
-            onClick={handleExportToExcel}
+            onClick={
+              tableType === "subproject"
+                ? handleExportToExcelSubproject
+                : tableType === "activities"
+                ? handleExportToExcel
+                : undefined // Instead of null
+            }
           >
             <AiOutlineExport className="w-4 h-4 shrink-0" />
             <span className="md:block hidden md:text-xs lg:text-sm">

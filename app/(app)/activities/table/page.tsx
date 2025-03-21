@@ -126,6 +126,7 @@ const Page = () => {
               onViewRowId={handleViewRowIdPressed}
               setAllowViewCalendar={() => setViewCalendar(!viewCalendar)}
               allowDateRange={false}
+              tableType="activities"
               allowExportToExcel
             />
           </CardContent>

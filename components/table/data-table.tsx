@@ -37,6 +37,7 @@ interface DataTableProps<TData, TValue> {
   onViewRowId?: (id: string) => void;
   allowDateRange?: boolean;
   allowExportToExcel?: boolean;
+  tableType?: string;
 }
 
 export function DataTable<TData extends { id: string }, TValue>({
@@ -50,6 +51,7 @@ export function DataTable<TData extends { id: string }, TValue>({
   onViewRowId,
   allowDateRange = false,
   allowExportToExcel = false,
+  tableType,
 }: DataTableProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = React.useState<
     Record<string, boolean>
@@ -174,6 +176,7 @@ export function DataTable<TData extends { id: string }, TValue>({
         selectedRows={rowSelection}
         allowDateRange={allowDateRange}
         allowExportToExcel={allowExportToExcel}
+        tableType={tableType}
       />
       <div className="rounded-md border grid overflow-auto">
         <div className="min-w-0">

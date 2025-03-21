@@ -67,6 +67,7 @@ import { userAgent } from "next/server";
 import FormFieldWrapper from "@/components/FormFieldWrapper";
 import { useActivitiesData } from "@/lib/calendar-of-activity/useActivitiesDataHook";
 import { useSession } from "next-auth/react";
+import { sendBulkEmail } from "@/actions/send-bulk-email";
 
 export const QuillEditor = dynamic(() => import("react-quill"), { ssr: false });
 
@@ -232,151 +233,309 @@ const CalendarForm = ({ setDialogClose, individualActivity_ }: Props) => {
     name: "calendarOfActivityAttachment",
   });
 
+  // const onSubmit = async (values: z.infer<typeof CalendarOfActivitySchema>) => {
+  //   const today = new Date();
+  //   const todayFormatted = new Date(
+  //     today.getFullYear(),
+  //     today.getMonth(),
+  //     today.getDate()
+  //   );
+  //   let status = "Upcoming";
+  //   if (values.dateFrom) {
+  //     // Convert dateFrom to local timezone
+  //     const localDateFrom = new Date(values.dateFrom);
+  //     // Adjust localDateFrom to match only the date (without time)
+  //     const localDateFromFormatted = new Date(
+  //       localDateFrom.getFullYear(),
+  //       localDateFrom.getMonth(),
+  //       localDateFrom.getDate()
+  //     );
+
+  //     // Compare localDateFromFormatted with todayFormatted
+  //     if (localDateFromFormatted.getTime() <= todayFormatted.getTime()) {
+  //       status = "Ongoing";
+  //     }
+  //   }
+
+  //   if (!navigator.onLine) {
+  //     // Alert the user that there is no internet connection
+  //     alert(
+  //       "No internet connection. Please check your network connection and try again."
+  //     );
+  //     return;
+  //   }
+
+  //   let participantError = false;
+  //   let preparatoryError = false;
+  //   let scheduleError = false;
+  //   let dateToError = false;
+
+  //   if (!allDayChecked) {
+  //     if (!values.timeStart || !values.timeEnd) {
+  //       scheduleError = true;
+  //     } else {
+  //       setScheduleError(false);
+  //       scheduleError = false;
+  //     }
+  //   }
+
+  //   if (allDayChecked) {
+  //     if (values.dateFrom == values.dateTo) {
+  //       dateToError = true;
+  //     } else {
+  //       dateToError = false;
+  //       setDateToError(false);
+  //     }
+  //   }
+
+  //   if (scheduleError) {
+  //     setScheduleError(true);
+  //     return;
+  //   } else {
+  //     setScheduleError(false);
+  //   }
+
+  //   if (dateToError) {
+  //     setDateToError(true);
+  //     return;
+  //   }
+
+  //   if (participantError) {
+  //     setParticipantError(true);
+  //     return;
+  //   } else {
+  //     setParticipantError(false);
+  //   }
+  //   const isValid = validatePreparatoryList();
+  //   if (
+  //     (!form.watch("listMode") && !watch("preparatoryContent")) ||
+  //     (form.watch("listMode") && !isValid)
+  //   ) {
+  //     setPreparatoryContentError(true);
+  //     return;
+  //   } else {
+  //     setPreparatoryContentError(false);
+  //   }
+
+  //   values.status = status;
+  //   (values.dateFrom = values.dateFrom.split("T")[0]),
+  //     (values.dateTo = values.dateTo.split("T")[0]),
+  //     setError("");
+  //   setSuccess("");
+  //   startTransition(() => {
+  //     setLoadingForm(true);
+  //     calendarOfActivity(values).then((data) => {
+  //       setError(data.error);
+  //       setSuccess(data.success);
+  //       setTimeout(async () => {
+  //         if (!data.error) {
+  //           try {
+  //             // currentUser?.user.expoPushToken &&
+  //             //   sendPushNotificationToMobileUser(
+  //             //     currentUser?.user.expoPushToken,
+  //             //     `New activity by ${currentUser?.name}`,
+  //             //     `${currentUser?.user.component} | ${currentUser?.user.unit} - ${
+  //             //       values.activityTitle
+  //             //     }\n${values.activityDescription}\n${formatDate(
+  //             //       values.dateFrom as any
+  //             //     )} - ${formatDate(values.dateTo as any)}`
+  //             //   );
+  //             try {
+  //               // Extract emails from usersData based on selected participants
+  //               const selectedParticipants = form.watch("participants") || [];
+
+  //               const emails = usersData
+  //                 .filter((user) =>
+  //                   selectedParticipants.some(
+  //                     (participant) => participant.userId === user.id
+  //                   )
+  //                 )
+  //                 .map((user) => user.email); // Ensure you extract the email field
+
+  //               if (emails.length === 0) {
+  //                 toast({
+  //                   title: "No recipients found",
+  //                   description: "Please select participants with valid emails.",
+  //                   variant: "destructive",
+  //                 });
+  //                 return;
+  //               }
+
+  //               // Send email request
+  //               const response = await sendBulkEmail({
+  //                 to: emails, // Now correctly passing an array of emails
+  //                 subject: values.activityTitle,
+  //                 text: `From: ${values.dateFrom} To: ${values.dateTo}\n
+  //                 Description: ${values.activityDescription}\n
+  //                 Type: ${values.type}\n
+  //                 Location: ${values.location}\n
+  //                 Target Participants: ${values.targetParticipant}\n`,
+  //                 // attachment: selectedFile, // Optional file from input
+  //               });
+
+  //               // Handle response
+  //               if (response.success) {
+  //                 toast({
+  //                   title: "Success",
+  //                   description: response.success,
+  //                 });
+  //               } else {
+  //                 toast({
+  //                   title: "Error",
+  //                   description: response.error || "Failed to send emails.",
+  //                   variant: "destructive",
+  //                 });
+  //               }
+  //             } catch (error) {
+  //               toast({
+  //                 title: "Unexpected Error",
+  //                 description:
+  //                   error instanceof Error ? error.message : "Something went wrong.",
+  //                 variant: "destructive",
+  //               });
+  //             }
+
+  //             toast({
+  //               title: "Success",
+  //               description:
+  //                 "Your calendar of activity has been encoded to the server",
+  //               duration: 10000,
+  //               action: (
+  //                 <ToastAction altText="Goto schedule to undo">Ok</ToastAction>
+  //               ),
+  //             });
+
+  //             // dispatch(fetchActivitiesData())
+  //           } catch (error) {
+  //             console.error("Error submitting calendar activity:", error);
+
+  //             // Display an error toast notification
+  //             toast({
+  //               title: "Error",
+  //               description:
+  //                 "An unexpected error occurred while sending notification.",
+  //               variant: "destructive",
+  //               duration: 10000,
+  //               action: <ToastAction altText="Error toast">Ok</ToastAction>,
+  //             });
+  //           } finally {
+  //             if (!activityLoading) {
+  //               refetchActivities();
+  //               setDialogClose();
+  //               setLoadingForm(false);
+  //             }
+  //           }
+  //         }
+  //         setLoadingForm(false);
+  //       }, 2000); // Delay for 2 seconds
+  //     });
+  //   });
+  // };
+  console.log("form error: ", form.formState.errors);
   const onSubmit = async (values: z.infer<typeof CalendarOfActivitySchema>) => {
-    const today = new Date();
-    const todayFormatted = new Date(
-      today.getFullYear(),
-      today.getMonth(),
-      today.getDate()
-    );
-    let status = "Upcoming";
-    if (values.dateFrom) {
-      // Convert dateFrom to local timezone
+    try {
+      if (!navigator.onLine) {
+        toast({
+          title: "No Internet Connection",
+          description: "Please check your network and try again.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Format today's date without time for accurate comparison
+      const today = new Date();
+      const todayFormatted = new Date(
+        today.getFullYear(),
+        today.getMonth(),
+        today.getDate()
+      );
+
+      // Format dateFrom properly
       const localDateFrom = new Date(values.dateFrom);
-      // Adjust localDateFrom to match only the date (without time)
       const localDateFromFormatted = new Date(
         localDateFrom.getFullYear(),
         localDateFrom.getMonth(),
         localDateFrom.getDate()
       );
 
-      // Compare localDateFromFormatted with todayFormatted
-      if (localDateFromFormatted.getTime() <= todayFormatted.getTime()) {
-        status = "Ongoing";
-      }
-    }
+      let status =
+        localDateFromFormatted.getTime() <= todayFormatted.getTime()
+          ? "Ongoing"
+          : "Upcoming";
 
-    if (!navigator.onLine) {
-      // Alert the user that there is no internet connection
-      alert(
-        "No internet connection. Please check your network connection and try again."
-      );
-      return;
-    }
-
-    let participantError = false;
-    let preparatoryError = false;
-    let scheduleError = false;
-    let dateToError = false;
-
-    if (!allDayChecked) {
-      if (!values.timeStart || !values.timeEnd) {
-        scheduleError = true;
+      // Validate time inputs
+      if (!allDayChecked && (!values.timeStart || !values.timeEnd)) {
+        setScheduleError(true);
+        return;
       } else {
         setScheduleError(false);
-        scheduleError = false;
       }
-    }
 
-    if (allDayChecked) {
-      if (values.dateFrom == values.dateTo) {
-        dateToError = true;
+      // Validate date range for all-day events
+      if (allDayChecked && values.dateFrom === values.dateTo) {
+        setDateToError(true);
+        return;
       } else {
-        dateToError = false;
         setDateToError(false);
       }
-    }
 
-    if (scheduleError) {
-      setScheduleError(true);
-      return;
-    } else {
-      setScheduleError(false);
-    }
+      // Validate preparatory list
+      const isValidPreparatory = validatePreparatoryList();
+      if (
+        (!form.watch("listMode") && !watch("preparatoryContent")) ||
+        (form.watch("listMode") && !isValidPreparatory)
+      ) {
+        setPreparatoryContentError(true);
+        return;
+      } else {
+        setPreparatoryContentError(false);
+      }
 
-    if (dateToError) {
-      setDateToError(true);
-      return;
-    }
+      // Finalizing values before submission
+      values.status = status;
+      values.dateFrom = new Date(values.dateFrom).toISOString().split("T")[0];
+      values.dateTo = new Date(values.dateTo).toISOString().split("T")[0];
 
-    if (participantError) {
-      setParticipantError(true);
-      return;
-    } else {
-      setParticipantError(false);
-    }
-    const isValid = validatePreparatoryList();
-    if (
-      (!form.watch("listMode") && !watch("preparatoryContent")) ||
-      (form.watch("listMode") && !isValid)
-    ) {
-      setPreparatoryContentError(true);
-      return;
-    } else {
-      setPreparatoryContentError(false);
-    }
-
-    values.status = status;
-    (values.dateFrom = values.dateFrom.split("T")[0]),
-      (values.dateTo = values.dateTo.split("T")[0]),
-      setError("");
-    setSuccess("");
-    startTransition(() => {
       setLoadingForm(true);
-      calendarOfActivity(values).then((data) => {
+      setError("");
+      setSuccess("");
+
+      const data = await calendarOfActivity(values);
+
+      if (data.error) {
         setError(data.error);
-        setSuccess(data.success);
-        setTimeout(() => {
-          if (!data.error) {
-            try {
-              // currentUser?.user.expoPushToken &&
-              //   sendPushNotificationToMobileUser(
-              //     currentUser?.user.expoPushToken,
-              //     `New activity by ${currentUser?.name}`,
-              //     `${currentUser?.user.component} | ${currentUser?.user.unit} - ${
-              //       values.activityTitle
-              //     }\n${values.activityDescription}\n${formatDate(
-              //       values.dateFrom as any
-              //     )} - ${formatDate(values.dateTo as any)}`
-              //   );
+        setLoadingForm(false);
+        return;
+      }
 
-              toast({
-                title: "Success",
-                description:
-                  "Your calendar of activity has been encoded to the server",
-                duration: 10000,
-                action: (
-                  <ToastAction altText="Goto schedule to undo">Ok</ToastAction>
-                ),
-              });
+      setSuccess(data.success);
 
-              // dispatch(fetchActivitiesData())
-            } catch (error) {
-              console.error("Error submitting calendar activity:", error);
+      // Send Email Notification
+      await sendEmailNotification(values);
 
-              // Display an error toast notification
-              toast({
-                title: "Error",
-                description:
-                  "An unexpected error occurred while sending notification.",
-                variant: "destructive",
-                duration: 10000,
-                action: <ToastAction altText="Error toast">Ok</ToastAction>,
-              });
-            } finally {
-              if (!activityLoading) {
-                refetchActivities();
-                setDialogClose();
-                setLoadingForm(false);
-              }
-            }
-          }
-          setLoadingForm(false);
-        }, 2000); // Delay for 2 seconds
+      toast({
+        title: "Success",
+        description: "Your calendar of activity has been recorded.",
+        duration: 10000,
+        action: <ToastAction altText="Go to schedule">Ok</ToastAction>,
       });
-    });
+
+      refetchActivities();
+      setDialogClose();
+    } catch (error) {
+      console.error("Error submitting calendar activity:", error);
+      toast({
+        title: "Submission Failed",
+        description: "An unexpected error occurred.",
+        variant: "destructive",
+        duration: 10000,
+        action: <ToastAction altText="Error toast">Ok</ToastAction>,
+      });
+    } finally {
+      setLoadingForm(false);
+    }
   };
-  console.log("form error: ", form.formState.errors);
 
   // Function to send a push notification
   const sendPushNotificationToMobileUser = async (
@@ -500,6 +659,86 @@ const CalendarForm = ({ setDialogClose, individualActivity_ }: Props) => {
     ]);
     form.setValue("preparatoryContent", "");
   };
+
+  const sendEmailNotification = async (
+    values: z.infer<typeof CalendarOfActivitySchema>
+  ) => {
+    try {
+      const selectedParticipants = form.watch("participants") || [];
+      const emails = usersData
+        .filter((user) =>
+          selectedParticipants.some(
+            (participant) => participant.userId === user.id
+          )
+        )
+        .map((user) => user.email);
+
+      if (emails.length === 0) {
+        toast({
+          title: "No Recipients Found",
+          description: "Please select participants with valid emails.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const response = await sendBulkEmail({
+        to: emails,
+        subject: `Upcoming Activity: ${values.activityTitle}`,
+        text: `Dear Team, 
+      
+We are pleased to inform you that you are one of the participants for an upcoming activity. Below are the details:
+
+📅 DATE: ${
+          values.dateFrom === values.dateTo
+            ? `${values.dateFrom}${
+                values.timeStart && values.timeEnd
+                  ? ` (${values.timeStart} - ${values.timeEnd})`
+                  : ""
+              }`
+            : `${values.dateFrom} to ${values.dateTo}`
+        }
+📆 WFP YEAR: ${values.WFPYear}  
+📍 LOCATION: ${values.location}  
+📝 ACTIVITY TITLE: ${values.activityTitle}  
+📌 TYPE: ${values.type} ${values.otherType ? `- ${values.otherType}` : ""}  
+🎯 TARGET PARTICIPANTS: ${values.targetParticipant}  
+📊 STATUS: ${values.status}  
+📄 DESCRIPTION:  
+${values.activityDescription}  
+
+Please mark your calendar accordingly. If you have any questions or require further information, feel free to reach out.  
+
+You can also visit the web application for more details:  
+🔗 [MIADP Portal - Calendar of Activities](https://miadp-mis.vercel.app/activities/table)  
+
+Best regards,  
+MIADP Portal - Calendar of Activities  
+`,
+      });
+
+      if (response.success) {
+        toast({
+          title: "Email Sent Successfully",
+          description: response.success,
+        });
+      } else {
+        toast({
+          title: "Email Failed",
+          description: response.error || "Unable to send emails.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Unexpected Error",
+        description:
+          error instanceof Error ? error.message : "Something went wrong.",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <Form {...form}>
       <form

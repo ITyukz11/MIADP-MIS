@@ -9,6 +9,8 @@ import { Label } from "@/components/ui/label";
 import { useActivitiesData } from "@/lib/calendar-of-activity/useActivitiesDataHook";
 import { Card, CardContent } from "@/components/ui/card";
 import { getMonth } from "@/utils/dateFormat";
+import { sendBulkEmail } from "@/actions/send-bulk-email";
+import { Button } from "@/components/ui/button";
 
 const Page = () => {
   const [coaData, setCoaData] = useState<any[]>([]);

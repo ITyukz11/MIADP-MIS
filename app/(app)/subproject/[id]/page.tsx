@@ -1,11 +1,14 @@
-import React from 'react'
+import React from "react";
 
-type Props = {}
+type Props = {};
 
 function Page({}: Props) {
   return (
-    <div>Subproject ID page</div>
-  )
+    <div>
+      Apologies, this feature has been discontinued as the MIADP Data Center
+      will integrate it into the RBME to avoid redundancy.
+    </div>
+  );
 }
 
-export default Page
+export default Page;

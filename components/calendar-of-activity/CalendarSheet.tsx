@@ -58,6 +58,7 @@ import { LoadingSpinner } from "../LoadingSpinner";
 import { formatDateLong } from "@/utils/dateFormat";
 import { truncateText } from "@/utils/truncateText";
 import { useSession } from "next-auth/react";
+import { useActivitiesData } from "@/lib/calendar-of-activity/useActivitiesDataHook";
 
 interface CalendarSheetProps {
   activityData: any[];
@@ -78,6 +79,7 @@ export function CalendarSheet({
   const [contentDialogTitle, setContentDialogTitle] = useState<string>("");
   const [contentData, setContentData] = useState<string>("");
 
+  const { refetchActivities } = useActivitiesData();
   const dispatch = useDispatch();
   const { usersData, loadingUser, errorUser } = useSelector(
     (state) => state.users
@@ -250,7 +252,8 @@ ${formattedPreparatoryList}`;
         action: <ToastAction altText="Ok">Ok</ToastAction>,
       });
 
-      dispatch(fetchActivitiesData());
+      // dispatch(fetchActivitiesData());
+      refetchActivities();
     } else {
       toast({
         title: "Error",

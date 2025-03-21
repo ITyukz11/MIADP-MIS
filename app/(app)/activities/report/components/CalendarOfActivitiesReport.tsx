@@ -149,7 +149,7 @@ const CalendarOfActivitiesReport = () => {
               <ol className="space-y-1">
                 {activitiesCountLoading
                   ? [...Array(6)].map((_, i) => (
-                      <Skeleton key={i} className="h-4 w-full" />
+                      <Skeleton key={i} className="h-16 w-full" />
                     ))
                   : sortedActivities?.map(([region, count], index) => (
                       <React.Fragment key={index}>

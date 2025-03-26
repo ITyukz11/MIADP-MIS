@@ -13,6 +13,9 @@ import {
 import { TbReportAnalytics } from "react-icons/tb";
 import { MdScreenSearchDesktop } from "react-icons/md";
 import { Construction } from "lucide-react";
+import { TbReportSearch } from "react-icons/tb";
+import { FaPeopleRoof } from "react-icons/fa6";
+import { GiProgression } from "react-icons/gi";
 
 export const navLinks = [
   { href: "/", text: "Home", icon: FaHome, disable: false },
@@ -30,6 +33,13 @@ export const navLinks = [
 export const managementLinks = [
   { href: "/admin/account", text: "Users", icon: FaUsers },
   { href: "/admin/generate-code", text: "Subproject", icon: FaCode },
+];
+
+export const adPlanLinks = [
+  { href: "/ad-plan/ad-profile", text: "AD Profile", icon: FaPeopleRoof },
+  { href: "/ad-plan/adaif", text: "ADAIF", icon: GiProgression },
+  { href: "/ad-plan/table-8-tracker", text: "Table 8", icon: TbReportSearch },
+  // { href: "/activities/report", text: "Report", icon: TbReportAnalytics },
 ];
 
 export const activityLinks = [

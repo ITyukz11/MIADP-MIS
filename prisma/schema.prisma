@@ -356,3 +356,19 @@ model DeletionRequest {
   createdAt     DateTime       @default(now()) @map(name: "created_at")
   updatedAt     DateTime       @updatedAt @map(name: "updated_at")
 }
+
+model Table8Tracker {
+  id             String  @id @default(uuid())
+  region         String
+  lgu            String
+  ancestralDomain String
+  commodities    String
+  infraEntrep    String
+  subproject     String
+  typeOfSP       String
+  location       String
+  validated      Boolean
+  conceptNote    Boolean
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}

@@ -44,6 +44,7 @@ export default async function AppLayout({ children }: AppLayoutProps) {
     month: ["All"],
     type: ["All"],
   };
+
   // console.log(
   //   "session.user.verificationAnswer:",
   //   session.user.verificationAnswer

@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useCalendarOfActivityMultiFilter } from "@/components/context/MultiFilterActivitiesContext";
 import { Label } from "@/components/ui/label";
-import { unitOptions } from "@/lib/data/filter";
+import { componentOptions, unitOptions } from "@/lib/data/filter";
 import { CaretSortIcon } from "@radix-ui/react-icons";
 
 function MultiSelectFilterUnit() {
@@ -69,6 +69,16 @@ function MultiSelectFilterUnit() {
           >
             All
           </DropdownMenuCheckboxItem>
+          {componentOptions.map((option) => (
+            <DropdownMenuCheckboxItem
+              key={option}
+              checked={selectedUnits.includes(option)}
+              onCheckedChange={(checked) => handleTypeChange(option, checked)}
+              onSelect={(e) => e.preventDefault()} // Prevent closing when selecting
+            >
+              {option}
+            </DropdownMenuCheckboxItem>
+          ))}
           {unitOptions.map((option) => (
             <DropdownMenuCheckboxItem
               key={option.value}

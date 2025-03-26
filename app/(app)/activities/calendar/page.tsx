@@ -27,6 +27,7 @@ import dayjs from "dayjs";
 import MajorOrIndividualDialog from "../major-or-individual-dialog";
 import { useCalendarOfActivityFilter } from "@/components/context/FilterRegionContext";
 import { useActivitiesData } from "@/lib/calendar-of-activity/useActivitiesDataHook";
+import { useCalendarOfActivityMultiFilter } from "@/components/context/MultiFilterActivitiesContext";
 
 interface Event {
   id: string;
@@ -59,7 +60,7 @@ const page = () => {
   const { activitiesData, activityError, activityLoading } =
     useActivitiesData();
 
-  const { currentFilter } = useCalendarOfActivityFilter();
+  const { currentMultiFilter } = useCalendarOfActivityMultiFilter();
 
   const [filteredData, setFilteredData] = useState<Event[]>([]);
 
@@ -144,10 +145,14 @@ const page = () => {
           const filteredActivities =
             activitiesData &&
             activitiesData.filter((activity: any) => {
-              if (currentFilter?.typeOfActivity === "WFP Activities") {
+              if (
+                currentMultiFilter?.typeOfActivity.includes("WFP Activities")
+              ) {
                 return !activity.individualActivity; // Only WFP Activities
               } else if (
-                currentFilter?.typeOfActivity === "Individual Activities"
+                currentMultiFilter?.typeOfActivity.includes(
+                  "Individual Activities"
+                )
               ) {
                 return activity.individualActivity; // Only Individual Activities
               }
@@ -192,10 +197,10 @@ const page = () => {
       }
     };
     fetchData();
-  }, [activitiesData, activityLoading, currentFilter]);
+  }, [activitiesData, activityLoading, currentMultiFilter]);
 
   useEffect(() => {
-    if (currentFilter?.region === "All") {
+    if (currentMultiFilter?.region.includes("All")) {
       setFilteredData(filteredCoaData);
 
       const filteredUpcomingData = filteredCoaData
@@ -212,12 +217,12 @@ const page = () => {
       const filteredActivities =
         activitiesData &&
         activitiesData.filter((activity: any) => {
-          if (currentFilter?.typeOfActivity === "WFP Activities") {
+          if (currentMultiFilter?.typeOfActivity.includes("WFP Activities")) {
             return !activity.individualActivity; // Only WFP Activities
           } else if (
-            currentFilter?.typeOfActivity === "Individual Activities"
+            currentMultiFilter?.typeOfActivity.includes("Individual Activities")
           ) {
-            return activity.individualActivity; // Only Individual Activities
+            return activity; // Only Individual Activities
           }
           return true; // If no specific type is selected, include all activities
         });
@@ -232,9 +237,13 @@ const page = () => {
               unit: string | undefined;
             };
           }) =>
-            item.user?.region === currentFilter?.region ||
-            item.user?.component === currentFilter?.region ||
-            item.user?.unit === currentFilter?.region
+            !currentMultiFilter?.region?.length || // If no filter is applied, allow all
+            (item.user?.region &&
+              currentMultiFilter.region.includes(item.user.region)) ||
+            (item.user?.component &&
+              currentMultiFilter.region.includes(item.user.component)) ||
+            (item.user?.unit &&
+              currentMultiFilter.region.includes(item.user.unit))
         );
 
       const formattedData =
@@ -271,7 +280,7 @@ const page = () => {
       setFilteredUpcomingEvents(filteredUpcomingData);
       setFilteredOnGoingEvents(filteredOnGoingEvents);
     }
-  }, [currentFilter, filteredCoaData]);
+  }, [currentMultiFilter, filteredCoaData]);
 
   const handleEventClick = (info: any) => {
     const activity = activitiesData.filter(

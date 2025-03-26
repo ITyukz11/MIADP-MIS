@@ -19,6 +19,20 @@ import SelectFilterMonth from "./components/SelectFilterMonth";
 import { IoMdHelpCircle } from "react-icons/io";
 import MIADPColorCodeDialog from "./components/Dialog/MIADPColorCode";
 import SelecterFilterType from "./components/SelecterFilterType";
+import SelectFilterTest from "./components/MultiSelectFilterMonth";
+import SelecterFilterTypeTest from "./components/MultiSelectFilterType";
+import SelectFilterTypeTest from "./components/MultiSelectFilterType";
+import SelectFilterRegionTest from "./components/MultiSelectFilterRegion";
+import SelectFilterUnitTest from "./components/MultiSelectFilterUnit";
+import SelectFilterStatusTest from "./components/MultiSelectFilterStatus";
+import SelectFilterWFPYearTest from "./components/MultiSelectFilterWFPYear";
+import MultiSelectFilterMonth from "./components/MultiSelectFilterMonth";
+import MultiSelectFilterRegion from "./components/MultiSelectFilterRegion";
+import MultiSelectFilterStatus from "./components/MultiSelectFilterStatus";
+import MultiSelectFilterType from "./components/MultiSelectFilterType";
+import MultiSelectFilterUnit from "./components/MultiSelectFilterUnit";
+import MultiSelectFilterWFPYear from "./components/MultiSelectFilterWFPYear";
+import MultiSelectTypeOfActivity from "./components/MultiSelectTypeOfActivity";
 
 interface ActivitiesLayoutProps {
   children: React.ReactNode;
@@ -95,13 +109,27 @@ export default function ActivitiesLayout({ children }: ActivitiesLayoutProps) {
       <div className="flex flex-row flex-wrap gap-2">
         <Card className="flex flex-row gap-2 w-full shadow-none">
           <CardContent className="flex items-center justify-center md:justify-start gap-2 w-full p-4 flex-wrap">
-            <SelectTypeOfActivity />
-            <SelecterFilterType />
-            <SelectFilterRegUniCom />
-            <SelectFilterUnitComponent />
-            <SelectFilterStatus />
-            <SelectFilterMonth />
-            <SelectFilterWFPYear />
+            {/* <SelectTypeOfActivity /> */}
+            <MultiSelectTypeOfActivity />
+
+            {/* <SelecterFilterType /> */}
+            <MultiSelectFilterType />
+
+            {/* <SelectFilterRegUniCom /> */}
+            <MultiSelectFilterRegion />
+
+            {/* <SelectFilterUnitComponent /> */}
+            <MultiSelectFilterUnit />
+
+            {/* <SelectFilterStatus /> */}
+            <MultiSelectFilterStatus />
+
+            {/* <SelectFilterWFPYear /> */}
+            <MultiSelectFilterWFPYear />
+
+            {/* <SelectFilterMonth /> */}
+            <MultiSelectFilterMonth />
+
             <div className="flex flex-row gap-2 md:ml-auto">
               <Button
                 onClick={handleRefresh}

@@ -13,11 +13,12 @@ import { useActivitiesData } from "@/lib/calendar-of-activity/useActivitiesDataH
 import { getStatusColor } from "@/components/table/data/activities/coa-columns";
 import { Activity } from "@/types/calendar-of-activity/calendar-of-activity";
 import { CalendarSheet } from "@/components/calendar-of-activity/CalendarSheet";
+import { useCalendarOfActivityMultiFilter } from "@/components/context/MultiFilterActivitiesContext";
 
 const Page: React.FC = () => {
   const { activitiesData, activityError, activityLoading } =
     useActivitiesData();
-  const { currentFilter } = useCalendarOfActivityFilter();
+  const { currentMultiFilter } = useCalendarOfActivityMultiFilter();
   const [filteredData, setFilteredData] = useState<Activity[]>([]);
   const [itemsToShow, setItemsToShow] = useState(5);
 
@@ -26,39 +27,77 @@ const Page: React.FC = () => {
 
   // Helper function to apply all filters
   const applyFilters = useMemo(() => {
-    return (data: Activity[]) => {
+    return (data: any[]) => {
       return data.filter((activity) => {
+        // const matchesType =
+        //   currentFilter?.typeOfActivity === "WFP Activities"
+        //     ? !activity.individualActivity
+        //     : currentFilter?.typeOfActivity === "Individual Activities"
+        //     ? activity.individualActivity
+        //     : true;
         const matchesType =
-          currentFilter?.typeOfActivity === "WFP Activities"
-            ? !activity.individualActivity
-            : currentFilter?.typeOfActivity === "Individual Activities"
-            ? activity.individualActivity
-            : true;
+          currentMultiFilter?.typeOfActivity?.includes("All") ||
+          (currentMultiFilter?.typeOfActivity?.includes("WFP Activities") &&
+            !activity.individualActivity) ||
+          (currentMultiFilter?.typeOfActivity?.includes(
+            "Individual Activities"
+          ) &&
+            activity.individualActivity);
+
+        // const matchesRegion =
+        //   currentFilter?.region === "All" ||
+        //   activity.user?.region === currentFilter?.region;
 
         const matchesRegion =
-          currentFilter?.region === "All" ||
-          activity.user?.region === currentFilter?.region;
+          !currentMultiFilter?.region || // If no filter is applied, show all
+          currentMultiFilter.region.includes("All") || // If "All" is selected, show all
+          (Array.isArray(currentMultiFilter.region) &&
+            currentMultiFilter.region.includes(activity.user?.region || ""));
 
+        // const matchesActivityType =
+        //   currentFilter?.type === "All" ||
+        //   activity.type === currentFilter?.type;
         const matchesActivityType =
-          currentFilter?.type === "All" ||
-          activity.type === currentFilter?.type;
+          currentMultiFilter?.type?.includes("All") ||
+          currentMultiFilter?.type?.includes(activity.type);
 
+        // const matchesUnit =
+        //   currentFilter?.unit === "All" ||
+        //   activity.user?.unit === currentFilter?.unit ||
+        //   activity.user?.component === currentFilter?.unit;
         const matchesUnit =
-          currentFilter?.unit === "All" ||
-          activity.user?.unit === currentFilter?.unit ||
-          activity.user?.component === currentFilter?.unit;
+          !currentMultiFilter?.unit || // If no filter is applied, show all
+          currentMultiFilter.unit.includes("All") || // If "All" is selected, show all
+          (Array.isArray(currentMultiFilter.unit) &&
+            (currentMultiFilter.unit.includes(activity.user?.unit || "") ||
+              currentMultiFilter.unit.includes(
+                activity.user?.component || ""
+              )));
+
+        // const matchesStatus =
+        //   currentFilter?.status === "All" ||
+        //   activity.status === currentFilter?.status;
 
         const matchesStatus =
-          currentFilter?.status === "All" ||
-          activity.status === currentFilter?.status;
+          currentMultiFilter?.status.includes("All") ||
+          currentMultiFilter?.status.includes(activity.status);
 
-        const matchesMonth =
-          currentFilter?.month === "All" ||
-          getMonth(activity.dateFrom) === currentFilter?.month;
+        // const matchesWFPYear =
+        //   currentFilter?.wfpYear === "All" ||
+        //   activity.WFPYear === currentFilter?.wfpYear;
 
         const matchesWFPYear =
-          currentFilter?.wfpYear === "All" ||
-          activity.WFPYear === currentFilter?.wfpYear;
+          currentMultiFilter?.wfpYear.includes("All") ||
+          currentMultiFilter?.wfpYear.includes(activity.WFPYear);
+
+        // const matchesMonth =
+        //   currentFilter?.month === "All" ||
+        //   getMonth(activity.dateFrom) === currentFilter?.month;
+        const matchesMonth =
+          currentMultiFilter?.month.includes("All") || // Show all if "All" is selected
+          currentMultiFilter?.month.some(
+            (month: string) => month === getMonth(activity.dateFrom)
+          );
 
         return (
           matchesType &&
@@ -66,12 +105,12 @@ const Page: React.FC = () => {
           matchesRegion &&
           matchesUnit &&
           matchesStatus &&
-          matchesMonth &&
-          matchesWFPYear
+          matchesWFPYear &&
+          matchesMonth
         );
       });
     };
-  }, [currentFilter]);
+  }, [currentMultiFilter]);
 
   // Apply filters and sort data
   useEffect(() => {

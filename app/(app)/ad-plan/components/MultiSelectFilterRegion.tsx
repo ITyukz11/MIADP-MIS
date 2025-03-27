@@ -74,7 +74,7 @@ function MultiSelectFilterRegion({}: Props) {
           <Button
             variant="outline"
             disabled={adPlanTable8Loading}
-            className="gap-0"
+            className="gap-0 w-fit"
           >
             {selectedRegions.length > 1
               ? `${selectedRegions.length} selected`

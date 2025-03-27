@@ -14,7 +14,8 @@ import { useAdPlanTable8Counts } from "../components/counts/countInfraAndEntrep"
 import { countConceptNoteTrue } from "../components/counts/countConceptNotes";
 import { countValidatedTrue } from "../components/counts/countValidated";
 import { FaStore } from "react-icons/fa";
-
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import Table8Report from "../components/reports/Table8Report";
 type Props = {};
 
 const Page = ({}: Props) => {
@@ -87,125 +88,150 @@ const Page = ({}: Props) => {
   const validatedTrueCount = countValidatedTrue(filteredData);
 
   return (
-    <div className="w-full flex flex-col gap-4">
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card className="hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              # of Infrastructure
-            </CardTitle>
-            <ConstructionIcon className="text-muted-foreground w-5 h-5" />
-          </CardHeader>
-          <CardContent>
-            {infraCount == 0 ? (
-              <div className="flex flex-col gap-2">
-                <Skeleton className="w-full h-10" />
-                <Skeleton className="w-full h-5" />
-              </div>
-            ) : (
-              <>
-                <div className="text-2xl font-bold">{infraCount}</div>
-                <p className="text-xs text-muted-foreground">
-                  + data still not accurate ok?
-                </p>
-              </>
-            )}
-          </CardContent>
-        </Card>
-        <Card className="hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              # of Enterprise
-            </CardTitle>
-            <FaStore className="text-muted-foreground w-5 h-5" />
-          </CardHeader>
-          <CardContent>
-            {filteredData.length == 0 && adPlanTable8Loading ? (
-              <div className="flex flex-col gap-2">
-                <Skeleton className="w-full h-10" />
-                <Skeleton className="w-full h-5" />
-              </div>
-            ) : (
-              <>
-                <div className="text-2xl font-bold">{entrepCount}</div>
-                <p className="text-xs text-muted-foreground">
-                  + data still not accurate ok?
-                </p>
-              </>
-            )}
-          </CardContent>
-        </Card>
-        <Card className="hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              # of SP Validated
-            </CardTitle>
-            <GrValidate className="text-muted-foreground w-5 h-5" />
-          </CardHeader>
-          <CardContent>
-            {filteredData.length == 0 && adPlanTable8Loading ? (
-              <div className="flex flex-col gap-2">
-                <Skeleton className="w-full h-10" />
-                <Skeleton className="w-full h-5" />
-              </div>
-            ) : (
-              <>
-                <div className="text-2xl font-bold">{validatedTrueCount}</div>
-                <p className="text-xs text-muted-foreground">
-                  + data still not accurate ok?
-                </p>
-              </>
-            )}
-          </CardContent>
-        </Card>
-        <Card className="hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              # of SP with CN
-            </CardTitle>
-            <GiNotebook className="text-muted-foreground w-5 h-5" />
-          </CardHeader>
-          <CardContent>
-            {filteredData.length == 0 && adPlanTable8Loading ? (
-              <div className="flex flex-col gap-2">
-                <Skeleton className="w-full h-10" />
-                <Skeleton className="w-full h-5" />
-              </div>
-            ) : (
-              <>
-                <div className="text-2xl font-bold">{conceptNoteTrueCount}</div>
-                <p className="text-xs text-muted-foreground">
-                  + data still not accurate ok?
-                </p>
-              </>
-            )}
-          </CardContent>
-        </Card>
-      </div>
-      <Card>
-        <CardContent className="p-4">
-          {filteredData.length == 0 && adPlanTable8Loading ? (
-            <div className="flex flex-col gap-2">
-              <Skeleton className="w-full h-10" />
-              <Skeleton className="h-[250px] w-full rounded-xl" />
+    <div className="w-full flex flex-col">
+      <div className="relative">
+        <Tabs defaultValue="overview">
+          <TabsList className="flex w-fit">
+            <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="analytics">Analytics</TabsTrigger>
+            <TabsTrigger value="reports" disabled>
+              Reports
+            </TabsTrigger>
+            <TabsTrigger value="notifications" disabled>
+              Announcements
+            </TabsTrigger>
+          </TabsList>
+          <TabsContent value="overview" className="space-y-4">
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+              <Card className="hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">
+                    # of Infrastructure
+                  </CardTitle>
+                  <ConstructionIcon className="text-muted-foreground w-5 h-5" />
+                </CardHeader>
+                <CardContent>
+                  {infraCount == 0 ? (
+                    <div className="flex flex-col gap-2">
+                      <Skeleton className="w-full h-10" />
+                      <Skeleton className="w-full h-5" />
+                    </div>
+                  ) : (
+                    <>
+                      <div className="text-2xl font-bold">{infraCount}</div>
+                      <p className="text-xs text-muted-foreground">
+                        + data still not accurate ok?
+                      </p>
+                    </>
+                  )}
+                </CardContent>
+              </Card>
+              <Card className="hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">
+                    # of Enterprise
+                  </CardTitle>
+                  <FaStore className="text-muted-foreground w-5 h-5" />
+                </CardHeader>
+                <CardContent>
+                  {filteredData.length == 0 && adPlanTable8Loading ? (
+                    <div className="flex flex-col gap-2">
+                      <Skeleton className="w-full h-10" />
+                      <Skeleton className="w-full h-5" />
+                    </div>
+                  ) : (
+                    <>
+                      <div className="text-2xl font-bold">{entrepCount}</div>
+                      <p className="text-xs text-muted-foreground">
+                        + data still not accurate ok?
+                      </p>
+                    </>
+                  )}
+                </CardContent>
+              </Card>
+              <Card className="hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">
+                    # of SP Validated
+                  </CardTitle>
+                  <GrValidate className="text-muted-foreground w-5 h-5" />
+                </CardHeader>
+                <CardContent>
+                  {filteredData.length == 0 && adPlanTable8Loading ? (
+                    <div className="flex flex-col gap-2">
+                      <Skeleton className="w-full h-10" />
+                      <Skeleton className="w-full h-5" />
+                    </div>
+                  ) : (
+                    <>
+                      <div className="text-2xl font-bold">
+                        {validatedTrueCount}
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        + data still not accurate ok?
+                      </p>
+                    </>
+                  )}
+                </CardContent>
+              </Card>
+              <Card className="hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">
+                    # of SP with CN
+                  </CardTitle>
+                  <GiNotebook className="text-muted-foreground w-5 h-5" />
+                </CardHeader>
+                <CardContent>
+                  {filteredData.length == 0 && adPlanTable8Loading ? (
+                    <div className="flex flex-col gap-2">
+                      <Skeleton className="w-full h-10" />
+                      <Skeleton className="w-full h-5" />
+                    </div>
+                  ) : (
+                    <>
+                      <div className="text-2xl font-bold">
+                        {conceptNoteTrueCount}
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        + data still not accurate ok?
+                      </p>
+                    </>
+                  )}
+                </CardContent>
+              </Card>
             </div>
-          ) : (
-            <DataTable
-              data={filteredData}
-              columns={AdPlanTable8Column}
-              hiddenColumns={["location", "typeOfSP"]}
-              allowSelectRow={false}
-              allowViewCalendar={true}
-              allowDateRange={false}
-              tableType="activities"
-              allowExportToExcel={false}
-            />
-          )}
-          {adPlanTable8Error && (
-            <Label className="text-destructive">{adPlanTable8Error}</Label>
-          )}
-        </CardContent>
-      </Card>
+            <Card>
+              <CardContent className="p-4">
+                {filteredData.length == 0 && adPlanTable8Loading ? (
+                  <div className="flex flex-col gap-2">
+                    <Skeleton className="w-full h-10" />
+                    <Skeleton className="h-[250px] w-full rounded-xl" />
+                  </div>
+                ) : (
+                  <DataTable
+                    data={filteredData}
+                    columns={AdPlanTable8Column}
+                    hiddenColumns={["location", "typeOfSP"]}
+                    allowSelectRow={false}
+                    allowViewCalendar={true}
+                    allowDateRange={false}
+                    tableType="activities"
+                    allowExportToExcel={false}
+                  />
+                )}
+                {adPlanTable8Error && (
+                  <Label className="text-destructive">
+                    {adPlanTable8Error}
+                  </Label>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+          <TabsContent value="analytics" className="space-y-4">
+            <Table8Report />
+          </TabsContent>
+        </Tabs>
+      </div>
     </div>
   );
 };

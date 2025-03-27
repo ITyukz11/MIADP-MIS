@@ -15,64 +15,28 @@ const videoData = [
   },
   {
     id: "3",
-    title:
-      "Get to know more about the Mindanao Inclusive Agriculture Development Project (MIADP)",
-    url: "https://www.youtube.com/embed/ZttRh8tyeD8",
-    thumbnail: "https://img.youtube.com/vi/ZttRh8tyeD8/0.jpg",
+    title: "MIADP RPCO 9 3rd World Bank ISM PRESENTATION",
+    url: "https://www.youtube.com/embed/YPwNOo8Q51s",
+    thumbnail: "https://img.youtube.com/vi/YPwNOo8Q51s/0.jpg",
   },
   {
     id: "4",
-    title: "MIADP - RPCO 12 Official Introduction Video",
-    url: "https://www.youtube.com/embed/AKiSzAasyQ8",
-    thumbnail: "https://img.youtube.com/vi/AKiSzAasyQ8/0.jpg",
+    title: "MIADP RPCO 10 3rd World Bank ISM PRESENTATION",
+    url: "https://www.youtube.com/embed/Cbw-dl-xbUw",
+    thumbnail: "https://img.youtube.com/vi/Cbw-dl-xbUw/0.jpg",
   },
   {
     id: "5",
-    title: "MIADP Caraga Region Overview",
-    url: "https://www.youtube.com/embed/BbUpkpysH8c",
-    thumbnail: "https://img.youtube.com/vi/BbUpkpysH8c/0.jpg",
+    title:
+      "Local Project Management and Implementation Unit (LPMIU) Indigenous People of Region 12",
+    url: "https://www.youtube.com/embed/SX_NB2qwOY0",
+    thumbnail: "https://img.youtube.com/vi/SX_NB2qwOY0/0.jpg",
   },
   {
-    id: "36",
-    title: "MIADP - RPCO X Project Highlights",
-    url: "https://www.youtube.com/embed/zSSGBbOkxUM",
-    thumbnail: "https://img.youtube.com/vi/zSSGBbOkxUM/0.jpg",
-  },
-  {
-    id: "26",
-    title: "MIADP - RPCO X Project Highlights",
-    url: "https://www.youtube.com/embed/zSSGBbOkxUM",
-    thumbnail: "https://img.youtube.com/vi/zSSGBbOkxUM/0.jpg",
-  },
-  {
-    id: "12",
-    title: "MIADP - RPCO X Project Highlights",
-    url: "https://www.youtube.com/embed/zSSGBbOkxUM",
-    thumbnail: "https://img.youtube.com/vi/zSSGBbOkxUM/0.jpg",
-  },
-  {
-    id: "23",
-    title: "MIADP - RPCO X Project Highlights",
-    url: "https://www.youtube.com/embed/zSSGBbOkxUM",
-    thumbnail: "https://img.youtube.com/vi/zSSGBbOkxUM/0.jpg",
-  },
-  {
-    id: "24",
-    title: "MIADP - RPCO X Project Highlights",
-    url: "https://www.youtube.com/embed/zSSGBbOkxUM",
-    thumbnail: "https://img.youtube.com/vi/zSSGBbOkxUM/0.jpg",
-  },
-  {
-    id: "234",
-    title: "MIADP - RPCO X Project Highlights",
-    url: "https://www.youtube.com/embed/zSSGBbOkxUM",
-    thumbnail: "https://img.youtube.com/vi/zSSGBbOkxUM/0.jpg",
-  },
-  {
-    id: "224",
-    title: "MIADP - RPCO X Project Highlights",
-    url: "https://www.youtube.com/embed/zSSGBbOkxUM",
-    thumbnail: "https://img.youtube.com/vi/zSSGBbOkxUM/0.jpg",
+    id: "6",
+    title: "Specialists MIADP talks RPCO 12",
+    url: "https://www.youtube.com/embed/DHHuw6O9VsU",
+    thumbnail: "https://img.youtube.com/vi/DHHuw6O9VsU/0.jpg",
   },
 ];
 
@@ -80,10 +44,10 @@ const ADAvps = () => {
   const [selectedVideo, setSelectedVideo] = useState(videoData[0]);
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen bg-gray-900 p-6 text-white">
+    <div className="flex flex-col items-center justify-center h-screen text-white">
       {/* Video Player */}
-      <div className="w-full max-w-4xl">
-        <div className="w-full aspect-video bg-black rounded-lg overflow-hidden shadow-2xl">
+      <div className="w-full">
+        <div className="w-full aspect-video overflow-hidden">
           <iframe
             width="100%"
             height="100%"
@@ -99,7 +63,7 @@ const ADAvps = () => {
       </div>
 
       {/* Horizontal Scrollable Video List */}
-      <div className="w-full max-w-4xl mt-6">
+      <div className="w-full mt-6">
         <h2 className="text-lg font-semibold mb-3">📌 Video List</h2>
         <div className="flex overflow-x-auto space-x-4 p-2 scrollbar-hide snap-x">
           {videoData.map((video) => (

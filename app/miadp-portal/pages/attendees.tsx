@@ -79,8 +79,8 @@ const Attendees = () => {
             whileHover={{ scale: 1.03 }}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: attendee.id * 0.1 }}
-            className="flex items-center bg-gray-100 dark:bg-gray-800 p-4 rounded-lg shadow-md"
+            transition={{ duration: 0.1 }}
+            className="flex items-center bg-gray-100 dark:bg-gray-800 p-4 rounded-lg shadow-md hover:border-blue-950 border-2"
           >
             <UserCircle className="text-blue-500 dark:text-gray-300 w-10 h-10 mr-4" />
             <div>

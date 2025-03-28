@@ -54,15 +54,9 @@ export default function Program() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
-      className="p-6 max-w-5xl mx-auto bg-white rounded-md"
+      className="p-6 max-w-5xl mx-auto bg-background rounded-md"
     >
-      <Image
-        alt="miadp header"
-        src={"/images/header.png"}
-        width={800}
-        height={170}
-      />
-      <div className="flex flex-col justify-center items-center mt-4">
+      <div className="flex flex-col justify-center items-center mb-4">
         <Label className="font-semibold text-xl">
           Mindanao Inclusive Agriculture Development Project
         </Label>
@@ -76,10 +70,9 @@ export default function Program() {
         <Label className="text-lg italic">
           Bureau of Agriculture and Fisheries Standards, Diliman, Quezon City
         </Label>
-        <h1 className="text-2xl font-bold mb-4 mt-8">PROGRAM OF ACTIVITIES</h1>
       </div>
 
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto border-2 border-white rounded-xl">
         <table className="w-full border-collapse border border-gray-300 shadow-md rounded-lg">
           <thead>
             <tr className="bg-[#185682] text-white">

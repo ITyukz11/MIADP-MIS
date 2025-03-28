@@ -94,7 +94,7 @@ const ResourceComponent = ({
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -100 }}
       transition={{ duration: 0.5 }}
-      className="p-6 bg-white shadow-lg rounded-md"
+      className="p-6 bg-background shadow-lg rounded-md"
     >
       <div className="flex items-center gap-3 mb-4">
         {icon}
@@ -119,33 +119,72 @@ export default function OneStopShop() {
     item.title.toLowerCase().includes(search.toLowerCase())
   );
   const images = [
-    {
-      src: "/miadp-pso.jpg",
-      alt: "miadp-pso logo",
-    },
+    // {
+    //   src: "/miadp-pso.jpg",
+    //   alt: "miadp-pso logo",
+    // },
     {
       src: "/miadp-region-ix.jpg",
       alt: "miadp-region-ix logo",
+      href: "https://www.facebook.com/da.miadp9",
     },
     {
       src: "/miadp-region-x.jpg",
       alt: "miadp-region-x logo",
+      href: "https://www.facebook.com/miadprpco10",
     },
     {
       src: "/miadp-region-xi.jpg",
       alt: "miadp-region-xi logo",
+      href: "https://www.facebook.com/miadp11",
     },
     {
       src: "/miadp-region-xii.jpg",
       alt: "miadp-region-xii logo",
+      href: "https://www.facebook.com/miadp.rpco12",
     },
     {
       src: "/miadp-region-xiii.jpg",
       alt: "miadp-region-xiii logo",
+      href: "https://www.facebook.com/miadprpco13",
     },
     {
       src: "/miadp-barmm.jpg",
       alt: "miadp-barmm logo",
+      href: "https://www.facebook.com/miadpbarmm",
+    },
+  ];
+
+  const images2 = [
+    {
+      src: "/logos/bagong-pilipinas.png",
+      alt: "bagong pilipinas.png",
+      href: "https://www.bagongpilipinastayo.com/",
+    },
+    {
+      src: "/logos/dept-agri.png",
+      alt: "department of agriculture logo",
+      href: "https://www.da.gov.ph/",
+    },
+    {
+      src: "/logos/world-bank.png",
+      alt: "world bank logo",
+      href: "https://www.worldbank.org/ext/en/home",
+    },
+    {
+      src: "/logos/ncip-logo.png",
+      alt: "ncip logo",
+      href: "https://ncip.gov.ph/",
+    },
+    {
+      src: "/MIADP-Assistant.png",
+      alt: "miadp official logo",
+      href: "https://chatgpt.com/g/g-X44lhvrfy-miadp-assistant",
+    },
+    {
+      src: "/logos/yuki-logo.png",
+      alt: "Yukz D. Programmer Logo",
+      href: "https://www.facebook.com/imbayuki/",
     },
   ];
 
@@ -216,31 +255,18 @@ export default function OneStopShop() {
           }}
         />
       </div>
-      <div className="flex flex-row justify-center min-h-[182px] w-full gap-4 p-4">
-        {images.map((image, index) => (
-          <Image
-            className="rounded-xl shrink-0"
-            key={index}
-            src={image.src}
-            alt={image.alt}
-            width={150}
-            height={150}
-            priority
-          />
-        ))}
-      </div>
+
       <AnimatePresence>
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5 }}
-          className="p-6 mb-2 w-[1150px] relative inset-0 bg-black bg-opacity-60 backdrop-blur-lg rounded-2xl shadow-2xl overflow-y-auto 
-  before:absolute before:inset-0 before:bg-gradient-to-br before:from-blue-500 before:to-purple-700 before:opacity-30 before:blur-xl before:-z-10"
+          className="p-6 mb-2 w-full relative overflow-y-auto"
         >
           <motion.div
             whileHover={{ scale: 1.2, rotate: -25 }}
             whileTap={{ scale: 0.9, rotate: 70 }}
-            className="cursor-pointer absolute right-5 top-5"
+            className="cursor-pointer absolute right-5 top-5 z-10"
             onClick={() =>
               setTheme(resolvedTheme === "dark" ? "light" : "dark")
             }
@@ -256,28 +282,92 @@ export default function OneStopShop() {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className={`w-full flex flex-row justify-center items-start ${
+            className={`w-full flex flex-col md:flex-row justify-center items-center gap-4 p-4 ${
               activeResource ? "hidden" : ""
             }`}
           >
-            <Label className="text-3xl flex flex-row font-bold text-center mb-6 text-white tracking-wider">
-              MIADP PORTAL 🔗
-            </Label>
+            {/* Left Icons (Hidden in Mobile) */}
+            <div className="hidden md:flex flex-row justify-center items-center gap-2">
+              {images.map((image, index) => (
+                <a
+                  key={index}
+                  href={image.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <motion.div
+                    whileHover={{
+                      scale: 1.15,
+                      boxShadow: "0px 4px 15px rgba(0, 123, 255, 0.6)", // Blue glow effect
+                      borderRadius: "12px",
+                    }}
+                    transition={{ duration: 0.3, ease: "easeOut" }}
+                    className="rounded-xl"
+                  >
+                    <Image
+                      className="rounded-xl shrink-0"
+                      src={image.src}
+                      alt={image.alt}
+                      width={50}
+                      height={50}
+                      priority
+                    />
+                  </motion.div>
+                </a>
+              ))}
+            </div>
+            {/* Title */}
+            <div className="text-center">
+              <Label className="text-2xl md:text-3xl font-bold text-center tracking-wider ">
+                MIADP PORTAL
+              </Label>
+              <div className="w-32 mx-auto h-1 bg-blue-800 rounded-full my-2"></div>
+            </div>
+            {/* Right Icons (Hidden in Mobile) */}
+            <div className="hidden md:flex flex-row justify-center items-center gap-2">
+              {images2.map((image, index) => (
+                <a
+                  key={index}
+                  href={image.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <motion.div
+                    whileHover={{
+                      scale: 1.15,
+                      boxShadow: "0px 4px 15px rgba(0, 123, 255, 0.6)", // Blue glow effect
+                      borderRadius: "12px",
+                    }}
+                    transition={{ duration: 0.3, ease: "easeOut" }}
+                    className="rounded-xl"
+                  >
+                    <Image
+                      className="rounded-xl shrink-0"
+                      src={image.src}
+                      alt={image.alt}
+                      width={50}
+                      height={50}
+                      priority
+                    />
+                  </motion.div>
+                </a>
+              ))}
+            </div>
           </motion.div>
 
           {activeResource ? (
             <motion.div
               key={activeResource.type}
-              className="relative w-full"
+              className="relative w-full pt-14 md:pt-0"
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, ease: "easeInOut" }}
             >
               {/* Title Section */}
               <div className="text-center">
-                <h2 className="text-2xl font-bold text-gray-100">
+                <Label className="text-2xl md:text-3xl font-bold text-center tracking-wider">
                   {activeResource.title}
-                </h2>
+                </Label>
                 <div className="w-20 mx-auto h-1 bg-blue-500 rounded-full my-2"></div>
               </div>
 
@@ -285,7 +375,7 @@ export default function OneStopShop() {
               <div className="absolute left-0 -top-5">
                 <button
                   className="bg-transparent text-center w-48 rounded-2xl h-14 relative text-white text-xl 
-                  font-semibold group flex items-center justify-center mx-auto mt-4 hover:bg-blue-400 
+                  font-semibold group flex items-center justify-center mx-auto mt-4 hover:bg-blue-500 
                   dark:hover:bg-gray-800/50 transition-all duration-300"
                   type="button"
                   onClick={() => setActiveResource(null)}
@@ -315,7 +405,7 @@ export default function OneStopShop() {
               </div>
 
               {/* Resource Component */}
-              <div className="mt-6">
+              <div className="pt-6">
                 <ResourceComponent
                   {...activeResource}
                   icon={iconMap[activeResource.type]}
@@ -328,7 +418,7 @@ export default function OneStopShop() {
                 placeholder="🔎 Search resources..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="mb-4 border-2 rounded-lg p-2 shadow-sm focus:ring-2 pl-4 bg-white"
+                className="mb-4 border-2 rounded-lg h-12 text-lg p-4 shadow-sm focus:ring-2 pl-5 bg-background"
               />
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

@@ -136,42 +136,45 @@ const ADAvps = () => {
       initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="flex flex-col items-center text-white p-4 space-y-4"
+      className="flex flex-col items-center text-white space-y-4 w-full"
     >
       {/* Category Tabs */}
-      <div className="flex space-x-4 border-b border-gray-600 pb-2">
-        {categories.map((category) => (
-          <motion.button
-            key={category}
-            onClick={() => {
-              if (category !== selectedCategory) {
-                setSelectedCategory(category);
-                setSelectedVideo(
-                  videoData.find((video) => video.section === category) ||
-                    videoData[0]
-                );
-              }
-            }}
-            whileHover={{ scale: 1.05 }}
-            className={`px-4 py-2 rounded-md ${
-              selectedCategory === category ? "bg-[#124365]" : "bg-gray-700"
-            }`}
-          >
-            {category}
-          </motion.button>
-        ))}
+      <div className="w-full overflow-x-auto scrollbar-hide">
+        <div className="flex flex-nowrap justify-center space-x-2 sm:space-x-4 border-b border-gray-600 pb-2 z-10">
+          {categories.map((category) => (
+            <motion.button
+              key={category}
+              onClick={() => {
+                if (category !== selectedCategory) {
+                  setSelectedCategory(category);
+                  setSelectedVideo(
+                    videoData.find((video) => video.section === category) ||
+                      videoData[0]
+                  );
+                }
+              }}
+              whileHover={{ scale: 1.05 }}
+              className={`px-4 py-2 rounded-md whitespace-nowrap ${
+                selectedCategory === category ? "bg-[#124365]" : "bg-gray-700"
+              }`}
+            >
+              {category}
+            </motion.button>
+          ))}
+        </div>
       </div>
 
-      {/* Video Player */}
+      {/* Video Player & List */}
       <motion.div
         key={selectedCategory}
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.4 }}
-        className="flex flex-row items-start justify-center w-full space-x-6"
+        className="flex flex-col md:flex-row items-center justify-center w-full space-y-4 md:space-y-0 md:space-x-6 h-[60vh] md:h-[70vh] min-h-[400px]"
       >
-        <div className="flex flex-col w-3/4 p-4 bg-gray-900 rounded-2xl shadow-lg border-4 border-gray-800">
-          <div className="w-full aspect-video overflow-hidden rounded-xl border-4 border-gray-700 shadow-2xl">
+        {/* Video Player */}
+        <div className="w-full md:w-3/4 p-4 bg-gray-900 rounded-2xl shadow-lg border-4 border-gray-800 flex flex-col h-full">
+          <div className="w-full flex-1 aspect-video overflow-hidden rounded-xl border-4 border-gray-700 shadow-2xl">
             <iframe
               width="100%"
               height="100%"
@@ -181,13 +184,13 @@ const ADAvps = () => {
               allowFullScreen
             ></iframe>
           </div>
-          <h3 className="mt-4 text-xl font-bold text-center">
+          <h3 className="mt-4 text-lg md:text-xl font-bold text-center">
             {selectedVideo?.title}
           </h3>
         </div>
 
-        {/* Video List */}
-        <div className="w-1/4 flex flex-col space-y-4 overflow-y-auto max-h-[500px] scrollbar-hide">
+        {/* Video List - Matches Height & Scrollable */}
+        <div className="w-full md:w-1/4 flex flex-col space-y-4 overflow-y-auto scrollbar-hide h-full p-4 bg-gray-900 rounded-2xl shadow-lg border-4 border-gray-800">
           <h2 className="text-lg font-semibold">📌 Video List</h2>
           {filteredVideos.map((video) => (
             <motion.div

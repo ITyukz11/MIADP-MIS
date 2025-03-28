@@ -62,10 +62,6 @@ const attendees = [
 const Attendees = () => {
   return (
     <div className="max-w-2xl mx-auto p-6 bg-white dark:bg-gray-900 shadow-xl rounded-lg">
-      <h2 className="text-2xl font-bold mb-4 text-center dark:text-white">
-        📋 Attendees List
-      </h2>
-
       {/* Animated Attendees List */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}

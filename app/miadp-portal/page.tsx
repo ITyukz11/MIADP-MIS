@@ -199,7 +199,7 @@ export default function OneStopShop() {
 
   const { resolvedTheme, setTheme } = useTheme();
   return (
-    <div className="h-full w-full flex flex-col items-center">
+    <div className="h-full w-full flex flex-col items-center min-w-[320px]">
       <div className="z-0">
         <Particles
           id="tsparticles"
@@ -261,7 +261,7 @@ export default function OneStopShop() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5 }}
-          className="p-6 mb-2 w-full relative overflow-y-auto"
+          className="p-6 mb-2 w-full relative overflow-y-auto min-w-[320px]"
         >
           <motion.div
             whileHover={{ scale: 1.2, rotate: -25 }}

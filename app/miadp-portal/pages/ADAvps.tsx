@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import Image from "next/image";
 
 const videoData = [
   {
@@ -140,7 +141,7 @@ const ADAvps = () => {
     >
       {/* Category Tabs */}
       <div className="w-full overflow-x-auto scrollbar-hide">
-        <div className="flex flex-nowrap justify-center space-x-2 sm:space-x-4 border-b border-gray-600 pb-2 z-10">
+        <div className="flex flex-nowrap justify-start md:justify-center space-x-2 sm:space-x-4 border-b border-gray-600 pb-2 z-10">
           {categories.map((category) => (
             <motion.button
               key={category}
@@ -154,7 +155,7 @@ const ADAvps = () => {
                 }
               }}
               whileHover={{ scale: 1.05 }}
-              className={`px-4 py-2 rounded-md whitespace-nowrap ${
+              className={`px-4 z-50 mt-2 py-2 rounded-md whitespace-nowrap ${
                 selectedCategory === category ? "bg-[#124365]" : "bg-gray-700"
               }`}
             >
@@ -170,7 +171,7 @@ const ADAvps = () => {
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.4 }}
-        className="flex flex-col md:flex-row items-center justify-center w-full space-y-4 md:space-y-0 md:space-x-6 h-[60vh] md:h-[70vh] min-h-[400px]"
+        className="flex flex-col md:flex-row items-center justify-center w-full space-y-4 md:space-y-0 md:space-x-6 h-auto md:h-[70vh] min-h-[400px]"
       >
         {/* Video Player */}
         <div className="w-full md:w-3/4 p-4 bg-gray-900 rounded-2xl shadow-lg border-4 border-gray-800 flex flex-col h-full">
@@ -189,28 +190,26 @@ const ADAvps = () => {
           </h3>
         </div>
 
-        {/* Video List - Matches Height & Scrollable */}
-        <div className="w-full md:w-1/4 flex flex-col space-y-4 overflow-y-auto scrollbar-hide h-full p-4 bg-gray-900 rounded-2xl shadow-lg border-4 border-gray-800">
-          <h2 className="text-lg font-semibold">📌 Video List</h2>
+        {/* Video List (Scrollable) */}
+        <div className="w-full md:w-1/4 max-h-[300px] md:max-h-[500px] overflow-y-auto space-y-2 px-2 scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800">
           {filteredVideos.map((video) => (
             <motion.div
               key={video.id}
-              onClick={() => setSelectedVideo(video)}
-              whileHover={{ scale: 0.95 }}
-              className={`flex flex-col items-center cursor-pointer transition-transform rounded-lg shadow-md p-2 border ${
-                selectedVideo?.id === video.id
-                  ? "border-blue-500"
-                  : "border-gray-700"
+              whileHover={{ scale: 1.05 }}
+              className={`flex overflow-hidden items-center space-x-3 p-2 rounded-md cursor-pointer transition ${
+                selectedVideo.id === video.id ? "bg-[#124365]" : "bg-gray-700"
               }`}
+              onClick={() => setSelectedVideo(video)}
             >
-              <img
+              <Image
                 src={video.thumbnail}
                 alt={video.title}
-                className="w-full h-24 object-cover rounded-lg"
+                width={80} // Set the width
+                height={56} // Set the height (maintaining 16:9 aspect ratio)
+                className="w-20 h-14 rounded-md object-cover"
+                unoptimized // Use this if loading external images (e.g., from YouTube)
               />
-              <span className="text-xs mt-2 text-center p-1">
-                {video.title}
-              </span>
+              <p className="text-xs sm:text-sm font-medium">{video.title}</p>
             </motion.div>
           ))}
         </div>

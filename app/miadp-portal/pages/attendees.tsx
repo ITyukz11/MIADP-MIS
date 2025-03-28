@@ -304,7 +304,7 @@ const groupedAttendees = attendees.reduce((acc, attendee) => {
 const Attendees = () => {
   return (
     <div className="max-w-6xl mx-auto p-6 bg-white dark:bg-gray-900 shadow-xl rounded-lg">
-      <h2 className="text-2xl font-bold text-center mb-6 dark:text-white">
+      <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-center mb-6 dark:text-white">
         Attendees List
       </h2>
 
@@ -318,7 +318,7 @@ const Attendees = () => {
             transition={{ duration: 0.5 }}
             className="space-y-4 w-full"
           >
-            <h3 className="text-xl font-semibold dark:text-white">
+            <h3 className="text-lg sm:text-xl md:text-2xl font-semibold dark:text-white">
               {category}
             </h3>
 
@@ -334,12 +334,12 @@ const Attendees = () => {
                   "bg-gray-100 dark:bg-gray-800"
                 }`}
               >
-                <UserCircle className="text-blue-500 shrink-0 dark:text-gray-300 w-10 h-10 mr-4" />
+                <UserCircle className="text-blue-500 dark:text-gray-300 w-8 sm:w-10 md:w-12 h-8 sm:h-10 md:h-12 mr-4" />
                 <div>
-                  <h3 className="text-lg font-semibold dark:text-white">
+                  <h3 className="text-sm sm:text-base md:text-lg font-semibold dark:text-white">
                     {attendee.name}
                   </h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                  <p className="text-xs sm:text-sm md:text-base text-gray-600 dark:text-gray-400">
                     {attendee.position}
                   </p>
                 </div>

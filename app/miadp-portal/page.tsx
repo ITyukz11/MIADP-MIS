@@ -30,33 +30,32 @@ const resources = [
   {
     type: "video",
     title: "Video Highlights",
-    description: "Watch the key moments from our latest event.",
+    description: "Watch key moments and highlights from our event.",
   },
-
   {
     type: "image",
     title: "Photo Gallery",
-    description: "Browse high-quality images from the event.",
+    description: "Explore a collection of images capturing latest activities.",
   },
   {
     type: "presentation",
     title: "Presentations",
-    description: "View the slides from the keynote presentation.",
+    description: "Access presentation slides from various components/units.",
   },
   {
     type: "program",
     title: "Program Schedule",
-    description: "Download the full event program and schedule.",
+    description: "Download the complete event schedule and agenda.",
   },
   {
     type: "attendees",
     title: "List of Attendees",
-    description: "See the names of people who attended the event.",
+    description: "View the list of participants who joined the event.",
   },
   {
     type: "gdrive",
     title: "Google Drive",
-    description: "Access all event files in Google Drive.",
+    description: "Find all event-related files in Google Drive.",
   },
 ];
 

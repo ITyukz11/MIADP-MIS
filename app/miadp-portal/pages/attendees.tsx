@@ -139,6 +139,12 @@ const attendees = [
     category: "PSO",
   },
   {
+    name: "Maribel Dato",
+    gender: "Female",
+    position: "Development Management Officer (NCIP-Manila Office)",
+    category: "PSO",
+  },
+  {
     name: "Errol Robyn M. Abella",
     gender: "Male",
     position: "Programmer",
@@ -170,6 +176,18 @@ const attendees = [
     name: "Jose Apollo Y. Pacamalan",
     gender: "Male",
     position: "Project Director",
+    category: "RPCO X",
+  },
+  {
+    name: "Rey Anthony B. Anacleto",
+    gender: "Male",
+    position: "Social Preparation Specialist",
+    category: "RPCO X",
+  },
+  {
+    name: "Joel Rudinas",
+    gender: "Male",
+    position: "Outgoing Deputy Project Director",
     category: "RPCO X",
   },
 
@@ -214,12 +232,7 @@ const attendees = [
     position: "Component 1 Head",
     category: "RPCO XIII",
   },
-  {
-    name: "Kathleen Lorraine R Sabaldan",
-    gender: "Female",
-    position: "M&E Unit Head",
-    category: "RPCO XIII",
-  },
+
   {
     name: "Ronald Galano",
     gender: "Male",
@@ -272,6 +285,58 @@ const attendees = [
     position: "DMO II, SPCMAD",
     category: "SPCMAD",
   },
+
+  //MIPA
+  {
+    name: "Rodolyn Andres",
+    gender: "Female",
+    position: "Chief of Ancestral Domain Division",
+    category: "MIPA",
+  },
+  //OIDCI
+  {
+    name: "Herman Z. Ongkiko",
+    gender: "Male",
+    position: "President",
+    category: "OIDCI",
+  },
+  {
+    name: "Ma. Rosamond Parado",
+    gender: "Female",
+    position: "Team Leader- Technical Service Provider",
+    category: "OIDCI",
+  },
+  //SDS
+  {
+    name: "Renato S Relampagos",
+    gender: "Male",
+    position: "President",
+    category: "SDS",
+  },
+  {
+    name: "Virgilio Cabezon",
+    gender: "Male",
+    position: "Team Leader",
+    category: "SDS",
+  },
+  {
+    name: "Ninosa Nuque",
+    gender: "Male",
+    position: "Vice President for Project Management and Business Development",
+    category: "SDS",
+  },
+  {
+    name: "Ma. Angeli S. Nunez",
+    gender: "Female",
+    position: "Vice President for Admin and Finance",
+    category: "SDS",
+  },
+  {
+    name: "Lita P. Sealza",
+    gender: "Female",
+    position: "Sociologist/Statistician",
+    category: "SDS",
+  },
 ];
 
 const categoryColors: Record<string, string> = {
@@ -288,10 +353,13 @@ const categoryColors: Record<string, string> = {
     "bg-teal-100 dark:bg-teal-900 border-teal-400 dark:border-teal-600",
   BARMM: "bg-red-100 dark:bg-red-900 border-red-400 dark:border-red-600",
   SPCMAD: "bg-pink-100 dark:bg-pink-900 border-pink-400 dark:border-pink-600",
+  MIPA: "bg-indigo-100 dark:bg-indigo-900 border-indigo-400 dark:border-indigo-600",
+  OIDCI: "bg-gray-100 dark:bg-gray-800 border-gray-400 dark:border-gray-600",
+  SDS: "bg-cyan-100 dark:bg-cyan-900 border-cyan-400 dark:border-cyan-600",
 
   // ✨ VIP Styling for World Bank
   "World Bank":
-    "bg-gradient-to-r from-gray-300 to-gray-100 dark:from-gray-700 dark:to-gray-900 border-gray-500 dark:border-gray-400 text-black dark:text-white shadow-xl",
+    "bg-gradient-to-r from-gray-300 to-gray-100 dark:from-gray-700 dark:to-gray-900 border-gray-500 dark:border-gray-400 text-black dark:text-white shadow-lg",
 };
 
 const groupedAttendees = attendees.reduce((acc, attendee) => {

@@ -25,6 +25,7 @@ import { ModeToggle } from "@/components/mode-toggle";
 import { FaMoon, FaSun } from "react-icons/fa";
 import Attendees from "./pages/attendees";
 import MIADPPortalGallery from "./pages/gallery";
+import GDrive from "./pages/GDrive";
 
 const resources = [
   {
@@ -87,6 +88,10 @@ const ResourceComponent = ({
   if (type === "attendees") return <Attendees />;
 
   if (type === "image") return <MIADPPortalGallery />;
+
+  if (type === "gdrive") return <GDrive />;
+
+  if (type === "presentation") return;
   return (
     <motion.div
       initial={{ opacity: 0, x: 100 }}
@@ -316,12 +321,16 @@ export default function OneStopShop() {
               ))}
             </div>
             {/* Title */}
-            <div className="text-center">
-              <Label className="text-2xl md:text-3xl font-bold text-center tracking-wider ">
-                MIADP PORTAL
+            <div className="text-center flex flex-col">
+              <Label className="text-2xl md:text-3xl font-bold tracking-wide uppercase">
+                MIADP Portal
               </Label>
-              <div className="w-32 mx-auto h-1 bg-blue-800 rounded-full my-2"></div>
+              <Label className="text-lg md:text-xl font-medium mt-2">
+                Interim Follow-On Technical Support Mission
+              </Label>
+              <div className="w-36 mx-auto h-1 bg-blue-800 rounded-full my-2"></div>
             </div>
+
             {/* Right Icons (Hidden in Mobile) */}
             <div className="hidden md:flex flex-row justify-center items-center gap-2">
               {images2.map((image, index) => (

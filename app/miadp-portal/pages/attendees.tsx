@@ -1,6 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { UserCircle } from "lucide-react";
+import { UserCircle, UserIcon } from "lucide-react";
 
 const attendees = [
   // 🌟 World Bank (VIP) 🌟
@@ -89,12 +89,7 @@ const attendees = [
     position: "Deputy Project Director",
     category: "PSO",
   },
-  {
-    name: "Errol Robyn M. Abella",
-    gender: "Male",
-    position: "Programmer",
-    category: "PSO",
-  },
+
   {
     name: "Joy Grecia",
     gender: "Female",
@@ -141,6 +136,12 @@ const attendees = [
     name: "Nelda Cacuyog",
     gender: "Female",
     position: "Admin Unit Head",
+    category: "PSO",
+  },
+  {
+    name: "Errol Robyn M. Abella",
+    gender: "Male",
+    position: "Programmer",
     category: "PSO",
   },
 
@@ -303,7 +304,7 @@ const groupedAttendees = attendees.reduce((acc, attendee) => {
 
 const Attendees = () => {
   return (
-    <div className="max-w-6xl mx-auto p-6 bg-white dark:bg-gray-900 shadow-xl rounded-lg">
+    <div className="max-w-6xl mx-auto">
       {/* Auto-fit columns dynamically */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 auto-cols-fr">
         {Object.entries(groupedAttendees).map(([category, attendees]) => (
@@ -314,33 +315,40 @@ const Attendees = () => {
             transition={{ duration: 0.5 }}
             className="space-y-4 w-full"
           >
-            <h3 className="text-lg sm:text-xl md:text-2xl font-semibold dark:text-white">
+            <h3 className="text-base sm:text-lg md:text-xl font-semibold dark:text-white">
               {category}
             </h3>
 
-            {attendees.map((attendee) => (
-              <motion.div
-                key={attendee.name}
-                whileHover={{ scale: 1.03 }}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.1 }}
-                className={`flex items-center p-4 rounded-lg shadow-md border-2 hover:border-blue-950 ${
-                  categoryColors[attendee.category] ||
-                  "bg-gray-100 dark:bg-gray-800"
-                }`}
-              >
-                <UserCircle className="text-blue-500 dark:text-gray-300 w-8 sm:w-10 md:w-12 h-8 sm:h-10 md:h-12 mr-4" />
-                <div>
-                  <h3 className="text-sm sm:text-base md:text-lg font-semibold dark:text-white">
-                    {attendee.name}
-                  </h3>
-                  <p className="text-xs sm:text-sm md:text-base text-gray-600 dark:text-gray-400">
-                    {attendee.position}
-                  </p>
-                </div>
-              </motion.div>
-            ))}
+            {attendees.map((attendee) => {
+              // Dynamically select an icon based on gender
+              const Icon = attendee.gender === "female" ? UserIcon : UserCircle;
+
+              return (
+                <motion.div
+                  key={attendee.name}
+                  whileHover={{ scale: 1.03 }}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.1 }}
+                  className={`flex items-center p-3 sm:p-4 rounded-lg shadow-md border-2 hover:border-blue-950 ${
+                    categoryColors[attendee.category] ||
+                    "bg-gray-100 dark:bg-gray-800"
+                  }`}
+                >
+                  {/* Icon with shrink-0 to prevent resizing issues */}
+                  <Icon className="shrink-0 text-blue-500 dark:text-gray-300 w-7 sm:w-9 md:w-10 h-7 sm:h-9 md:h-10 mr-3 sm:mr-4" />
+
+                  <div>
+                    <h3 className="text-xs sm:text-sm md:text-base font-semibold dark:text-white">
+                      {attendee.name}
+                    </h3>
+                    <p className="text-[10px] sm:text-xs md:text-sm text-gray-600 dark:text-gray-400">
+                      {attendee.position}
+                    </p>
+                  </div>
+                </motion.div>
+              );
+            })}
           </motion.div>
         ))}
       </div>

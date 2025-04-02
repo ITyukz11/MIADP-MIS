@@ -4,7 +4,7 @@ export default function Program() {
   return (
     <div className="flex justify-center items-center w-full h-full">
       <iframe
-        src="/Final-Program.pdf"
+        src="/Interim-Program.pdf"
         className="w-full h-[80vh] md:w-4/5 md:h-[80vh] border rounded-lg shadow-lg"
       />
     </div>

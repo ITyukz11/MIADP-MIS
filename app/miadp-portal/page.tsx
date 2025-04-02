@@ -26,6 +26,7 @@ import { FaMoon, FaSun } from "react-icons/fa";
 import Attendees from "./pages/attendees";
 import MIADPPortalGallery from "./pages/gallery";
 import GDrive from "./pages/GDrive";
+import Presentations from "./pages/presentation";
 
 const resources = [
   {
@@ -91,7 +92,7 @@ const ResourceComponent = ({
 
   if (type === "gdrive") return <GDrive />;
 
-  if (type === "presentation") return;
+  if (type === "presentation") return <Presentations />;
   return (
     <motion.div
       initial={{ opacity: 0, x: 100 }}

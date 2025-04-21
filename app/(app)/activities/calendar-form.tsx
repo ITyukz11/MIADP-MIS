@@ -682,39 +682,60 @@ const CalendarForm = ({ setDialogClose, individualActivity_ }: Props) => {
         return;
       }
 
+      const formatDateTime = (date: string, time?: string) => {
+        const dt = new Date(`${date}T${time || "00:00"}`);
+        return dt.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+      };
+
+      const googleCalendarLink = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(
+        values.activityTitle
+      )}&dates=${formatDateTime(
+        values.dateFrom,
+        values.timeStart
+      )}/${formatDateTime(
+        values.dateTo,
+        values.timeEnd
+      )}&details=${encodeURIComponent(
+        values.activityDescription
+      )}&location=${encodeURIComponent(values.location)}`;
+
       const response = await sendBulkEmail({
         to: emails,
         subject: `Upcoming Activity: ${values.activityTitle}`,
-        text: `Dear Team, 
-      
-We are pleased to inform you that you are one of the participants for an upcoming activity. Below are the details:
-
-📅 DATE: ${
-          values.dateFrom === values.dateTo
-            ? `${values.dateFrom}${
-                values.timeStart && values.timeEnd
-                  ? ` (${values.timeStart} - ${values.timeEnd})`
-                  : ""
-              }`
-            : `${values.dateFrom} to ${values.dateTo}`
-        }
-📆 WFP YEAR: ${values.WFPYear}  
-📍 LOCATION: ${values.location}  
-📝 ACTIVITY TITLE: ${values.activityTitle}  
-📌 TYPE: ${values.type} ${values.otherType ? `- ${values.otherType}` : ""}  
-🎯 TARGET PARTICIPANTS: ${values.targetParticipant}  
-📊 STATUS: ${values.status}  
-📄 DESCRIPTION:  
-${values.activityDescription}  
-
-Please mark your calendar accordingly. If you have any questions or require further information, feel free to reach out.  
-
-You can also visit the web application for more details:  
-🔗 [MIADP Portal - Calendar of Activities](https://miadp-mis.vercel.app/activities/table)  
-
-Best regards,  
-MIADP Portal - Calendar of Activities  
-`,
+        text: `Dear Team,
+  
+  We are pleased to inform you that you are one of the participants for an upcoming activity. Below are the details:
+  
+  📅 DATE: ${
+    values.dateFrom === values.dateTo
+      ? `${values.dateFrom}${
+          values.timeStart && values.timeEnd
+            ? ` (${values.timeStart} - ${values.timeEnd})`
+            : ""
+        }`
+      : `${values.dateFrom} to ${values.dateTo}`
+  }
+  📆 WFP YEAR: ${values.WFPYear}  
+  📍 LOCATION: ${values.location}  
+  📝 ACTIVITY TITLE: ${values.activityTitle}  
+  📌 TYPE: ${values.type}${values.otherType ? ` - ${values.otherType}` : ""}  
+  🎯 TARGET PARTICIPANTS: ${values.targetParticipant}  
+  📊 STATUS: ${values.status}  
+  📄 DESCRIPTION:  
+  ${values.activityDescription}  
+  
+  📅 Add to your calendar:  
+  🔗 ${googleCalendarLink}
+  
+  Please mark your calendar accordingly. If you have any questions or require further information, feel free to reach out.
+  
+  You can also visit the web application for more details:  
+  🔗 MIADP Portal - Calendar of Activities  
+  https://miadp-mis.vercel.app/activities/table
+  
+  Best regards,  
+  MIADP Portal - Calendar of Activities
+  `,
       });
 
       if (response.success) {

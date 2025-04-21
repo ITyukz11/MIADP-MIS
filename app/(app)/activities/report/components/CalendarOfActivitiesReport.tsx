@@ -32,20 +32,9 @@ import { DataTable } from "@/components/table/data-table";
 import { countParticipantActivityColumn } from "@/components/table/data/activities/count-participant-activity-column";
 import ChartSwitcher, { ChartType } from "./ChartSwitcher";
 import { useActivitiesCountData } from "@/lib/calendar-of-activity/countActivities";
-
-const data = [
-  { name: "PSO", C1: 5, C2: 4, C3: 4, C4: 20, amt: 34 },
-  { name: "RPCO 9", C1: 5, C2: 4, C3: 13, C4: 5, amt: 34 },
-  { name: "RPCO 10", C1: 2, C2: 4, C3: 4, C4: 2, amt: 34 },
-  { name: "RPCO 11", C1: 10, C2: 4, C3: 14, C4: 10, amt: 34 },
-  { name: "RPCO 12", C1: 22, C2: 2, C3: 4, C4: 5, amt: 34 },
-  { name: "RPCO 13", C1: 5, C2: 4, C3: 4, C4: 20, amt: 34 },
-  { name: "BARMM", C1: 1, C2: 4, C3: 4, C4: 10, amt: 34 },
-];
+import { useActivitiesCountComponentsData } from "@/lib/calendar-of-activity/countActivitiesByComponent";
 
 const CalendarOfActivitiesReport = () => {
-  const colors = ["#8884d8", "#82ca9d", "#ffc658", "#ff7300"]; // Colors for components
-
   const {
     activitiesCountData,
     activitiesCountError,
@@ -73,6 +62,7 @@ const CalendarOfActivitiesReport = () => {
       dispatch(fetchCountActivityParticipantsData());
     }
   }, [countParticipantActivitiesData, dispatch]);
+  const [chartType, setChartType] = useState<ChartType>(ChartType.BAR);
 
   // Ensure the data is typed correctly
   const sortedActivities = activitiesCountData
@@ -86,6 +76,9 @@ const CalendarOfActivitiesReport = () => {
     componentActivityCountsLoading,
     componentActivityCountsError,
   } = useSelector((state) => state.countByComponentActivity);
+
+  const { activitiesCountComponentData, activitiesCountComponentLoading } =
+    useActivitiesCountComponentsData();
 
   useEffect(() => {
     if (Object.keys(componentActivityCountsData).length === 0) {
@@ -122,10 +115,6 @@ const CalendarOfActivitiesReport = () => {
       return transformed;
     });
   };
-
-  const transformedData = transformData(componentActivityCountsData);
-
-  const [chartType, setChartType] = useState<ChartType>(ChartType.BAR);
 
   const handleChange = (value: string) => {
     setChartType(value as ChartType);
@@ -228,7 +217,6 @@ const CalendarOfActivitiesReport = () => {
                   major activities encoded over time. **
                 </Label>
               </CardTitle>
-              {componentActivityCountsLoading && <LoadingSpinner />}
             </div>
             <div className="mt-2 md:mt-0">
               <Select
@@ -258,14 +246,28 @@ const CalendarOfActivitiesReport = () => {
             </div>
           </CardHeader>
           <CardContent>
-            <ChartSwitcher data={transformedData} typeChart={chartType} />
+            {activitiesCountComponentLoading ||
+            !activitiesCountComponentData ? (
+              <div className="h-72 flex flex-col gap-4">
+                <Skeleton className="h-6 w-32" /> {/* Fake chart title */}
+                <Skeleton className="h-full w-full rounded-md" />{" "}
+                {/* Fake chart body */}
+              </div>
+            ) : Object.keys(activitiesCountComponentData).length === 0 ? (
+              <Label className="text-gray-500">No activity data found.</Label>
+            ) : (
+              <ChartSwitcher
+                data={transformData(activitiesCountComponentData)}
+                typeChart={chartType}
+              />
+            )}
           </CardContent>
         </Card>
       </div>
 
       {/* Data Table Section */}
       {/* <div className="mt-4">
-        {componentActivityCountsLoading ? (
+        {activitiesCountComponentLoading ? (
           <div className="space-y-2 p-2">
             <Skeleton className="h-4 w-full" />
             <Skeleton className="h-4 w-full" />

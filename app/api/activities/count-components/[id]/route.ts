@@ -4,12 +4,20 @@ import { withAccelerate } from "@prisma/extension-accelerate";
 
 const prisma = new PrismaClient().$extends(withAccelerate());
 
-export async function GET(request) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
   try {
+    const wfpYear = params.id;
+
+    console.log("Filtering by WFPYear:", wfpYear);
+
     // Fetch activities filtered by WFPYear
     const activities = await prisma.calendarOfActivity.findMany({
       where: {
-        individualActivity: false, // Add the individualActivity filter
+        WFPYear: wfpYear,
+        individualActivity: false,
       },
       include: {
         user: {
@@ -35,7 +43,7 @@ export async function GET(request) {
       acc[region][component] += 1;
 
       return acc;
-    }, {});
+    }, {} as Record<string, Record<string, number>>);
 
     return NextResponse.json(countsByRegionAndComponent);
   } catch (error) {

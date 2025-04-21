@@ -1,41 +1,27 @@
-import React, { useState } from 'react'
+import React, { useState } from "react";
 import {
   Dialog,
-  DialogClose,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
-import { DropdownMenuItem } from '@radix-ui/react-dropdown-menu'
-import { Input } from '../ui/input';
-import { Button } from '../ui/button';
-import { Form, FormControl, FormField, FormItem, FormLabel } from '../ui/form';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-import { RegisterSchema } from '@/schemas';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { LoadingSpinner } from '../LoadingSpinner';
-
+} from "@/components/ui/dialog";
+import { Input } from "../ui/input";
+import { Form, FormControl, FormField, FormItem, FormLabel } from "../ui/form";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { RegisterSchema } from "@/schemas";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { PendingUserType } from "../table/data/pending-users/schema";
+import { Label } from "../ui/label";
 
 interface DialogViewProps {
-  viewDatas: {
-    region: string;
-    name: string;
-    email: string;
-    password: string;
-    position: string;
-    component: string;
-    unit: string;
-  },
+  viewDatas: PendingUserType;
   open: boolean;
-  close:()=> void;
+  close: () => void;
 }
 
-
-function DialogView({ viewDatas, open, close}: DialogViewProps) {
+function DialogView({ viewDatas, open, close }: DialogViewProps) {
   const [loading, setLoading] = useState(false); // Initialize loading state
   const form = useForm<z.infer<typeof RegisterSchema>>({
     resolver: zodResolver(RegisterSchema),
@@ -46,36 +32,36 @@ function DialogView({ viewDatas, open, close}: DialogViewProps) {
       unit: viewDatas.unit,
       position: viewDatas.position,
       fullname: viewDatas.name,
-    }
-  })
-console.log("viewDatas: ", viewDatas)
+    },
+  });
+  console.log("viewDatas: ", viewDatas);
   const pendingUserData = [
     {
       name: "fullname" as "fullname",
-      label: "Fullname"
+      label: "Fullname",
     },
     {
       name: "email" as "email",
-      label: "Email"
+      label: "Email",
     },
     {
       name: "region" as "region",
-      label: "Region"
+      label: "Region",
     },
     {
       name: "component" as "component",
-      label: "Component"
+      label: "Component",
     },
     {
       name: "unit" as "unit",
-      label: "Unit"
+      label: "Unit",
     },
     {
       name: "position" as "position",
-      label: "Position"
+      label: "Position",
     },
   ];
-  
+
   return (
     <Dialog open={open} onOpenChange={close}>
       <DialogContent className="min-w-[30%] overflow-y-auto scrollbar-thin max-h-[95vh] ">
@@ -84,12 +70,12 @@ console.log("viewDatas: ", viewDatas)
           <DialogDescription>
             Don&apos;t forget to approve or reject this pending user.
           </DialogDescription>
-
         </DialogHeader>
-        <Form  {...form}>
+        <Form {...form}>
           <form //onSubmit={form.handleSubmit(onSubmit)}
             className="space-y-6"
-            autoComplete="off" >
+            autoComplete="off"
+          >
             <div className="space-y-4">
               {pendingUserData.map((data, index) => (
                 <FormField
@@ -104,7 +90,7 @@ console.log("viewDatas: ", viewDatas)
                           {...field}
                           readOnly
                           disabled={loading}
-                          style={{ userSelect: 'none' }}
+                          style={{ userSelect: "none" }}
                         />
                       </FormControl>
                     </FormItem>
@@ -112,8 +98,17 @@ console.log("viewDatas: ", viewDatas)
                 />
               ))}
 
+              {/* Show createdAt separately since it's not part of the schema */}
+              <div className="space-y-2">
+                <Label>Created At</Label>
+                <Input
+                  readOnly
+                  value={new Date(viewDatas.createdAt).toLocaleString()}
+                  style={{ userSelect: "none" }}
+                />
+              </div>
             </div>
-            <div className='flex flex-row justify-end'>
+            {/* <div className='flex flex-row justify-end'>
             <Button
             className='mr-1'
                 variant={'destructive'}
@@ -126,13 +121,12 @@ console.log("viewDatas: ", viewDatas)
               >
                 {loading && <LoadingSpinner />}  Approve
               </Button>
-            </div>
-
+            </div> */}
           </form>
         </Form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }
 
-export default DialogView
+export default DialogView;

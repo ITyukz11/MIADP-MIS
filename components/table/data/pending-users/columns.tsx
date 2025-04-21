@@ -1,10 +1,10 @@
-"use client"
-import { ColumnDef } from "@tanstack/react-table"
-import { Checkbox } from "@/components/ui/checkbox"
-import { DataTableColumnHeader } from "../../data-table-column-header"
-import { DataTableRowActions } from "./data-table-row-actions"
-import { Badge } from "../../../ui/badge"
-import { PendingUserType } from "./schema"
+"use client";
+import { ColumnDef } from "@tanstack/react-table";
+import { Checkbox } from "@/components/ui/checkbox";
+import { DataTableColumnHeader } from "../../data-table-column-header";
+import { DataTableRowActions } from "./data-table-row-actions";
+import { Badge } from "../../../ui/badge";
+import { PendingUserType } from "./schema";
 
 export const columns: ColumnDef<PendingUserType>[] = [
   {
@@ -106,8 +106,22 @@ export const columns: ColumnDef<PendingUserType>[] = [
       return (
         <div className="flex space-x-2">
           <span className="max-w-[500px] truncate font-medium">
-          
-          <Badge variant={row.getValue("status")=="Approved"?"outline":"destructive"}>{row.getValue("status")}</Badge>
+            <Badge
+              variant={
+                row.getValue("status") === "Rejected"
+                  ? "destructive"
+                  : "outline"
+              }
+              className={
+                row.getValue("status") === "Pending"
+                  ? "bg-orange-500 hover:bg-yellow-500 text-white hover:text-white"
+                  : row.getValue("status") === "Approved"
+                  ? "bg-green-600 hover:bg-green-600 hover:text-white text-white"
+                  : ""
+              }
+            >
+              {row.getValue("status")}
+            </Badge>
           </span>
         </div>
       );
@@ -132,7 +146,7 @@ export const columns: ColumnDef<PendingUserType>[] = [
     },
   },
   {
-    id: "actions",                        // @ts-ignore
+    id: "actions",
     cell: ({ row }) => <DataTableRowActions rowData={row.original} />,
   },
 ];

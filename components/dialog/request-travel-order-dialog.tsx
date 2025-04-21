@@ -7,20 +7,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Form, FormField } from "../ui/form";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { avoidDefaultDomBehavior, handleKeyDown } from "@/utils/dialogUtils";
-import FormFieldWrapper from "../FormFieldWrapper";
-import { useSelector } from "@/app/store/store";
 import { useUsersData } from "@/lib/users/useUserDataHook";
 import { UserType } from "@/types/users/userType";
 import { Cat, Dog, Fish, Rabbit, Turtle } from "lucide-react";
-import { MultiSelect } from "../ui/multi-select";
-import DTRUploader from "@/app/(app)/(components)/DTRUploader";
-import DailyTimeRecord from "@/app/(app)/(components)/DTRUploader";
+// import DTRUploader from "@/app/(app)/(components)/DTRUploader";
+// import DailyTimeRecord from "@/app/(app)/(components)/DTRUploader";
 
 interface RequestTravelOrderDialogProps {
   open: boolean;
@@ -95,7 +91,7 @@ function RequestTravelOrderDialog({
             *Please make sure all the details are correct before submitting!
           </DialogDescription>
         </DialogHeader>
-        <DailyTimeRecord />
+        {/* <DailyTimeRecord /> */}
         {/* <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}

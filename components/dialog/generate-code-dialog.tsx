@@ -33,7 +33,12 @@ import { avoidDefaultDomBehavior, handleKeyDown } from "@/utils/dialogUtils";
 import { TbNumber123 } from "react-icons/tb";
 import { useSession } from "next-auth/react";
 
-function GenerateCodeDialog() {
+interface GenerateCodeDialogProps {
+  open: boolean;
+  close: () => void;
+}
+
+function GenerateCodeDialog({ open, close }: GenerateCodeDialogProps) {
   const [loading, setLoading] = useState(false); // Initialize loading state
   const [isChecked, setIsChecked] = useState<boolean>(false);
   const [finishedGenerate, setFinishedGenerate] = useState<boolean>(false);
@@ -124,6 +129,7 @@ function GenerateCodeDialog() {
         values.type;
 
       values.municipality = values?.municipality;
+
       const ancestralDomainLoc = codeAncestralDomain.find(
         (AD) => AD.value === values.ancestralDomainLoc
       )?.label;
@@ -180,13 +186,7 @@ function GenerateCodeDialog() {
   console.log("form: ", form.watch("municipality"));
   return (
     <>
-      <Dialog>
-        <DialogTrigger asChild>
-          <Label className="flex flex-row gap-2 p-2 cursor-pointer hover:bg-slate-100 rounded-sm dark:hover:bg-slate-800">
-            <TbNumber123 />
-            Request Subproject Code
-          </Label>
-        </DialogTrigger>
+      <Dialog open={open} onOpenChange={close}>
         <DialogContent
           className="min-w-[60%] overflow-y-auto scrollbar-thin max-h-[95vh] "
           onPointerDownOutside={avoidDefaultDomBehavior}
@@ -284,36 +284,40 @@ function GenerateCodeDialog() {
                     placeholder="Select AD Location"
                     tabIndex={6}
                   />
-                  {filteredMunicipality &&
-                  filteredMunicipality?.municipality?.split(", ").length > 1 ? (
+                  {
+                    // filteredMunicipality && (
+                    //filteredMunicipality?.municipality?.split(", ").length > 1 ? (
                     <FormFieldWrapper
                       control={form.control}
                       name="municipality"
                       label="Municipality"
                       type="select"
-                      selectOptions={filteredMunicipality.municipality
+                      selectOptions={filteredMunicipality?.municipality
                         .split(", ") // Convert the string to an array
                         .map((municipality) => ({
                           label: municipality.trim(), // Trim any extra spaces
                           value: municipality.trim(), // Use the same value for simplicity
                         }))}
-                      isDisabled={loading} // Disable if no region is selected
+                      isDisabled={loading || !filteredMunicipality} // Disable if no region is selected
                       placeholder="Input Municipality"
                       note="(Please select)"
                       tabIndex={8}
                     />
-                  ) : (
-                    <FormFieldWrapper
-                      control={form.control}
-                      name="municipality"
-                      label="Municipality"
-                      isDisabled={loading}
-                      placeholder="Input Municipality"
-                      note="(auto generated)"
-                      tabIndex={8}
-                      value={filteredMunicipality?.municipality || ""}
-                    />
-                  )}
+                    //)
+                    //)
+                    // : (
+                    //   <FormFieldWrapper
+                    //     control={form.control}
+                    //     name="municipality"
+                    //     label="Municipality"
+                    //     isDisabled={true}
+                    //     placeholder="Input Municipality"
+                    //     note="(auto generated)"
+                    //     tabIndex={8}
+                    //     value={filteredMunicipality?.municipality || ""}
+                    //   />
+                    // )
+                  }
 
                   <FormFieldWrapper
                     control={form.control}
@@ -373,7 +377,7 @@ function GenerateCodeDialog() {
                 (error && <FormError message={"An error occurred"} />)}
               <div className="flex flex-row justify-end mt-4">
                 <Button disabled={loading} type="submit">
-                  {loading && <LoadingSpinner />} Generate!
+                  {loading && <LoadingSpinner />} Submit!
                 </Button>
               </div>
             </form>

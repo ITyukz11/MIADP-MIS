@@ -1,44 +1,29 @@
 // Import necessary components and types
 import { DataTable } from "@/components/table/data-table";
 import { columns } from "@/components/table/data/pending-users/columns"; // Adjust the import path
+import { PendingUserType } from "@/components/table/data/pending-users/schema";
 import { Label } from "@/components/ui/label";
-
-// Define the PendingUser interface
-interface PendingUser {
-  id: string; 
-  region: string; 
-  name: string; 
-  email: string; 
-  status: string; 
-  createdAt: string;
-  component: string;
-  unit: string;
-  position: string;
-}
+import { Skeleton } from "@/components/ui/skeleton";
 
 // Define the props for PendingAccountForm component
 interface PendingAccountFormProps {
-  pendingUsers: PendingUser[];
+  pendingUsers: PendingUserType[];
   disableApproveButton: boolean; // Define the prop here
 }
 
 // Define the PendingAccountForm component
-const hiddenColumns = [
-  'color',
-  
-]
-export default function PendingAccountForm({ pendingUsers }: PendingAccountFormProps) {
-  if (!pendingUsers) {
-    return (
-      <div>
-        <Label>Loading...</Label>
-      </div>
-    );
-  }
-
+const hiddenColumns = ["color"];
+export default function PendingAccountForm({
+  pendingUsers,
+}: PendingAccountFormProps) {
   return (
     <div>
-      <DataTable data={pendingUsers} columns={columns} allowSelectRow={true} hiddenColumns={hiddenColumns}/>
+      <DataTable
+        data={pendingUsers}
+        columns={columns}
+        allowSelectRow={true}
+        hiddenColumns={hiddenColumns}
+      />
     </div>
   );
 }

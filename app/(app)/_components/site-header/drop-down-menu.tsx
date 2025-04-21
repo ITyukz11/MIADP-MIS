@@ -13,7 +13,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { FaBook, FaUser, FaWpforms } from "react-icons/fa";
-import { MdLiveHelp, MdLogout } from "react-icons/md";
+import { MdLiveHelp, MdLogout, MdTravelExplore } from "react-icons/md";
 import {
   Avatar,
   AvatarFallback,
@@ -28,6 +28,7 @@ import { IoAirplane } from "react-icons/io5";
 import RequestFormPalTicket from "../../../../components/dialog/form-pal-ticket";
 import RequestFormPalTicketTest from "../../../../components/dialog/form-pal-ticket-test";
 import GenerateCodeDialog from "../../../../components/dialog/generate-code-dialog";
+import RequestTravelOrderDialog from "@/components/dialog/request-travel-order-dialog";
 
 interface DropDownMenuComponentProps {}
 
@@ -35,6 +36,7 @@ export const DropDownMenuComponent = ({}: DropDownMenuComponentProps) => {
   const [profileDialog, setProfileDialog] = useState<boolean>(false);
   const [palTicketDialog, setPalTicketDialog] = useState<boolean>(false);
   const [openGenerateDialog, setGenerateDialog] = useState<boolean>(false);
+  const [openRequestTO, setRequestTO] = useState<boolean>(false);
   const { data: currentUser } = useSession();
 
   const router = useRouter();
@@ -73,8 +75,26 @@ export const DropDownMenuComponent = ({}: DropDownMenuComponentProps) => {
               </DropdownMenuSubTrigger>
               <DropdownMenuPortal>
                 <DropdownMenuSubContent>
-                  <GenerateCodeDialog />
-                  {/* <DropdownMenuItem onClick={()=> setGenerateDialog(!openGenerateDialog)}><TbNumber123/>Request Subproject Code</DropdownMenuItem> */}
+                  {/* <GenerateCodeDialog /> */}
+                  <DropdownMenuItem
+                    onClick={() => {
+                      setGenerateDialog(!openGenerateDialog);
+                      document.body.style.pointerEvents = "";
+                    }}
+                  >
+                    <TbNumber123 />
+                    Request Subproject Code
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => {
+                      setRequestTO(true);
+                      document.body.style.pointerEvents = "";
+                    }}
+                    disabled
+                  >
+                    <MdTravelExplore />
+                    Request Travel Order
+                  </DropdownMenuItem>
                   <DropdownMenuItem
                     disabled
                     onClick={() => setPalTicketDialog(true)}
@@ -110,7 +130,14 @@ export const DropDownMenuComponent = ({}: DropDownMenuComponentProps) => {
         setClose={() => setProfileDialog(!profileDialog)}
       />
       {/* <RequestFormPalTicketTest open={palTicketDialog} close={()=> setPalTicketDialog(!palTicketDialog)}/> */}
-      {/* <GenerateCodeDialog open={openGenerateDialog} close={()=> setGenerateDialog(!openGenerateDialog)}/> */}
+      <GenerateCodeDialog
+        open={openGenerateDialog}
+        close={() => setGenerateDialog(!openGenerateDialog)}
+      />
+      <RequestTravelOrderDialog
+        open={openRequestTO}
+        close={() => setRequestTO(!openRequestTO)}
+      />
     </>
   );
 };

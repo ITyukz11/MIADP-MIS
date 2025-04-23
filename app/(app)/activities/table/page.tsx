@@ -170,8 +170,9 @@ const Page = () => {
           </CardContent>
         </Card>
       ) : (
-        <div className="flex flex-col space-y-3">
-          <Skeleton className="h-[250px] w-full rounded-xl" />
+        <div className="w-full flex flex-col gap-2 items-center">
+          <Skeleton className="w-full h-10" />
+          <Skeleton className="w-full h-40" />
         </div>
       )}
       {activityError && (

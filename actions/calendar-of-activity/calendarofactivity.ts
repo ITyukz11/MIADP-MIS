@@ -5,6 +5,7 @@ import { CalendarOfActivitySchema } from "@/schemas/calendar-of-activity";
 interface InsertActivityResponse {
     success?: string;
     error?: string;
+    id: string;
 }
 
 export const calendarOfActivity = async (values: z.infer<typeof CalendarOfActivitySchema>): Promise<InsertActivityResponse> => {
@@ -15,7 +16,7 @@ export const calendarOfActivity = async (values: z.infer<typeof CalendarOfActivi
     try {
         if (!validatedFields.success) {
             console.log(validatedFields.error); // Log the validation error
-            return { error: "Invalid fields!" };
+            return { error: "Invalid fields!", id:"" };
         } else {
             const response = await axios.post('/api/auth/calendar-of-activity', {
                 authorizeOther: values.authorizeOther,
@@ -45,10 +46,10 @@ export const calendarOfActivity = async (values: z.infer<typeof CalendarOfActivi
             // Check if the response contains an error message
             if (response.data.error) {
                 // If there's an error message, return it
-                return { error: response.data.error };
+                return { error: response.data.error, id:""};
             } else {
                 // If no error message, assume successful registration
-                return { success: response.data.message };
+                return { success: response.data.message, id: response.data.id };
             }
         }
     }
@@ -59,12 +60,12 @@ export const calendarOfActivity = async (values: z.infer<typeof CalendarOfActivi
             if (axiosError.response) {
                 const responseData = axiosError.response.data;
                 if (responseData && typeof responseData === 'object' && 'message' in responseData && typeof responseData.message === 'string') {
-                    return { error: responseData.message };
+                    return { error: responseData.message ,id:""};
                 }
             }
-            return { error: "An error occurred while inserting new calendar of activity." };
+            return { error: "An error occurred while inserting new calendar of activity.",id:"" };
         } else {
-            return { error: "An error occurred while inserting new calendar of activity." };
+            return { error: "An error occurred while inserting new calendar of activity." ,id:""};
         }
     }
 };

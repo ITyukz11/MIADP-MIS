@@ -1,6 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getCurrentUser } from "@/lib/session";
-import { hash } from "bcrypt";
 import { Prisma, PrismaClient } from "@prisma/client";
 import { withAccelerate } from "@prisma/extension-accelerate";
 
@@ -104,7 +102,8 @@ export async function POST(request) {
 
     console.log({ newCalendarOfActivity });
 
-    return NextResponse.json({ newCalendarOfActivity }, { status: 200 });
+    // Return the created calendar of activity along with its ID
+    return NextResponse.json({ newCalendarOfActivity, id: newCalendarOfActivity.id }, { status: 200 });
   } catch (error) {
     console.error("Error inserting new activity:", error);
     return NextResponse.json(

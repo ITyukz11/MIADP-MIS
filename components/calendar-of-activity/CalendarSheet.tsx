@@ -34,7 +34,7 @@ import {
 import { Badge } from "../ui/badge";
 import Image from "next/image";
 import { TbNotes, TbStatusChange } from "react-icons/tb";
-import { FaQrcode } from "react-icons/fa";
+import { FaExternalLinkAlt, FaLink, FaQrcode } from "react-icons/fa";
 import { useEffect, useState } from "react";
 import { GenerateQRCodeWithLogo } from "../GenerateQrCodeWithLogo";
 import { MdAttachment, MdOutlineDateRange } from "react-icons/md";
@@ -59,6 +59,7 @@ import { formatDateLong } from "@/utils/dateFormat";
 import { truncateText } from "@/utils/truncateText";
 import { useSession } from "next-auth/react";
 import { useActivitiesData } from "@/lib/calendar-of-activity/useActivitiesDataHook";
+import { useUsersData } from "@/lib/users/useUserDataHook";
 
 interface CalendarSheetProps {
   activityData: any[];
@@ -80,16 +81,10 @@ export function CalendarSheet({
   const [contentData, setContentData] = useState<string>("");
 
   const { refetchActivities } = useActivitiesData();
-  const dispatch = useDispatch();
-  const { usersData, loadingUser, errorUser } = useSelector(
-    (state) => state.users
-  );
+
   const { data: currentUser } = useSession();
-  useEffect(() => {
-    if (usersData.length === 0) {
-      dispatch(fetchUsersData());
-    }
-  }, [dispatch, usersData.length]);
+ 
+  const {usersData, usersLoading, usersError}=useUsersData()
 
   const [qrCode, setQrCode] = useState<string | null>(null);
   const [openProfile, setOpenProfile] = useState(false);
@@ -103,6 +98,7 @@ export function CalendarSheet({
     }
 
     const {
+      id,
       activityTitle,
       activityDescription,
       type,
@@ -122,6 +118,9 @@ export function CalendarSheet({
       participants,
       preparatoryContent,
       createdAt,
+      updatedAt,
+      WFPYear,
+      user
     } = activityData[0];
 
     // Format preparatoryList and participants
@@ -143,30 +142,16 @@ Preparatory Item ${index + 1}:
         ? `Participants:\n${participants
             .map((participant: any, index: any) => {
               const user = usersData.find(
-                (user) => user.id === participant.userId
+                (user: { id: any; }) => user.id === participant.userId
               );
               return `${index + 1}. ${user?.name}`;
             })
             .join("\n")}`
         : `Participants: -`;
 
-    // Generate formatted QR code data
-    const qrData = `Activity Title: ${activityTitle}\n
-Activity Description: ${activityDescription}\n
-Type: ${type}\n
-${otherType ? `Other Type: ${otherType}` : ""}
-Target Participant: ${targetParticipant}\n
-Location: ${location}\n
-Date From: ${formatDate(dateFrom) || "-"}\n
-Date To: ${formatDate(dateTo) || "-"}\n
-Time Start: ${formatTime(timeStart) || "-"}\n
-Time End: ${formatTime(timeEnd) || "-"}\n
-Attachments: ${attachments || "-"}\n
-Status: ${status || "-"}\n
-Remarks: ${remarks || "-"}\n
-Author: ${userName || "-"}\n
-${formattedParticipants}
-${formattedPreparatoryList}`;
+    // Generate QR code data with redirect URL
+    const redirectUrl = `https://miadp-mis.vercel.app/calendar-of-activities/${id}`;
+    const qrData = redirectUrl;
 
     // Generate the QR code
     GenerateQRCodeWithLogo(qrData).then(setQrCode).catch(console.error);
@@ -200,6 +185,7 @@ ${formattedPreparatoryList}`;
     preparatoryList,
     preparatoryContent,
     createdAt,
+    updatedAt,
   } = activityData[0];
 
   const isValidUrl = (string: string) => {
@@ -279,6 +265,10 @@ ${formattedPreparatoryList}`;
     setContentDialogTitle(title);
     setOpenContentDialog(!openContentDialog);
   };
+
+  const handleOpenLink = () => {
+    window.open(`https://miadp-mis.vercel.app/calendar-of-activities/${id}`, '_blank');
+  };
   return (
     <>
       <Sheet open={openSheet} onOpenChange={closeCalendarSheet}>
@@ -295,7 +285,14 @@ ${formattedPreparatoryList}`;
                 className="border w-full h-1 md:hidden"
               ></div>
             </SheetTitle>
-            {user.id == currentUser?.user.id && (
+            <div className="flex flex-col gap-2 absolute top-8 right-4">
+                <FaExternalLinkAlt
+                  size={20}
+                  className="cursor-pointer"
+                  onClick={handleOpenLink}
+                />
+              </div>
+            {user?.id === currentUser?.user?.id && (
               <div className="flex flex-col gap-2 absolute top-8 right-4">
                 <PiNotePencilBold
                   size={20}
@@ -309,6 +306,7 @@ ${formattedPreparatoryList}`;
                 />
               </div>
             )}
+        
           </SheetHeader>
           <div className="mt-4 gap-5 grid grid-cols-1 md:grid-cols-2 auto-rows-min">
             <div className="flex flex-col space-y-2 gap-5">
@@ -569,13 +567,13 @@ ${formattedPreparatoryList}`;
                       <AccordionContent>
                         <div className="flex flex-wrap justify-start gap-1 p-2 border rounded-lg">
                           {participants.map(
-                            (participant: any, index: number) => {
+                            (participant: { userId: string }, index: number) => {
                               const user = usersData.find(
-                                (user) => user.id === participant.userId
+                                (user: { id: string }) => user.id === participant.userId
                               );
                               return (
                                 <div
-                                  key={index}
+                                  key={participant.userId}
                                   className="flex flex-wrap cursor-pointer"
                                 >
                                   {user ? (
@@ -604,10 +602,10 @@ ${formattedPreparatoryList}`;
                                       <Label>User details not found.</Label>
                                     </Badge>
                                   )}
-                                  {loadingUser && <LoadingSpinner />}
-                                  {errorUser && (
+                                  {usersLoading && <LoadingSpinner />}
+                                  {usersError && (
                                     <Label className="text-destructive">
-                                      {errorUser}
+                                      {usersError}
                                     </Label>
                                   )}
                                 </div>
@@ -793,8 +791,21 @@ ${formattedPreparatoryList}`;
                   }
                   description="Date Created"
                 />
-                <Badge variant={"outline"} className="font-medium shadow-md">
+                <Badge variant={"outline"} className="font-medium shadow-md bg-green-800 text-white">
                   {formatProperDateTime(createdAt)}
+                </Badge>
+              </div>
+              <div className="flex items-center space-x-2 mt-2">
+                <TooltipComponent
+                  trigger={
+                    <div className="flex items-center cursor-help">
+                      <MdOutlineDateRange size={24} />
+                    </div>
+                  }
+                  description="Date Updated"
+                />
+                <Badge variant={"outline"} className="font-medium shadow-md bg-yellow-800 text-white">
+                  {formatProperDateTime(updatedAt)}
                 </Badge>
               </div>
             </div>

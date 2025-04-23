@@ -68,6 +68,8 @@ import FormFieldWrapper from "@/components/FormFieldWrapper";
 import { useActivitiesData } from "@/lib/calendar-of-activity/useActivitiesDataHook";
 import { useSession } from "next-auth/react";
 import { sendBulkEmail } from "@/actions/send-bulk-email";
+import { format, parseISO } from "date-fns"
+import { useUsersData } from "@/lib/users/useUserDataHook";
 
 export const QuillEditor = dynamic(() => import("react-quill"), { ssr: false });
 
@@ -109,10 +111,8 @@ export const quillFormats = [
 ];
 
 const CalendarForm = ({ setDialogClose, individualActivity_ }: Props) => {
-  // const { usersData, loadingUser, errorUser, fetchUsers } = useUsers();
-  const { usersData, loadingUser, errorUser } = useSelector(
-    (state) => state.users
-  );
+  const { usersData, usersLoading, usersError, refetchUsers } = useUsersData();
+
   const { data: currentUser } = useSession();
 
   const [filteredUsersData, setFilteredUsersData] = useState<UserType[]>([]);
@@ -512,7 +512,7 @@ const CalendarForm = ({ setDialogClose, individualActivity_ }: Props) => {
       setSuccess(data.success);
 
       // Send Email Notification
-      await sendEmailNotification(values);
+      await sendEmailNotification(values, data.id);
 
       toast({
         title: "Success",
@@ -632,7 +632,7 @@ const CalendarForm = ({ setDialogClose, individualActivity_ }: Props) => {
     const filteredUsersData =
       filterRegion === "All"
         ? usersData
-        : usersData.filter((user) => user.region === filterRegion);
+        : usersData.filter((user: { region: string | undefined; }) => user.region === filterRegion);
 
     const multiSelectUsersDropdownData =
       convertUsersToDropdownData(filteredUsersData);
@@ -659,19 +659,19 @@ const CalendarForm = ({ setDialogClose, individualActivity_ }: Props) => {
     ]);
     form.setValue("preparatoryContent", "");
   };
-
   const sendEmailNotification = async (
-    values: z.infer<typeof CalendarOfActivitySchema>
+    values: z.infer<typeof CalendarOfActivitySchema>,
+    id: string // Added id as a parameter
   ) => {
     try {
       const selectedParticipants = form.watch("participants") || [];
       const emails = usersData
-        .filter((user) =>
+        .filter((user: { id: string; }) =>
           selectedParticipants.some(
             (participant) => participant.userId === user.id
           )
         )
-        .map((user) => user.email);
+        .map((user: { email: any; }) => user.email);
 
       if (emails.length === 0) {
         toast({
@@ -682,59 +682,70 @@ const CalendarForm = ({ setDialogClose, individualActivity_ }: Props) => {
         return;
       }
 
-      const formatDateTime = (date: string, time?: string) => {
-        const dt = new Date(`${date}T${time || "00:00"}`);
-        return dt.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+      const startDate = parseISO(values.dateFrom);
+      const endDate = parseISO(values.dateTo);
+      let startDateTime, endDateTime;
+
+      if (allDayChecked) {
+        startDateTime = format(startDate, "yyyyMMdd");
+        endDateTime = format(endDate, "yyyyMMdd");
+      } else {
+        // Parse time strings into hours and minutes
+        const [startHours, startMinutes] = values.timeStart.split(':');
+        const [endHours, endMinutes] = values.timeEnd.split(':');
+
+        // Set the time components on the dates
+        startDate.setHours(parseInt(startHours), parseInt(startMinutes));
+        endDate.setHours(parseInt(endHours), parseInt(endMinutes));
+
+        startDateTime = format(startDate, "yyyyMMdd'T'HHmmss");
+        endDateTime = format(endDate, "yyyyMMdd'T'HHmmss");
+      }
+
+      const baseUrl = "https://www.google.com/calendar/render?action=TEMPLATE";
+      const text = encodeURIComponent(values.activityTitle);
+      const dates = `${startDateTime}/${endDateTime}`;
+      const details = encodeURIComponent(values.activityDescription);
+      const location = encodeURIComponent(values.location);
+      // Format date and time
+      const formatDate = (dateString: string | number | Date) => {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
       };
 
-      const googleCalendarLink = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(
-        values.activityTitle
-      )}&dates=${formatDateTime(
-        values.dateFrom,
-        values.timeStart
-      )}/${formatDateTime(
-        values.dateTo,
-        values.timeEnd
-      )}&details=${encodeURIComponent(
-        values.activityDescription
-      )}&location=${encodeURIComponent(values.location)}`;
+      const formatTime = (timeString: string) => {
+        const [hours, minutes] = timeString.split(':');
+        const date = new Date();
+        date.setHours(parseInt(hours), parseInt(minutes));
+        return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+      };
+
+      const googleCalendarLink = `${baseUrl}&text=${text}&dates=${dates}&details=${details}&location=${location}&allday=${allDayChecked}`;
 
       const response = await sendBulkEmail({
         to: emails,
-        subject: `Upcoming Activity: ${values.activityTitle}`,
+        subject: `📆 MIADP Upcoming Activity: ${values.activityTitle}`,
         text: `Dear Team,
   
   We are pleased to inform you that you are one of the participants for an upcoming activity. Below are the details:
-  
-  📅 DATE: ${
-    values.dateFrom === values.dateTo
-      ? `${values.dateFrom}${
-          values.timeStart && values.timeEnd
-            ? ` (${values.timeStart} - ${values.timeEnd})`
-            : ""
-        }`
-      : `${values.dateFrom} to ${values.dateTo}`
-  }
-  📆 WFP YEAR: ${values.WFPYear}  
-  📍 LOCATION: ${values.location}  
-  📝 ACTIVITY TITLE: ${values.activityTitle}  
-  📌 TYPE: ${values.type}${values.otherType ? ` - ${values.otherType}` : ""}  
-  🎯 TARGET PARTICIPANTS: ${values.targetParticipant}  
-  📊 STATUS: ${values.status}  
-  📄 DESCRIPTION:  
-  ${values.activityDescription}  
-  
-  📅 Add to your calendar:  
-  🔗 ${googleCalendarLink}
-  
+
+  📍 LOCATION: ${values.location}
+  📝 ACTIVITY TITLE: ${values.activityTitle}
+  🎯 TARGET PARTICIPANTS: ${values.targetParticipant}
+  📅 DATE: ${formatDate(values.dateFrom)}${values.dateFrom !== values.dateTo ? ` - ${formatDate(values.dateTo)}` : ''}
+  🕰️ TIME: ${values.allDay ? 'All Day' : `${formatTime(values.timeStart)} - ${formatTime(values.timeEnd)}`}
+  📄 DESCRIPTION: ${values.activityDescription}
+
+  📅 Add to your calendar: 🔗 ${googleCalendarLink}
+
   Please mark your calendar accordingly. If you have any questions or require further information, feel free to reach out.
   
   You can also visit the web application for more details:  
   🔗 MIADP Portal - Calendar of Activities  
   https://miadp-mis.vercel.app/activities/table
   
-  Best regards,  
-  MIADP Portal - Calendar of Activities
+  Additionally, you can also share this activity with others using this link:  
+  🔗 https://miadp-mis.vercel.app/calendar-of-activities/${id} 
   `,
       });
 
@@ -1342,24 +1353,24 @@ const CalendarForm = ({ setDialogClose, individualActivity_ }: Props) => {
                           />
                           {form.watch(`preparatoryList.${index}.status`) ==
                             "Other" && (
-                            <FormField
-                              control={form.control}
-                              name={`preparatoryList.${index}.remarks`}
-                              render={({ field }) => (
-                                <FormItem className="w-full">
-                                  <FormMessage />
-                                  <FormControl>
-                                    <Input
-                                      {...field}
-                                      className="w-full"
-                                      disabled={loadingForm}
-                                      placeholder="Please specify..."
-                                    />
-                                  </FormControl>
-                                </FormItem>
-                              )}
-                            />
-                          )}
+                              <FormField
+                                control={form.control}
+                                name={`preparatoryList.${index}.remarks`}
+                                render={({ field }) => (
+                                  <FormItem className="w-full">
+                                    <FormMessage />
+                                    <FormControl>
+                                      <Input
+                                        {...field}
+                                        className="w-full"
+                                        disabled={loadingForm}
+                                        placeholder="Please specify..."
+                                      />
+                                    </FormControl>
+                                  </FormItem>
+                                )}
+                              />
+                            )}
                           <Button
                             className="w-fit"
                             type="button"

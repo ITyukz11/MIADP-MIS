@@ -496,6 +496,7 @@ const CalendarForm = ({ setDialogClose, individualActivity_ }: Props) => {
       values.status = status;
       values.dateFrom = new Date(values.dateFrom).toISOString().split("T")[0];
       values.dateTo = new Date(values.dateTo).toISOString().split("T")[0];
+      values.allDay = allDayChecked;
 
       setLoadingForm(true);
       setError("");

@@ -293,7 +293,7 @@ Preparatory Item ${index + 1}:
                 />
               </div>
             {user?.id === currentUser?.user?.id && (
-              <div className="flex flex-col gap-2 absolute top-8 right-4">
+              <div className="flex flex-col gap-2 absolute top-16 right-4">
                 <PiNotePencilBold
                   size={20}
                   className="cursor-pointer"

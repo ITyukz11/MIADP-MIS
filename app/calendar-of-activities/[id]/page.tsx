@@ -9,9 +9,10 @@ import { FaCalendarAlt, FaClock, FaMapMarkerAlt, FaUsers, FaUser, FaBuilding, Fa
 import { useUsersData } from "@/lib/users/useUserDataHook"
 import { Separator } from "@/components/ui/separator"
 import { Key } from "react"
-import { getStatusColor } from "@/components/table/data/activities/coa-columns"
+import { formatDate, getStatusColor } from "@/components/table/data/activities/coa-columns"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
+import { formatDateLong } from "@/utils/dateFormat"
 
 export default function Page({ params }: { params: { id: string } }) {
   const [activity, setActivity] = useState<Activity | null>(null)
@@ -39,11 +40,17 @@ export default function Page({ params }: { params: { id: string } }) {
   }, [params.id])
 
   if (loading || usersLoading) {
-    return <div className="p-6 text-center">Loading...</div>
+    return (
+      <div className="p-6 text-center">
+        <div className="spinner-border text-primary" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </div>
+      </div>
+    )
   }
 
   if (error || usersError) {
-    return <div className="p-6 text-center text-red-500">Error: {error || usersError?.message}</div>
+    return <div className="p-6 text-center text-red-500">Error: {error || usersError?.message || 'An error occurred'}</div>
   }
 
   if (!activity) {
@@ -208,7 +215,16 @@ export default function Page({ params }: { params: { id: string } }) {
               <p className="text-gray-600 text-sm sm:text-base text-center">{activity.activityDescription}</p>
               <div className="flex justify-center flex-wrap gap-2">
                 <Badge className="text-xs sm:text-sm">{activity.type}</Badge>
-                <Badge variant="outline" className={`text-xs sm:text-sm text-white ${getStatusColor(activity.status)}`}>{activity.status}</Badge>
+                <Badge
+                  className={`text-xs sm:text-sm cursor-default shadow-md  dark:text-white hover:${getStatusColor(
+                    activity.status
+                  )} ${getStatusColor(activity.status)}`}
+                >
+                  {activity.status}
+                  {activity.status === "Ongoing" && (
+                    <div className="h-3 w-3 rounded-full bg-white animate-pulse ml-1"></div>
+                  )}
+                </Badge>
               </div>
               <div className="flex justify-center mt-2">
                 <Link 
@@ -233,7 +249,12 @@ export default function Page({ params }: { params: { id: string } }) {
                 </div>
                 <div className="space-y-2 text-sm sm:text-base">
                   <div className="flex items-center"><FaCalendarAlt className="w-4 h-4 sm:w-5 sm:h-5 mr-2" /><strong>WFP Year:</strong> {activity.WFPYear}</div>
-                  <div className="flex items-center"><FaCalendarAlt className="w-4 h-4 sm:w-5 sm:h-5 mr-2" /><strong>Date:</strong> {format(parseISO(activity.dateFrom), "PPP")} {activity.dateFrom !== activity.dateTo ? ` - ${format(parseISO(activity.dateTo), "PPP")}` : ""}</div>
+                  <div className="flex items-center"><FaCalendarAlt className="w-4 h-4 sm:w-5 sm:h-5 mr-2" /><strong>Date:</strong> 
+                  {activity.dateFrom === activity.dateTo
+                    ? formatDate(activity.dateFrom)
+                    : `${formatDate(activity.dateFrom)} - ${formatDateLong(activity.dateTo)}`}
+                  {/* {format(parseISO(activity.dateFrom), "PPP")} {activity.dateFrom !== activity.dateTo ? ` - ${format(parseISO(activity.dateTo), "PPP")}` : ""} */}
+                  </div>
                   <div className="flex items-center"><FaClock className="w-4 h-4 sm:w-5 sm:h-5 mr-2" /><strong>Time:</strong> {activity.allDay ? "All day" : `${activity.timeStart} - ${activity.timeEnd}`}</div>
                   <div className="flex items-center"><FaMapMarkerAlt className="w-4 h-4 sm:w-5 sm:h-5 mr-2" /><strong>Location:</strong> {activity.location}</div>
                 </div>

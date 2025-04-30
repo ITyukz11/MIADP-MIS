@@ -10,6 +10,8 @@ import * as ExcelJS from "exceljs";
 import { useCalendarOfActivityFilter } from "../context/FilterRegionContext";
 import { useSelector } from "@/app/store/store";
 import { Label } from "../ui/label";
+import { useUsersData } from "@/lib/users/useUserDataHook";
+import { UserType } from "@/types/users/userType";
 
 interface DataTableToolbarProps<TData> {
   data: TData[];
@@ -36,9 +38,12 @@ export function DataTableToolbar<TData>({
   const [filterInput, setFilterInput] = useState<string>("");
 
   const { currentFilter } = useCalendarOfActivityFilter();
-  const { usersData, loadingUser, errorUser } = useSelector(
-    (state) => state.users
-  );
+  const {usersData} =useUsersData()
+  // const { usersData, loadingUser, errorUser } = useSelector(
+  //   (state) => state.users
+  // );
+
+
   // const [dateRange, setDateRange] = useState<DateRange | undefined>({
   //   from: new Date(2024, 0, 1), // January 1, 2024
   //   to: new Date(2024, 11, 31), // December 31, 2024
@@ -259,7 +264,7 @@ export function DataTableToolbar<TData>({
         const participantsSet: Set<string> = new Set();
 
         participantsData.forEach((participant: any) => {
-          const user = usersData.find((user) => user.id === participant.userId);
+          const user = usersData.find((user:UserType) => user.id === participant.userId);
 
           // Ensure the component exists before accessing its characters
           const componentCode = user?.component

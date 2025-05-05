@@ -198,7 +198,7 @@ export function SubprojectDataTableRowActions({
       rowData.briefDescription
         ? `
         <tr>
-            <td><b>Coordinate</b></td>
+            <td><b>Brief Description</b></td>
             <td>${rowData.briefDescription}</td>
         </tr>
     `

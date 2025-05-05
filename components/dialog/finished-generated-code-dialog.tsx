@@ -211,7 +211,7 @@ function FinishedGeneratedCode({
           SubprojectInformations.briefDescription
             ? `
             <tr>
-                <td><b>Coordinate</b></td>
+                <td><b>Brief Description</b></td>
                 <td>${SubprojectInformations.briefDescription}</td>
             </tr>
         `

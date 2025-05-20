@@ -432,6 +432,9 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
           }
 
           refetchActivities();
+
+          // Send Email Notification
+          await sendEmailNotification(values);
         } else if (result.error) {
           toast({
             variant: "destructive",
@@ -548,7 +551,6 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
 
   const sendEmailNotification = async (
     values: z.infer<typeof CalendarOfActivitySchema>,
-    id: string // Added id as a parameter
   ) => {
     try {
       const selectedParticipants = form.watch("participants") || [];
@@ -640,7 +642,7 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
   https://miadp-mis.vercel.app/activities/table
   
   Additionally, you can also share this activity with others using this link:  
-  🔗 https://miadp-mis.vercel.app/calendar-of-activities/${id} 
+  🔗 https://miadp-mis.vercel.app/calendar-of-activities/${activityId} 
 
   📅 Add to your calendar: 🔗 ${googleCalendarLink}
 

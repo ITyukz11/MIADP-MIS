@@ -731,15 +731,16 @@ const CalendarForm = ({ setDialogClose, individualActivity_ }: Props) => {
   We are pleased to inform you that you are one of the participants for an upcoming activity. Below are the details:
 
   📍 LOCATION: ${values.location}
+
   📝 ACTIVITY TITLE: ${values.activityTitle}
+
   🎯 TARGET PARTICIPANTS: ${values.targetParticipant}
+
   📅 DATE: ${formatDate(values.dateFrom)}${values.dateFrom !== values.dateTo ? ` - ${formatDate(values.dateTo)}` : ''}
+
   🕰️ TIME: ${values.allDay ? 'All Day' : `${formatTime(values.timeStart)} - ${formatTime(values.timeEnd)}`}
+
   📄 DESCRIPTION: ${values.activityDescription}
-
-  📅 Add to your calendar: 🔗 ${googleCalendarLink}
-
-  Please mark your calendar accordingly. If you have any questions or require further information, feel free to reach out.
   
   You can also visit the web application for more details:  
   🔗 MIADP Portal - Calendar of Activities  
@@ -747,6 +748,10 @@ const CalendarForm = ({ setDialogClose, individualActivity_ }: Props) => {
   
   Additionally, you can also share this activity with others using this link:  
   🔗 https://miadp-mis.vercel.app/calendar-of-activities/${id} 
+
+  📅 Add to your calendar: 🔗 ${googleCalendarLink}
+
+  Please mark your calendar accordingly. If you have any questions or require further information, feel free to reach out.
   `,
       });
 

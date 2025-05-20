@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef, useCallback, memo } from "react";
 import {
   Dialog,
   DialogContent,
@@ -196,28 +196,17 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
       setSelectedData([]);
       setSelectedParticipants([]);
     }
-  }, [
-    activityId,
-    currentIndex,
-    openUpdateDialog,
-    participants,
-    usersData,
-    setSelectedData,
-    setSelectedParticipants,
-    convertUsersToSelectedParticipantData,
-  ]);
-
-  //only once
-  useEffect(() => {
-    if (participants && participants.length > 0 && !doneStoringParticipantsBefore) {
-      setSelectedParticipantsBefore(
-        participants.map((participant) => participant.userId)
-      );
-      setDoneStoringParticipantsBefore(true)
-    }
-  }, [doneStoringParticipantsBefore, participants]);
+  }, [activityId, 
+    currentIndex, 
+    openUpdateDialog, 
+    participants, 
+    usersData, 
+    setSelectedData, 
+    setSelectedParticipants, 
+    convertUsersToSelectedParticipantData]);
 
   console.log("selected participants before: ", selectedParticipantsBefore)
+  console.log("selected participants before boolean: ", doneStoringParticipantsBefore)
   useEffect(() => {
     const filteredUsersData =
       filterRegion === "All"
@@ -278,12 +267,18 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
               : [{ details: "", link: "" }],
           remarks: activityData.remarks,
         });
+
+        const currentParticipants = activityData.participants.map((participant:any) => participant.userId);
+
+        setSelectedParticipantsBefore(currentParticipants)
         // setListMode(activityData.preparatoryContent ? false : true)
         setAllDayChecked(activityData.dateFrom != activityData.dateTo);
       }
+
       setLoadingForm(false);
     }
   }, [activityId, currentIndex, activitiesData, form, currentUser?.user.id]);
+
 
   const { control, watch } = form;
 
@@ -566,8 +561,7 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
           )
         )
         .map((user: { email: any }) => user.email);
-
-
+      
       if (emails.length === 0) {
         toast({
           title: "No Recipients Found",
@@ -697,8 +691,8 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
                     : () => setCurrentIndex(currentIndex - 1)
                 }
                 className={`w-10 h-10 ${currentIndex === 0
-                    ? "cursor-not-allowed opacity-50"
-                    : "cursor-pointer"
+                  ? "cursor-not-allowed opacity-50"
+                  : "cursor-pointer"
                   }`}
               />
               <Label>
@@ -711,8 +705,8 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
                     : () => setCurrentIndex(currentIndex + 1)
                 }
                 className={`w-10 h-10 ${currentIndex === activityId.length - 1
-                    ? "cursor-not-allowed opacity-50"
-                    : "cursor-pointer"
+                  ? "cursor-not-allowed opacity-50"
+                  : "cursor-pointer"
                   }`}
               />
             </div>
@@ -1528,4 +1522,5 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
   );
 };
 
-export default UpdateActivityDialog;
+export default memo(UpdateActivityDialog);
+

@@ -64,6 +64,9 @@ import { Switch } from "../ui/switch";
 import { FaX } from "react-icons/fa6";
 import { useActivitiesData } from "@/lib/calendar-of-activity/useActivitiesDataHook";
 import { useSession } from "next-auth/react";
+import { useUsersData } from "@/lib/users/useUserDataHook";
+import { sendBulkEmail } from "@/actions/send-bulk-email";
+import { format, parseISO } from "date-fns";
 
 interface UpdateActivityDialogProps {
   activityId: string[];
@@ -96,6 +99,9 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
   const { RangePicker } = DatePicker;
 
   const [selectedParticipants, setSelectedParticipants] = useState([""]);
+  const [selectedParticipantsBefore, setSelectedParticipantsBefore] = useState([""]);
+  const [doneStoringParticipantsBefore, setDoneStoringParticipantsBefore] = useState<boolean>(false)
+
   const [participantError, setParticipantError] = useState(false);
   const [preparatoryError, setPreparatoryError] = useState(false);
   const [timeError, setTimeError] = useState(false);
@@ -103,10 +109,10 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
 
   const { refetchActivities } = useActivitiesData();
 
-  // const { usersData, loadingUser, errorUser, fetchUsers } = useUsers();
-  const { usersData, loadingUser, errorUser } = useSelector(
-    (state) => state.users
-  );
+  const { usersData, usersLoading, usersError, refetchUsers } = useUsersData();
+  // const { usersData, loadingUser, errorUser } = useSelector(
+  //   (state) => state.users
+  // );
 
   const { data: currentUser } = useSession();
 
@@ -201,11 +207,22 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
     convertUsersToSelectedParticipantData,
   ]);
 
+  //only once
+  useEffect(() => {
+    if (participants && participants.length > 0 && !doneStoringParticipantsBefore) {
+      setSelectedParticipantsBefore(
+        participants.map((participant) => participant.userId)
+      );
+      setDoneStoringParticipantsBefore(true)
+    }
+  }, [doneStoringParticipantsBefore, participants]);
+
+  console.log("selected participants before: ", selectedParticipantsBefore)
   useEffect(() => {
     const filteredUsersData =
       filterRegion === "All"
         ? usersData
-        : usersData.filter((user) => user.region === filterRegion);
+        : usersData.filter((user: { region: string | undefined; }) => user.region === filterRegion);
 
     setFilteredUsersData(filteredUsersData);
 
@@ -247,8 +264,8 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
             activityData.participants.length > 0
               ? activityData.participants
               : activityData.individualActivity
-              ? [{ userId: currentUser?.user.id }]
-              : [{ userId: "" }],
+                ? [{ userId: currentUser?.user.id }]
+                : [{ userId: "" }],
           preparatoryContent: activityData.preparatoryContent,
           preparatoryList:
             activityData.preparatoryList.length > 0
@@ -256,7 +273,7 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
               : [{ description: "", status: "", remarks: "" }],
           calendarOfActivityAttachment:
             activityData.calendarOfActivityAttachment &&
-            activityData.calendarOfActivityAttachment.length > 0
+              activityData.calendarOfActivityAttachment.length > 0
               ? activityData.calendarOfActivityAttachment
               : [{ details: "", link: "" }],
           remarks: activityData.remarks,
@@ -529,6 +546,130 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
     form.setValue("listMode", !form.watch("listMode"));
   };
 
+  const sendEmailNotification = async (
+    values: z.infer<typeof CalendarOfActivitySchema>,
+    id: string // Added id as a parameter
+  ) => {
+    try {
+      const selectedParticipants = form.watch("participants") || [];
+
+      const filteredParticipants = selectedParticipants.filter(
+        (participant) => !selectedParticipantsBefore.includes(participant.userId)
+      );
+
+      const emails = usersData
+        .filter((user: { id: string }) =>
+          filteredParticipants.some(
+            (participant) => participant.userId === user.id
+          )
+        )
+        .map((user: { email: any }) => user.email);
+
+
+      if (emails.length === 0) {
+        toast({
+          title: "No Recipients Found",
+          description: "Please select participants with valid emails.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const startDate = parseISO(values.dateFrom);
+      const endDate = parseISO(values.dateTo);
+      let startDateTime, endDateTime;
+
+      if (allDayChecked) {
+        startDateTime = format(startDate, "yyyyMMdd");
+        endDateTime = format(endDate, "yyyyMMdd");
+      } else {
+        // Parse time strings into hours and minutes
+        const [startHours, startMinutes] = values.timeStart.split(':');
+        const [endHours, endMinutes] = values.timeEnd.split(':');
+
+        // Set the time components on the dates
+        startDate.setHours(parseInt(startHours), parseInt(startMinutes));
+        endDate.setHours(parseInt(endHours), parseInt(endMinutes));
+
+        startDateTime = format(startDate, "yyyyMMdd'T'HHmmss");
+        endDateTime = format(endDate, "yyyyMMdd'T'HHmmss");
+      }
+
+      const baseUrl = "https://www.google.com/calendar/render?action=TEMPLATE";
+      const text = encodeURIComponent(values.activityTitle);
+      const dates = `${startDateTime}/${endDateTime}`;
+      const details = encodeURIComponent(values.activityDescription);
+      const location = encodeURIComponent(values.location);
+      // Format date and time
+      const formatDate = (dateString: string | number | Date) => {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+      };
+
+      const formatTime = (timeString: string) => {
+        const [hours, minutes] = timeString.split(':');
+        const date = new Date();
+        date.setHours(parseInt(hours), parseInt(minutes));
+        return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+      };
+
+      const googleCalendarLink = `${baseUrl}&text=${text}&dates=${dates}&details=${details}&location=${location}&allday=${allDayChecked}`;
+
+      const response = await sendBulkEmail({
+        to: emails,
+        subject: `📆 MIADP Upcoming Activity: ${values.activityTitle}`,
+        text: `Dear Team,
+  
+  We are pleased to inform you that you are one of the participants for an upcoming activity. Below are the details:
+
+  📍 LOCATION: ${values.location}
+
+  📝 ACTIVITY TITLE: ${values.activityTitle}
+
+  🎯 TARGET PARTICIPANTS: ${values.targetParticipant}
+
+  📅 DATE: ${formatDate(values.dateFrom)}${values.dateFrom !== values.dateTo ? ` - ${formatDate(values.dateTo)}` : ''}
+
+  🕰️ TIME: ${values.allDay ? 'All Day' : `${formatTime(values.timeStart)} - ${formatTime(values.timeEnd)}`}
+  
+  📄 DESCRIPTION: ${values.activityDescription}
+
+  
+  You can also visit the web application for more details:  
+  🔗 MIADP Portal - Calendar of Activities  
+  https://miadp-mis.vercel.app/activities/table
+  
+  Additionally, you can also share this activity with others using this link:  
+  🔗 https://miadp-mis.vercel.app/calendar-of-activities/${id} 
+
+  📅 Add to your calendar: 🔗 ${googleCalendarLink}
+
+  Please mark your calendar accordingly. If you have any questions or require further information, feel free to reach out.
+  `,
+      });
+
+      if (response.success) {
+        toast({
+          title: "Email Sent Successfully",
+          description: response.success,
+        });
+      } else {
+        toast({
+          title: "Email Failed",
+          description: response.error || "Unable to send emails.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Unexpected Error",
+        description:
+          error instanceof Error ? error.message : "Something went wrong.",
+        variant: "destructive",
+      });
+    }
+  };
+
   console.log(form.formState.errors);
 
   return (
@@ -553,11 +694,10 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
                     ? undefined
                     : () => setCurrentIndex(currentIndex - 1)
                 }
-                className={`w-10 h-10 ${
-                  currentIndex === 0
+                className={`w-10 h-10 ${currentIndex === 0
                     ? "cursor-not-allowed opacity-50"
                     : "cursor-pointer"
-                }`}
+                  }`}
               />
               <Label>
                 {currentIndex + 1} of {activityId.length}
@@ -568,11 +708,10 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
                     ? undefined
                     : () => setCurrentIndex(currentIndex + 1)
                 }
-                className={`w-10 h-10 ${
-                  currentIndex === activityId.length - 1
+                className={`w-10 h-10 ${currentIndex === activityId.length - 1
                     ? "cursor-not-allowed opacity-50"
                     : "cursor-pointer"
-                }`}
+                  }`}
               />
             </div>
           )}
@@ -938,7 +1077,7 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
                         <div className="flex flex-row gap-2 justify-center sm:justify-end items-center w-full sm:w-fit">
                           <Badge className="flex flex-row gap-1 justify-center items-center">
                             <MdPeopleAlt />
-                            {filteredUsersData.length}
+                            {usersLoading ? <LoadingSpinner /> : filteredUsersData.length}
                           </Badge>
                           <Select
                             onValueChange={setFilterRegion}
@@ -1188,24 +1327,24 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
                                       {form.watch(
                                         `preparatoryList.${index}.status`
                                       ) == "Other" && (
-                                        <FormField
-                                          control={form.control}
-                                          name={`preparatoryList.${index}.remarks`}
-                                          render={({ field }) => (
-                                            <FormItem className="w-full">
-                                              <FormMessage />
-                                              <FormControl>
-                                                <Input
-                                                  {...field}
-                                                  className="w-full"
-                                                  disabled={loadingForm}
-                                                  placeholder="Please specify..."
-                                                />
-                                              </FormControl>
-                                            </FormItem>
-                                          )}
-                                        />
-                                      )}
+                                          <FormField
+                                            control={form.control}
+                                            name={`preparatoryList.${index}.remarks`}
+                                            render={({ field }) => (
+                                              <FormItem className="w-full">
+                                                <FormMessage />
+                                                <FormControl>
+                                                  <Input
+                                                    {...field}
+                                                    className="w-full"
+                                                    disabled={loadingForm}
+                                                    placeholder="Please specify..."
+                                                  />
+                                                </FormControl>
+                                              </FormItem>
+                                            )}
+                                          />
+                                        )}
                                       <Button
                                         className="w-fit"
                                         type="button"

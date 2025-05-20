@@ -35,7 +35,7 @@ import { Badge } from "../ui/badge";
 import Image from "next/image";
 import { TbNotes, TbStatusChange } from "react-icons/tb";
 import { FaExternalLinkAlt, FaLink, FaQrcode } from "react-icons/fa";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { GenerateQRCodeWithLogo } from "../GenerateQrCodeWithLogo";
 import { MdAttachment, MdOutlineDateRange } from "react-icons/md";
 import Profile from "../profile/Profile";
@@ -83,14 +83,19 @@ export function CalendarSheet({
   const { refetchActivities } = useActivitiesData();
 
   const { data: currentUser } = useSession();
- 
-  const {usersData, usersLoading, usersError}=useUsersData()
+  const [forUpdateSelectedId, setForUpdateSelectedId] = useState<any>([])
+  const [forDeleteSelectedId, setForDeleteSelectedId] = useState<any>([])
+
+  const { usersData, usersLoading, usersError } = useUsersData()
 
   const [qrCode, setQrCode] = useState<string | null>(null);
   const [openProfile, setOpenProfile] = useState(false);
   const [openContentDialog, setOpenContentDialog] = useState(false);
 
   const { activityLoading } = useSelector((state) => state.activity);
+
+
+
   useEffect(() => {
     // Ensure activityData is defined and has at least one element
     if (!activityData || activityData.length === 0) {
@@ -140,13 +145,13 @@ Preparatory Item ${index + 1}:
     const formattedParticipants =
       participants.length > 0
         ? `Participants:\n${participants
-            .map((participant: any, index: any) => {
-              const user = usersData.find(
-                (user: { id: any; }) => user.id === participant.userId
-              );
-              return `${index + 1}. ${user?.name}`;
-            })
-            .join("\n")}`
+          .map((participant: any, index: any) => {
+            const user = usersData.find(
+              (user: { id: any; }) => user.id === participant.userId
+            );
+            return `${index + 1}. ${user?.name}`;
+          })
+          .join("\n")}`
         : `Participants: -`;
 
     // Generate QR code data with redirect URL
@@ -188,31 +193,14 @@ Preparatory Item ${index + 1}:
     updatedAt,
   } = activityData[0];
 
-  const isValidUrl = (string: string) => {
-    try {
-      new URL(string);
-      return true;
-    } catch (_) {
-      return false;
-    }
+  const handleOpenUpdateDialog = () => {
+    setOpenUpdateDialog(true);
+    setForUpdateSelectedId([id]);
   };
-  const formatProperDateTime = (timestamp: string): string => {
-    const date = new Date(timestamp);
 
-    const options: Intl.DateTimeFormatOptions = {
-      month: "short", // 'Aug'
-      day: "numeric", // '6'
-      year: "numeric", // '2024'
-      hour: "2-digit", // 'hh'
-      minute: "2-digit", // 'mm'
-      hour12: true, // am/pm
-    };
-
-    // Format date and time
-    const formattedDate = date.toLocaleString("en-US", options);
-
-    // Format output as 'Aug 6, 2024 - hh:mm am/pm'
-    return `${formattedDate.replace(/,/, " -")}`;
+  const handleOpenDeleteDialog = () => {
+    setOpenDeleteDialog(true);
+    setForDeleteSelectedId([id]);
   };
 
   const handleCancelUpdate = () => {
@@ -220,7 +208,6 @@ Preparatory Item ${index + 1}:
   };
 
   const handleCancelDelete = () => {
-    // Handle cancel action here
     setOpenDeleteDialog(false);
   };
 
@@ -255,6 +242,37 @@ Preparatory Item ${index + 1}:
     }
   };
 
+
+
+  const isValidUrl = (string: string) => {
+    try {
+      new URL(string);
+      return true;
+    } catch (_) {
+      return false;
+    }
+  };
+  const formatProperDateTime = (timestamp: string): string => {
+    const date = new Date(timestamp);
+
+    const options: Intl.DateTimeFormatOptions = {
+      month: "short", // 'Aug'
+      day: "numeric", // '6'
+      year: "numeric", // '2024'
+      hour: "2-digit", // 'hh'
+      minute: "2-digit", // 'mm'
+      hour12: true, // am/pm
+    };
+
+    // Format date and time
+    const formattedDate = date.toLocaleString("en-US", options);
+
+    // Format output as 'Aug 6, 2024 - hh:mm am/pm'
+    return `${formattedDate.replace(/,/, " -")}`;
+  };
+
+
+
   const handleOpenContentDialog = (
     title: string,
     content: string,
@@ -286,27 +304,27 @@ Preparatory Item ${index + 1}:
               ></div>
             </SheetTitle>
             <div className="flex flex-col gap-2 absolute top-8 right-4">
-                <FaExternalLinkAlt
-                  size={20}
-                  className="cursor-pointer"
-                  onClick={handleOpenLink}
-                />
-              </div>
+              <FaExternalLinkAlt
+                size={20}
+                className="cursor-pointer"
+                onClick={handleOpenLink}
+              />
+            </div>
             {user?.id === currentUser?.user?.id && (
               <div className="flex flex-col gap-2 absolute top-16 right-4">
                 <PiNotePencilBold
                   size={20}
                   className="cursor-pointer"
-                  onClick={() => setOpenUpdateDialog(true)}
+                  onClick={handleOpenUpdateDialog}
                 />
                 <IoTrashOutline
                   size={20}
                   className="cursor-pointer"
-                  onClick={() => setOpenDeleteDialog(true)}
+                  onClick={handleOpenDeleteDialog}
                 />
               </div>
             )}
-        
+
           </SheetHeader>
           <div className="mt-4 gap-5 grid grid-cols-1 md:grid-cols-2 auto-rows-min">
             <div className="flex flex-col space-y-2 gap-5">
@@ -332,16 +350,16 @@ Preparatory Item ${index + 1}:
                           user.region === "PSO"
                             ? "/miadp-pso.jpg"
                             : user.region === "RPCO 13"
-                            ? "/miadp-region-xiii.jpg"
-                            : user.region === "RPCO 12"
-                            ? "/miadp-region-xii.jpg"
-                            : user.region === "RPCO 11"
-                            ? "/miadp-region-xi.jpg"
-                            : user.region === "RPCO 10"
-                            ? "/miadp-region-x.jpg"
-                            : user.region === "RPCO 9"
-                            ? "/miadp-region-ix.jpg"
-                            : "/miadp-barmm.jpg"
+                              ? "/miadp-region-xiii.jpg"
+                              : user.region === "RPCO 12"
+                                ? "/miadp-region-xii.jpg"
+                                : user.region === "RPCO 11"
+                                  ? "/miadp-region-xi.jpg"
+                                  : user.region === "RPCO 10"
+                                    ? "/miadp-region-x.jpg"
+                                    : user.region === "RPCO 9"
+                                      ? "/miadp-region-ix.jpg"
+                                      : "/miadp-barmm.jpg"
                         }
                         alt={"MIADP pso Logo"}
                         width={30}
@@ -832,14 +850,14 @@ Preparatory Item ${index + 1}:
         setDeleteDialogClose={() => setOpenContentDialog(!openContentDialog)}
       />
       <UpdateActivityDialog
-        activityId={[id]}
+        activityId={forUpdateSelectedId}
         onCancel={handleCancelUpdate}
         openUpdateDialog={openUpdateDialog}
         setUpdateDialogClose={setOpenUpdateDialog}
         loadingUpdate={activityLoading}
       />
       <ConfirmDeleteDialog
-        items={[id]}
+        items={forDeleteSelectedId}
         onCancel={handleCancelDelete}
         onConfirm={handleConfirmDelete}
         openDeleteDialog={openDeleteDialog}

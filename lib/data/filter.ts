@@ -52,6 +52,103 @@ export const regionOptions = [
   "BARMM",
 ];
 
+export const PSAMindanaoRegions = [
+  { label: "Zamboanga Peninsula", value: "Zamboanga Peninsula", code: "090000000" },
+  { label: "Northern Mindanao", value: "Northern Mindanao",code: "100000000" },
+  { label: "Davao Region", value: "Davao Region", code: "110000000" },
+  { label: "SOCCSKSARGEN",value: "SOCCSKSARGEN", code: "120000000" },
+  { label: "Caraga", value: "Caraga", code: "160000000" },
+  { label: "Bangsamoro",  value: "Bangsamoro",code: "150000000" },
+];
+
+export const mindanaoProvinces = [
+  // Zamboanga Peninsula
+  { code: "097200000", value: "Zamboanga Del Norte", region: "Zamboanga Peninsula", label: "Zamboanga Del Norte" },
+  { code: "097300000", value: "Zamboanga Del Sur", region: "Zamboanga Peninsula", label: "Zamboanga Del Sur" },
+  { code: "098300000", value: "Zamboanga Sibugay", region: "Zamboanga Peninsula", label: "Zamboanga Sibugay" },
+
+  // Northern Mindanao
+  { code: "101300000", value: "Bukidnon", region: "Northern Mindanao", label: "Bukidnon" },
+  { code: "101800000", value: "Camiguin", region: "Northern Mindanao", label: "Camiguin" },
+  { code: "103500000", value: "Lanao Del Norte", region: "Northern Mindanao", label: "Lanao Del Norte" },
+  { code: "104200000", value: "Misamis Occidental", region: "Northern Mindanao", label: "Misamis Occidental" },
+  { code: "104300000", value: "Misamis Oriental", region: "Northern Mindanao", label: "Misamis Oriental" },
+
+  // Davao Region
+  { code: "112300000", value: "Davao Del Norte", region: "Davao Region", label: "Davao Del Norte" },
+  { code: "112400000", value: "Davao Del Sur", region: "Davao Region", label: "Davao Del Sur" },
+  { code: "112500000", value: "Davao Oriental", region: "Davao Region", label: "Davao Oriental" },
+  { code: "118200000", value: "Davao De Oro", region: "Davao Region", label: "Davao De Oro" },
+  { code: "118600000", value: "Davao Occidental", region: "Davao Region", label: "Davao Occidental" },
+
+  // SOCCSKSARGEN
+  { code: "124700000", value: "Cotabato", region: "SOCCSKSARGEN", label: "Cotabato" },
+  { code: "126300000", value: "South Cotabato", region: "SOCCSKSARGEN", label: "South Cotabato" },
+  { code: "126500000", value: "Sultan Kudarat", region: "SOCCSKSARGEN", label: "Sultan Kudarat" },
+  { code: "128000000", value: "Sarangani", region: "SOCCSKSARGEN", label: "Sarangani" },
+
+  // Caraga
+  { code: "160200000", value: "Agusan Del Norte", region: "Caraga", label: "Agusan Del Norte" },
+  { code: "160300000", value: "Agusan Del Sur", region: "Caraga", label: "Agusan Del Sur" },
+  { code: "166700000", value: "Surigao Del Norte", region: "Caraga", label: "Surigao Del Norte" },
+  { code: "166800000", value: "Surigao Del Sur", region: "Caraga", label: "Surigao Del Sur" },
+  { code: "168500000", value: "Dinagat Islands", region: "Caraga", label: "Dinagat Islands" },
+
+  // BARMM
+  { code: "150700000", value: "Basilan", region: "BARMM", label: "Basilan" },
+  { code: "153600000", value: "Lanao Del Sur", region: "BARMM", label: "Lanao Del Sur" },
+  { code: "153800000", value: "Maguindanao", region: "BARMM", label: "Maguindanao" },
+  { code: "156600000", value: "Sulu", region: "BARMM", label: "Sulu" },
+  { code: "157000000", value: "Tawi-Tawi", region: "BARMM", label: "Tawi-Tawi" },
+];
+
+export const mindanaoCities = [
+  // Zamboanga Peninsula
+  { value: "Dapitan", region: "Zamboanga Peninsula", province: "Zamboanga Del Norte", label: "Dapitan" },
+  { value: "Dipolog", region: "Zamboanga Peninsula", province: "Zamboanga Del Norte", label: "Dipolog" },
+  { value: "Pagadian", region: "Zamboanga Peninsula", province: "Zamboanga Del Sur", label: "Pagadian" },
+  { value: "Zamboanga", region: "Zamboanga Peninsula", province: "Zamboanga City", label: "Zamboanga" },
+  { value: "Isabela", region: "Zamboanga Peninsula", province: "Basilan", label: "Isabela" },
+
+  // Northern Mindanao
+  { value: "Malaybalay", region: "Northern Mindanao", province: "Bukidnon", label: "Malaybalay" },
+  { value: "Valencia", region: "Northern Mindanao", province: "Bukidnon", label: "Valencia" },
+  { value: "Iligan", region: "Northern Mindanao", province: "Lanao Del Norte", label: "Iligan" },
+  { value: "Oroquieta", region: "Northern Mindanao", province: "Misamis Occidental", label: "Oroquieta" },
+  { value: "Ozamiz", region: "Northern Mindanao", province: "Misamis Occidental", label: "Ozamiz" },
+  { value: "Tangub", region: "Northern Mindanao", province: "Misamis Occidental", label: "Tangub" },
+  { value: "Cagayan De Oro", region: "Northern Mindanao", province: "Misamis Oriental", label: "Cagayan De Oro" },
+  { value: "El Salvador", region: "Northern Mindanao", province: "Misamis Oriental", label: "El Salvador" },
+  { value: "Gingoog", region: "Northern Mindanao", province: "Misamis Oriental", label: "Gingoog" },
+
+  // Davao Region
+  { value: "Panabo", region: "Davao Region", province: "Davao Del Norte", label: "Panabo" },
+  { value: "Island Garden City of Samal", region: "Davao Region", province: "Davao Del Norte", label: "Island Garden City of Samal" }, // Kept full value
+  { value: "Tagum", region: "Davao Region", province: "Davao Del Norte", label: "Tagum" },
+  { value: "Davao", region: "Davao Region", province: "Davao City", label: "Davao" },
+  { value: "Digos", region: "Davao Region", province: "Davao Del Sur", label: "Digos" },
+  { value: "Mati", region: "Davao Region", province: "Davao Oriental", label: "Mati" },
+
+  // SOCCSKSARGEN
+  { value: "Kidapawan", region: "SOCCSKSARGEN", province: "Cotabato", label: "Kidapawan" },
+  { value: "General Santos", region: "SOCCSKSARGEN", province: "South Cotabato", label: "General Santos" },
+  { value: "Koronadal", region: "SOCCSKSARGEN", province: "South Cotabato", label: "Koronadal" },
+  { value: "Tacurong", region: "SOCCSKSARGEN", province: "Sultan Kudarat", label: "Tacurong" },
+  { value: "Cotabato", region: "SOCCSKSARGEN", province: "Cotabato", label: "Cotabato" },
+
+  // Caraga
+  { value: "Butuan", region: "Caraga", province: "Agusan Del Norte", label: "Butuan" },
+  { value: "Cabadbaran", region: "Caraga", province: "Agusan Del Norte", label: "Cabadbaran" },
+  { value: "Bayugan", region: "Caraga", province: "Agusan Del Sur", label: "Bayugan" },
+  { value: "Surigao", region: "Caraga", province: "Surigao Del Norte", label: "Surigao" },
+  { value: "Bislig", region: "Caraga", province: "Surigao Del Sur", label: "Bislig" },
+  { value: "Tandag", region: "Caraga", province: "Surigao Del Sur", label: "Tandag" },
+
+  // BARMM
+  { value: "Lamitan", region: "BARMM", province: "Basilan", label: "Lamitan" },
+  { value: "Marawi", region: "BARMM", province: "Lanao Del Sur", label: "Marawi" },
+];
+
 export const positionOptions = [
   "Administrative Aide",
   "Driver/Mechanic",

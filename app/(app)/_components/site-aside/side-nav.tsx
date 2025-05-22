@@ -28,16 +28,15 @@ import { Separator } from "@/components/ui/separator";
 import { ChevronUp } from "lucide-react";
 import {
   activityLinks,
-  adPlanLinks,
   managementLinks,
   navLinks,
+  sidebarComponentSections,
 } from "../site-header/nav-links";
 
 import { TbActivity } from "react-icons/tb";
 import { cn } from "@/lib/utils";
-import { SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { useSession } from "next-auth/react";
-import { FaChalkboardTeacher } from "react-icons/fa";
+import { FaHome } from "react-icons/fa";
 
 export const SiteSideBar = () => {
   const pathname = usePathname();
@@ -63,38 +62,70 @@ export const SiteSideBar = () => {
           <SidebarGroupLabel>Application</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              <Collapsible className="group/collapsible">
-                <CollapsibleTrigger asChild>
-                  <SidebarMenuButton>
-                    <FaChalkboardTeacher /> AD Plan
-                    <ChevronUp className="ml-auto transition-transform group-data-[state=open]/collapsible:-rotate-180" />
-                  </SidebarMenuButton>
-                </CollapsibleTrigger>
-                <CollapsibleContent
-                  className={cn(
-                    "outline-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2"
-                  )}
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  asChild
+                  isActive={pathname === "/" ? true : false}
                 >
-                  <SidebarMenuSub>
-                    {adPlanLinks.map((link, index) => (
-                      <SidebarMenuItem key={index}>
-                        <SidebarMenuButton
-                          asChild
-                          isActive={pathname === link.href ? true : false}
-                        >
-                          <Link
-                            href={link.href}
-                            className="hover:text-popover-foreground "
+                  <Link
+                    href={"/"}
+                    className={cn("hover:text-popover-foreground", {
+                      "text-popover-foreground": pathname === "/",
+                    })}
+                  >
+                    <FaHome />
+                    <span>Home</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroupContent>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {sidebarComponentSections.map((section, i) => (
+                <Collapsible key={i} className="group/collapsible">
+                  <CollapsibleTrigger asChild>
+                    <SidebarMenuButton>
+                      <section.icon /> {section.name}
+                      <ChevronUp className="ml-auto transition-transform group-data-[state=open]/collapsible:-rotate-180" />
+                    </SidebarMenuButton>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent
+                    className={cn(
+                      "outline-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2"
+                    )}
+                  >
+                    <SidebarMenuSub>
+                      {section.links.map((link, j) => (
+                        <SidebarMenuItem key={j}>
+                          <SidebarMenuButton
+                            asChild
+                            isActive={pathname === link.href}
                           >
-                            <link.icon />
-                            <span>{link.text}</span>
-                          </Link>
-                        </SidebarMenuButton>
-                      </SidebarMenuItem>
-                    ))}
-                  </SidebarMenuSub>
-                </CollapsibleContent>
-              </Collapsible>
+                            {link.disable ? (
+                              <a
+                                className="hover:text-popover-foreground cursor-not-allowed opacity-50"
+                              >
+                                <link.icon />
+                                <span>{link.text}</span>
+                              </a>
+                            ) : (
+                              <Link
+                                href={link.href}
+                                className="hover:text-popover-foreground"
+                              >
+                                <link.icon />
+                                <span>{link.text}</span>
+                              </Link>
+                            )}
+                          </SidebarMenuButton>
+                        </SidebarMenuItem>
+                      ))}
+                    </SidebarMenuSub>
+                  </CollapsibleContent>
+                </Collapsible>
+              ))}
+
               {navLinks.map((link, index) => (
                 <SidebarMenuItem key={index}>
                   <SidebarMenuButton

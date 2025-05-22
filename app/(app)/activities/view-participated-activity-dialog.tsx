@@ -107,7 +107,7 @@ const ViewMyParticipatedSchedDialog = (props: Props) => {
               columns={columns}
               hiddenColumns={hiddenColumns}
               allowSelectRow={false}
-              allowViewCalendar={true}
+              cursorRowSelect={true}
               onViewRowId={handleViewRowIdPressed}
               setAllowViewCalendar={() => setViewCalendar(!viewCalendar)}
               allowDateRange={true}

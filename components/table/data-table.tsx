@@ -32,7 +32,7 @@ interface DataTableProps<TData, TValue> {
   hiddenColumns?: string[];
   onSelectedRowIdsChange?: (selectedRowIds: string[]) => void;
   allowSelectRow: boolean;
-  allowViewCalendar?: boolean;
+  cursorRowSelect?: boolean;
   setAllowViewCalendar?: () => void;
   onViewRowId?: (id: string) => void;
   allowDateRange?: boolean;
@@ -46,7 +46,7 @@ export function DataTable<TData extends { id: string }, TValue>({
   hiddenColumns = [],
   onSelectedRowIdsChange,
   allowSelectRow,
-  allowViewCalendar,
+  cursorRowSelect,
   setAllowViewCalendar,
   onViewRowId,
   allowDateRange = false,
@@ -208,7 +208,7 @@ export function DataTable<TData extends { id: string }, TValue>({
                     data-state={row.getIsSelected() && "selected"}
                     onClick={() => handleRowClick(row.original.id)}
                     style={{
-                      cursor: allowViewCalendar ? "pointer" : "default",
+                      cursor: cursorRowSelect ? "pointer" : "default",
                     }} // Conditional cursor style
                     className={`${
                       index % 2 === 0

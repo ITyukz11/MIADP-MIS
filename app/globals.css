@@ -94,8 +94,23 @@
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
     height: 100vh;
+  }
+
+  /* globals.css or tailwind.css */
+  .hide-number-input-arrows::-webkit-outer-spin-button,
+  .hide-number-input-arrows::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  .hide-number-input-arrows {
+    appearance: textfield;
+    /* Standard */
+    -moz-appearance: textfield;
+    /* Firefox */
   }
 }

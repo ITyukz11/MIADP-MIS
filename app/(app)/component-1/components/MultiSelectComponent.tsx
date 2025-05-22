@@ -13,6 +13,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { CaretSortIcon } from "@radix-ui/react-icons";
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { Separator } from "@/components/ui/separator";
 
 export interface Option {
     value: string;
@@ -77,20 +78,20 @@ export function MultiSelectFilter({
 
     const handleKeyDown = (event: React.KeyboardEvent) => {
         if (event.key === "Escape") {
-          setIsOpen(false); // close dropdown first
-          if (onCloseSheet) {
-            onCloseSheet(); // tell sheet to close as well
-          }
+            setIsOpen(false); // close dropdown first
+            if (onCloseSheet) {
+                onCloseSheet(); // tell sheet to close as well
+            }
         }
-      };
-    
+    };
+
     const displayText =
         selectedItems.length > 1
-            ? 
+            ?
             <div className="flex flex-row gap-1">
                 <span className="bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">{selectedItems.length}</span>
                 Selected
-                </div>
+            </div>
             : selectedItems.includes(allValue)
                 ? allValue
                 : selectedItems.join(", ");
@@ -101,22 +102,21 @@ export function MultiSelectFilter({
             <DropdownMenu open={isOpen} onOpenChange={setIsOpen} >
                 <DropdownMenuTrigger asChild>
                     <Button variant="outline" disabled={loading} className={`gap-0 w-full overflow-hidden flex justify-between`}>
-                       {displayText}
+                        {displayText}
                         <CaretSortIcon className="h-4 w-4 opacity-50" />
                     </Button>
                 </DropdownMenuTrigger>
 
                 <DropdownMenuContent
-                    className="bg-white p-0 w-fit" 
+                    className="bg-white p-0 w-fit dark:bg-gray-800"
                     onKeyDown={handleKeyDown}
                 >
-                    <div className="sticky -top-1 bg-white z-10 py-2 border-b">
-                        <DropdownMenuLabel>Select {label}</DropdownMenuLabel>
+                    <div className="sticky -top-1 bg-white dark:bg-gray-900 z-10 py-2 border-b dark:border-gray-700">
+                        <DropdownMenuLabel className="dark:text-gray-200">Select {label}</DropdownMenuLabel>
                     </div>
-                    <DropdownMenuSeparator />
-
+                    <Separator />
                     {/* ScrollArea or div with overflow-y-auto and fixed height */}
-                    <ScrollArea className="max-h-[280px] overflow-y-auto px-2">
+                    <ScrollArea className="max-h-[280px] overflow-y-auto px-2 dark:bg-gray-900">
                         <DropdownMenuCheckboxItem
                             checked={selectedItems.includes(allValue)}
                             onCheckedChange={(checked) => handleItemChange(allValue, checked)}

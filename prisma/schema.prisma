@@ -372,3 +372,70 @@ model Table8Tracker {
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 }
+
+model ProcessDocReport {
+  id                        String   @id @default(cuid())
+  createdAt                DateTime @default(now())
+  updatedAt                DateTime @updatedAt
+
+  // 1. Activity Brief
+  activityTitle            String
+  WFPActivity              String
+  activityObjectives       String
+  dateConducted            DateTime
+  region                   String
+  province                 String
+  city                     String
+  municipality             String
+  baranggay                String
+  totalMaleIP              Int
+  totalFemaleIP            Int
+  totalMaleNonIP           Int
+  totalFemaleNonIP         Int
+
+  // 2. PRE Activity
+  preActivity              String
+  preOtherActivity         String? // optional
+  preActivityDescription   String
+  preActivityOutputQty     Int
+  preActivityOutputDescription String
+  preActivityOutcome       String
+  preActivityEmergingImpact String
+
+  // DURING Activity
+  during                   String
+  duringOtherActivity      String? // optional
+  duringDescription        String
+  duringOutputQty          Int
+  duringOutputDescription  String
+  duringOutcome            String
+  duringEmergingImpact     String
+
+  // POST Activity
+  postActivity             String
+  postOtherActivity        String? // optional
+  postActivityDescription  String
+  postActivityOutputQty    Int
+  postActivityOutputDescription String
+  postActivityOutcome      String
+  postActivityEmergingImpact String
+
+  // 3. Attachments (store file URLs)
+  attendanceSheet          String
+  program                  String
+  photoDocumentation       String
+  participantsProfile      String
+  presentationMaterials    String
+
+  // Signatories
+  preparedByName           String
+  reviewedByName           String
+  notedByName              String
+}
+
+model ApiRateLimit {
+  id         String   @id @default(cuid())
+  ipAddress  String   @unique
+  count      Int      @default(1)
+  lastAccess DateTime @default(now())
+}

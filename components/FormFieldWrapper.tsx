@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import {
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -29,15 +30,18 @@ type FormFieldWrapperProps<T extends FieldValues> = {
   name: Path<T>;
   label: string;
   placeholder?: string;
+  description?:string;
   type?:
-    | "text"
-    | "email"
-    | "checkbox"
-    | "password"
-    | "select"
-    | "number"
-    | "amount"
-    | "date";
+  | "text"
+  | "email"
+  | "checkbox"
+  | "password"
+  | "select"
+  | "multiselect"
+  | "number"
+  | "amount"
+  | "date"
+  |"file"
   isTextarea?: boolean;
   isDisabled?: boolean;
   isOptional?: boolean;
@@ -54,12 +58,14 @@ type FormFieldWrapperProps<T extends FieldValues> = {
   className?: string;
   value?: string;
   readOnly?: boolean;
+  valueAsNumber?: boolean;
 };
 
 const FormFieldWrapper = <T extends FieldValues>({
   control,
   name,
   label,
+  description,
   placeholder,
   type = "text",
   isTextarea = false,
@@ -74,10 +80,12 @@ const FormFieldWrapper = <T extends FieldValues>({
   className,
   value,
   readOnly = false,
+  valueAsNumber = false,
 }: FormFieldWrapperProps<T>) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  
   useEffect(() => {
     if (isFocus) {
       if (isTextarea && textareaRef.current) {
@@ -110,13 +118,13 @@ const FormFieldWrapper = <T extends FieldValues>({
                 disabled={isDisabled}
               >
                 <SelectTrigger
-                  className="overflow-hidden"
+                  className="overflow-hidden bg-white"
                   tabIndex={isDisabled ? -1 : tabIndex}
                 >
                   {field.value
                     ? selectOptions.find(
-                        (option) => option.value === field.value
-                      )?.label
+                      (option) => option.value === field.value
+                    )?.label
                     : placeholder}
                 </SelectTrigger>
                 <SelectContent>
@@ -134,7 +142,7 @@ const FormFieldWrapper = <T extends FieldValues>({
             ) : isTextarea ? (
               <Textarea
                 {...field}
-                className={className}
+                className={`${className} bg-white`}
                 disabled={isDisabled}
                 placeholder={placeholder}
                 tabIndex={isDisabled ? -1 : tabIndex}
@@ -149,7 +157,7 @@ const FormFieldWrapper = <T extends FieldValues>({
                   autoComplete="new-password"
                   disabled={isDisabled}
                   placeholder={placeholder}
-                  className="pr-10"
+                  className="pr-10 bg-white"
                   tabIndex={isDisabled ? -1 : tabIndex}
                   ref={inputRef}
                   readOnly={readOnly}
@@ -196,7 +204,7 @@ const FormFieldWrapper = <T extends FieldValues>({
               <div className="relative overflow-visible">
                 <Label className="absolute left-2 bottom-3">₱</Label>
                 <Input
-                  className="pl-5 z-auto"
+                  className="pl-5 z-auto appearance-none bg-white [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [&-moz-appearance]:textfield"
                   type="number"
                   placeholder={placeholder}
                   {...field}
@@ -207,6 +215,20 @@ const FormFieldWrapper = <T extends FieldValues>({
                   }
                 />
               </div>
+            ) : type === "file" ? (
+              <Input
+                type="file"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  field.onChange(file); // ✅ manually set File object
+                }}
+                disabled={isDisabled}
+                placeholder={placeholder}
+                className={`${className} bg-white w-full ${window.innerWidth < 768 ? 'text-sm' : ''}`}
+                tabIndex={isDisabled ? -1 : tabIndex}
+                ref={fileInputRef}
+                readOnly={readOnly}
+              />
             ) : (
               <Input
                 {...field}
@@ -216,13 +238,23 @@ const FormFieldWrapper = <T extends FieldValues>({
                 placeholder={
                   isOptional ? `${placeholder} (if any)` : placeholder
                 }
-                className="pr-10 appearance-none"
+                className={`pr-10 appearance-none hide-number-input-arrows bg-white ${window.innerWidth < 768 ? 'text-sm' : ''}`}
                 tabIndex={isDisabled ? -1 : tabIndex}
                 ref={inputRef}
                 value={value}
+                onChange={(e) => {
+                  if (type === "number" && valueAsNumber) {
+                    field.onChange(e.target.valueAsNumber);
+                  } else {
+                    field.onChange(e.target.value);
+                  }
+                }}
               />
             )}
           </FormControl>
+          <FormDescription>
+            {description}
+          </FormDescription>
         </FormItem>
       )}
     />

@@ -68,7 +68,7 @@ export default async function AppLayout({ children }: AppLayoutProps) {
                     <SiteHeader />
                     <div className="p-4 overflow-x-hidden">{children}</div>
                   </main>
-                  <FloatingAIChat />
+                  {/* <FloatingAIChat /> */}
                   <SiteFooter />
                   {!session.user.verificationAnswer && (
                     <>

@@ -15,12 +15,12 @@ export function SiteFooter() {
             </a>
             . If you have any inquiries, please contact {" "}
             <a
-              href='https://m.me/nelson.faustino.33'
+              href='https://m.me/imbayuki'
               target="_blank"
               rel="noreferrer"
               className="font-medium underline underline-offset-4"
             >
-              Project Leader
+              me
             </a>
             .
           </p>

@@ -19,6 +19,7 @@ import ViewProcessDocumentationReport from './ViewProcessDocReport';
 import { AnimatePresence, motion } from 'framer-motion';
 import { IoArrowBackCircle } from 'react-icons/io5';
 import { Button } from '@/components/ui/button';
+import { ProcessDocDashboard } from './(analytics)/Analytics';
 
 export default function Page() {
   const { adPlanProcDocReportData, adPlanProcDocReportError, adPlanProcDocReportLoading, refetchAdPlanProcDocReport } = useADPlanProcessDocReportData();
@@ -166,7 +167,7 @@ export default function Page() {
         <Tabs defaultValue="overview">
           <TabsList className="flex w-fit">
             <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="analytics" disabled>Analytics</TabsTrigger>
+            <TabsTrigger value="analytics" >Analytics</TabsTrigger>
             <TabsTrigger value="reports" disabled>
               Reports
             </TabsTrigger>
@@ -332,7 +333,7 @@ export default function Page() {
             </AnimatePresence>
           </TabsContent>
           <TabsContent value="analytics" className="space-y-4">
-            {/* <Table8Report /> */}
+              <ProcessDocDashboard data={filteredData}/>
           </TabsContent>
         </Tabs>
       </div>

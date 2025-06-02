@@ -174,6 +174,15 @@ const ProcessDocumentReportForm = ({ setClose }: ProcessDocumentReportFormInterf
     form.setValue("city", "")
   }, [form, selectedRegion]);
 
+  const CombinedWFPActivities = [
+    ...WFPActivities2025RPCO09,
+    ...WFPActivities2025RPCO10,
+    ...WFPActivities2025RPCO11,
+    ...WFPActivities2025RPCO12,
+    ...WFPActivities2025RPCO13,
+    ...WFPActivities2025RPCOBARMM,
+  ];
+
   console.log("error: ", form.formState.errors)
   const onSubmit = async (data: z.infer<typeof ProcessDocReportSchema>) => {
     setLoading(true);
@@ -185,7 +194,7 @@ const ProcessDocumentReportForm = ({ setClose }: ProcessDocumentReportFormInterf
         "participantsProfile",
         "presentationMaterials",
       ] as const;
-  
+
       // Upload all files in parallel using Promise.all
       const uploadResults = await Promise.all(
         fileFields.map(async (field) => {
@@ -200,7 +209,7 @@ const ProcessDocumentReportForm = ({ setClose }: ProcessDocumentReportFormInterf
           return { field, url: "" };
         })
       );
-  
+
       // Build the URL mapping
       const uploadedUrls: Partial<Record<typeof fileFields[number], string>> = {};
       uploadResults.forEach(({ field, url }) => {
@@ -208,13 +217,13 @@ const ProcessDocumentReportForm = ({ setClose }: ProcessDocumentReportFormInterf
           uploadedUrls[field] = url;
         }
       });
-  
+
       // Safely convert dateConducted to ISO string
       const dateConductedISO =
         data.dateConducted instanceof Date
           ? data.dateConducted.toISOString()
           : new Date(data.dateConducted).toISOString();
-  
+
       // Construct final payload with file URLs and serialized date
       const finalPayload = {
         ...data,
@@ -227,16 +236,16 @@ const ProcessDocumentReportForm = ({ setClose }: ProcessDocumentReportFormInterf
         participantsProfile: uploadedUrls.participantsProfile || "",
         presentationMaterials: uploadedUrls.presentationMaterials || "",
       };
-  
+
       console.log("Ready to submit payload:", finalPayload);
-  
+
       try {
         console.log("Calling /api/auth/ad-plan/process-doc-report with:", finalPayload);
         const result = await submitProcessDocReport(finalPayload);
         sendEmailNotification(data)
 
         console.log("API response:", result);
-  
+
         if (result.success) {
           toast({ title: "Success", description: "Submitted successfully!" });
         } else {
@@ -258,16 +267,16 @@ const ProcessDocumentReportForm = ({ setClose }: ProcessDocumentReportFormInterf
   // const onSubmit = async (data:z.infer<typeof ProcessDocReportSchema>)=>{
   //   sendEmailNotification(data)
 
-    // const reportAttachment = await generateProcDocReportPDF(
-    //   data,
-    // );
-    // const downloadUrl = URL.createObjectURL(reportAttachment);
-    // const link = document.createElement("a");
-    // link.href = downloadUrl;
-    // link.download = `ProcessDocumentReport_${data.activityTitle}.pdf`;
-    // document.body.appendChild(link);
-    // link.click();
-    // document.body.removeChild(link);
+  // const reportAttachment = await generateProcDocReportPDF(
+  //   data,
+  // );
+  // const downloadUrl = URL.createObjectURL(reportAttachment);
+  // const link = document.createElement("a");
+  // link.href = downloadUrl;
+  // link.download = `ProcessDocumentReport_${data.activityTitle}.pdf`;
+  // document.body.appendChild(link);
+  // link.click();
+  // document.body.removeChild(link);
   // }
   const sendEmailNotification = async (
     values: z.infer<typeof ProcessDocReportSchema>,
@@ -275,7 +284,7 @@ const ProcessDocumentReportForm = ({ setClose }: ProcessDocumentReportFormInterf
     try {
 
       const ownerEmail = currentUser?.user.email || ""
-      const emails = ["miadp.pso.adplan@gmail.com",ownerEmail]
+      const emails = ["miadp.pso.adplan@gmail.com", ownerEmail]
 
       if (emails.length === 0) {
         toast({
@@ -341,14 +350,14 @@ const ProcessDocumentReportForm = ({ setClose }: ProcessDocumentReportFormInterf
     const ProcessDocReportPDF = (await import("../../process-documentation-report/ProcessDocReportPDF")).default; // ✅ Dynamic import for component
 
     const blob = await pdf(
-      <ProcessDocReportPDF processDocumentReportData={processDocumentReportData}/>
+      <ProcessDocReportPDF processDocumentReportData={processDocumentReportData} />
     ).toBlob();
 
     return new File([blob], "Employee-Payslip.pdf", {
       type: "application/pdf",
     });
   };
-  
+
   return <div>
     <Form {...form}>
       <form
@@ -383,46 +392,55 @@ const ProcessDocumentReportForm = ({ setClose }: ProcessDocumentReportFormInterf
                           role="combobox"
                           tabIndex={2}
                           className={cn(
-                            "w-full justify-between",
+                            "w-full justify-between h-auto min-h-10", // Ensures a minimum height but allows wrapping
+                            "whitespace-normal break-words text-left", // Enables wrapping
                             !field.value && "text-muted-foreground"
                           )}
                         >
                           {field.value
-                            ? `${WFPActivities2025RPCO09.find(
-                              (a) => a.title === field.value
-                            )?.region} - ${field.value}`
+                            ? `${CombinedWFPActivities.find((a) => a.title === field.value)?.region} - ${field.value}`
                             : "Select WFP activity"}
                           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                         </Button>
+
                       </FormControl>
                     </PopoverTrigger>
-                    <PopoverContent className="z-[100] w-full p-0 max-h-60">
+                    <PopoverContent
+                      className="z-[100] p-0 max-h-60"
+                      align="start"
+                      style={{ width: 'var(--radix-popover-trigger-width)' }}
+                    >
                       <Command>
                         <CommandInput placeholder="Search activity..." />
                         <CommandList>
                           <CommandEmpty>No activity found.</CommandEmpty>
                           <CommandGroup>
-                            {WFPActivities2025RPCO09.map((activity) => (
+                            {CombinedWFPActivities.map((activity, index) => (
                               <CommandItem
-                                key={activity.id}
+                                key={index}
                                 value={activity.title}
                                 onSelect={() => {
                                   form.setValue("WFPActivity", activity.title);
                                 }}
+                                className="items-start gap-2" // top-align if text wraps
                               >
                                 <Check
                                   className={cn(
-                                    "mr-2 h-4 w-4",
+                                    "mt-1 h-4 w-4",
                                     activity.title === field.value ? "opacity-100" : "opacity-0"
                                   )}
                                 />
-                                {activity.region} - {activity.title}
+                                <span className="whitespace-normal break-words leading-snug">
+                                  {activity.region} - {activity.title}
+                                </span>
                               </CommandItem>
                             ))}
                           </CommandGroup>
                         </CommandList>
                       </Command>
                     </PopoverContent>
+
+
                   </Popover>
                 </FormItem>
               )}
@@ -601,8 +619,8 @@ const ProcessDocumentReportForm = ({ setClose }: ProcessDocumentReportFormInterf
                 tabIndex={14}
                 placeholder="Select"
                 type="select"
-                selectOptions={preActivityData.map((activity)=>({
-                  label:activity,
+                selectOptions={preActivityData.map((activity) => ({
+                  label: activity,
                   value: activity
                 }))
                 }
@@ -881,7 +899,7 @@ const ProcessDocumentReportForm = ({ setClose }: ProcessDocumentReportFormInterf
                 description="Component 1 Head"
                 tabIndex={42}
               />
-              </div>
+            </div>
           </section>
         </div>
         <div className="flex flex-end">

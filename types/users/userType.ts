@@ -10,6 +10,8 @@ export type UserType = {
   unit: string;
   component: string;
   position: string;
+  active:boolean;
+  dateSeparated:string;
   email: string;
   color: string;
   expoPushToken?: string | null;

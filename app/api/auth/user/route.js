@@ -54,6 +54,8 @@ export async function GET(request) {
           updatedAt: true,
           role: true,
           CalendarOfActivityParticipant: true,
+          active:true,
+          dateSeparated:true
         },
       });
 
@@ -80,6 +82,8 @@ export async function GET(request) {
           createdAt: true,
           updatedAt: true,
           role: true,
+          active:true,
+          dateSeparated:true,
           CalendarOfActivityParticipant: true,
         },
         cacheStrategy: { ttl: 3600, swr: 300 },

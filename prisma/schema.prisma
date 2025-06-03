@@ -23,6 +23,8 @@ model User {
   position                      String
   email                         String                          @unique
   color                         String
+  active                        Boolean                         @default(true)
+  dateSeparated                 String?
   CalendarOfActivityParticipant CalendarOfActivityParticipant[]
   expoPushToken                 String?
   notification                  Notifications?
@@ -312,7 +314,7 @@ model DoctrackDocumentOutgoingRouteStatus {
 model SubProjectCode {
   id                     String            @id @default(cuid())
   briefDescription       String?
-  sequentialNum          String           
+  sequentialNum          String
   subprojectTitle        String
   component              String
   sharedFundingWithInfra Boolean?
@@ -348,89 +350,89 @@ model SubProjectPhoto {
 }
 
 model DeletionRequest {
-  id            String         @id @default(cuid())
-  email         String
-  reason        String
-  confirmation  Boolean
-  approved      Boolean        @default(false)
-  createdAt     DateTime       @default(now()) @map(name: "created_at")
-  updatedAt     DateTime       @updatedAt @map(name: "updated_at")
+  id           String   @id @default(cuid())
+  email        String
+  reason       String
+  confirmation Boolean
+  approved     Boolean  @default(false)
+  createdAt    DateTime @default(now()) @map(name: "created_at")
+  updatedAt    DateTime @updatedAt @map(name: "updated_at")
 }
 
 model Table8Tracker {
-  id             String  @id @default(uuid())
-  region         String
-  lgu            String
+  id              String   @id @default(uuid())
+  region          String
+  lgu             String
   ancestralDomain String
-  commodities    String
-  infraEntrep    String
-  subproject     String
-  typeOfSP       String
-  location       String
-  validated      Boolean
-  conceptNote    Boolean
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  commodities     String
+  infraEntrep     String
+  subproject      String
+  typeOfSP        String
+  location        String
+  validated       Boolean
+  conceptNote     Boolean
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 }
 
 model ProcessDocReport {
-  id                        String   @id @default(cuid())
-  createdAt                DateTime @default(now())
-  updatedAt                DateTime @updatedAt
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // 1. Activity Brief
-  activityTitle            String
-  WFPActivity              String
-  activityObjectives       String
-  dateConducted            DateTime
-  region                   String
-  province                 String
-  city                     String
-  municipality             String
-  baranggay                String
-  totalMaleIP              Int
-  totalFemaleIP            Int
-  totalMaleNonIP           Int
-  totalFemaleNonIP         Int
+  activityTitle      String
+  WFPActivity        String
+  activityObjectives String
+  dateConducted      DateTime
+  region             String
+  province           String
+  city               String
+  municipality       String
+  baranggay          String
+  totalMaleIP        Int
+  totalFemaleIP      Int
+  totalMaleNonIP     Int
+  totalFemaleNonIP   Int
 
   // 2. PRE Activity
-  preActivity              String
-  preOtherActivity         String? // optional
-  preActivityDescription   String
-  preActivityOutputQty     Int
+  preActivity                  String
+  preOtherActivity             String? // optional
+  preActivityDescription       String
+  preActivityOutputQty         Int
   preActivityOutputDescription String
-  preActivityOutcome       String
-  preActivityEmergingImpact String
+  preActivityOutcome           String
+  preActivityEmergingImpact    String
 
   // DURING Activity
-  during                   String
-  duringOtherActivity      String? // optional
-  duringDescription        String
-  duringOutputQty          Int
-  duringOutputDescription  String
-  duringOutcome            String
-  duringEmergingImpact     String
+  during                  String
+  duringOtherActivity     String? // optional
+  duringDescription       String
+  duringOutputQty         Int
+  duringOutputDescription String
+  duringOutcome           String
+  duringEmergingImpact    String
 
   // POST Activity
-  postActivity             String
-  postOtherActivity        String? // optional
-  postActivityDescription  String
-  postActivityOutputQty    Int
+  postActivity                  String
+  postOtherActivity             String? // optional
+  postActivityDescription       String
+  postActivityOutputQty         Int
   postActivityOutputDescription String
-  postActivityOutcome      String
-  postActivityEmergingImpact String
+  postActivityOutcome           String
+  postActivityEmergingImpact    String
 
   // 3. Attachments (store file URLs)
-  attendanceSheet          String
-  program                  String
-  photoDocumentation       String
-  participantsProfile      String
-  presentationMaterials    String
+  attendanceSheet       String
+  program               String
+  photoDocumentation    String
+  participantsProfile   String
+  presentationMaterials String
 
   // Signatories
-  preparedByName           String
-  reviewedByName           String
-  notedByName              String
+  preparedByName String
+  reviewedByName String
+  notedByName    String
 }
 
 model ApiRateLimit {

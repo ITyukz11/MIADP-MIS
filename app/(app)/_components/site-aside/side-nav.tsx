@@ -28,7 +28,6 @@ import { Separator } from "@/components/ui/separator";
 import { ChevronUp } from "lucide-react";
 import {
   activityLinks,
-  managementLinks,
   navLinks,
   sidebarComponentSections,
 } from "../site-header/nav-links";
@@ -36,11 +35,30 @@ import {
 import { TbActivity } from "react-icons/tb";
 import { cn } from "@/lib/utils";
 import { useSession } from "next-auth/react";
-import { FaHome } from "react-icons/fa";
+import { FaCode, FaHome, FaUsers } from "react-icons/fa";
+import { usePendingUsersData } from "@/lib/admin/usePendingUsersData";
+import { useUsersData } from "@/lib/users/useUserDataHook";
+import { FaClipboardUser } from "react-icons/fa6";
 
 export const SiteSideBar = () => {
   const pathname = usePathname();
   const { data: currentUser } = useSession();
+  const { pendingUsersData, pendingUsersError, pendingUsersLoading } = usePendingUsersData();
+  const { usersData, usersLoading, usersError } = useUsersData();
+
+  const userCount = React.useMemo(() => {
+    return usersData?.length ?? 0;
+  }, [usersData]);
+
+  const pendingCount = React.useMemo(() => {
+    return pendingUsersData?.filter((user: { status: string; }) => user.status.toLocaleLowerCase() === "pending").length ?? 0;
+  }, [pendingUsersData]);
+
+  const managementLinks = React.useMemo(() => [
+    { href: "/admin/account/users", text: "Users", icon: FaUsers, count: userCount },
+    { href: "/admin/account/pending-users", text: "Pending Users", icon: FaClipboardUser, count: pendingCount },
+    { href: "/admin/generate-code", text: "Subproject", icon: FaCode, count: 0 },
+  ], [userCount, pendingCount]);
 
   return (
     <Sidebar variant="sidebar" className="shadow-lg z-50">
@@ -199,13 +217,27 @@ export const SiteSideBar = () => {
                         asChild
                         isActive={pathname === link.href ? true : false}
                       >
-                        <Link href={link.href}>
-                          <link.icon />
-                          <span>{link.text}</span>
+                        <Link href={link.href} className="flex flex-row justify-between items-center">
+                          <div className="flex flex-row gap-2 shrink-0 items-center">
+                            <link.icon className="shrink-0 w-4 h-4" />
+                            <span>{link.text}</span>
+                          </div>
+                          {link.count > 0 && (
+                            <span
+                              className={cn(
+                                "text-xs font-medium px-2 py-0.5 rounded-full",
+                                link.text === "Users" && "bg-green-600 text-white",
+                                link.text === "Pending Users" && "bg-red-500 text-white"
+                              )}
+                            >
+                              {link.count}
+                            </span>
+                          )}
                         </Link>
                       </SidebarMenuButton>
                     </SidebarMenuItem>
                   ))}
+
                 </SidebarMenuSub>
               </CollapsibleContent>
             </Collapsible>

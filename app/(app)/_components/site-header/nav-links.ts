@@ -21,6 +21,8 @@ import { FaRoad } from "react-icons/fa";
 import { GiGrain } from "react-icons/gi";
 import { GiPapers } from "react-icons/gi";
 import { HiSupport } from "react-icons/hi";
+import { FaClipboardUser } from "react-icons/fa6";
+import { usePendingUsersData } from "@/lib/admin/usePendingUsersData";
 
 export const navLinks = [
   {
@@ -32,11 +34,6 @@ export const navLinks = [
   { href: "/e-library", text: "E-Library", icon: FaBook, disable: false },
   { href: "/forum", text: "Forum", icon: MdForum, disable: false },
   // { href: "/document-tracking", text: "Doctrack", icon: MdScreenSearchDesktop },
-];
-
-export const managementLinks = [
-  { href: "/admin/account", text: "Users", icon: FaUsers },
-  { href: "/admin/generate-code", text: "Subproject", icon: FaCode },
 ];
 
 export const sidebarComponentSections = [
@@ -62,10 +59,12 @@ export const sidebarComponentSections = [
         icon: IoIosPeople,
         disable: true
       },
-      { href: "/component-1/adaif", 
-        text: "ADAIF", 
+      {
+        href: "/component-1/adaif",
+        text: "ADAIF",
         icon: GiProgression,
-        disable:true },
+        disable: true
+      },
       {
         href: "/component-1/table-8-tracker",
         text: "Table 8",
@@ -88,8 +87,8 @@ export const sidebarComponentSections = [
     name: "Component 2",
     icon: FaRoad,
     links: [
-      { href: "/component-2", text: "Dashboard", icon: MdSpaceDashboard, disable: true},
-      { href: "/component-2/Subproject", text: "Subproject", icon: FaRoad,disable: true },
+      { href: "/component-2", text: "Dashboard", icon: MdSpaceDashboard, disable: true },
+      { href: "/component-2/Subproject", text: "Subproject", icon: FaRoad, disable: true },
     ],
   },
   {
@@ -114,7 +113,7 @@ export const sidebarComponentSections = [
     name: "Component 4",
     icon: HiSupport,
     links: [
-      { href: "/component-4", text: "Dashboard", icon: MdSpaceDashboard,disable: true },
+      { href: "/component-4", text: "Dashboard", icon: MdSpaceDashboard, disable: true },
       { href: "/component-4/admin", text: "Admin", icon: GiPapers, disable: true },
     ],
   },

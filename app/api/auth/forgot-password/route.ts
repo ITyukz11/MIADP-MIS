@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
     from: `"MIADP MIS" <${process.env.GMAIL_USER}>`,
     to: email,
     subject: "MIADP MIS Password Reset Instructions",
-    text: `Dear User,\n\nYour password reset code is: ${code}. This code is valid for 10 minutes. Please use it to reset your password.\n\nBest regards,\nMIADP MIS`,
+    text: `Dear ${user.name},\n\nYour password reset code is: ${code}. This code is valid for 10 minutes. Please use it to reset your password.\n\nBest regards,\nMIADP MIS`,
   };
 
   try {

@@ -1,3 +1,4 @@
+import { UserType } from "@/types/users/userType";
 import useSWR from "swr";
 
 const fetchUsers = async () => {
@@ -10,7 +11,7 @@ const fetchUsers = async () => {
       throw new Error("Failed to fetch");
     }
 
-    const data = await response.json();
+    const data:UserType[] = await response.json();
     return data;
   } catch (error) {
     console.error("Error fetching all users:", error);

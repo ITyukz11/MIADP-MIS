@@ -146,7 +146,7 @@ Preparatory Item ${index + 1}:
       participants.length > 0
         ? `Participants:\n${participants
           .map((participant: any, index: any) => {
-            const user = usersData.find(
+            const user = usersData?.find(
               (user: { id: any; }) => user.id === participant.userId
             );
             return `${index + 1}. ${user?.name}`;
@@ -586,7 +586,7 @@ Preparatory Item ${index + 1}:
                         <div className="flex flex-wrap justify-start gap-1 p-2 border rounded-lg">
                           {participants.map(
                             (participant: { userId: string }, index: number) => {
-                              const user = usersData.find(
+                              const user = usersData?.find(
                                 (user: { id: string }) => user.id === participant.userId
                               );
                               return (

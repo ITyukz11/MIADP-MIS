@@ -172,7 +172,7 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
 
     return participants
       .map((participant: any) => {
-        const matchedUser = usersData.find(
+        const matchedUser = usersData?.find(
           (user: any) => user.id === participant.userId
         );
         if (matchedUser) {
@@ -211,12 +211,12 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
     const filteredUsersData =
       filterRegion === "All"
         ? usersData
-        : usersData.filter((user: { region: string | undefined; }) => user.region === filterRegion);
+        : usersData?.filter((user: { region: string | undefined; }) => user.region === filterRegion);
 
-    setFilteredUsersData(filteredUsersData);
+    setFilteredUsersData(filteredUsersData || []);
 
     const multiSelectUsersDropdownDatas =
-      convertUsersToDropdownData(filteredUsersData);
+      convertUsersToDropdownData(filteredUsersData || []);
     setMultiSelectUsersDropdownData(multiSelectUsersDropdownDatas);
   }, [currentUser?.user.region, usersData, filterRegion]);
 
@@ -554,15 +554,14 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
         (participant) => !selectedParticipantsBefore.includes(participant.userId)
       );
 
-      const emails = usersData
-        .filter((user: { id: string }) =>
+      const emails = usersData?.filter((user: { id: string }) =>
           filteredParticipants.some(
             (participant) => participant.userId === user.id
           )
         )
         .map((user: { email: any }) => user.email);
       
-      if (emails.length === 0) {
+      if (emails?.length === 0) {
         toast({
           title: "No Recipients Found",
           description: "Please select participants with valid emails.",
@@ -612,7 +611,7 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
       const googleCalendarLink = `${baseUrl}&text=${text}&dates=${dates}&details=${details}&location=${location}&allday=${allDayChecked}`;
 
       const response = await sendBulkEmail({
-        to: emails,
+        to: emails || [],
         subject: `📆 MIADP Upcoming Activity: ${values.activityTitle}`,
         text: `Dear Team,
   

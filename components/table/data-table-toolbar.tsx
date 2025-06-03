@@ -264,7 +264,7 @@ export function DataTableToolbar<TData>({
         const participantsSet: Set<string> = new Set();
 
         participantsData.forEach((participant: any) => {
-          const user = usersData.find((user:UserType) => user.id === participant.userId);
+          const user = usersData?.find((user:UserType) => user.id === participant.userId);
 
           // Ensure the component exists before accessing its characters
           const componentCode = user?.component

@@ -9,6 +9,7 @@ type CustomUser = {
   email: string;
   name: string;
   role: UserRole;
+  active: boolean;
 };
 
 export const authOptions: NextAuthOptions = {
@@ -33,7 +34,11 @@ export const authOptions: NextAuthOptions = {
           });
 
           if (!user) {
-            throw new Error("Employee not found");
+            throw new Error(`Employee with email ${credentials.email} not found`);
+          }
+
+          if (!user.active) {
+            throw new Error("Sorry, the admin deactivated your account. Please contact the MIADP PSO for reactivation.");
           }
 
           const passwordCorrect =

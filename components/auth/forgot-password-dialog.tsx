@@ -28,30 +28,57 @@ export function ForgotPasswordDialog({ open, setClose }: ForgotPasswordDialogPro
 
     const [confirmedEmail, setConfirmedEmail] = useState<boolean>(false)
 
+    // const handleSubmit = async (e: React.FormEvent) => {
+    //     e.preventDefault();
+    //     setLoading(true);
+    //     setError(null);
+
+    //         try {
+
+    //             const values = {
+    //                 email: email
+    //             }
+
+    //             verifyemail(values)
+    //                 .then((data) => {
+    //                     setError(data.error || null)
+
+    //                     if(!data.error){
+    //                         setConfirmedEmail(true)
+    //                     }
+    //                 });
+    //         } catch (err: any) {
+    //             console.error("Error verifying password:", err);
+    //             setError(err.message || "An error occurred while verifying the password. Please try again.");
+    //         }
+    // };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
         setError(null);
-    
-            try {
 
-                const values = {
-                    email: email
-                }
+        try {
+            const res = await fetch('/api/auth/forgot-password', {
+                method: 'POST',
+                body: JSON.stringify({ email }),
+            });
 
-                verifyemail(values)
-                    .then((data) => {
-                        setError(data.error || null)
+            const data = await res.json();
 
-                        if(!data.error){
-                            setConfirmedEmail(true)
-                        }
-                    });
-            } catch (err: any) {
-                console.error("Error verifying password:", err);
-                setError(err.message || "An error occurred while verifying the password. Please try again.");
+            if (!res.ok) {
+                setError(data.error || 'Something went wrong');
+                return;
             }
+
+            setConfirmedEmail(true);
+        } catch (err: any) {
+            setError("Failed to send reset code. Try again.");
+        } finally {
+            setLoading(false);
+        }
     };
+
     useEffect(() => {
         if (error) {
             setLoading(false)
@@ -70,45 +97,46 @@ export function ForgotPasswordDialog({ open, setClose }: ForgotPasswordDialogPro
 
     return (
         <>
-       
-        <Dialog open={open} onOpenChange={setClose}>
-            <DialogContent className="sm:max-w-[425px]"
-                onPointerDownOutside={avoidDefaultDomBehavior}
-                onInteractOutside={avoidDefaultDomBehavior}
-                onKeyDown={handleKeyDown}>
-                <DialogHeader>
-                    <DialogTitle>Forgot Password</DialogTitle>
-                    <DialogDescription>
-                        Please enter your email to confirm your identity.
-                        <Label className="text-xs text-destructive">   (This feature is temporary as we are yet to secure a domain name)</Label>
-                    </DialogDescription>
-                </DialogHeader>
-                <form onSubmit={handleSubmit}>
-                    <div className="flex flex-col gap-2 py-4">
-                        <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="email" className="text-right">
-                                Email
-                            </Label>
-                            <Input
-                                id="email"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                className="col-span-3"
-                                disabled={loading}
-                            />
+
+            <Dialog open={open} onOpenChange={setClose}>
+                <DialogContent className="sm:max-w-[425px]"
+                    onPointerDownOutside={avoidDefaultDomBehavior}
+                    onInteractOutside={avoidDefaultDomBehavior}
+                    onKeyDown={handleKeyDown}>
+                    <DialogHeader>
+                        <DialogTitle className="text-lg font-semibold">
+                            Forgot Your Password?
+                        </DialogTitle>
+                        <DialogDescription className="text-sm text-muted-foreground">
+                            To reset your password, please enter the email associated with your account.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <form onSubmit={handleSubmit}>
+                        <div className="flex flex-col gap-2 py-4">
+                            <div className="grid grid-cols-4 items-center gap-4">
+                                <Label htmlFor="email" className="text-right">
+                                    Email
+                                </Label>
+                                <Input
+                                    id="email"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    className="col-span-3"
+                                    disabled={loading}
+                                />
+                            </div>
                         </div>
-                    </div>
-                    <DialogFooter className="flex justify-between flex-row items-center">
-                        <Label className="text-destructive">{error}</Label> <Button type="submit" disabled={loading}>{loading ? <LoadingSpinner /> : 'Confirm'}</Button>
-                    </DialogFooter>
-                </form>
-            </DialogContent>
-        </Dialog>
-        <NewForgotPasswordDialog 
-            open={confirmedEmail} 
-            setClose={()=> setConfirmedEmail(!confirmedEmail)} 
-            forgotPassEmail={email}
-            setCloseForgotPassDialog={()=> setClose()}/>
+                        <DialogFooter className="flex justify-between flex-row items-center">
+                            <Label className="text-destructive">{error}</Label> <Button type="submit" disabled={loading}>{loading ? <LoadingSpinner /> : 'Confirm'}</Button>
+                        </DialogFooter>
+                    </form>
+                </DialogContent>
+            </Dialog>
+            <NewForgotPasswordDialog
+                open={confirmedEmail}
+                setClose={() => setConfirmedEmail(!confirmedEmail)}
+                forgotPassEmail={email}
+                setCloseForgotPassDialog={() => setClose()} />
         </>
     );
 }

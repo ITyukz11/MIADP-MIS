@@ -70,6 +70,7 @@
     "formidable": "^3.5.2",
     "framer-motion": "^11.1.3",
     "html2canvas": "^1.4.1",
+    "input-otp": "^1.4.2",
     "install": "^0.13.0",
     "jotai": "^2.9.0",
     "jsonwebtoken": "^9.0.2",

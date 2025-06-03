@@ -196,13 +196,13 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
       setSelectedData([]);
       setSelectedParticipants([]);
     }
-  }, [activityId, 
-    currentIndex, 
-    openUpdateDialog, 
-    participants, 
-    usersData, 
-    setSelectedData, 
-    setSelectedParticipants, 
+  }, [activityId,
+    currentIndex,
+    openUpdateDialog,
+    participants,
+    usersData,
+    setSelectedData,
+    setSelectedParticipants,
     convertUsersToSelectedParticipantData]);
 
   console.log("selected participants before: ", selectedParticipantsBefore)
@@ -210,8 +210,8 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
   useEffect(() => {
     const filteredUsersData =
       filterRegion === "All"
-        ? usersData
-        : usersData?.filter((user: { region: string | undefined; }) => user.region === filterRegion);
+        ? usersData?.filter((user: { active: boolean; }) => user.active) || []
+        : usersData?.filter((user: { region: string | undefined; active: boolean; }) => user.region === filterRegion && user.active) || [];
 
     setFilteredUsersData(filteredUsersData || []);
 
@@ -268,7 +268,7 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
           remarks: activityData.remarks,
         });
 
-        const currentParticipants = activityData.participants.map((participant:any) => participant.userId);
+        const currentParticipants = activityData.participants.map((participant: any) => participant.userId);
 
         setSelectedParticipantsBefore(currentParticipants)
         // setListMode(activityData.preparatoryContent ? false : true)
@@ -554,14 +554,14 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
         (participant) => !selectedParticipantsBefore.includes(participant.userId)
       );
 
-      const emails = usersData?.filter((user: { id: string }) =>
-          filteredParticipants.some(
-            (participant) => participant.userId === user.id
-          )
+      const emails = (usersData || []).filter((user: { id: string }) =>
+        filteredParticipants.some(
+          (participant) => participant.userId === user.id
         )
+      )
         .map((user: { email: any }) => user.email);
-      
-      if (emails?.length === 0) {
+
+      if (emails.length === 0) {
         toast({
           title: "No Recipients Found",
           description: "Please select participants with valid emails.",
@@ -611,7 +611,7 @@ const UpdateActivityDialog: React.FC<UpdateActivityDialogProps> = ({
       const googleCalendarLink = `${baseUrl}&text=${text}&dates=${dates}&details=${details}&location=${location}&allday=${allDayChecked}`;
 
       const response = await sendBulkEmail({
-        to: emails || [],
+        to: emails,
         subject: `📆 MIADP Upcoming Activity: ${values.activityTitle}`,
         text: `Dear Team,
   

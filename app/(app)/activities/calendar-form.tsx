@@ -632,8 +632,8 @@ const CalendarForm = ({ setDialogClose, individualActivity_ }: Props) => {
   useEffect(() => {
     const filteredUsersData =
       filterRegion === "All"
-        ? usersData
-        : usersData.filter((user: { region: string | undefined; }) => user.region === filterRegion);
+        ? usersData?.filter((user: { active: boolean; }) => user.active) || []
+        : usersData?.filter((user: { region: string | undefined; active: boolean; }) => user.region === filterRegion && user.active) || [];
 
     const multiSelectUsersDropdownData =
       convertUsersToDropdownData(filteredUsersData);
@@ -662,11 +662,11 @@ const CalendarForm = ({ setDialogClose, individualActivity_ }: Props) => {
   };
   const sendEmailNotification = async (
     values: z.infer<typeof CalendarOfActivitySchema>,
-    id: string // Added id as a parameter
+    id: string
   ) => {
     try {
       const selectedParticipants = form.watch("participants") || [];
-      const emails = usersData
+      const emails = (usersData || [])
         .filter((user: { id: string; }) =>
           selectedParticipants.some(
             (participant) => participant.userId === user.id

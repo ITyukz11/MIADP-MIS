@@ -40,6 +40,10 @@ model User {
   subProjectCode                SubProjectCode[]
   subProjectPhoto               SubProjectPhoto[]
   status                        String                          @default("Approved") // Status field to track approval status (e.g., "approved", "disapproved", "pending")
+ 
+  resetCode                     String?      // For 6-digit code
+  resetCodeExpiry               DateTime?    // Expiration time (e.g., 10 minutes after sending)
+ 
   createdAt                     DateTime                        @default(now()) @map(name: "created_at")
   updatedAt                     DateTime                        @updatedAt @map(name: "updated_at")
 

@@ -48,7 +48,7 @@ const AreYouSureDialog = ({
           <AlertDialogCancel onClick={onClose} disabled={loading}>
             Cancel
           </AlertDialogCancel>
-          <Button onClick={handleConfirm} disabled={loading} className="btn">
+          <Button onClick={handleConfirm} disabled={loading}>
             {loading ? <LoadingSpinner /> : buttonTitle}
           </Button>
         </AlertDialogFooter>
